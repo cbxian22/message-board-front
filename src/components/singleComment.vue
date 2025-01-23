@@ -8,7 +8,9 @@ const comments = ref([]);
 // 獲取留言
 const fetchComments = async () => {
   try {
-    const response = await axios.get("http://localhost:3000/api/posts");
+    const response = await axios.get(
+      "https://message-board-server-7yot.onrender.com/api/posts"
+    );
 
     if (response.status === 200 && Array.isArray(response.data)) {
       comments.value = response.data.map((comment) => ({

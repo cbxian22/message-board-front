@@ -69,7 +69,7 @@ const handleReply = async () => {
   try {
     // 使用 userId 構建正确的 API 路徑
     const response = await axios.post(
-      `http://localhost:3000/api/replies/${route.params.id}/${userId}`,
+      `https://message-board-server-7yot.onrender.com/api/replies/${route.params.id}/${userId}`,
       {
         content: newReply.value,
       },

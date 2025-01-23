@@ -56,11 +56,14 @@ const login = async () => {
   }
 
   try {
-    const response = await axios.post("http://localhost:3000/api/login", {
-      username: username.value,
-      password: password.value,
-      role: role.value,
-    });
+    const response = await axios.post(
+      "https://message-board-server-7yot.onrender.com/api/login",
+      {
+        username: username.value,
+        password: password.value,
+        role: role.value,
+      }
+    );
 
     console.log(response.data); // 獲取後端響應(含生成令牌token)
 
