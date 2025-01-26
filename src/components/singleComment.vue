@@ -9,7 +9,8 @@ const comments = ref([]);
 const fetchComments = async () => {
   try {
     const response = await axios.get(
-      "https://message-board-server-7yot.onrender.com/api/posts"
+      // "https://message-board-server-7yot.onrender.com/api/posts"
+      "http://localhost:3000/api/posts"
     );
 
     if (response.status === 200 && Array.isArray(response.data)) {

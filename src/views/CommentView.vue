@@ -12,7 +12,8 @@ const route = useRoute();
 const fetchComment = async () => {
   try {
     const response = await axios.get(
-      `http://localhost:3000/api/posts/${route.params.id}`
+      // `http://localhost:3000/api/posts/${route.params.id}`
+      `https://message-board-server-7yot.onrender.com/api/posts/${route.params.id}`
     );
     if (response.status === 200) {
       comment.value = response.data;
@@ -31,7 +32,8 @@ const fetchComment = async () => {
 const fetchReplies = async () => {
   try {
     const response = await axios.get(
-      `http://localhost:3000/api/replies/${route.params.id}`
+      // `http://localhost:3000/api/replies/${route.params.id}`
+      `https://message-board-server-7yot.onrender.com/api/replies/${route.params.id}`
     );
     if (response.status === 200) {
       replies.value = response.data;
@@ -70,6 +72,7 @@ const handleReply = async () => {
     // 使用 userId 構建正确的 API 路徑
     const response = await axios.post(
       `https://message-board-server-7yot.onrender.com/api/replies/${route.params.id}/${userId}`,
+      // `http://localhost:3000/api/replies/${route.params.id}/${userId}`,
       {
         content: newReply.value,
       },

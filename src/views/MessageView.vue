@@ -44,6 +44,7 @@ const handleMessage = async () => {
     // 使用 userId 構建正确的 API 路徑
     const response = await axios.post(
       `https://message-board-server-7yot.onrender.com/api/posts/${userId}`,
+      // `http://localhost:3000/api/posts/${userId}`,
       {
         title: messagetitle.value,
         content: content.value,

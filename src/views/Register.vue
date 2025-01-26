@@ -52,6 +52,7 @@ const handleRegister = async () => {
   try {
     const response = await axios.post(
       "https://message-board-server-7yot.onrender.com/api/register",
+      // "http://localhost:3000/api/register",
       {
         name: name.value,
         username: username.value,
