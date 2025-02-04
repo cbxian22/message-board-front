@@ -1,9 +1,10 @@
 <script setup>
-import { ref, onMounted } from "vue";
+import { ref, onMounted, onUnmounted } from "vue";
 import axios from "axios";
 import { useRouter } from "vue-router";
 const router = useRouter();
 const comments = ref([]);
+let socket = null;
 
 // 獲取留言
 const fetchComments = async () => {
@@ -49,8 +50,33 @@ const goToCommentPage = (id) => {
   router.push({ name: "Comment", params: { id } });
 };
 
-// 組件加載時獲取留言
-onMounted(fetchComments);
+// 連接 WebSocket 並監聽新留言
+const connectWebSocket = () => {
+  socket = new WebSocket("wss://你的後端伺服器網址"); // 換成你的 WebSocket 伺服器網址
+
+  socket.onmessage = (event) => {
+    console.log("收到 WebSocket 訊息:", event.data);
+    fetchComments(); // 重新獲取留言
+  };
+
+  socket.onclose = () => {
+    console.log("WebSocket 連線已關閉");
+    setTimeout(connectWebSocket, 3000); // 3 秒後重新連線
+  };
+};
+
+// 頁面加載時執行
+onMounted(() => {
+  fetchComments();
+  connectWebSocket();
+});
+
+// 離開頁面時關閉 WebSocket
+onUnmounted(() => {
+  if (socket) {
+    socket.close();
+  }
+});
 </script>
 
 <template>
