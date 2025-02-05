@@ -1,7 +1,9 @@
 <script setup>
 import { ref, onMounted } from "vue";
+import { useSocketStore } from "../stores/socketStore";
 import axios from "axios";
 import { useRouter } from "vue-router";
+const socketStore = useSocketStore();
 const router = useRouter();
 const comments = ref([]);
 
@@ -52,6 +54,7 @@ const goToCommentPage = (id) => {
 // 頁面加載時執行
 onMounted(() => {
   fetchComments();
+  socketStore.connect();
 });
 </script>
 
