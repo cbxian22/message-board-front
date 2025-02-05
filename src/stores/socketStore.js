@@ -1,42 +1,49 @@
-// stores/webSocketStore.js
+import { defineStore } from "pinia";
 
-export const useWebSocketStore = defineStore("webSocket", {
+export const useSocketStore = defineStore("socket", {
   state: () => ({
-    socket: null, // WebSocket 物件
-    messages: [], // 儲存收到的訊息
-    isConnected: false, // WebSocket 連線狀態
+    socket: null,
+    messages: [],
   }),
-
   actions: {
-    // 建立 WebSocket 連接
     connect() {
+      // 如果已經有連接且 WebSocket 狀態是開啟的，則不再建立新的連接
+      if (this.socket && this.socket.readyState === WebSocket.OPEN) return;
+
+      // 建立新的 WebSocket 連接
       this.socket = new WebSocket(
         "wss://message-board-server-7yot.onrender.com"
       );
 
-      this.socket.onopen = () => {
-        this.isConnected = true;
-        console.log("Connected to server");
-      };
-
+      // 處理收到的訊息
       this.socket.onmessage = (event) => {
-        this.messages.push(event.data); // 儲存收到的訊息
-        console.log("Received:", event.data);
+        const message = JSON.parse(event.data);
+        if (message.type === "new_message") {
+          // 新的留言，將其添加到前端
+          this.messages.unshift(message.data);
+        }
       };
 
+      // 處理 WebSocket 關閉事件，並嘗試重連
       this.socket.onclose = () => {
-        this.isConnected = false;
-        console.log("Disconnected from server");
+        console.log("WebSocket disconnected, attempting to reconnect...");
+        setTimeout(() => this.connect(), 3000); // 3秒後重連
+      };
+
+      // 可選：處理錯誤事件
+      this.socket.onerror = (error) => {
+        console.error("WebSocket error:", error);
       };
     },
 
-    // 發送訊息
+    // 可以新增發送訊息的功能
     sendMessage(message) {
       if (this.socket && this.socket.readyState === WebSocket.OPEN) {
-        this.socket.send(message);
-        console.log("Sent:", message);
+        this.socket.send(
+          JSON.stringify({ type: "new_message", data: message })
+        );
       } else {
-        console.log("WebSocket is not connected");
+        console.error("WebSocket is not connected.");
       }
     },
   },
