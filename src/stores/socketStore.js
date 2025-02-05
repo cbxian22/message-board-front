@@ -15,6 +15,11 @@ export const useSocketStore = defineStore("socket", {
         "wss://message-board-server-7yot.onrender.com"
       );
 
+      // 處理連接成功事件
+      this.socket.onopen = () => {
+        console.log("WebSocket connected successfully");
+      };
+
       // 處理收到的訊息
       this.socket.onmessage = (event) => {
         const message = JSON.parse(event.data);
