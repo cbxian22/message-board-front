@@ -52,7 +52,9 @@ const goToCommentPage = (id) => {
 
 // 連接 WebSocket 並監聽新留言
 const connectWebSocket = () => {
-  socket = new WebSocket("wss://你的後端伺服器網址"); // 換成你的 WebSocket 伺服器網址
+  socket = new WebSocket(
+    "wss://https://message-board-server-7yot.onrender.com"
+  ); // 換成你的 WebSocket 伺服器網址
 
   socket.onmessage = (event) => {
     console.log("收到 WebSocket 訊息:", event.data);
