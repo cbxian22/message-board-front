@@ -18,6 +18,7 @@ export const useSocketStore = defineStore("socket", {
       // 處理連接成功事件
       this.socket.onopen = () => {
         console.log("WebSocket connected successfully");
+        console.log("WebSocket readyState:", this.socket.readyState);
       };
 
       // 處理收到的訊息
@@ -44,9 +45,9 @@ export const useSocketStore = defineStore("socket", {
     // 可以新增發送訊息的功能
     sendMessage(message) {
       if (this.socket && this.socket.readyState === WebSocket.OPEN) {
-        this.socket.send(
-          JSON.stringify({ type: "new_message", data: message })
-        );
+        const msg = JSON.stringify({ type: "new_message", data: message });
+        console.log("Sending message:", msg); // 在這裡查看是否確實發送訊息
+        this.socket.send(msg);
       } else {
         console.error("WebSocket is not connected.");
       }
