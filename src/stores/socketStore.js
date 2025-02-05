@@ -24,9 +24,11 @@ export const useSocketStore = defineStore("socket", {
       // 處理收到的訊息
       this.socket.onmessage = (event) => {
         const message = JSON.parse(event.data);
-        if (message.type === "new_message") {
+        console.log("Received message from server:", message); // 確認收到訊息
+        // 假設訊息是 { title, content } 格式
+        if (message.title && message.content) {
           // 新的留言，將其添加到前端
-          this.messages.unshift(message.data);
+          this.messages.unshift(message);
         }
       };
 
@@ -42,10 +44,14 @@ export const useSocketStore = defineStore("socket", {
       };
     },
 
-    // 可以新增發送訊息的功能
+    // 發送訊息的功能
     sendMessage(message) {
       if (this.socket && this.socket.readyState === WebSocket.OPEN) {
-        const msg = JSON.stringify({ type: "new_message", data: message });
+        // 這裡發送的訊息將是 { title, content }
+        const msg = JSON.stringify({
+          title: message.title,
+          content: message.content,
+        });
         console.log("Sending message:", msg); // 在這裡查看是否確實發送訊息
         this.socket.send(msg);
       } else {

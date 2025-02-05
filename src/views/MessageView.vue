@@ -32,9 +32,13 @@
 import { ref } from "vue";
 import axios from "../stores/axiosConfig"; // 引入统一配置后的 axios
 import { useRouter } from "vue-router";
+import { useSocketStore } from "../stores/socketStore"; // 引入 WebSocket Store
 const router = useRouter();
 const messagetitle = ref("");
 const content = ref("");
+
+// 使用 Pinia Store 發送 WebSocket 訊息
+const socketStore = useSocketStore();
 
 const handleMessage = async () => {
   const userId = localStorage.getItem("userId");
@@ -61,6 +65,13 @@ const handleMessage = async () => {
       // alert("留言成功！");
       messagetitle.value = "";
       content.value = "";
+
+      // 發送 WebSocket 訊息
+      socketStore.sendMessage({
+        title: messagetitle.value,
+        content: content.value,
+      });
+
       router.push("/");
     } else {
       alert("留言提交失敗");
