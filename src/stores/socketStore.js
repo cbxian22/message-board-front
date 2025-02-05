@@ -1,28 +1,43 @@
-import { defineStore } from "pinia";
+// stores/webSocketStore.js
 
-export const useSocketStore = defineStore("socket", {
+export const useWebSocketStore = defineStore("webSocket", {
   state: () => ({
-    socket: null,
-    messages: [],
+    socket: null, // WebSocket 物件
+    messages: [], // 儲存收到的訊息
+    isConnected: false, // WebSocket 連線狀態
   }),
+
   actions: {
+    // 建立 WebSocket 連接
     connect() {
-      if (this.socket) return;
       this.socket = new WebSocket(
         "wss://message-board-server-7yot.onrender.com"
       );
 
+      this.socket.onopen = () => {
+        this.isConnected = true;
+        console.log("Connected to server");
+      };
+
       this.socket.onmessage = (event) => {
-        const message = JSON.parse(event.data);
-        if (message.type === "new_message") {
-          this.messages.unshift(message.data);
-        }
+        this.messages.push(event.data); // 儲存收到的訊息
+        console.log("Received:", event.data);
       };
 
       this.socket.onclose = () => {
-        console.log("WebSocket disconnected, attempting to reconnect...");
-        setTimeout(() => this.connect(), 3000);
+        this.isConnected = false;
+        console.log("Disconnected from server");
       };
+    },
+
+    // 發送訊息
+    sendMessage(message) {
+      if (this.socket && this.socket.readyState === WebSocket.OPEN) {
+        this.socket.send(message);
+        console.log("Sent:", message);
+      } else {
+        console.log("WebSocket is not connected");
+      }
     },
   },
 });
