@@ -1,6 +1,6 @@
 <template>
   <div class="homepage">
-    <h1 class="page-title">留言板</h1>
+    <h1 class="page-title">此網站將不斷更新...</h1>
     <!-- 新增留言按鈕 -->
     <button @click="goToMessagePage" class="add-comment-btn">新增留言</button>
     <div v-if="aru" class="aru">
