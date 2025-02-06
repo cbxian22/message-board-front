@@ -18,12 +18,12 @@
             >貼文時間: {{ formatDate(comment.timestamp) }}</span
           >
         </div> -->
-        <p v-if="comment.file_url" class="comment-file">
+        <!-- <p v-if="comment.file_url" class="comment-file">
           附件: <a :href="comment.file_url" target="_blank">下載</a>
         </p>
         <button @click="goToCommentPage(comment.id)" class="view-button">
           查看及回覆
-        </button>
+        </button> -->
       </div>
     </div>
     <singleComment />
