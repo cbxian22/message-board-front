@@ -3,7 +3,7 @@
     <h1 class="page-title">留言板</h1>
     <!-- 新增留言按鈕 -->
     <button @click="goToMessagePage" class="add-comment-btn">新增留言</button>
-    <div>
+    <div v-if="aru" class="aru">
       <h1>最新留言</h1>
       <div
         v-for="(message, index) in socketStore.messages"
@@ -32,12 +32,15 @@
 </template>
 
 <script setup>
-import { onMounted } from "vue";
+import { computed, onMounted } from "vue";
 import { useSocketStore } from "../stores/socketStore";
 import singleComment from "../components/singleComment.vue";
 const socketStore = useSocketStore();
 import { useRouter } from "vue-router";
 const router = useRouter();
+
+// 計算是否有新留言
+const aru = computed(() => socketStore.messages.length > 0);
 
 // 跳轉到 MessageView
 const goToMessagePage = () => {
@@ -205,5 +208,10 @@ onMounted(() => {
 .view-button:hover {
   background-color: #0056b3;
   transform: translateY(-3px);
+}
+
+.aru {
+  border-bottom: 1px solid black;
+  padding: 20px 0 20px 0;
 }
 </style>
