@@ -1,38 +1,34 @@
 <template>
   <div class="login-container">
-    <h1>留言板</h1>
-    <form @submit.prevent="login">
-      <div class="form-group">
+    <div class="logo">
+      <h1>留言板</h1>
+    </div>
+
+    <form @submit.prevent="login" class="form-container">
+      <!-- <div class="form-group">
         <label for="role">角色</label>
         <select id="role" v-model="role" required>
           <option value="user">使用者</option>
           <option value="admin">管理員</option>
         </select>
+      </div> -->
+
+      <div class="form-group">
+        <label :class="{ active: username }" class="floating-label">
+          <input id="username" type="text" v-model="username" required />
+          <span>輸入用戶帳號</span>
+        </label>
       </div>
 
       <div class="form-group">
-        <label for="username">用戶帳號:</label>
-        <input
-          id="username"
-          type="text"
-          v-model="username"
-          placeholder="輸入用戶帳號"
-          required
-        />
+        <label :class="{ active: password }" class="floating-label">
+          <input id="password" type="password" v-model="password" required />
+          <span>輸入密碼</span>
+        </label>
       </div>
-
       <div class="form-group">
-        <label for="password">密碼</label>
-        <input
-          id="password"
-          type="password"
-          v-model="password"
-          placeholder="輸入密碼"
-          required
-        />
+        <button type="submit" class="btn">登入</button>
       </div>
-
-      <button type="submit" class="btn">登入</button>
     </form>
   </div>
 </template>
@@ -84,43 +80,72 @@ const login = async () => {
 
 <style scoped>
 .login-container {
-  max-width: 400px;
-  width: 100%; /* 確保容器的寬度為 100% */
-  margin: 0 auto;
-  padding: 20px;
+  width: 350px;
+  padding: 20px 0;
   border: 1px solid #ccc;
-  border-radius: 8px;
-  background-color: #f9f9f9;
-
-  /* 使用絕對定位將容器置中 */
+  border-radius: 2px;
+  background-color: black;
   position: absolute;
   top: 50%;
   left: 50%;
-  transform: translate(-50%, -50%); /* 確保元素的中心點與視窗中心對齊 */
+  transform: translate(-50%, -50%);
 }
 
-h1 {
+.logo {
+  padding: 20px 0;
+}
+
+.logo h1 {
   text-align: center;
+  color: #fff;
+}
+
+/* --------- */
+.form-container {
+  display: flex;
+  flex-direction: column;
 }
 
 .form-group {
-  margin-bottom: 15px;
+  margin: 10px 0 0 0;
+  width: 80%;
+  align-self: center;
 }
 
-label {
-  display: block;
-  margin-bottom: 5px;
-  font-weight: bold;
+/* 輸入框樣式 */
+.floating-label {
+  position: relative;
 }
 
-input,
-select {
+.floating-label input {
   width: 100%;
-  padding: 8px;
-  margin-bottom: 10px;
+  background-color: black;
+  color: #fff;
+  padding: 10px 10px 5px;
+  font-size: 16px;
   border: 1px solid #ccc;
-  border-radius: 4px;
+  border-radius: 2px;
+  outline: none;
+  transition: border 0.3s;
 }
+
+/* 標籤文字 */
+.floating-label span {
+  position: absolute;
+  left: 12px;
+  top: 50%;
+  transform: translateY(-50%);
+  font-size: 14px;
+  color: #999;
+  transition: all 0.3s ease-in-out;
+  pointer-events: none;
+}
+/* 使用 Vue class 切換標籤位置 */
+.floating-label.active span {
+  top: 0px;
+  font-size: 12px;
+}
+/* --------- */
 
 button {
   width: 100%;
