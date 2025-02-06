@@ -62,15 +62,15 @@ const handleMessage = async () => {
 
     // 根據後端響應，而繼續
     if (response.status === 201) {
-      // alert("留言成功！");
-      messagetitle.value = "";
-      content.value = "";
-
       // 發送 WebSocket 訊息
       socketStore.sendMessage({
         title: messagetitle.value,
         content: content.value,
       });
+
+      // alert("留言成功！");
+      messagetitle.value = "";
+      content.value = "";
 
       router.push("/");
     } else {
