@@ -1,7 +1,17 @@
 <template>
   <div class="homepage">
     <h1 class="page-title">留言板</h1>
+    <div>
+      <h1>最新留言</h1>
+      <ul>
+        <li v-for="(message, index) in socketStore.messages" :key="index">
+          <strong>{{ message.title }}</strong
+          >: {{ message.content }}
+        </li>
+      </ul>
+    </div>
     <!-- 新增留言按鈕 -->
+
     <button @click="goToMessagePage" class="add-comment-btn">新增留言</button>
     <singleComment />
     <router-view></router-view>
@@ -9,7 +19,10 @@
 </template>
 
 <script setup>
+import { onMounted } from "vue";
+import { useSocketStore } from "../stores/socketStore";
 import singleComment from "../components/singleComment.vue";
+const socketStore = useSocketStore();
 import { useRouter } from "vue-router";
 const router = useRouter();
 
@@ -22,6 +35,10 @@ const goToMessagePage = () => {
   }
   router.push({ name: "Message" });
 };
+
+onMounted(() => {
+  socketStore.connect(); // 確保 WebSocket 連線
+});
 </script>
 
 <style scoped>
