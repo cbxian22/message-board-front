@@ -1,11 +1,12 @@
 <template>
-  <div class="login-container">
-    <div class="logo">
-      <h1>留言板</h1>
-    </div>
+  <div class="container-box">
+    <div class="container">
+      <div class="logo">
+        <h1>Boardxian</h1>
+      </div>
 
-    <form @submit.prevent="login" class="form-container">
-      <!-- <div class="form-group">
+      <form @submit.prevent="login" class="form-container">
+        <!-- <div class="form-group">
         <label for="role">角色</label>
         <select id="role" v-model="role" required>
           <option value="user">使用者</option>
@@ -13,23 +14,31 @@
         </select>
       </div> -->
 
-      <div class="form-group">
-        <label :class="{ active: username }" class="floating-label">
-          <input id="username" type="text" v-model="username" required />
-          <span>輸入用戶帳號</span>
-        </label>
-      </div>
+        <div class="form-group">
+          <label :class="{ active: username }" class="floating-label">
+            <input id="username" type="text" v-model="username" required />
+            <span>輸入用戶帳號</span>
+          </label>
+        </div>
 
-      <div class="form-group">
-        <label :class="{ active: password }" class="floating-label">
-          <input id="password" type="password" v-model="password" required />
-          <span>輸入密碼</span>
-        </label>
+        <div class="form-group">
+          <label :class="{ active: password }" class="floating-label">
+            <input id="password" type="password" v-model="password" required />
+            <span>輸入密碼</span>
+          </label>
+        </div>
+        <div class="form-group">
+          <button type="submit" class="btn">登入</button>
+        </div>
+      </form>
+    </div>
+
+    <div class="container">
+      <div class="register">
+        <span>還沒有帳號嗎？</span>
+        <router-link to="/register" class="nav-link">註冊</router-link>
       </div>
-      <div class="form-group">
-        <button type="submit" class="btn">登入</button>
-      </div>
-    </form>
+    </div>
   </div>
 </template>
 
@@ -79,20 +88,22 @@ const login = async () => {
 </script>
 
 <style scoped>
-.login-container {
+.container-box {
+  margin-top: 100px;
+  display: flex;
+  flex-direction: column;
+  justify-self: center;
   width: 350px;
-  padding: 20px 0;
-  border: 1px solid #ccc;
+}
+.container {
+  margin-bottom: 10px;
+  padding: 30px 0;
+  border: 0.5px solid #aaa;
   border-radius: 2px;
-  background-color: black;
-  position: absolute;
-  top: 50%;
-  left: 50%;
-  transform: translate(-50%, -50%);
 }
 
 .logo {
-  padding: 20px 0;
+  padding: 30px 0;
 }
 
 .logo h1 {
@@ -104,12 +115,12 @@ const login = async () => {
 .form-container {
   display: flex;
   flex-direction: column;
+  align-items: center;
 }
 
 .form-group {
-  margin: 10px 0 0 0;
+  margin-top: 12px;
   width: 80%;
-  align-self: center;
 }
 
 /* 輸入框樣式 */
@@ -119,11 +130,9 @@ const login = async () => {
 
 .floating-label input {
   width: 100%;
-  background-color: black;
-  color: #fff;
-  padding: 10px 10px 5px;
+  padding: 10px 0px 8px 10px;
   font-size: 16px;
-  border: 1px solid #ccc;
+  border: 0.5px solid #aaa;
   border-radius: 2px;
   outline: none;
   transition: border 0.3s;
@@ -131,19 +140,24 @@ const login = async () => {
 
 /* 標籤文字 */
 .floating-label span {
+  padding-bottom: 10px;
   position: absolute;
-  left: 12px;
-  top: 50%;
+  left: 10px;
+  top: 70%;
   transform: translateY(-50%);
   font-size: 14px;
-  color: #999;
-  transition: all 0.3s ease-in-out;
+  color: #aaa;
+  transition: all;
   pointer-events: none;
+  background: none;
 }
 /* 使用 Vue class 切換標籤位置 */
 .floating-label.active span {
   top: 0px;
   font-size: 12px;
+}
+.floating-label.active input {
+  padding: 16px 0px 2px 10px;
 }
 /* --------- */
 
@@ -151,13 +165,21 @@ button {
   width: 100%;
   padding: 10px;
   background-color: #007bff;
-  color: #fff;
   border: none;
   border-radius: 4px;
   cursor: pointer;
 }
 
 button:hover {
-  background-color: #0056b3;
+  background-color: #007bff;
+}
+
+.register {
+  text-align: center;
+}
+
+.register a {
+  text-decoration: none;
+  color: #0056b3;
 }
 </style>
