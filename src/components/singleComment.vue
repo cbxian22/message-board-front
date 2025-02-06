@@ -54,7 +54,7 @@ const goToCommentPage = (id) => {
 // 頁面加載時執行
 onMounted(() => {
   fetchComments();
-  socketStore.connect();
+  // socketStore.connect();
 });
 </script>
 
