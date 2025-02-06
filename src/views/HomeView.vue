@@ -10,8 +10,8 @@
         :key="index"
         class="comment"
       >
-        <h3 class="comment-title">{{ message.title }}</h3>
-        <p class="comment-content">{{ message.content }}</p>
+        <h3 class="comment-title">{{ message.data.title }}</h3>
+        <p class="comment-content">{{ message.data.content }}</p>
         <!-- <div class="comment-meta">
           <span class="comment-author">貼文者: {{ comment.name }}</span>
           <span class="comment-time"
