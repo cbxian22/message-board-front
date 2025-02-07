@@ -15,13 +15,13 @@ const router = createRouter({
       path: "/login",
       name: "Login",
       component: () => import("../views/LoginView.vue"),
-      // meta: { requiresGuest: true },
+      meta: { requiresGuest: true },
     },
     {
       path: "/register",
       name: "Register",
       component: () => import("../views/Register.vue"),
-      // meta: { requiresGuest: true },
+      meta: { requiresGuest: true },
     },
     {
       path: "/message",
@@ -72,7 +72,7 @@ router.beforeEach((to, from, next) => {
   console.log("Checking auth status:", authStore.isLoggedIn); // 確認登入狀態
 
   if ((to.name === "Login" || to.name === "Register") && authStore.isLoggedIn) {
-    return next({ name: "Home" }); // 已登入者跳轉到首頁
+    next({ name: "Home" }); // 已登入者跳轉到首頁
   } else {
     next(); // 其他情況正常跳轉
   }
