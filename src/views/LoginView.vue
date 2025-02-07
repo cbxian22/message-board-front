@@ -84,7 +84,7 @@ const login = async () => {
     if (response.data.success) {
       const { token, userId } = response.data; // 儲存 token 和 userId
       authStore.login(token, userId); // 儲存進 pinia
-      router.push("/");
+      // router.push("/");
     } else {
       alert(response.data.message || "登錄失敗，請檢查用戶名或密碼！");
     }
