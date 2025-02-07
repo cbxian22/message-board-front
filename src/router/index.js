@@ -71,7 +71,7 @@ router.beforeEach((to, from, next) => {
   const authStore = useAuthStore();
   console.log("Checking auth status:", authStore.isLoggedIn); // 確認登入狀態
 
-  if ((to.name === "Login" || to.name === "Register") && authStore.isLoggedIn) {
+  if (to.meta.requiresGuest && authStore.isLoggedIn) {
     next({ name: "Home" }); // 已登入者跳轉到首頁
   } else {
     next(); // 其他情況正常跳轉
