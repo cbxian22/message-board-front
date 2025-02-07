@@ -66,4 +66,15 @@ const router = createRouter({
 //   }
 // });
 
+// 路由守衛：登入者不可訪問 login
+router.beforeEach((to, from, next) => {
+  const authStore = useAuthStore();
+  if (to.meta.requiresGuest && authStore.isLoggedIn) {
+    console.log("已登入，跳轉到首頁");
+    next("/:pathMatch(.*)*"); // 防止已登入者進入登入頁
+  } else {
+    next();
+  }
+});
+
 export default router;

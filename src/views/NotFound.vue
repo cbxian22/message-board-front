@@ -1,7 +1,8 @@
 <template>
   <div class="not-found">
-    <h1>404 - Page Not Found</h1>
-    <p>The page you are looking for does not exist.</p>
+    <h1>很抱歉，此頁面無法使用。</h1>
+    <p>你點擊的連結可能發生故障，或該頁面已遭移除。</p>
+    <router-link to="/" class="nav-link">返回 Boardxian。</router-link>
   </div>
 </template>
 
