@@ -15,13 +15,13 @@ const router = createRouter({
       path: "/login",
       name: "Login",
       component: () => import("../views/LoginView.vue"),
-      // meta: { requiresGuest: true },
+      meta: { requiresGuest: true },
     },
     {
       path: "/register",
       name: "Register",
       component: () => import("../views/Register.vue"),
-      // meta: { requiresGuest: true },
+      meta: { requiresGuest: true },
     },
     {
       path: "/message",
@@ -37,13 +37,8 @@ const router = createRouter({
       // meta: { requiresGuest: true },
     },
 
-    // 捕捉所有未知路由，並重定向到 /404
     {
       path: "/:pathMatch(.*)*",
-      redirect: "/404",
-    },
-    {
-      path: "/404",
       name: "NotFound",
       component: () => import("../views/NotFound.vue"),
     },
@@ -74,11 +69,12 @@ const router = createRouter({
 // 路由守衛：登入者不可訪問 login
 router.beforeEach((to, from, next) => {
   const authStore = useAuthStore();
+  console.log(authStore.isLoggedIn);
 
   // 阻止已登入者訪問 Login 和 Register 頁面
-  if (authStore.isLoggedIn && (to.name === "Login" || to.name === "Register")) {
+  if (to.meta.requiresGuest && authStore.isLoggedIn) {
     console.log("已登入，跳轉到 404 頁面");
-    next("/404");
+    next("/:pathMatch(.*)*");
   } else {
     next(); // 其他情況正常跳轉
   }
