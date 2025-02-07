@@ -1,39 +1,52 @@
 <template>
-  <div class="register-container">
-    <h1>留言板</h1>
-    <form @submit.prevent="handleRegister">
-      <div class="form-group">
-        <label for="name">暱稱:</label>
-        <input
-          id="name"
-          v-model="name"
-          placeholder="輸入暱稱"
-          type="text"
-          required
-        />
+  <div class="container-box">
+    <div class="container">
+      <div class="logo">
+        <h1>Boardxian</h1>
       </div>
-      <div class="form-group">
-        <label for="username">用戶帳號:</label>
-        <input
-          id="username"
-          v-model="username"
-          placeholder="輸入用戶帳號"
-          type="text"
-          required
-        />
+
+      <form @submit.prevent="handleRegister" class="form-container">
+        <div class="form-group">
+          <label for="name" :class="{ active: name }" class="floating-label">
+            <input id="name" v-model="name" type="text" required />
+            <span>用戶名稱</span>
+          </label>
+        </div>
+
+        <div class="form-group">
+          <label
+            for="username"
+            :class="{ active: username }"
+            class="floating-label"
+          >
+            <input id="username" v-model="username" type="text" required />
+            <span>用戶帳號</span>
+          </label>
+        </div>
+
+        <div class="form-group">
+          <label
+            for="password"
+            :class="{ active: password }"
+            class="floating-label"
+          >
+            <input id="password" v-model="password" type="password" required />
+            <span>用戶密碼</span>
+          </label>
+        </div>
+
+        <div class="form-group">
+          <button type="submit">註冊</button>
+        </div>
+      </form>
+    </div>
+
+    <div class="container">
+      <div class="login">
+        <span>還沒有帳號嗎？</span>
+        <router-link to="/login" class="nav-link">登入</router-link>
       </div>
-      <div class="form-group">
-        <label for="password">密碼:</label>
-        <input
-          id="password"
-          v-model="password"
-          placeholder="密碼"
-          type="password"
-          required
-        />
-      </div>
-      <button type="submit">註冊</button>
-    </form>
+    </div>
   </div>
 </template>
 
@@ -74,54 +87,98 @@ const handleRegister = async () => {
 </script>
 
 <style scoped>
-.register-container {
-  max-width: 400px;
-  width: 100%;
-  margin: 0 auto;
-  padding: 20px;
-  border: 1px solid #ccc;
-  border-radius: 8px;
-  background-color: #f9f9f9;
-
-  position: absolute;
-  top: 50%;
-  left: 50%;
-  transform: translate(-50%, -50%);
+.container-box {
+  margin-top: 100px;
+  display: flex;
+  flex-direction: column;
+  justify-self: center;
+  width: 350px;
+}
+.container {
+  margin-bottom: 10px;
+  padding: 30px 0;
+  border: 0.5px solid #aaa;
+  border-radius: 2px;
 }
 
-h1 {
+.logo {
+  padding: 30px 0;
+}
+
+.logo h1 {
   text-align: center;
+  color: #fff;
+}
+
+/* --------- */
+.form-container {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
 }
 
 .form-group {
-  margin-bottom: 15px;
+  margin-top: 12px;
+  width: 80%;
 }
 
-label {
-  display: block;
-  margin-bottom: 5px;
-  font-weight: bold;
+/* 輸入框樣式 */
+.floating-label {
+  position: relative;
 }
 
-input {
+.floating-label input {
   width: 100%;
-  padding: 8px;
-  margin-bottom: 10px;
-  border: 1px solid #ccc;
-  border-radius: 4px;
+  padding: 10px 0px 8px 10px;
+  font-size: 16px;
+  border: 0.5px solid #aaa;
+  border-radius: 2px;
+  outline: none;
+  transition: border 0.3s;
 }
+
+/* 標籤文字 */
+.floating-label span {
+  padding-bottom: 10px;
+  position: absolute;
+  left: 10px;
+  top: 70%;
+  transform: translateY(-50%);
+  font-size: 14px;
+  color: #aaa;
+  transition: all;
+  pointer-events: none;
+  background: none;
+}
+/* 使用 Vue class 切換標籤位置 */
+.floating-label.active span {
+  top: 0px;
+  font-size: 12px;
+}
+.floating-label.active input {
+  padding: 16px 0px 2px 10px;
+}
+/* --------- */
 
 button {
   width: 100%;
   padding: 10px;
   background-color: #007bff;
-  color: #fff;
   border: none;
   border-radius: 4px;
   cursor: pointer;
 }
 
 button:hover {
-  background-color: #0056b3;
+  background-color: #007bff;
+}
+
+.login {
+  text-align: center;
+}
+
+.login a {
+  text-decoration: none;
+  color: #0056b3;
 }
 </style>
