@@ -1,40 +1,44 @@
 <template>
-  <div class="homepage">
-    <h1 class="page-title">此網站將不斷更新...</h1>
-    <!-- 新增留言按鈕 -->
-    <button @click="goToMessagePage" class="add-comment-btn">新增留言</button>
-    <div v-if="aru" class="aru">
-      <h1>最新留言</h1>
-      <div
-        v-for="(message, index) in socketStore.messages"
-        :key="index"
-        class="comment"
-      >
-        <h3 class="comment-title">{{ message.data.title }}</h3>
-        <p class="comment-content">{{ message.data.content }}</p>
-        <!-- <div class="comment-meta">
+  <!-- <div class="homepage"> -->
+  <!-- <h1 class="page-title">此網站將不斷更新...</h1> -->
+  <!-- 新增留言按鈕 -->
+  <!-- <button @click="goToMessagePage" class="add-comment-btn">新增留言</button> -->
+
+  <div v-if="aru" class="aru">
+    <h1>最新留言</h1>
+    <div
+      v-for="(message, index) in socketStore.messages"
+      :key="index"
+      class="comment"
+    >
+      <h3 class="comment-title">{{ message.data.title }}</h3>
+      <p class="comment-content">{{ message.data.content }}</p>
+      <!-- <div class="comment-meta">
           <span class="comment-author">貼文者: {{ comment.name }}</span>
           <span class="comment-time"
             >貼文時間: {{ formatDate(comment.timestamp) }}</span
           >
         </div> -->
-        <!-- <p v-if="comment.file_url" class="comment-file">
+      <!-- <p v-if="comment.file_url" class="comment-file">
           附件: <a :href="comment.file_url" target="_blank">下載</a>
         </p>
         <button @click="goToCommentPage(comment.id)" class="view-button">
           查看及回覆
         </button> -->
-      </div>
     </div>
-    <singleComment />
-    <router-view></router-view>
   </div>
+
+  <!-- <singleComment /> -->
+  <Navbar />
+  <router-view></router-view>
+  <!-- </div> -->
 </template>
 
 <script setup>
 import { computed, onMounted } from "vue";
 import { useSocketStore } from "../stores/socketStore";
 import singleComment from "../components/singleComment.vue";
+import Navbar from "../components/Navbar.vue";
 const socketStore = useSocketStore();
 import { useRouter } from "vue-router";
 const router = useRouter();
@@ -43,14 +47,14 @@ const router = useRouter();
 const aru = computed(() => socketStore.messages.length > 0);
 
 // 跳轉到 MessageView
-const goToMessagePage = () => {
-  const token = localStorage.getItem("token");
-  if (!token) {
-    alert("請先登入以新增留言！");
-    return;
-  }
-  router.push({ name: "Message" });
-};
+// const goToMessagePage = () => {
+//   const token = localStorage.getItem("token");
+//   if (!token) {
+//     alert("請先登入以新增留言！");
+//     return;
+//   }
+//   router.push({ name: "Message" });
+// };
 
 onMounted(() => {
   socketStore.connect(); // 確保 WebSocket 連線

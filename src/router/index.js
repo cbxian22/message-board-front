@@ -9,7 +9,8 @@ const router = createRouter({
       path: "/",
       name: "Home",
       component: HomeView,
-      meta: { requiresAuth: true },
+      // meta: { requiresAuth: true },
+      meta: { requiresGuest: true },
     },
     {
       path: "/login",
@@ -26,7 +27,7 @@ const router = createRouter({
     {
       path: "/message",
       name: "Message",
-      component: () => import("../views/MessageView.vue"),
+      component: () => import("../components/MessageView.vue"),
       meta: { requiresGuest: true },
     },
     {
