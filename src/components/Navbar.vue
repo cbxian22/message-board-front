@@ -55,6 +55,9 @@ const checkTokenAndOpenModal = () => {
 <style scoped>
 /* 整體導航條 */
 nav {
+  width: 100%;
+  border-top: 0.5px solid #aaa;
+  position: fixed;
 }
 
 /* 項目列表樣式 */
@@ -62,7 +65,6 @@ nav ul {
   display: flex;
   justify-content: center;
   list-style-type: none;
-  width: 100%;
 }
 
 /* 項目間距 */

@@ -58,117 +58,105 @@ onMounted(() => {
 });
 </script>
 
+<!-- <script setup>
+import { ref } from "vue";
+
+const comments = ref([
+  {
+    id: 1,
+    photo: "https://fakeimg.pl/300/",
+    title: "這是第一個留言標題",
+    content: "這是第一個留言的內容，討論一些有趣的話題。",
+    name: "小明",
+    timestamp: 1675886200000,
+    file_url: "https://example.com/file1.pdf",
+  },
+  {
+    id: 2,
+    photo: "https://fakeimg.pl/300/",
+    title: "第二個留言標題，討論新技術",
+    content: "這是第二個留言的內容，分享一些關於最新技術的見解。",
+    name: "小華",
+    timestamp: 1675972600000,
+    file_url: "",
+  },
+  {
+    id: 3,
+    photo: "https://fakeimg.pl/300/",
+    title: "第三個留言標題，問問題",
+    content: "這是第三個留言的內容，這裡有一些問題等待解答。",
+    name: "小李",
+    timestamp: 1676059000000,
+    file_url: "https://example.com/file2.jpg",
+  },
+  {
+    id: 4,
+    photo: "https://fakeimg.pl/300/",
+    title: "聊天與討論，第四個留言",
+    content: "這是第四個留言的內容，這裡是關於一些生活中的趣事。",
+    name: "小張",
+    timestamp: 1676145400000,
+    file_url: "",
+  },
+]);
+
+const formatDate = (timestamp) => {
+  const date = new Date(timestamp);
+  return date.toLocaleString(); // 格式化日期時間
+};
+
+const goToCommentPage = (id) => {
+  console.log(`跳轉到留言頁面，留言ID: ${id}`);
+};
+</script> -->
+
 <template>
-  <div class="comment-list">
-    <div v-for="comment in comments" :key="comment.id" class="comment">
+  <div v-for="comment in comments" :key="comment.id" class="comment-box">
+    <div class="photo-content">
+      <img :src="comment.photo" alt="頭像" class="photo" />
+    </div>
+    <div class="comment">
+      <span class="comment-time"
+        >貼文時間: {{ formatDate(comment.timestamp) }}</span
+      >
       <h3 class="comment-title">{{ comment.title }}</h3>
       <p class="comment-content">{{ comment.content }}</p>
-      <div class="comment-meta">
-        <span class="comment-author">貼文者: {{ comment.name }}</span>
-        <span class="comment-time"
-          >貼文時間: {{ formatDate(comment.timestamp) }}</span
-        >
-      </div>
+      <!-- <span class="comment-author"> {{ comment.name }}</span> -->
+
       <p v-if="comment.file_url" class="comment-file">
         附件: <a :href="comment.file_url" target="_blank">下載</a>
       </p>
-      <button @click="goToCommentPage(comment.id)" class="view-button">
-        查看及回覆
-      </button>
+      <div>
+        <button @click="goToCommentPage(comment.id)" class="view-button">
+          回覆
+        </button>
+      </div>
     </div>
   </div>
 </template>
 
 <style scoped>
-/* 整體頁面容器 */
-.comment-list {
-  display: flex;
-  flex-direction: column;
-  align-items: center;
-  margin-top: 40px;
-  padding: 0 20px;
-}
-
-/* 每條留言的樣式 */
-.comment {
-  border-radius: 8px;
+.comment-box {
   padding: 20px;
-  margin: 20px 0;
-  width: 100%;
-  max-width: 800px;
-  transition: transform 0.3s ease, box-shadow 0.3s ease;
-}
-
-/* 當鼠標懸停在留言上時 */
-.comment:hover {
-  transform: translateY(-5px);
-}
-
-/* 標題樣式 */
-.comment-title {
-  font-size: 1.8rem;
-  font-weight: 600;
-  margin-bottom: 10px;
-  line-height: 1.3;
-}
-
-/* 內容樣式 */
-.comment-content {
-  font-size: 1rem;
-  margin-bottom: 15px;
-  line-height: 1.6;
-  overflow: hidden;
-  text-overflow: ellipsis;
-  display: -webkit-box;
-  --webkit-box-orient: vertical;
-  --webkit-line-clamp: 4;
-}
-
-/* 作者和時間樣式 */
-.comment-meta {
+  border-bottom: 0.5px solid rgba(170, 170, 170, 0.5);
   display: flex;
-  justify-content: space-between;
-  font-size: 0.9rem;
-  margin-bottom: 15px;
+  background-color: rgb(16, 16, 16);
 }
 
-.comment-author {
-  font-weight: 600;
+.photo-content {
+  background-color: transparent;
+  margin-right: 15px;
 }
 
-.comment-time {
-  font-style: italic;
+.comment {
+  flex: 1; /* 讓 comment 占滿剩餘空間 */
 }
-
-/* 附件樣式 */
-.comment-file {
-  font-size: 0.9rem;
-  color: #007bff;
-  margin-top: 10px;
+.comment > *,
+div {
+  background-color: transparent;
 }
-
-.comment-file a {
-  text-decoration: none;
-  color: #007bff;
-}
-
-.comment-file a:hover {
-  text-decoration: underline;
-}
-
-/* 按鈕樣式 */
-.view-button {
-  padding: 10px 20px;
-  background-color: #007bff;
-  border: none;
-  border-radius: 5px;
-  cursor: pointer;
-  font-size: 1rem;
-  transition: background-color 0.3s ease, transform 0.3s ease;
-}
-
-.view-button:hover {
-  background-color: #0056b3;
-  transform: translateY(-3px);
+.photo {
+  border-radius: 50%;
+  width: 50px;
 }
 </style>
