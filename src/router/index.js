@@ -69,13 +69,14 @@ const router = createRouter({
 // 路由守衛：登入者不可訪問 login
 router.beforeEach((to, from, next) => {
   const authStore = useAuthStore();
-  console.log(authStore.isLoggedIn);
+  console.log("Checking auth status:", authStore.isLoggedIn); // 確認登入狀態
 
-  // 阻止已登入者訪問 Login 和 Register 頁面，並重定向到 NotFound 頁面
+  // 如果已登入者訪問 Login 或 Register 頁面，重定向到 NotFound
   if ((to.name === "Login" || to.name === "Register") && authStore.isLoggedIn) {
     console.log("已登入，跳轉到 NotFound 頁面");
     next({ name: "NotFound" }); // 已登入者跳轉到 NotFound 頁面
   } else {
+    console.log("Navigating normally");
     next(); // 其他情況正常跳轉
   }
 });
