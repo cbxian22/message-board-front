@@ -53,12 +53,13 @@ onMounted(() => {
 </script>
 
 <style scoped>
-/* 整體容器 */
+/* 安插 singleComment 容器 */
 .container-box {
   width: 650px;
   display: flex;
   flex-direction: column;
   justify-self: center;
+  padding-bottom: 60px; /* 預留空間，避免被固定的 Navbar 擋住 */
 }
 
 /* 主標題 */

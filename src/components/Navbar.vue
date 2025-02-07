@@ -58,7 +58,9 @@ nav {
   width: 100%;
   border-top: 0.5px solid #aaa;
   position: fixed;
-  z-index: 10;
+  bottom: 0; /* 固定在視窗底部 */
+  left: 0;
+  z-index: 1000; /* 確保它不被其他元素遮擋 */
 }
 
 /* 項目列表樣式 */
