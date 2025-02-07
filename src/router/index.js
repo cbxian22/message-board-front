@@ -69,11 +69,13 @@ const router = createRouter({
 // 路由守衛：登入者不可訪問 login
 router.beforeEach((to, from, next) => {
   const authStore = useAuthStore();
-  if ((to.name === "Login" || to.name === "Register") && authStore.isLoggedIn) {
+
+  // 阻止已登入者訪問 Login 和 Register 頁面
+  if (authStore.isLoggedIn && (to.name === "Login" || to.name === "Register")) {
     console.log("已登入，跳轉到 404 頁面");
-    next("/:pathMatch(.*)*"); // 已登入者跳轉到 404 頁面
+    next("/:pathMatch(.*)*");
   } else {
-    next();
+    next(); // 其他情況正常跳轉
   }
 });
 
