@@ -18,14 +18,14 @@
       </li>
 
       <li>
-        <router-link to="/" class="nav-link">
-          <img :src="Accounticon" alt="Accounticon" />
+        <router-link to="/login" class="nav-link">
+          <img :src="Loginicon" alt="Loginicon" />
         </router-link>
       </li>
 
       <li v-if="authStore.isLoggedIn">
-        <router-link to="/login" class="nav-link">
-          <img :src="Loginicon" alt="Loginicon" />
+        <router-link to="/" class="nav-link">
+          <img :src="Accounticon" alt="Accounticon" />
         </router-link>
       </li>
 
