@@ -58,6 +58,7 @@ nav {
   width: 100%;
   border-top: 0.5px solid #aaa;
   position: fixed;
+  z-index: 10;
 }
 
 /* 項目列表樣式 */
