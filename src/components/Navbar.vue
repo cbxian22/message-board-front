@@ -23,15 +23,19 @@
         </router-link>
       </li>
 
-      <li v-if="authStore.isLoggedIn" class="nav-link">
-        <router-link to="/" @click.prevent="logout" class="nav-link"
-          >登出</router-link
-        >
+      <li v-if="authStore.isLoggedIn">
+        <router-link to="/login" class="nav-link">
+          <img :src="Loginicon" alt="Loginicon" />
+        </router-link>
       </li>
 
-      <li v-if="authStore.isLoggedIn" class="nav-link">
+      <!-- <li v-if="authStore.isLoggedIn" class="nav-link">
+        <router-link to="/" @click.prevent="logout">登出</router-link>
+      </li> -->
+
+      <!-- <li v-if="authStore.isLoggedIn" class="nav-link">
         <h4>Hi {{ authStore.userName }}</h4>
-      </li>
+      </li> -->
     </ul>
   </nav>
 
@@ -51,6 +55,7 @@ import Homeicon from "../assets/Homeicon.svg";
 import Searchicon from "../assets/Searchicon.svg";
 import Addicon from "../assets/Addicon.svg";
 import Accounticon from "../assets/Accounticon.svg";
+import Loginicon from "../assets/Loginicon.svg";
 
 const authStore = useAuthStore();
 authStore.checkLoginStatus();
