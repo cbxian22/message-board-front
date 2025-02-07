@@ -37,8 +37,13 @@ const router = createRouter({
       // meta: { requiresGuest: true },
     },
 
+    // 捕捉所有未知路由，並重定向到 /404
     {
       path: "/:pathMatch(.*)*",
+      redirect: "/404",
+    },
+    {
+      path: "/404",
       name: "NotFound",
       component: () => import("../views/NotFound.vue"),
     },
