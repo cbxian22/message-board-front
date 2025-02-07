@@ -1,5 +1,6 @@
 import { createRouter, createWebHistory } from "vue-router";
 import { useAuthStore } from "@/stores/authStore"; // 引入 Pinia 授權管理
+import { nextTick } from "vue";
 import HomeView from "../views/HomeView.vue";
 
 const router = createRouter({
