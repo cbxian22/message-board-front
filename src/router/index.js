@@ -15,13 +15,13 @@ const router = createRouter({
       path: "/login",
       name: "Login",
       component: () => import("../views/LoginView.vue"),
-      meta: { requiresGuest: true },
+      // meta: { requiresGuest: true },
     },
     {
       path: "/register",
       name: "Register",
       component: () => import("../views/Register.vue"),
-      meta: { requiresGuest: true },
+      // meta: { requiresGuest: true },
     },
     {
       path: "/message",
@@ -67,18 +67,24 @@ const router = createRouter({
 // });
 
 // 如果已登入者訪問 Login 或 Register 頁面，重定向到首頁
-const authStore = useAuthStore();
 router.beforeEach((to, from, next) => {
-  console.log("前往的路由:", to.name);
-  console.log("requiresGuest:", to.meta.requiresGuest);
-  console.log("當前登入狀態:", authStore.isLoggedIn);
+  const authStore = useAuthStore();
 
-  if (to.meta.requiresGuest && authStore.isLoggedIn) {
-    console.log("阻止訪問，重定向到首頁");
-    return next({ name: "Home" });
-  }
+  // 當 isLoggedIn 狀態變更時，確保狀態已更新後再進行導航檢查
+  nextTick(() => {
+    console.log("Checking auth status:", authStore.isLoggedIn); // 確認最新的登入狀態
 
-  next();
+    // 如果已登入且正在訪問 Login 或 Register 頁面，重定向到首頁
+    if (
+      (to.name === "Login" || to.name === "Register") &&
+      authStore.isLoggedIn
+    ) {
+      console.log("已登入，跳轉到首頁");
+      return next({ name: "Home" }); // 已登入的使用者跳轉到首頁
+    }
+
+    next(); // 其他情況正常導航
+  });
 });
 
 export default router;
