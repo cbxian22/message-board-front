@@ -72,7 +72,6 @@ onMounted(() => {
 .page-title {
   font-size: 2rem;
   font-weight: bold;
-  color: #333;
   text-align: center;
   margin-bottom: 20px;
 }
@@ -122,14 +121,11 @@ onMounted(() => {
 
 /* 每條留言的樣式 */
 .comment {
-  background-color: #fff;
   border-radius: 8px;
   padding: 20px;
   margin: 20px 0;
   width: 100%;
   max-width: 800px;
-  box-shadow: 0 4px 20px rgba(0, 0, 0, 0.1);
-  transition: transform 0.3s ease, box-shadow 0.3s ease;
 }
 
 /* 當鼠標懸停在留言上時 */
@@ -142,7 +138,6 @@ onMounted(() => {
 .comment-title {
   font-size: 1.8rem;
   font-weight: 600;
-  color: #333;
   margin-bottom: 10px;
   line-height: 1.3;
 }
@@ -150,14 +145,10 @@ onMounted(() => {
 /* 內容樣式 */
 .comment-content {
   font-size: 1rem;
-  color: #555;
   margin-bottom: 15px;
   line-height: 1.6;
   overflow: hidden;
   text-overflow: ellipsis;
-  display: -webkit-box;
-  --webkit-box-orient: vertical;
-  --webkit-line-clamp: 4;
 }
 
 /* 作者和時間樣式 */
@@ -165,7 +156,6 @@ onMounted(() => {
   display: flex;
   justify-content: space-between;
   font-size: 0.9rem;
-  color: #777;
   margin-bottom: 15px;
 }
 
@@ -197,7 +187,6 @@ onMounted(() => {
 .view-button {
   padding: 10px 20px;
   background-color: #007bff;
-  color: white;
   border: none;
   border-radius: 5px;
   cursor: pointer;
