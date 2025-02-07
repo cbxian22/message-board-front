@@ -73,7 +73,7 @@ router.beforeEach((to, from, next) => {
   // 阻止已登入者訪問 Login 和 Register 頁面
   if (authStore.isLoggedIn && (to.name === "Login" || to.name === "Register")) {
     console.log("已登入，跳轉到 404 頁面");
-    next("/:pathMatch(.*)*");
+    next("/404");
   } else {
     next(); // 其他情況正常跳轉
   }
