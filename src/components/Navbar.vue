@@ -1,10 +1,26 @@
 <template>
   <nav>
     <ul>
-      <li><router-link to="/" class="nav-link">首頁</router-link></li>
+      <li>
+        <router-link to="/" class="nav-link">
+          <img :src="Homeicon" alt="Homeicon" />
+        </router-link>
+      </li>
+      <li>
+        <router-link to="/" class="nav-link">
+          <img :src="Searchicon" alt="Searchicon" />
+        </router-link>
+      </li>
+      <li>
+        <button @click="checkTokenAndOpenModal" class="nav-link">
+          <img :src="Addicon" alt="Addicon" />
+        </button>
+      </li>
 
       <li>
-        <button @click="checkTokenAndOpenModal" class="nav-link">+</button>
+        <router-link to="/" class="nav-link">
+          <img :src="Accounticon" alt="Accounticon" />
+        </router-link>
       </li>
 
       <li v-if="authStore.isLoggedIn">
@@ -31,6 +47,10 @@ import { ref } from "vue";
 import { useAuthStore } from "../stores/authStore";
 import Message from "../components/MessageView.vue";
 import Login from "../components/LoginModal.vue";
+import Homeicon from "../assets/Homeicon.svg";
+import Searchicon from "../assets/Searchicon.svg";
+import Addicon from "../assets/Addicon.svg";
+import Accounticon from "../assets/Accounticon.svg";
 
 const authStore = useAuthStore();
 authStore.checkLoginStatus();
@@ -55,6 +75,8 @@ const checkTokenAndOpenModal = () => {
 <style scoped>
 /* 整體導航條 */
 nav {
+  display: flex;
+  justify-content: center;
   width: 100%;
   border-top: 0.5px solid #aaa;
   position: fixed;
@@ -66,8 +88,8 @@ nav {
 /* 項目列表樣式 */
 nav ul {
   display: flex;
-  justify-content: center;
-  list-style-type: none;
+  justify-content: space-around;
+  width: 60%;
 }
 
 /* 項目間距 */
@@ -83,11 +105,13 @@ nav ul li {
   cursor: default;
 }
 
-/* 頁面鏈接 */
 .nav-link {
-  text-decoration: none;
-  font-size: 1rem;
-  padding: 15px 25px;
+  display: flex; /* 讓 a 內的內容可以對齊 */
+  align-items: center; /* 垂直置中 */
+  justify-content: center; /* 水平置中（可選） */
+  cursor: pointer;
+  padding: 10px 25px;
+  margin: 5px 0;
   border-radius: 10px;
   transition: background-color 0.3s ease, color 0.3s ease;
 }
