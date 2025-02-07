@@ -17,7 +17,6 @@ export const useAuthStore = defineStore("auth", {
     userId: null,
     userName: "",
     role: "",
-    needsLoginModal: false,
   }),
   actions: {
     login(token) {
@@ -34,8 +33,6 @@ export const useAuthStore = defineStore("auth", {
         localStorage.setItem("userName", this.userName);
         localStorage.setItem("role", this.role);
       }
-
-      this.needsLoginModal = false; // 成功登入後關閉彈窗
     },
     logout() {
       this.isLoggedIn = false;
@@ -60,8 +57,6 @@ export const useAuthStore = defineStore("auth", {
           this.logout();
         }
       }
-
-      this.needsLoginModal = false;
     },
   },
 });

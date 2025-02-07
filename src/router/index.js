@@ -53,11 +53,8 @@ router.beforeEach((to, from, next) => {
 
   // 如果需要登入的頁面且未登入
   if (to.meta.requiresAuth && !authStore.isLoggedIn) {
-    // console.log("未登入，跳轉到 /login");
-    // next("/login"); // 如果未登入，跳轉到登入頁
-    console.log("未登入，顯示登入彈窗");
-    authStore.needsLoginModal = true; // 設定需要登入彈窗
-    next(false); // 停止導航，不跳轉
+    console.log("未登入，跳轉到 /");
+    next("/"); // 如果未登入，跳轉到登入頁
   }
   // 如果需要未登入用戶訪問的頁面，且用戶已登入
   else if (to.meta.requiresGuest && authStore.isLoggedIn) {
