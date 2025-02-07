@@ -9,8 +9,8 @@ const router = createRouter({
       path: "/",
       name: "Home",
       component: HomeView,
-      // meta: { requiresAuth: true },
-      meta: { requiresGuest: true },
+      meta: { requiresAuth: true },
+      // meta: { requiresGuest: true },
     },
     {
       path: "/login",
