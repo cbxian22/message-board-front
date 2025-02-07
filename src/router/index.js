@@ -66,15 +66,13 @@ const router = createRouter({
 //   }
 // });
 
-// 路由守衛：登入者不可訪問 login
+// 如果已登入者訪問 Login 或 Register 頁面，重定向到首頁
 router.beforeEach((to, from, next) => {
   const authStore = useAuthStore();
   console.log("Checking auth status:", authStore.isLoggedIn); // 確認登入狀態
 
-  // 如果已登入者訪問 Login 或 Register 頁面，重定向到首頁
   if ((to.name === "Login" || to.name === "Register") && authStore.isLoggedIn) {
-    console.log("已登入，跳轉到首頁");
-    next({ name: "Home" }); // 已登入者跳轉到首頁
+    return next({ name: "Home" }); // 已登入者跳轉到首頁
   } else {
     next(); // 其他情況正常跳轉
   }
