@@ -67,8 +67,8 @@ const router = createRouter({
 // });
 
 // 如果已登入者訪問 Login 或 Register 頁面，重定向到首頁
+const authStore = useAuthStore();
 router.beforeEach((to, from, next) => {
-  const authStore = useAuthStore();
   console.log("前往的路由:", to.name);
   console.log("requiresGuest:", to.meta.requiresGuest);
   console.log("當前登入狀態:", authStore.isLoggedIn);
