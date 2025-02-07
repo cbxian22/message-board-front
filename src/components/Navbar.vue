@@ -23,13 +23,13 @@
         </router-link>
       </li>
 
-      <li v-if="authStore.isLoggedIn">
+      <li v-if="authStore.isLoggedIn" class="nav-link">
         <router-link to="/" @click.prevent="logout" class="nav-link"
           >登出</router-link
         >
       </li>
 
-      <li v-if="authStore.isLoggedIn" class="username">
+      <li v-if="authStore.isLoggedIn" class="nav-link">
         <h4>Hi {{ authStore.userName }}</h4>
       </li>
     </ul>
@@ -95,14 +95,6 @@ nav ul {
 /* 項目間距 */
 nav ul li {
   display: flex;
-}
-
-/* 用戶名顯示 */
-.username {
-  margin-left: auto;
-  color: white;
-  font-size: 1rem;
-  cursor: default;
 }
 
 .nav-link {
