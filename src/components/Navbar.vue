@@ -17,7 +17,7 @@
         </button>
       </li>
 
-      <li>
+      <li v-if="!authStore.isLoggedIn">
         <router-link to="/login" class="nav-link">
           <img :src="Loginicon" alt="Loginicon" />
         </router-link>
