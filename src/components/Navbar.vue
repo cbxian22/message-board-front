@@ -29,9 +29,9 @@
         </router-link>
       </li>
 
-      <!-- <li v-if="authStore.isLoggedIn" class="nav-link">
+      <li v-if="authStore.isLoggedIn" class="nav-link">
         <router-link to="/" @click.prevent="logout">登出</router-link>
-      </li> -->
+      </li>
 
       <!-- <li v-if="authStore.isLoggedIn" class="nav-link">
         <h4>Hi {{ authStore.userName }}</h4>
