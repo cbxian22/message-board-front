@@ -19,9 +19,6 @@
     </ul>
   </nav>
 
-  <!-- 等待 isModalOpen 觸發 Message -->
-  <!-- <Message v-model="isModalOpen" /> -->
-
   <!-- 貼文 Modal -->
   <Message v-model="isPostModalOpen" />
 
@@ -48,9 +45,9 @@ const logout = () => {
 const checkTokenAndOpenModal = () => {
   const token = localStorage.getItem("token");
   if (!token) {
-    isLoginModalOpen.value = true; // 🔥 如果沒登入，彈出登入視窗
+    isLoginModalOpen.value = true;
   } else {
-    isPostModalOpen.value = true; // ✅ 有登入，彈出貼文視窗
+    isPostModalOpen.value = true;
   }
 };
 </script>

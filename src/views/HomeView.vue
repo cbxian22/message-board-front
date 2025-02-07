@@ -28,7 +28,7 @@
     </div>
   </div>
 
-  <!-- <singleComment /> -->
+  <singleComment />
   <Navbar />
   <router-view></router-view>
   <!-- </div> -->

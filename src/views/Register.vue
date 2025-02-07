@@ -43,7 +43,7 @@
 
     <div class="container">
       <div class="login">
-        <span>還沒有帳號嗎？</span>
+        <span>已經有帳號嗎？</span>
         <router-link to="/login" class="nav-link">登入</router-link>
       </div>
     </div>
