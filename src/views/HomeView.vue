@@ -29,10 +29,11 @@
               查看及回覆
             </button> -->
           </div>
-          <singleComment />
+
           <!-- <singleComment @loaded="handleLoaded" /> -->
         </div>
       </div>
+      <singleComment />
     </div>
     <Navbar />
   </div>
