@@ -25,7 +25,6 @@ const fetchComments = async () => {
         timestamp: new Date(comment.created_at),
         file_url: comment.file_url, // 如有顯示
       }));
-      // emit("loaded"); // 在數據成功獲取後才 emit
     } else {
       alert("無法獲取留言，數據格式不正確");
     }
@@ -55,10 +54,10 @@ const goToCommentPage = (id) => {
 
 // 頁面加載時執行
 onMounted(() => {
-  fetchComments();
-  // socketStore.connect();
-  emit("loaded"); // 假設加載完成後觸發
-}, 2000); // 假設需要兩秒鐘來模擬加載過程
+  fetchComments().then(() => {
+    emit("loaded"); // 確保在數據成功獲取後再觸發事件
+  });
+});
 </script>
 
 <!-- <script setup>

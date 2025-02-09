@@ -30,7 +30,7 @@
         </button> -->
           </div>
         </div>
-        <singleComment @loaded="isLoading = false" />
+        <singleComment @loaded="handleLoaded" />
       </div>
     </div>
     <Navbar />
@@ -51,11 +51,13 @@ const isLoading = ref(true); // 預設為 true，等 singleComment 加載完畢�
 // 計算是否有新留言
 const aru = computed(() => socketStore.messages.length > 0);
 
+// 事件處理方法，當 singleComment 完成加載後觸發
+const handleLoaded = () => {
+  isLoading.value = false; // 加載完成後設為 false
+};
+
 onMounted(() => {
   socketStore.connect(); // 確保 WebSocket 連線
-  socketStore.$subscribe(() => {
-    console.log("messages:", socketStore.messages);
-  });
 });
 </script>
 
