@@ -40,20 +40,21 @@
 
 <script setup>
 import { computed, onMounted, ref } from "vue";
-import { NSpin } from "naive-ui";
+// import { NSpin } from "naive-ui";
 import { useSocketStore } from "../stores/socketStore";
 import singleComment from "../components/singleComment.vue";
 import Navbar from "../components/Navbar.vue";
-import { useRouter } from "vue-router";
+// import { useRouter } from "vue-router";
 const socketStore = useSocketStore();
-const router = useRouter();
-const isLoading = ref(true); // 預設為 true，等 singleComment 加載完畢後變 false
+
+// const router = useRouter();
+// const isLoading = ref(true); // 預設為 true，等 singleComment 加載完畢後變 false
 
 // 當 singleComment 加載完成時，更新 isLoading
-const handleLoaded = () => {
-  console.log("資料庫資料已加載完成");
-  isLoading.value = false;
-};
+// const handleLoaded = () => {
+//   console.log("資料庫資料已加載完成");
+//   isLoading.value = false;
+// };
 
 // 計算是否有新留言
 const aru = computed(() => socketStore.messages.length > 0);

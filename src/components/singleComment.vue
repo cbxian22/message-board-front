@@ -6,7 +6,7 @@ import { useRouter } from "vue-router";
 // const socketStore = useSocketStore();
 const router = useRouter();
 const comments = ref([]);
-const emit = defineEmits();
+// const emit = defineEmits();
 
 // 獲取留言
 const fetchComments = async () => {
@@ -16,8 +16,8 @@ const fetchComments = async () => {
       // "http://localhost:3000/api/posts"
     );
     if (response.status === 200 && Array.isArray(response.data)) {
-      emit("loaded"); // 資料成功加載後觸發 loaded 事件
-      console.log("以傳遞");
+      // emit("loaded"); // 資料成功加載後觸發 loaded 事件
+      // console.log("以傳遞");
 
       comments.value = response.data.map((comment) => ({
         id: comment.id,
