@@ -1,12 +1,12 @@
 <script setup>
-import { ref, onMounted } from "vue";
+import { ref, onMounted, defineEmits } from "vue";
 import { useSocketStore } from "../stores/socketStore";
 import axios from "axios";
 import { useRouter } from "vue-router";
-const socketStore = useSocketStore();
+// const socketStore = useSocketStore();
 const router = useRouter();
 const comments = ref([]);
-
+const emit = defineEmits(["loaded"]);
 // 獲取留言
 const fetchComments = async () => {
   try {
@@ -55,6 +55,7 @@ const goToCommentPage = (id) => {
 onMounted(() => {
   fetchComments();
   // socketStore.connect();
+  emit("loaded");
 });
 </script>
 
