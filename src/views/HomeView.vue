@@ -30,7 +30,14 @@
         </button> -->
           </div>
         </div>
-        <singleComment @loaded="handleLoaded" />
+        <!-- 使用 Suspense 包裹 singleComment -->
+        <Suspense>
+          <singleComment @loaded="handleLoaded" />
+          <template #fallback>
+            <n-spin size="large" stroke="#FFF" />
+            <!-- 顯示加載中圓圈 -->
+          </template>
+        </Suspense>
       </div>
     </div>
     <Navbar />
