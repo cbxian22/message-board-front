@@ -1,6 +1,6 @@
 <template>
-  <n-space v-if="isLoading">
-    <n-spin size="large" />
+  <n-space v-if="isLoading" class="loading-container">
+    <n-spin size="large" stroke="#FFF" description="貼文加載中..." />
   </n-space>
   <div class="container-box">
     <h1 class="page-title">此網站將不斷更新...</h1>
@@ -39,8 +39,8 @@
 </template>
 
 <script setup>
+import { computed, onMounted, ref } from "vue";
 import { NSpace, NSpin } from "naive-ui";
-import { computed, onMounted } from "vue";
 import { useSocketStore } from "../stores/socketStore";
 import singleComment from "../components/singleComment.vue";
 import Navbar from "../components/Navbar.vue";
@@ -58,6 +58,16 @@ onMounted(() => {
 </script>
 
 <style scoped>
+.loading-container {
+  position: fixed; /* 固定在視窗中央 */
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
 /* 安插 singleComment 容器 */
 .container-box {
   width: 650px;
