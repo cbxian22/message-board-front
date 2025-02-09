@@ -60,6 +60,7 @@ const handleLoaded = () => {
 
 onMounted(() => {
   socketStore.connect(); // 確保 WebSocket 連線
+  console.log("homeview.vue mounted"); // 確認 homeview 是否載入
 });
 </script>
 

@@ -10,11 +10,14 @@ const emit = defineEmits(["loaded"]);
 
 // 獲取留言
 const fetchComments = async () => {
+  console.log("Fetching comments..."); // 確認是否進入 fetchComments
   try {
     const response = await axios.get(
       "https://message-board-server-7yot.onrender.com/api/posts"
       // "http://localhost:3000/api/posts"
     );
+
+    console.log("Response received:", response);
 
     if (response.status === 200 && Array.isArray(response.data)) {
       comments.value = response.data.map((comment) => ({
@@ -25,8 +28,8 @@ const fetchComments = async () => {
         timestamp: new Date(comment.created_at),
         file_url: comment.file_url, // 如有顯示
       }));
-      console.log("Comments loaded successfully"); // 打印確認
-      emit("loaded"); // 發送事件
+
+      console.log("Comments processed:", comments.value); // 確認數據處理完成
       emit("loaded"); // 資料成功後再觸發 "loaded"
     } else {
       alert("無法獲取留言，數據格式不正確");
@@ -57,7 +60,7 @@ const goToCommentPage = (id) => {
 
 // 頁面加載時執行
 onMounted(() => {
-  console.log("singleComment component mounted");
+  console.log("singleComment.vue mounted"); // 確認 singleComment 是否載入
   fetchComments();
 });
 </script>
