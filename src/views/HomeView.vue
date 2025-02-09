@@ -30,18 +30,11 @@
         </button> -->
           </div>
         </div>
-        <!-- 使用 Suspense 包裹 singleComment -->
-        <Suspense>
-          <singleComment @loaded="handleLoaded" />
-          <template #fallback>
-            <n-spin size="large" stroke="#FFF" />
-            <!-- 顯示加載中圓圈 -->
-          </template>
-        </Suspense>
+        <singleComment @loaded="handleLoaded" />
       </div>
     </div>
-    <Navbar />
   </div>
+  <Navbar />
 </template>
 
 <script setup>
@@ -62,12 +55,14 @@ const aru = computed(() => socketStore.messages.length > 0);
 const handleLoaded = () => {
   console.log("Loading complete"); // 確保該行日誌能夠顯示
   isLoading.value = false;
-  console.log("isLoading:", isLoading.value); // 顯示當前 isLoading 的值
 };
 
-onMounted(() => {
-  socketStore.connect(); // 確保 WebSocket 連線
-  console.log("homeview.vue mounted"); // 確認 homeview 是否載入
+onMounted(async () => {
+  // socketStore.connect(); // 確保 WebSocket 連線
+  await Promise.all([
+    socketStore.connect(), // 假设返回 Promise
+    // 其他异步操作
+  ]);
 });
 </script>
 
