@@ -1,7 +1,7 @@
 <template>
-  <!-- <div v-if="isLoading">
+  <div v-if="isLoading">
     <n-spin class="loading-container" size="large" stroke="#FFF" />
-  </div> -->
+  </div>
 
   <div>
     <div class="container-box">
