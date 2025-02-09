@@ -34,7 +34,8 @@
           </div>
         </div>
 
-        <singleComment @loaded="isLoading = false" />
+        <singleComment />
+        <!-- <singleComment @loaded="isLoading = false" /> -->
       </div>
     </div>
     <Navbar />

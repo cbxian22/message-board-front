@@ -6,7 +6,7 @@ import { useRouter } from "vue-router";
 // const socketStore = useSocketStore();
 const router = useRouter();
 const comments = ref([]);
-const emit = defineEmits(["loaded"]);
+// const emit = defineEmits(["loaded"]);
 
 // 獲取留言
 const fetchComments = async () => {
@@ -52,23 +52,11 @@ const goToCommentPage = (id) => {
   router.push({ name: "Comment", params: { id } });
 };
 
-// // 頁面加載時執行
-// onMounted(() => {
-//   fetchComments();
-//   // socketStore.connect();
-//   console.log("🚀 singleComment 已加載，準備觸發 loaded 事件");
-//   emit("loaded");
-// });
-onMounted(async () => {
-  try {
-    console.log("🔄 嘗試加載 singleComment...");
-    await fetchComments(); // 確保 API 被調用
-    console.log("✅ singleComment API 加載成功，觸發 @loaded");
-    emit("loaded"); // 觸發 loaded
-  } catch (error) {
-    console.error("❌ singleComment 加載失敗:", error);
-    emit("loaded"); // 即使錯誤也要觸發，避免卡住 loading
-  }
+// 頁面加載時執行
+onMounted(() => {
+  fetchComments();
+  // socketStore.connect();
+  // emit("loaded");
 });
 </script>
 
