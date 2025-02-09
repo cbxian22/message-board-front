@@ -7,6 +7,7 @@ import { useRouter } from "vue-router";
 const router = useRouter();
 const comments = ref([]);
 const emit = defineEmits(["loaded"]);
+
 // 獲取留言
 const fetchComments = async () => {
   try {
@@ -55,6 +56,7 @@ const goToCommentPage = (id) => {
 onMounted(() => {
   fetchComments();
   // socketStore.connect();
+  console.log("🚀 singleComment 已加載，準備觸發 loaded 事件");
   emit("loaded");
 });
 </script>

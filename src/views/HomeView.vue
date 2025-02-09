@@ -1,11 +1,6 @@
 <template>
   <div v-if="isLoading">
-    <n-spin
-      class="loading-container"
-      size="large"
-      stroke="#FFF"
-      description="貼文加載中..."
-    />
+    <n-spin class="loading-container" size="large" stroke="#FFF" />
   </div>
 
   <div v-else>
@@ -48,7 +43,7 @@
 
 <script setup>
 import { computed, onMounted, ref } from "vue";
-import { NSpace, NSpin } from "naive-ui";
+import { NSpin } from "naive-ui";
 import { useSocketStore } from "../stores/socketStore";
 import singleComment from "../components/singleComment.vue";
 import Navbar from "../components/Navbar.vue";
