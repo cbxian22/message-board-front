@@ -7,7 +7,7 @@
     <div class="container-box">
       <h1 class="page-title">此網站將不斷更新...</h1>
       <div class="container">
-        <!-- <div v-if="aru" class="aru">
+        <div v-if="aru" class="aru">
           <h1>最新留言</h1>
           <div
             v-for="(message, index) in socketStore.messages"
@@ -22,14 +22,14 @@
             >貼文時間: {{ formatDate(comment.timestamp) }}</span
           >
         </div> -->
-        <!-- <p v-if="comment.file_url" class="comment-file">
+            <!-- <p v-if="comment.file_url" class="comment-file">
           附件: <a :href="comment.file_url" target="_blank">下載</a>
         </p>
         <button @click="goToCommentPage(comment.id)" class="view-button">
           查看及回覆
-        </button> 
+        </button> -->
           </div>
-        </div> -->
+        </div>
         <singleComment @loaded="handleLoaded" />
       </div>
     </div>
@@ -57,6 +57,7 @@ const handleLoaded = () => {
 };
 
 onMounted(() => {
+  console.log("Loading complete"); // 確保該行日誌能夠顯示
   socketStore.connect(); // 確保 WebSocket 連線
 });
 </script>
