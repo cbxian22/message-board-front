@@ -25,6 +25,8 @@ const fetchComments = async () => {
         timestamp: new Date(comment.created_at),
         file_url: comment.file_url, // 如有顯示
       }));
+      console.log("Comments loaded successfully"); // 打印確認
+      emit("loaded"); // 發送事件
       emit("loaded"); // 資料成功後再觸發 "loaded"
     } else {
       alert("無法獲取留言，數據格式不正確");
@@ -55,6 +57,7 @@ const goToCommentPage = (id) => {
 
 // 頁面加載時執行
 onMounted(() => {
+  console.log("singleComment component mounted");
   fetchComments();
 });
 </script>
