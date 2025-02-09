@@ -9,20 +9,20 @@
       <div class="container">
         <!-- <div v-if="aru" class="aru">
           <h1>最新留言</h1>
-          <!-- <div
+           <div
             v-for="(message, index) in socketStore.messages"
             :key="index"
             class="comment"
           >
             <h3 class="comment-title">{{ message.data.title }}</h3>
             <p class="comment-content">{{ message.data.content }}</p>
-            <!-- <div class="comment-meta">
+             <div class="comment-meta">
           <span class="comment-author">貼文者: {{ comment.name }}</span>
           <span class="comment-time"
             >貼文時間: {{ formatDate(comment.timestamp) }}</span
           >
-        </div> -->
-        <!-- <p v-if="comment.file_url" class="comment-file">
+        </div>
+         <p v-if="comment.file_url" class="comment-file">
               附件: <a :href="comment.file_url" target="_blank">下載</a>
             </p>
             <button @click="goToCommentPage(comment.id)" class="view-button">
@@ -30,7 +30,7 @@
             </button>  
           </div> 
         </div> 
-        <!-- <singleComment @loaded="handleLoaded" /> -->
+        <singleComment @loaded="handleLoaded" /> -->
         <singleComment @loaded="handleLoaded" />
       </div>
     </div>
@@ -40,7 +40,7 @@
 
 <script setup>
 import { computed, onMounted, ref } from "vue";
-// import { NSpin } from "naive-ui";
+import { NSpin } from "naive-ui";
 import { useSocketStore } from "../stores/socketStore";
 import singleComment from "../components/singleComment.vue";
 import Navbar from "../components/Navbar.vue";
@@ -70,15 +70,18 @@ onMounted(() => {
   height: 100vh;
   display: flex;
   align-items: center;
-  justify-content: center; /* 水平置中 */
+  justify-content: center;
+  /* 水平置中 */
 }
+
 /* 安插 singleComment 容器 */
 .container-box {
   width: 650px;
   display: flex;
   flex-direction: column;
   justify-self: center;
-  padding-bottom: 60px; /* 預留空間，避免被固定的 Navbar 擋住 */
+  padding-bottom: 60px;
+  /* 預留空間，避免被固定的 Navbar 擋住 */
 }
 
 /* 主標題 */
