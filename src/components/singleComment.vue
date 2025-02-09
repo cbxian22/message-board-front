@@ -1,12 +1,12 @@
 <script setup>
 import { ref, onMounted, defineEmits } from "vue";
-import { useSocketStore } from "../stores/socketStore";
+// import { useSocketStore } from "../stores/socketStore";
 import axios from "axios";
 import { useRouter } from "vue-router";
 // const socketStore = useSocketStore();
 const router = useRouter();
 const comments = ref([]);
-// const emit = defineEmits(["loaded"]);
+const emit = defineEmits(["loaded"]);
 
 // 獲取留言
 const fetchComments = async () => {
@@ -25,6 +25,7 @@ const fetchComments = async () => {
         timestamp: new Date(comment.created_at),
         file_url: comment.file_url, // 如有顯示
       }));
+      emit("loaded"); // 在數據成功獲取後才 emit
     } else {
       alert("無法獲取留言，數據格式不正確");
     }
@@ -56,7 +57,6 @@ const goToCommentPage = (id) => {
 onMounted(() => {
   fetchComments();
   // socketStore.connect();
-  // emit("loaded");
 });
 </script>
 

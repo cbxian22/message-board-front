@@ -3,13 +3,10 @@
     <n-spin class="loading-container" size="large" stroke="#FFF" />
   </div>
 
-  <div>
+  <div v-else>
     <div class="container-box">
       <h1 class="page-title">此網站將不斷更新...</h1>
       <div class="container">
-        <!-- 新增留言按鈕 -->
-        <!-- <button @click="goToMessagePage" class="add-comment-btn">新增留言</button> -->
-
         <div v-if="aru" class="aru">
           <h1>最新留言</h1>
           <div
@@ -33,9 +30,7 @@
         </button> -->
           </div>
         </div>
-
-        <singleComment />
-        <!-- <singleComment @loaded="isLoading = false" /> -->
+        <singleComment @loaded="isLoading = false" />
       </div>
     </div>
     <Navbar />
