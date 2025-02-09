@@ -53,11 +53,12 @@ const aru = computed(() => socketStore.messages.length > 0);
 
 // 事件處理方法，當 singleComment 完成加載後觸發
 const handleLoaded = () => {
-  isLoading.value = false; // 加載完成後設為 false
+  console.log("Loading complete"); // 確保該行日誌能夠顯示
+  isLoading.value = false;
+  console.log("isLoading:", isLoading.value); // 顯示當前 isLoading 的值
 };
 
 onMounted(() => {
-  console.log("Loading complete"); // 確保該行日誌能夠顯示
   socketStore.connect(); // 確保 WebSocket 連線
 });
 </script>
