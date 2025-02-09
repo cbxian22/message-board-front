@@ -1,15 +1,15 @@
 <template>
-  <!-- <div v-if="isLoading">
+  <div v-if="isLoading">
     <n-spin class="loading-container" size="large" stroke="#FFF" />
-  </div> -->
+  </div>
 
   <div>
     <div class="container-box">
       <h1 class="page-title">此網站將不斷更新...</h1>
       <div class="container">
-        <div v-if="aru" class="aru">
+        <!-- <div v-if="aru" class="aru">
           <h1>最新留言</h1>
-          <div
+          <!-- <div
             v-for="(message, index) in socketStore.messages"
             :key="index"
             class="comment"
@@ -22,18 +22,17 @@
             >貼文時間: {{ formatDate(comment.timestamp) }}</span
           >
         </div> -->
-            <!-- <p v-if="comment.file_url" class="comment-file">
+        <!-- <p v-if="comment.file_url" class="comment-file">
               附件: <a :href="comment.file_url" target="_blank">下載</a>
             </p>
             <button @click="goToCommentPage(comment.id)" class="view-button">
               查看及回覆
-            </button> -->
-          </div>
-
-          <!-- <singleComment @loaded="handleLoaded" /> -->
-        </div>
+            </button>  
+          </div> 
+        </div> 
+        <!-- <singleComment @loaded="handleLoaded" /> -->
+        <singleComment @loaded="handleLoaded" />
       </div>
-      <singleComment />
     </div>
     <Navbar />
   </div>
@@ -49,13 +48,13 @@ import Navbar from "../components/Navbar.vue";
 const socketStore = useSocketStore();
 
 // const router = useRouter();
-// const isLoading = ref(true); // 預設為 true，等 singleComment 加載完畢後變 false
+const isLoading = ref(true); // 預設為 true，等 singleComment 加載完畢後變 false
 
 // 當 singleComment 加載完成時，更新 isLoading
-// const handleLoaded = () => {
-//   console.log("資料庫資料已加載完成");
-//   isLoading.value = false;
-// };
+const handleLoaded = () => {
+  console.log("資料庫資料已加載完成");
+  isLoading.value = false;
+};
 
 // 計算是否有新留言
 const aru = computed(() => socketStore.messages.length > 0);

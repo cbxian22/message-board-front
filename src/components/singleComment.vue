@@ -6,7 +6,7 @@ import { useRouter } from "vue-router";
 // const socketStore = useSocketStore();
 const router = useRouter();
 const comments = ref([]);
-// const emit = defineEmits();
+const emit = defineEmits();
 
 // 獲取留言
 const fetchComments = async () => {
@@ -16,9 +16,6 @@ const fetchComments = async () => {
       // "http://localhost:3000/api/posts"
     );
     if (response.status === 200 && Array.isArray(response.data)) {
-      // emit("loaded"); // 資料成功加載後觸發 loaded 事件
-      // console.log("以傳遞");
-
       comments.value = response.data.map((comment) => ({
         id: comment.id,
         title: comment.title,
@@ -27,6 +24,7 @@ const fetchComments = async () => {
         timestamp: new Date(comment.created_at),
         file_url: comment.file_url, // 如有顯示
       }));
+      emit("loaded");
     } else {
       alert("無法獲取留言，數據格式不正確");
     }
