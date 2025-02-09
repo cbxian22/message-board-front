@@ -1,13 +1,12 @@
 <script setup>
-import { ref, onMounted } from "vue";
+import { ref, onMounted, defineEmits } from "vue";
 // import { useSocketStore } from "../stores/socketStore";
 import axios from "axios";
 import { useRouter } from "vue-router";
 // const socketStore = useSocketStore();
 const router = useRouter();
 const comments = ref([]);
-
-const emit = defineEmits(["loaded"]);
+const emit = defineEmits();
 
 // 獲取留言
 const fetchComments = async () => {
@@ -17,6 +16,7 @@ const fetchComments = async () => {
       // "http://localhost:3000/api/posts"
     );
     if (response.status === 200 && Array.isArray(response.data)) {
+      emit("loaded"); // 資料成功加載後觸發 loaded 事件
       comments.value = response.data.map((comment) => ({
         id: comment.id,
         title: comment.title,
@@ -31,8 +31,6 @@ const fetchComments = async () => {
   } catch (error) {
     console.error("取得留言錯誤:", error);
     alert("留言取得失敗，請檢查網絡或稍後再試");
-  } finally {
-    emit("loaded"); // 确保在 finally 块中触发，无论成功或失败
   }
 };
 
@@ -56,7 +54,6 @@ const goToCommentPage = (id) => {
 
 // 頁面加載時執行
 onMounted(() => {
-  console.log("singleComment.vue mounted"); // 確認 singleComment 是否載入
   fetchComments();
 });
 </script>
@@ -116,7 +113,11 @@ const goToCommentPage = (id) => {
 <template>
   <div v-for="comment in comments" :key="comment.id" class="comment-box">
     <div class="photo-content">
-      <img :src="comment.photo" alt="頭像" class="photo" />
+      <img
+        :src="comment.photo || 'https://fakeimg.pl/50/'"
+        alt="頭像"
+        class="photo"
+      />
     </div>
     <div class="comment">
       <span class="comment-time"

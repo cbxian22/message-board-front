@@ -48,21 +48,17 @@ const socketStore = useSocketStore();
 const router = useRouter();
 const isLoading = ref(true); // 預設為 true，等 singleComment 加載完畢後變 false
 
-// 計算是否有新留言
-const aru = computed(() => socketStore.messages.length > 0);
-
-// 事件處理方法，當 singleComment 完成加載後觸發
+// 當 singleComment 加載完成時，更新 isLoading
 const handleLoaded = () => {
-  console.log("Loading complete"); // 確保該行日誌能夠顯示
+  console.log("資料庫資料已加載完成");
   isLoading.value = false;
 };
 
-onMounted(async () => {
-  // socketStore.connect(); // 確保 WebSocket 連線
-  await Promise.all([
-    socketStore.connect(), // 假设返回 Promise
-    // 其他异步操作
-  ]);
+// 計算是否有新留言
+const aru = computed(() => socketStore.messages.length > 0);
+
+onMounted(() => {
+  socketStore.connect(); // 确保 WebSocket 连接
 });
 </script>
 
