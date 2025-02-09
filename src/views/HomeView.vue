@@ -1,41 +1,45 @@
 <template>
-  <div class="container-box">
-    <h1 class="page-title">此網站將不斷更新...</h1>
-    <div class="container">
-      <!-- 新增留言按鈕 -->
-      <!-- <button @click="goToMessagePage" class="add-comment-btn">新增留言</button> -->
+  <n-space>
+    <n-spin size="large" />
+    <div class="container-box">
+      <h1 class="page-title">此網站將不斷更新...</h1>
+      <div class="container">
+        <!-- 新增留言按鈕 -->
+        <!-- <button @click="goToMessagePage" class="add-comment-btn">新增留言</button> -->
 
-      <div v-if="aru" class="aru">
-        <h1>最新留言</h1>
-        <div
-          v-for="(message, index) in socketStore.messages"
-          :key="index"
-          class="comment"
-        >
-          <h3 class="comment-title">{{ message.data.title }}</h3>
-          <p class="comment-content">{{ message.data.content }}</p>
-          <!-- <div class="comment-meta">
+        <div v-if="aru" class="aru">
+          <h1>最新留言</h1>
+          <div
+            v-for="(message, index) in socketStore.messages"
+            :key="index"
+            class="comment"
+          >
+            <h3 class="comment-title">{{ message.data.title }}</h3>
+            <p class="comment-content">{{ message.data.content }}</p>
+            <!-- <div class="comment-meta">
           <span class="comment-author">貼文者: {{ comment.name }}</span>
           <span class="comment-time"
             >貼文時間: {{ formatDate(comment.timestamp) }}</span
           >
         </div> -->
-          <!-- <p v-if="comment.file_url" class="comment-file">
+            <!-- <p v-if="comment.file_url" class="comment-file">
           附件: <a :href="comment.file_url" target="_blank">下載</a>
         </p>
         <button @click="goToCommentPage(comment.id)" class="view-button">
           查看及回覆
         </button> -->
+          </div>
         </div>
-      </div>
 
-      <singleComment />
+        <singleComment />
+      </div>
     </div>
-  </div>
-  <Navbar />
+    <Navbar />
+  </n-space>
 </template>
 
 <script setup>
+import { NSpace, NSpin } from "naive-ui";
 import { computed, onMounted } from "vue";
 import { useSocketStore } from "../stores/socketStore";
 import singleComment from "../components/singleComment.vue";
