@@ -23,18 +23,18 @@
           >
         </div> -->
             <!-- <p v-if="comment.file_url" class="comment-file">
-          附件: <a :href="comment.file_url" target="_blank">下載</a>
-        </p>
-        <button @click="goToCommentPage(comment.id)" class="view-button">
-          查看及回覆
-        </button> -->
+              附件: <a :href="comment.file_url" target="_blank">下載</a>
+            </p>
+            <button @click="goToCommentPage(comment.id)" class="view-button">
+              查看及回覆
+            </button> -->
           </div>
+          <singleComment @loaded="handleLoaded" />
         </div>
-        <singleComment @loaded="handleLoaded" />
       </div>
     </div>
+    <Navbar />
   </div>
-  <Navbar />
 </template>
 
 <script setup>
