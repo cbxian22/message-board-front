@@ -29,7 +29,8 @@
               查看及回覆
             </button> -->
           </div>
-          <singleComment @loaded="handleLoaded" />
+          <singleComment />
+          <!-- <singleComment @loaded="handleLoaded" /> -->
         </div>
       </div>
     </div>

@@ -17,6 +17,8 @@ const fetchComments = async () => {
     );
     if (response.status === 200 && Array.isArray(response.data)) {
       emit("loaded"); // 資料成功加載後觸發 loaded 事件
+      console.log("以傳遞");
+
       comments.value = response.data.map((comment) => ({
         id: comment.id,
         title: comment.title,
