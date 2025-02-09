@@ -53,6 +53,9 @@ const aru = computed(() => socketStore.messages.length > 0);
 
 onMounted(() => {
   socketStore.connect(); // 確保 WebSocket 連線
+  socketStore.$subscribe(() => {
+    console.log("messages:", socketStore.messages);
+  });
 });
 </script>
 
