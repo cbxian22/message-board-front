@@ -17,14 +17,28 @@
 </template>
 
 <script setup>
+import { watch } from "vue";
 import Closeicon from "../assets/Closeicon.svg";
 
-defineProps(["modelValue"]);
+const props = defineProps(["modelValue"]);
 const emit = defineEmits(["update:modelValue"]);
 
 const close = () => {
   emit("update:modelValue", false); // 讓 `v-model` 更新
 };
+
+// 監聽 `props.modelValue`，控制 body 滾動
+watch(
+  () => props.modelValue, // 這裡要監聽 `props.modelValue`
+  (newValue) => {
+    if (newValue) {
+      document.body.style.overflow = "hidden"; // 禁止滾動
+    } else {
+      document.body.style.overflow = ""; // 恢復滾動
+    }
+  },
+  { immediate: true } // 立即執行一次，確保初始狀態同步
+);
 </script>
 
 <style scoped>
