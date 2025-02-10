@@ -6,9 +6,8 @@ import { useRouter } from "vue-router";
 // const socketStore = useSocketStore();
 const router = useRouter();
 const comments = ref([]);
-// const emit = defineEmits();
-const emit = defineEmits(["loaded"]);
-const isDataLoaded = ref(false);
+const emit = defineEmits();
+
 // 獲取留言
 const fetchComments = async () => {
   try {
@@ -54,13 +53,8 @@ const goToCommentPage = (id) => {
 };
 
 // 頁面加載時執行
-// onMounted(() => {
-//   fetchComments();
-// });
-onMounted(async () => {
-  await fetchComments(); // 確保這個方法執行完成
-  isDataLoaded.value = true;
-  emit("loaded"); // ✅ 確保這裡有 emit，通知父組件已加載完成
+onMounted(() => {
+  fetchComments();
 });
 </script>
 

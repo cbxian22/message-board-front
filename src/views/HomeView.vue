@@ -1,6 +1,6 @@
 <template>
-  <div v-if="isLoading" class="loading-container">
-    <n-spin size="large" stroke="#FFF" />
+  <div v-if="isLoading" @loaded="handleLoaded">
+    <n-spin class="loading-container" size="large" stroke="#FFF" />
   </div>
 
   <div v-else>
@@ -31,7 +31,7 @@
           </div> 
         </div> 
         <singleComment @loaded="handleLoaded" /> -->
-        <singleComment @loaded="handleLoaded" />
+        <singleComment />
       </div>
     </div>
     <Navbar />
