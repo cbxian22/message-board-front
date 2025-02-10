@@ -3,7 +3,7 @@
     <n-spin class="loading-container" size="large" stroke="#FFF" />
   </div>
 
-  <div @loaded="handleLoaded">
+  <div>
     <div class="container-box">
       <h1 class="page-title">此網站將不斷更新...</h1>
       <div class="container">
@@ -31,7 +31,7 @@
           </div> 
         </div> 
         <singleComment @loaded="handleLoaded" /> -->
-        <singleComment />
+        <singleComment @loaded="handleLoaded" />
       </div>
     </div>
     <Navbar />
