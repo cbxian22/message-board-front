@@ -11,12 +11,26 @@
 </template>
 
 <script setup>
+import { watch } from "vue";
 defineProps(["modelValue"]);
 const emit = defineEmits(["update:modelValue"]);
 
 const close = () => {
   emit("update:modelValue", false); // 讓 `v-model` 更新
 };
+
+// 監聽 modelValue，當 Modal 開啟時，禁止滾動
+watch(
+  () => modelValue,
+  (newValue) => {
+    if (newValue) {
+      document.body.style.overflow = "hidden";
+    } else {
+      document.body.style.overflow = "";
+    }
+  },
+  { immediate: true }
+);
 </script>
 
 <style scoped>
