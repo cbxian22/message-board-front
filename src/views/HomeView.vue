@@ -1,6 +1,10 @@
 <template>
   <div v-show="isLoading" class="loading-container">
     <n-spin size="large" stroke="#FFF" />
+    <div class="n-spin-b">
+      <p>produced by</p>
+      <p>BoXian</p>
+    </div>
   </div>
 
   <div v-show="!isLoading">
@@ -70,9 +74,24 @@ onMounted(() => {
   width: 100vw;
   height: 100vh;
   display: flex;
+  flex-direction: column;
   align-items: center;
   justify-content: center;
   /* 水平置中 */
+  position: fixed;
+  top: 0vh;
+  left: 0vw;
+}
+
+.n-spin-b {
+  position: absolute;
+  top: calc(50% + 200px);
+  text-align: center;
+}
+
+.n-spin-b p:last-child {
+  margin-top: 8px;
+  font-size: 20px;
 }
 
 /* 安插 singleComment 容器 */
