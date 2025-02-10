@@ -11,30 +11,31 @@
     <div class="container-box">
       <h1 class="page-title">此網站將不斷更新...</h1>
       <div class="container">
-        <!-- <div v-if="aru" class="aru">
+        <div v-if="aru" class="aru">
           <h1>最新留言</h1>
-           <div
+          <div
             v-for="(message, index) in socketStore.messages"
             :key="index"
             class="comment"
           >
             <h3 class="comment-title">{{ message.data.title }}</h3>
             <p class="comment-content">{{ message.data.content }}</p>
-             <div class="comment-meta">
-          <span class="comment-author">貼文者: {{ comment.name }}</span>
-          <span class="comment-time"
-            >貼文時間: {{ formatDate(comment.timestamp) }}</span
-          >
-        </div>
-         <p v-if="comment.file_url" class="comment-file">
+
+            <!-- <div class="comment-meta">
+              <span class="comment-author">貼文者: {{ comment.name }}</span>
+              <span class="comment-time"
+                >貼文時間: {{ formatDate(comment.timestamp) }}</span
+              >
+            </div>
+            <p v-if="comment.file_url" class="comment-file">
               附件: <a :href="comment.file_url" target="_blank">下載</a>
             </p>
             <button @click="goToCommentPage(comment.id)" class="view-button">
               查看及回覆
-            </button>  
-          </div> 
-        </div> 
-        <singleComment @loaded="handleLoaded" /> -->
+            </button> -->
+            <!--  -->
+          </div>
+        </div>
         <singleComment @loaded="handleLoaded" />
       </div>
     </div>
