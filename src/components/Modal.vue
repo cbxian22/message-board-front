@@ -1,17 +1,15 @@
 <template>
   <transition name="fade">
     <div v-if="modelValue" class="modal-overlay" @click.self="close">
-      <div class="modal-content">
-        <!-- 插槽，讓其他組件插入內容 -->
-        <button class="close-btn" @click="close">
-          <img
-            class="material-symbols-outlined"
-            :src="Closeicon"
-            alt="Closeicon"
-          />
-        </button>
-        <slot></slot>
-      </div>
+      <button class="close-btn" @click="close">
+        <img
+          class="material-symbols-outlined"
+          :src="Closeicon"
+          alt="Closeicon"
+        />
+      </button>
+
+      <slot><!-- 插槽，讓其他組件插入內容 --></slot>
     </div>
   </transition>
 </template>
@@ -59,12 +57,6 @@ watch(
 .fade-enter-from,
 .fade-leave-to {
   opacity: 0;
-}
-
-.modal-content {
-  min-width: 400px;
-  border: 1px solid #333;
-  border-radius: 8px;
 }
 
 .close-btn {

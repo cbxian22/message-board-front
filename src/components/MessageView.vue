@@ -5,9 +5,8 @@
     @update:modelValue="emit('update:modelValue', $event)"
   >
     <div class="message-container">
-      <h1>我要貼文</h1>
       <form @submit.prevent="handleMessage" class="message-form">
-        <div class="form-group">
+        <!-- <div class="form-group">
           <label for="messagetitle">主題:</label>
           <input
             id="messagetitle"
@@ -16,19 +15,43 @@
             required
             class="form-input"
           />
+        </div> -->
+
+        <div class="message-form-up">
+          <p>新貼文</p>
         </div>
 
-        <div class="form-group">
-          <label for="content">內容:</label>
-          <textarea
-            id="content"
-            v-model="content"
-            required
-            class="form-textarea"
-          ></textarea>
+        <div class="message-form-mi">
+          <!-- <img
+            :src="comment.photo || 'https://fakeimg.pl/50/'"
+            alt="頭像"
+            class="photo"
+          /> -->
+          <div>
+            <img
+              :src="'https://fakeimg.pl/50/'"
+              alt="頭像"
+              class="photo"
+              draggable="false"
+            />
+          </div>
+
+          <div class="user-content">
+            <p>user</p>
+            <label for="content"></label>
+            <textarea
+              id="content"
+              v-model="content"
+              placeholder="最近想潑點什麼呢？"
+              required
+              class="form-textarea"
+            ></textarea>
+          </div>
         </div>
 
-        <button type="submit" class="submit-btn">送出</button>
+        <div class="message-form-end">
+          <button type="submit" class="submit-btn">發佈</button>
+        </div>
       </form>
     </div>
   </Modal>
@@ -89,68 +112,79 @@ const handleMessage = async () => {
 
 <style scoped>
 .message-container {
-  max-width: 600px;
-  margin: 0 auto;
-  padding: 20px;
-  background-color: #fff;
-  border-radius: 8px;
-  box-shadow: 0 4px 16px rgba(0, 0, 0, 0.1);
-}
-
-h1 {
+  display: flex;
+  flex-direction: column;
+  width: 625px;
+  height: 250px;
+  border-radius: 20px;
+  background-color: rgb(16, 16, 16);
   text-align: center;
-  font-family: "Arial", sans-serif;
-  color: #333;
+  border: 0.5px solid rgba(102, 102, 102, 0.5);
+}
+.message-container * {
+  background: transparent;
 }
 
 .message-form {
   display: flex;
-  flex-direction: column;
-  gap: 16px;
+  flex-direction: column; /* 讓內部元素垂直排列 */
+  height: 100%;
 }
 
-.form-group {
+.message-form-up {
+  flex: 1;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  border-bottom: 0.5px solid rgba(102, 102, 102, 0.5);
+}
+
+.message-form-mi {
+  flex: 2;
+  display: flex;
+  align-items: center;
+  justify-content: flex-start;
+  padding: 0 30px;
+}
+
+.photo {
+  border-radius: 50%;
+  width: 50px;
+  margin-right: 10px;
+  display: flex;
+}
+
+.user-content {
   display: flex;
   flex-direction: column;
-  gap: 8px;
+  align-items: flex-start;
+  width: 100%;
 }
 
-label {
-  font-weight: bold;
-  color: #555;
-}
-
-.form-input,
-.form-textarea {
-  padding: 10px;
-  font-size: 1rem;
-  border: 1px solid #ccc;
-  border-radius: 4px;
-}
-
-.form-input:focus,
-.form-textarea:focus {
-  border-color: #007bff;
-  outline: none;
-}
-
-.form-textarea {
-  resize: vertical;
-  min-height: 150px;
-}
-
-.submit-btn {
-  padding: 10px 20px;
-  background-color: #007bff;
-  color: white;
+.user-content textarea {
   border: none;
-  border-radius: 4px;
-  font-size: 1rem;
-  cursor: pointer;
-  transition: background-color 0.3s ease;
+  outline: none;
+  background: transparent;
+  width: 100%;
+  font-size: 14px;
 }
 
-.submit-btn:hover {
-  background-color: #0056b3;
+.user-content textarea::placeholder {
+  color: gray; /* 設定 placeholder 的顏色 */
+  opacity: 0.7; /* 調整透明度 */
+}
+
+.message-form-end {
+  flex: 1;
+  display: flex;
+  align-items: center;
+  justify-content: end;
+  margin: 20px 30px;
+}
+
+.message-form-end button {
+  padding: 10px 20px;
+  border: 0.5px solid rgba(102, 102, 102, 0.5);
+  border-radius: 10px;
 }
 </style>

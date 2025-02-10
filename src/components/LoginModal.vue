@@ -34,9 +34,12 @@ const emit = defineEmits(["update:modelValue"]);
 <style scoped>
 .container {
   padding: 30px;
-  background: rgb(16, 16, 16);
+  width: 350px;
+  height: auto;
+  background-color: rgb(16, 16, 16);
   border-radius: 8px;
   text-align: center;
+  border: 0.5px solid rgba(102, 102, 102, 0.5);
 }
 
 .container * {
