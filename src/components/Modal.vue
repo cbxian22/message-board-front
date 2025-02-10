@@ -2,70 +2,66 @@
   <transition name="fade">
     <div v-if="modelValue" class="modal-overlay" @click.self="close">
       <div class="modal-content">
-        <slot></slot>
         <!-- 插槽，讓其他組件插入內容 -->
-        <button class="close-btn" @click="close">關閉</button>
+        <button class="close-btn" @click="close">
+          <img
+            class="material-symbols-outlined"
+            :src="Closeicon"
+            alt="Closeicon"
+          />
+        </button>
+        <slot></slot>
       </div>
     </div>
   </transition>
 </template>
 
 <script setup>
-import { watch } from "vue";
+import Closeicon from "../assets/Closeicon.svg";
+
 defineProps(["modelValue"]);
 const emit = defineEmits(["update:modelValue"]);
 
 const close = () => {
   emit("update:modelValue", false); // 讓 `v-model` 更新
 };
-
-// 監聽 modelValue，當 Modal 開啟時，禁止滾動
-watch(
-  () => modelValue,
-  (newValue) => {
-    if (newValue) {
-      document.body.style.overflow = "hidden";
-    } else {
-      document.body.style.overflow = "";
-    }
-  },
-  { immediate: true }
-);
 </script>
 
 <style scoped>
 .modal-overlay {
-  position: fixed;
-  top: 0;
-  left: 0;
-  width: 100vw;
-  height: 100vh;
   background: rgba(0, 0, 0, 0.5);
   display: flex;
+  flex-direction: column;
   align-items: center;
   justify-content: center;
+  width: 100vw;
+  height: 100vh;
+  position: fixed;
+  top: 0vh;
+  left: 0vw;
+  z-index: 1000;
 }
 
-.modal-content {
-  padding: 20px;
-  min-width: 400px;
-}
-
-.fade-enter-active,
-.fade-leave-active {
-  transition: opacity 0.3s ease;
-}
 .fade-enter-from,
 .fade-leave-to {
   opacity: 0;
 }
 
+.modal-content {
+  min-width: 400px;
+  border: 1px solid #333;
+  border-radius: 8px;
+}
+
 .close-btn {
-  margin-top: 10px;
-  padding: 5px 10px;
-  border: none;
-  background: #007bff;
-  color: white;
   cursor: pointer;
+  position: fixed;
+  top: 0;
+  right: 0;
+  margin: 20px 20px 0px 0;
+}
+
+.material-symbols-outlined {
+  width: 28px;
 }
 </style>
