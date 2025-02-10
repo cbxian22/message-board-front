@@ -3,7 +3,7 @@
     <n-spin size="large" stroke="#FFF" />
   </div>
 
-  <div>
+  <div v-else>
     <div class="container-box">
       <h1 class="page-title">此網站將不斷更新...</h1>
       <div class="container">
