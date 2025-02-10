@@ -3,7 +3,7 @@
     <n-spin size="large" stroke="#FFF" />
   </div>
 
-  <div v-else @loaded="handleLoaded">
+  <div>
     <div class="container-box">
       <h1 class="page-title">此網站將不斷更新...</h1>
       <div class="container">
@@ -31,7 +31,7 @@
           </div> 
         </div> 
         <singleComment @loaded="handleLoaded" /> -->
-        <singleComment />
+        <singleComment @loaded="handleLoaded" />
       </div>
     </div>
     <Navbar />
@@ -53,6 +53,8 @@ const isLoading = ref(true);
 // 當 singleComment 加載完成時，更新 isLoading
 const handleLoaded = () => {
   isLoading.value = false;
+  console.log("singleComment is loading");
+  console.log(isLoading.value);
 };
 
 // 計算是否有新留言
