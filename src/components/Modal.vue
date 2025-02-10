@@ -65,7 +65,6 @@ watch(
   min-width: 400px;
   border: 1px solid #333;
   border-radius: 8px;
-  overflow-y: auto; /* 允許 modal 滾動 */
 }
 
 .close-btn {

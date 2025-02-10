@@ -101,7 +101,7 @@ onMounted(() => {
   display: flex;
   flex-direction: column;
   justify-self: center;
-  padding-bottom: 60px;
+  padding-bottom: 100px;
   /* 預留空間，避免被固定的 Navbar 擋住 */
 }
 
