@@ -16,3 +16,39 @@ button {
 img {
   background-color: transparent;
 }
+
+/* 原始樣式保持不變，以下為響應式調整 */
+
+/* 平板 RWD (寬度小於 768px) */
+@media (max-width: 768px) {
+  .container-box {
+    width: 90%;
+    padding: 0 10px;
+  }
+  .page-title {
+    font-size: 1.5rem;
+  }
+  .aru {
+    padding: 15px 0;
+  }
+}
+
+/* 手機 RWD (寬度小於 480px) */
+@media (max-width: 480px) {
+  .container-box {
+    width: 100%;
+    padding: 0 5px;
+  }
+  .page-title {
+    font-size: 1.2rem;
+  }
+  .n-spin-b p:last-child {
+    font-size: 16px;
+  }
+  .aru {
+    padding: 10px 0;
+  }
+  .comment-content {
+    font-size: 14px;
+  }
+}
