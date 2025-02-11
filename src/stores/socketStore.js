@@ -118,7 +118,7 @@ export const useSocketStore = defineStore("socket", {
         const msg = JSON.stringify({
           type: "new_message",
           data: {
-            title: message.title,
+            // title: message.title,
             content: message.content,
           },
         });

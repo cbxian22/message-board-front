@@ -58,14 +58,14 @@
 
 <script setup>
 import Modal from "./Modal.vue"; // 引入彈窗組件
-import { ref, watchEffect, nextTick, watch } from "vue";
+import { ref, nextTick, watch } from "vue";
 import axios from "../stores/axiosConfig"; // 統一配置後的 axios
 import { useSocketStore } from "../stores/socketStore"; // WebSocket Store
 
 const props = defineProps(["modelValue"]);
 const emit = defineEmits(["update:modelValue"]);
 
-const messagetitle = ref("");
+// const messagetitle = ref("");
 const content = ref("");
 const textarea = ref(null); // 取得 textarea DOM 節點
 const prevHeight = ref("auto"); // 儲存上一次高度
@@ -109,19 +109,20 @@ const handleMessage = async () => {
   try {
     const response = await axios.post(
       `https://message-board-server-7yot.onrender.com/api/posts/${userId}`,
-      { title: messagetitle.value, content: content.value },
+      // { title: messagetitle.value, content: content.value },
+      { content: content.value },
       { headers: { Authorization: `Bearer ${token}` } }
     );
 
     if (response.status === 201) {
       // 發送 WebSocket 訊息
       socketStore.sendMessage({
-        title: messagetitle.value,
+        // title: messagetitle.value,
         content: content.value,
       });
 
       // 清空輸入欄
-      messagetitle.value = "";
+      // messagetitle.value = "";
       content.value = "";
 
       // 關閉 Modal
