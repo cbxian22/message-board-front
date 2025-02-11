@@ -106,7 +106,7 @@ onMounted(() => {
 
 <template>
   <div class="comment-detail">
-    <h3>{{ comment.title }}</h3>
+    <!-- <h3>{{ comment.title }}</h3> -->
     <p class="comment-content">{{ comment.content }}</p>
     <p class="comment-author">貼文者: {{ comment.user_name }}</p>
     <p class="comment-time">貼文時間: {{ formatDate(comment.created_at) }}</p>

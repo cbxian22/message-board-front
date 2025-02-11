@@ -3,7 +3,7 @@
     <h1>Admin Panel</h1>
     <div v-if="messages.length > 0">
       <div v-for="message in messages" :key="message.id">
-        <h3>{{ message.title }}</h3>
+        <!-- <h3>{{ message.title }}</h3> -->
         <p>{{ message.content }}</p>
         <button @click="editMessage(message.id)">Edit</button>
         <button @click="deleteMessage(message.id)">Delete</button>

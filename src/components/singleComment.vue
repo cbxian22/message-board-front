@@ -18,7 +18,7 @@ const fetchComments = async () => {
     if (response.status === 200 && Array.isArray(response.data)) {
       comments.value = response.data.map((comment) => ({
         id: comment.id,
-        title: comment.title,
+        // title: comment.title,
         content: comment.content,
         name: comment.user_name,
         timestamp: new Date(comment.created_at),
@@ -123,7 +123,7 @@ const goToCommentPage = (id) => {
       <span class="comment-time"
         >貼文時間: {{ formatDate(comment.timestamp) }}</span
       >
-      <h3 class="comment-title">{{ comment.title }}</h3>
+      <!-- <h3 class="comment-title">{{ comment.title }}</h3> -->
       <p class="comment-content">{{ comment.content }}</p>
       <!-- <span class="comment-author"> {{ comment.name }}</span> -->
 

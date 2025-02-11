@@ -18,7 +18,7 @@
             :key="index"
             class="comment"
           >
-            <h3 class="comment-title">{{ message.data.title }}</h3>
+            <!-- <h3 class="comment-title">{{ message.data.title }}</h3> -->
             <p class="comment-content">{{ message.data.content }}</p>
 
             <!-- <div class="comment-meta">
