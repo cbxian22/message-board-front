@@ -50,6 +50,7 @@ import { NSpin } from "naive-ui";
 import { useSocketStore } from "../stores/socketStore";
 import singleComment from "../components/singleComment.vue";
 import Navbar from "../components/Navbar.vue";
+import NavbarUp from "../components/NavbarUp.vue";
 // import { useRouter } from "vue-router";
 const socketStore = useSocketStore();
 
