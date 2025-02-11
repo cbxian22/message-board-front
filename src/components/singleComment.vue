@@ -141,7 +141,7 @@ const goToCommentPage = (id) => {
 
 <style scoped>
 .comment-box {
-  padding: 20px;
+  padding: 40px 20px;
   border-bottom: 0.5px solid rgba(170, 170, 170, 0.5);
   display: flex;
   background-color: rgb(16, 16, 16);

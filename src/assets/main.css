@@ -22,8 +22,7 @@ img {
 /* 平板 RWD (寬度小於 768px) */
 @media (max-width: 768px) {
   .container-box {
-    width: 90%;
-    padding: 0 10px;
+    width: 85% !important;
   }
   .page-title {
     font-size: 1.5rem;
@@ -34,9 +33,9 @@ img {
 }
 
 /* 手機 RWD (寬度小於 480px) */
-@media (max-width: 480px) {
+@media (max-width: 500px) {
   .container-box {
-    width: 100%;
+    width: 100% !important;
     padding: 0 5px;
   }
   .page-title {

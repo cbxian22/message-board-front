@@ -8,8 +8,8 @@
   </div>
 
   <div v-show="!isLoading">
+    <h1 class="page-title">此網站將不斷更新...</h1>
     <div class="container-box">
-      <h1 class="page-title">此網站將不斷更新...</h1>
       <div class="container">
         <div v-if="aru" class="aru">
           <h1>最新留言</h1>
@@ -36,6 +36,7 @@
             <!--  -->
           </div>
         </div>
+        <!-- <singleComment /> -->
         <singleComment @loaded="handleLoaded" />
       </div>
     </div>
