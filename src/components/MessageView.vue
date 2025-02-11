@@ -1,9 +1,7 @@
 <template>
   <!-- 使用 v-bind 和 v-on 來綁定和觸發事件 -->
-  <Modal
-    :modelValue="modelValue"
-    @update:modelValue="emit('update:modelValue', $event)"
-  >
+  <Modal :modelValue="modelValue" @update:modelValue="handleModalClose">
+    <!-- @update:modelValue="emit('update:modelValue', $event)" -->
     <div class="message-container">
       <form @submit.prevent="handleMessage" class="message-form">
         <!-- <div class="form-group">
@@ -44,7 +42,8 @@
               v-model="content"
               placeholder="最近想潑點什麼呢？"
               required
-              class="form-textarea"
+              @input="adjustHeight"
+              ref="textarea"
             ></textarea>
           </div>
         </div>
@@ -59,7 +58,7 @@
 
 <script setup>
 import Modal from "./Modal.vue"; // 引入彈窗組件
-import { ref } from "vue";
+import { ref, watchEffect, nextTick, watch } from "vue";
 import axios from "../stores/axiosConfig"; // 統一配置後的 axios
 import { useSocketStore } from "../stores/socketStore"; // WebSocket Store
 
@@ -68,8 +67,35 @@ const emit = defineEmits(["update:modelValue"]);
 
 const messagetitle = ref("");
 const content = ref("");
+const textarea = ref(null); // 取得 textarea DOM 節點
+const prevHeight = ref("auto"); // 儲存上一次高度
+
+const adjustHeight = () => {
+  nextTick(() => {
+    if (textarea.value) {
+      textarea.value.style.height = "auto"; // 先重設高度
+      textarea.value.style.height = `${textarea.value.scrollHeight}px`; // 設定自動增長
+      prevHeight.value = textarea.value.style.height; // 儲存當前高度
+    }
+  });
+};
 
 const socketStore = useSocketStore();
+
+// 處理 Modal 關閉的邏輯
+const handleModalClose = (newValue) => {
+  // 當 Modal 關閉時，這個方法會被觸發
+  if (content.value.trim() !== "") {
+    const confirmClose = window.confirm("確認要關閉並清除內容嗎？");
+    if (confirmClose) {
+      content.value = ""; // 清空內容
+      emit("update:modelValue", false);
+      prevHeight.value = null; // 儲存上一次高度
+    }
+  } else {
+    emit("update:modelValue", false);
+  }
+};
 
 const handleMessage = async () => {
   const userId = localStorage.getItem("userId");
@@ -108,6 +134,20 @@ const handleMessage = async () => {
     alert("留言提交失敗");
   }
 };
+
+// 監聽 Modal 開啟，恢復高度
+watch(
+  () => props.modelValue,
+  (newValue) => {
+    if (newValue) {
+      nextTick(() => {
+        if (textarea.value) {
+          textarea.value.style.height = prevHeight.value; // 恢復之前的高度
+        }
+      });
+    }
+  }
+);
 </script>
 
 <style scoped>
@@ -115,7 +155,7 @@ const handleMessage = async () => {
   display: flex;
   flex-direction: column;
   width: 625px;
-  height: 250px;
+  height: auto;
   border-radius: 20px;
   background-color: rgb(16, 16, 16);
   text-align: center;
@@ -137,14 +177,25 @@ const handleMessage = async () => {
   align-items: center;
   justify-content: center;
   border-bottom: 0.5px solid rgba(102, 102, 102, 0.5);
+  max-height: 52px;
+  min-height: 52px;
 }
 
 .message-form-mi {
   flex: 2;
   display: flex;
-  align-items: center;
-  justify-content: flex-start;
-  padding: 0 30px;
+  align-items: flex-start;
+  padding-top: 20px;
+  margin-left: 30px;
+  min-height: 104px;
+
+  max-height: 250px;
+  overflow: auto;
+}
+
+.message-form-mi::-webkit-scrollbar-thumb {
+  /* background: rgba(102, 102, 102, 0.5);
+  border-radius: 3px; */
 }
 
 .photo {
@@ -161,12 +212,19 @@ const handleMessage = async () => {
   width: 100%;
 }
 
+.user-content p {
+  margin-bottom: 5px;
+  font-weight: bold;
+}
+
 .user-content textarea {
   border: none;
   outline: none;
+  resize: none;
   background: transparent;
   width: 100%;
   font-size: 14px;
+  padding-right: 30px;
 }
 
 .user-content textarea::placeholder {
@@ -180,6 +238,8 @@ const handleMessage = async () => {
   align-items: center;
   justify-content: end;
   margin: 20px 30px;
+  max-height: 52px;
+  min-height: 52px;
 }
 
 .message-form-end button {
