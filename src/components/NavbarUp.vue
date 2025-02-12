@@ -25,7 +25,7 @@
                 <n-button @click="setLightTheme"> 淺色 </n-button>
               </n-config-provider>
               <!--  -->
-              <div v-if="!authStore.isLoggedIn" class="nav-link">
+              <div v-if="authStore.isLoggedIn" class="nav-link">
                 <router-link to="/" @click.prevent="logout">登出</router-link>
               </div>
             </div>
