@@ -3,8 +3,6 @@ body {
   margin: 0;
   padding: 0;
   box-sizing: border-box;
-  background-color: black;
-  color: #fff;
 }
 
 button {
@@ -15,6 +13,45 @@ button {
 
 img {
   background-color: transparent;
+}
+
+a {
+  text-decoration: none;
+}
+
+.app-container {
+  color: var(--n-text-color);
+  background-color: var(--n-body-color);
+}
+
+/* 深色模式 */
+.dark-mode {
+  background: rgb(16, 16, 16);
+  color: #fff; /* 預設字體顏色 */
+}
+
+/* 淺色模式 */
+.light-mode {
+  background: white;
+  color: black; /* 預設字體顏色 */
+}
+
+/* 可以進一步自定義不同元素的字體顏色 */
+.dark-mode .title {
+  color: #fff;
+}
+
+.light-mode .title {
+  color: black;
+}
+
+/* 例如：修改留言區域的字體顏色 */
+.dark-mode .comment-content {
+  color: #ddd; /* 深色模式的留言內容字體顏色 */
+}
+
+.light-mode .comment-content {
+  color: #333; /* 淺色模式的留言內容字體顏色 */
 }
 
 /* 原始樣式保持不變，以下為響應式調整 */
