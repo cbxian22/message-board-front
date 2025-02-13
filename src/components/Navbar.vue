@@ -83,7 +83,6 @@ nav {
   display: flex;
   justify-content: center;
   width: 100%;
-  border-top: 0.5px solid #aaa;
   position: fixed;
   bottom: 0; /* 固定在視窗底部 */
   left: 0;
@@ -117,8 +116,18 @@ nav ul li {
   background-color: rgba(128, 128, 128, 0.15);
 }
 
-/* 登入註冊鏈接 */
-.register {
-  margin-left: auto;
+/* 淺色下更改引入 icon 顏色 */
+.light-mode img {
+  filter: invert(1) grayscale(100%) contrast(100%) brightness(0);
+}
+
+.dark-mode nav {
+  background: rgba(10, 10, 10, 0.6); /* 半透明黑色背景 */
+  backdrop-filter: blur(10px); /* 霧化效果 */
+}
+
+.light-mode nav {
+  background: rgba(255, 255, 255, 0.6); /* 半透明黑色背景 */
+  backdrop-filter: blur(10px); /* 霧化效果 */
 }
 </style>

@@ -93,6 +93,7 @@ const handleRegister = async () => {
   flex-direction: column;
   justify-self: center;
   width: 350px;
+  background-color: transparent;
 }
 .container {
   margin-bottom: 10px;
@@ -107,7 +108,7 @@ const handleRegister = async () => {
 
 .logo h1 {
   text-align: center;
-  color: #fff;
+  cursor: default;
 }
 
 /* --------- */
@@ -133,7 +134,6 @@ const handleRegister = async () => {
   font-size: 16px;
   border: 0.5px solid #aaa;
   border-radius: 2px;
-  outline: none;
   transition: border 0.3s;
 }
 
@@ -148,7 +148,6 @@ const handleRegister = async () => {
   color: #aaa;
   transition: all;
   pointer-events: none;
-  background: none;
 }
 /* 使用 Vue class 切換標籤位置 */
 .floating-label.active span {
@@ -163,14 +162,12 @@ const handleRegister = async () => {
 button {
   width: 100%;
   padding: 10px;
-  background-color: #007bff;
-  border: none;
+  background-color: #007bff !important;
   border-radius: 4px;
-  cursor: pointer;
 }
 
 button:hover {
-  background-color: #007bff;
+  background-color: #0095f6 !important;
 }
 
 .login {
@@ -178,7 +175,14 @@ button:hover {
 }
 
 .login a {
-  text-decoration: none;
-  color: #0056b3;
+  color: #007bff;
+}
+
+.dark-mode input {
+  background: rgb(35, 35, 35);
+}
+
+.light-mode input {
+  background: rgb(245, 245, 245); /* 半透明黑色背景 */
 }
 </style>

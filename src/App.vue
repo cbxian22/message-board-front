@@ -1,7 +1,7 @@
 <template>
   <n-config-provider :theme="theme">
-    <n-global-style />
     <div :class="themeClass" class="app-container">
+      <n-global-style />
       <router-view />
     </div>
   </n-config-provider>

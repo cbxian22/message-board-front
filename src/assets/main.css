@@ -6,55 +6,54 @@ body {
 }
 
 button {
+  color: var(--n-text-color);
+  cursor: pointer;
   border: none;
   outline: none;
-  background-color: transparent;
+  background: none !important;
 }
 
-img {
-  background-color: transparent;
+input {
+  color: var(--n-text-color);
+  outline: none;
+}
+
+img,
+span {
+  background: none !important;
 }
 
 a {
+  color: var(--n-text-color);
   text-decoration: none;
+  background: none !important;
 }
 
-.app-container {
+.app-container,
+html ::root {
   color: var(--n-text-color);
   background-color: var(--n-body-color);
 }
 
 /* 深色模式 */
 .dark-mode {
-  background: rgb(16, 16, 16);
-  color: #fff; /* 預設字體顏色 */
+  --n-body-color: rgb(10, 10, 10);
+  --n-text-color: rgb(243, 245, 247);
+}
+
+.dark-mode .container-box {
+  background-color: rgb(24, 24, 24);
 }
 
 /* 淺色模式 */
 .light-mode {
-  background: white;
-  color: black; /* 預設字體顏色 */
+  --n-body-color: rgba(255, 255, 255, 0.5);
+  --n-text-color: rgb(0, 0, 0);
 }
 
-/* 可以進一步自定義不同元素的字體顏色 */
-.dark-mode .title {
-  color: #fff;
+.light-mode .container-box {
+  background-color: rgb(255, 255, 255);
 }
-
-.light-mode .title {
-  color: black;
-}
-
-/* 例如：修改留言區域的字體顏色 */
-.dark-mode .comment-content {
-  color: #ddd; /* 深色模式的留言內容字體顏色 */
-}
-
-.light-mode .comment-content {
-  color: #333; /* 淺色模式的留言內容字體顏色 */
-}
-
-/* 原始樣式保持不變，以下為響應式調整 */
 
 /* 平板 RWD (寬度小於 768px) */
 @media (max-width: 768px) {

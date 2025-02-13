@@ -144,22 +144,17 @@ const goToCommentPage = (id) => {
   padding: 40px 20px;
   border-bottom: 0.5px solid rgba(170, 170, 170, 0.5);
   display: flex;
-  background-color: rgb(16, 16, 16);
   border-radius: 8px;
 }
 
 .photo-content {
-  background-color: transparent;
   margin-right: 15px;
 }
 
 .comment {
   flex: 1; /* 讓 comment 占滿剩餘空間 */
 }
-.comment > *,
-div {
-  background-color: transparent;
-}
+
 .photo {
   border-radius: 50%;
   width: 50px;

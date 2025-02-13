@@ -102,6 +102,7 @@ const login = async () => {
   flex-direction: column;
   justify-self: center;
   width: 350px;
+  background-color: transparent;
 }
 .container {
   margin-bottom: 10px;
@@ -116,7 +117,7 @@ const login = async () => {
 
 .logo h1 {
   text-align: center;
-  color: #fff;
+  cursor: default;
 }
 
 /* --------- */
@@ -157,7 +158,6 @@ const login = async () => {
   color: #aaa;
   transition: all;
   pointer-events: none;
-  background: none;
 }
 /* 使用 Vue class 切換標籤位置 */
 .floating-label.active span {
@@ -172,14 +172,12 @@ const login = async () => {
 button {
   width: 100%;
   padding: 10px;
-  background-color: #007bff;
-  border: none;
+  background-color: #007bff !important;
   border-radius: 4px;
-  cursor: pointer;
 }
 
 button:hover {
-  background-color: #007bff;
+  background-color: #0095f6 !important;
 }
 
 .register {
@@ -187,7 +185,14 @@ button:hover {
 }
 
 .register a {
-  text-decoration: none;
-  color: #0056b3;
+  color: #007bff;
+}
+
+.dark-mode input {
+  background: rgb(35, 35, 35);
+}
+
+.light-mode input {
+  background: rgb(245, 245, 245); /* 半透明黑色背景 */
 }
 </style>

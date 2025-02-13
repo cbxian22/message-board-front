@@ -103,20 +103,12 @@ onMounted(() => {
   display: flex;
   flex-direction: column;
   justify-self: center;
-  margin: 100px 0;
   /* 預留空間，避免被固定的 Navbar 擋住 */
-}
-
-/* 主標題 */
-.page-title {
-  font-size: 2rem;
-  font-weight: bold;
-  text-align: center;
-  margin-bottom: 20px;
+  margin: 100px 0;
 }
 
 .container {
-  background: rgb(16, 16, 16);
+  /* background: rgb(16, 16, 16); */
   border: 0.5px solid #aaa;
   border-radius: 8px;
 }
