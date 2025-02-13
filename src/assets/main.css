@@ -33,6 +33,7 @@ a {
 html ::root {
   color: var(--n-text-color);
   background-color: var(--n-body-color);
+  transition: background-color 0.3s ease, color 0.3s ease;
 }
 
 /* 深色模式 */
@@ -43,6 +44,7 @@ html ::root {
 
 .dark-mode .container-box {
   background-color: rgb(24, 24, 24);
+  transition: background-color 0.3s ease, color 0.3s ease;
 }
 
 /* 淺色模式 */
@@ -53,6 +55,7 @@ html ::root {
 
 .light-mode .container-box {
   background-color: rgb(255, 255, 255);
+  transition: background-color 0.3s ease, color 0.3s ease;
 }
 
 /* 平板 RWD (寬度小於 768px) */

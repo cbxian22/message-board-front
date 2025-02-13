@@ -63,4 +63,12 @@ const emit = defineEmits(["update:modelValue"]);
   border-radius: 10px;
   transition: background-color 0.3s ease, color 0.3s ease;
 }
+
+.light-mode .container {
+  background: rgb(245, 245, 245);
+}
+
+.light-mode .content * {
+  color: #505050;
+}
 </style>

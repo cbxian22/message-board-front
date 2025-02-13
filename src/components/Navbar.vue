@@ -29,10 +29,6 @@
         </router-link>
       </li>
 
-      <li v-if="authStore.isLoggedIn" class="nav-link">
-        <router-link to="/" @click.prevent="logout">登出</router-link>
-      </li>
-
       <!-- <li v-if="authStore.isLoggedIn" class="nav-link">
         <h4>Hi {{ authStore.userName }}</h4>
       </li> -->
@@ -63,9 +59,9 @@ authStore.checkLoginStatus();
 const isPostModalOpen = ref(false);
 const isLoginModalOpen = ref(false);
 
-const logout = () => {
-  authStore.logout();
-};
+// const logout = () => {
+//   authStore.logout();
+// };
 
 const checkTokenAndOpenModal = () => {
   const token = localStorage.getItem("token");
@@ -105,15 +101,14 @@ nav ul li {
   display: flex; /* 讓 a 內的內容可以對齊 */
   align-items: center; /* 垂直置中 */
   justify-content: center; /* 水平置中（可選） */
-  cursor: pointer;
   padding: 10px 25px;
   margin: 5px 0;
-  border-radius: 10px;
-  transition: background-color 0.3s ease, color 0.3s ease;
 }
 
 .nav-link:hover {
-  background-color: rgba(128, 128, 128, 0.15);
+  background-color: rgba(128, 128, 128, 0.15) !important;
+  border-radius: 10px;
+  transition: background-color 0.3s ease, color 0.3s ease;
 }
 
 /* 淺色下更改引入 icon 顏色 */
@@ -124,10 +119,12 @@ nav ul li {
 .dark-mode nav {
   background: rgba(10, 10, 10, 0.6); /* 半透明黑色背景 */
   backdrop-filter: blur(10px); /* 霧化效果 */
+  transition: background-color 0.3s ease, color 0.3s ease;
 }
 
 .light-mode nav {
   background: rgba(255, 255, 255, 0.6); /* 半透明黑色背景 */
   backdrop-filter: blur(10px); /* 霧化效果 */
+  transition: background-color 0.3s ease, color 0.3s ease;
 }
 </style>

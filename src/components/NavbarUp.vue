@@ -13,28 +13,33 @@
         </li>
 
         <li>
-          <button @click="openModal" class="nav-link">
+          <button ref="modalButton" @click="openModal" class="nav-link">
             <img :src="Dragicon" alt="Dragicon" />
           </button>
 
           <div v-show="isModalOpen" class="modal-overlay">
             <div class="modal-content" @click.stop>
-              <!--  -->
-              <n-collapse arrow-placement="right" class="nav-link">
+              <n-collapse arrow-placement="right" class="nav-modal">
                 <n-collapse-item title="外觀">
                   <n-config-provider :theme="theme">
                     <div class="theme-switch-container">
-                      <span>深色</span>
-                      <n-switch size="large" @update:value="toggleTheme" />
                       <span>淺色</span>
+                      <n-switch
+                        size="large"
+                        v-model:value="isDarkMode"
+                        @update:value="toggleTheme"
+                      />
+                      <span>深色</span>
                     </div>
                   </n-config-provider>
                 </n-collapse-item>
               </n-collapse>
-              <!--  -->
+
+              <div v-if="authStore.isLoggedIn" class="border-login"></div>
+
               <div
                 v-if="authStore.isLoggedIn"
-                class="nav-link"
+                class="nav-modal"
                 @click.prevent="logout"
               >
                 <router-link to="/">登出</router-link>
@@ -51,13 +56,7 @@
 import { ref, computed, onMounted, onUnmounted } from "vue";
 import { useAuthStore } from "../stores/authStore";
 import { useThemeStore } from "../stores/themeStore";
-import {
-  NButton,
-  NConfigProvider,
-  NSwitch,
-  NCollapseItem,
-  NCollapse,
-} from "naive-ui";
+import { NConfigProvider, NSwitch, NCollapseItem, NCollapse } from "naive-ui";
 import Dragicon from "../assets/Dragicon.svg";
 import Sendicon from "../assets/Sendicon.svg";
 
@@ -66,54 +65,47 @@ const authStore = useAuthStore();
 authStore.checkLoginStatus();
 
 const isModalOpen = ref(false);
+const modalButton = ref(null);
+const isDarkMode = computed(() => themeStore.isDarkMode);
 
 const openModal = (event) => {
-  event.stopPropagation(); // 阻止事件冒泡
-  isModalOpen.value = true;
+  event.stopPropagation();
+  isModalOpen.value = !isModalOpen.value;
 };
 
 const closeModal = (event) => {
-  if (isModalOpen.value) {
-    const modal = document.querySelector(".modal-content");
-    if (modal && !modal.contains(event.target)) {
-      isModalOpen.value = false;
-    }
+  const modal = document.querySelector(".modal-content");
+
+  if (
+    modal &&
+    (modal.contains(event.target) || modalButton.value.contains(event.target))
+  ) {
+    return;
   }
+
+  isModalOpen.value = false;
 };
 
-// 監聽點擊事件
 onMounted(() => {
-  document.addEventListener("click", closeModal);
+  document.addEventListener("mousedown", closeModal);
 });
 
 onUnmounted(() => {
-  document.removeEventListener("click", closeModal);
+  document.removeEventListener("mousedown", closeModal);
 });
 
 const logout = () => {
   authStore.logout();
 };
 
-const theme = computed(() => themeStore.theme);
-
+// 變更主題並儲存
 const toggleTheme = (value) => {
   if (value) {
-    themeStore.setLightTheme();
-  } else {
     themeStore.setDarkTheme();
+  } else {
+    themeStore.setLightTheme();
   }
 };
-
-// 切換深色和淺色主題
-// const setDarkTheme = () => {
-//   themeStore.setDarkTheme();
-//   console.log("目前主題：", themeStore.theme);
-// };
-
-// const setLightTheme = () => {
-//   themeStore.setLightTheme();
-//   console.log("目前主題：", themeStore.theme);
-// };
 </script>
 
 <style scoped>
@@ -145,14 +137,26 @@ nav ul li {
   position: relative; /* 確保彈出視窗相對於按鈕定位 */
 }
 
+.nav-link {
+  display: flex;
+  padding: 10px 25px;
+  margin: 5px 0;
+}
+
+.nav-link:hover {
+  background: rgba(128, 128, 128, 0.15) !important;
+  border-radius: 10px;
+  transition: background-color 0.3s ease, color 0.3s ease;
+}
+
 .modal-overlay {
-  position: absolute; /* 使用 absolute 定位 */
-  top: 100%; /* 將彈出視窗放在按鈕的正下方 */
-  right: 150%;
+  position: absolute;
+  top: 100%;
+  right: 115%;
   width: 100%;
   display: flex;
   justify-content: center;
-  z-index: 2000; /* 確保在導覽列之上 */
+  z-index: 2000;
 }
 
 .modal-content {
@@ -161,33 +165,52 @@ nav ul li {
   padding: 20px;
   border: 0.5px solid #aaa;
   border-radius: 10px;
-  min-width: 300px;
-  max-width: 300px;
 }
-.nav-link {
-  display: flex;
-  width: 100%;
-
-  padding: 10px 25px;
+.nav-modal {
   margin: 5px 0;
+}
+.nav-modal:hover {
+  background: rgba(128, 128, 128, 0.15);
   border-radius: 10px;
   transition: background-color 0.3s ease, color 0.3s ease;
 }
+
 .n-collapse-item {
   flex-direction: column;
   align-items: self-start;
+}
+
+/* 你的 CSS 可能被 scoped 限制，導致外部樣式無法影響該組件。 */
+::v-deep(.n-collapse-item__header-main) {
+  width: 200px;
+  padding: 5px 10px;
+}
+
+::v-deep(.n-collapse-item__content-inner) {
+  padding: 5px 10px;
+}
+
+.theme-switch-container span {
+  cursor: default;
 }
 
 .n-switch {
   padding: 0 20px;
 }
 
+::v-deep(.nav-modal .router-link-active) {
+  padding: 5px 10px;
+  width: 200px;
+}
+
 .router-link-exact-active {
   color: red;
 }
 
-.nav-link:hover {
-  background-color: rgba(128, 128, 128, 0.15);
+.border-login {
+  border-top: 0.5px solid #aaa;
+  width: 100%;
+  margin: 5px 0;
 }
 
 /* 淺色下更改引入 icon 顏色 */
@@ -198,18 +221,22 @@ nav ul li {
 .dark-mode nav {
   background: rgba(10, 10, 10, 0.6);
   backdrop-filter: blur(10px);
+  transition: background-color 0.3s ease, color 0.3s ease;
 }
 
 .light-mode nav {
   background: rgba(255, 255, 255, 0.6);
   backdrop-filter: blur(10px);
+  transition: background-color 0.3s ease, color 0.3s ease;
 }
 
 .dark-mode .modal-content {
   background: rgb(24, 24, 24);
+  transition: background-color 0.3s ease, color 0.3s ease;
 }
 
 .light-mode .modal-content {
   background: rgb(255, 255, 255);
+  transition: background-color 0.3s ease, color 0.3s ease;
 }
 </style>

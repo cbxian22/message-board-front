@@ -189,14 +189,8 @@ watch(
   padding-top: 20px;
   margin-left: 30px;
   min-height: 104px;
-
   max-height: 250px;
   overflow: auto;
-}
-
-.message-form-mi::-webkit-scrollbar-thumb {
-  /* background: rgba(102, 102, 102, 0.5);
-  border-radius: 3px; */
 }
 
 .photo {
@@ -226,10 +220,11 @@ watch(
   width: 100%;
   font-size: 14px;
   padding-right: 30px;
+  color: rgb(243, 245, 247);
 }
 
 .user-content textarea::placeholder {
-  color: gray; /* 設定 placeholder 的顏色 */
+  color: #aaa;
   opacity: 0.7; /* 調整透明度 */
 }
 
@@ -247,5 +242,12 @@ watch(
   padding: 10px 20px;
   border: 0.5px solid rgba(102, 102, 102, 0.5);
   border-radius: 10px;
+}
+
+.light-mode .message-container {
+  background: rgb(255, 255, 255);
+}
+.light-mode .user-content textarea {
+  color: rgb(0, 0, 0);
 }
 </style>

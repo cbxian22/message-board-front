@@ -193,6 +193,6 @@ button:hover {
 }
 
 .light-mode input {
-  background: rgb(245, 245, 245); /* 半透明黑色背景 */
+  background: rgb(245, 245, 245);
 }
 </style>
