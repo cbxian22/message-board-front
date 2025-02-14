@@ -57,6 +57,7 @@ import { ref, computed, onMounted, onUnmounted } from "vue";
 import { useAuthStore } from "../stores/authStore";
 import { useThemeStore } from "../stores/themeStore";
 import { NConfigProvider, NSwitch, NCollapseItem, NCollapse } from "naive-ui";
+import Login from "../components/LoginModal.vue";
 import Dragicon from "../assets/Dragicon.svg";
 import Sendicon from "../assets/Sendicon.svg";
 
@@ -181,7 +182,8 @@ nav ul li {
 }
 
 /* 你的 CSS 可能被 scoped 限制，導致外部樣式無法影響該組件。 */
-::v-deep(.n-collapse-item__header-main) {
+::v-deep(.n-collapse-item__header-main),
+.nav-modal a {
   width: 200px;
   padding: 5px 10px;
 }
@@ -203,7 +205,7 @@ nav ul li {
   width: 200px;
 }
 
-.router-link-exact-active {
+.nav-modal a {
   color: red;
 }
 
