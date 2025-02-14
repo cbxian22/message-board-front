@@ -1,5 +1,6 @@
 import { defineStore } from "pinia";
 import { jwtDecode } from "jwt-decode"; // 使用官方的導入方式
+import { useChatStore } from "./chatStore"; // 確保路徑正確
 
 const verifyToken = (token) => {
   try {
@@ -33,8 +34,8 @@ export const useAuthStore = defineStore("auth", {
         localStorage.setItem("userName", this.userName);
         localStorage.setItem("role", this.role);
 
-        // 登入後連接 WebSocket
-        const chatStore = useChatStore();
+        // ✅ 修正：確保 Pinia 可用
+        const chatStore = useChatStore(this.$pinia);
         chatStore.connectWebSocket(this.userId);
       }
     },
@@ -58,8 +59,8 @@ export const useAuthStore = defineStore("auth", {
           this.userName = decodedToken.userName || "未知用户";
           this.role = decodedToken.role;
 
-          // 確保重新整理後仍然連接 WebSocket
-          const chatStore = useChatStore();
+          // ✅ 確保 WebSocket 正確初始化
+          const chatStore = useChatStore(this.$pinia);
           chatStore.connectWebSocket(this.userId);
         } else {
           this.logout();
