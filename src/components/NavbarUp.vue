@@ -42,7 +42,7 @@
                 class="nav-modal"
                 @click.prevent="logout"
               >
-                <router-link to="/">登出</router-link>
+                <router-link to="/login">登出</router-link>
               </div>
             </div>
           </div>

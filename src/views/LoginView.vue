@@ -1,12 +1,21 @@
 <template>
-  <div class="container-box">
-    <div class="container">
-      <div class="logo">
-        <h1>Boardxian</h1>
-      </div>
+  <div v-show="isLoading" class="loading-container">
+    <n-spin size="large" stroke="#FFF" />
+    <div class="n-spin-b">
+      <p>produced by</p>
+      <p>BoXian</p>
+    </div>
+  </div>
 
-      <form @submit.prevent="login" class="form-container">
-        <!-- <div class="form-group">
+  <div v-show="!isLoading">
+    <div class="container-box">
+      <div class="container">
+        <div class="logo">
+          <h1>Boardxian</h1>
+        </div>
+
+        <form @submit.prevent="login" class="form-container">
+          <!-- <div class="form-group">
         <label for="role">角色</label>
         <select id="role" v-model="role" required>
           <option value="user">使用者</option>
@@ -14,44 +23,51 @@
         </select>
       </div> -->
 
-        <div class="form-group">
-          <label
-            for="username"
-            :class="{ active: username }"
-            class="floating-label"
-          >
-            <input id="username" type="text" v-model="username" required />
-            <span>輸入用戶帳號</span>
-          </label>
-        </div>
+          <div class="form-group">
+            <label
+              for="username"
+              :class="{ active: username }"
+              class="floating-label"
+            >
+              <input id="username" type="text" v-model="username" required />
+              <span>輸入用戶帳號</span>
+            </label>
+          </div>
 
-        <div class="form-group">
-          <label
-            for="password"
-            :class="{ active: password }"
-            class="floating-label"
-          >
-            <input id="password" type="password" v-model="password" required />
-            <span>輸入密碼</span>
-          </label>
-        </div>
-        <div class="form-group">
-          <button type="submit" class="btn">登入</button>
-        </div>
-      </form>
-    </div>
+          <div class="form-group">
+            <label
+              for="password"
+              :class="{ active: password }"
+              class="floating-label"
+            >
+              <input
+                id="password"
+                type="password"
+                v-model="password"
+                required
+              />
+              <span>輸入密碼</span>
+            </label>
+          </div>
+          <div class="form-group">
+            <button type="submit" class="btn">登入</button>
+          </div>
+        </form>
+      </div>
 
-    <div class="container">
-      <div class="register">
-        <span>還沒有帳號嗎？</span>
-        <router-link to="/register" class="nav-link">註冊</router-link>
+      <div class="container">
+        <div class="register">
+          <span>還沒有帳號嗎？</span>
+          <router-link to="/register" class="nav-link">註冊</router-link>
+        </div>
       </div>
     </div>
   </div>
 </template>
 
 <script setup>
-import { ref } from "vue";
+import { NSpin } from "naive-ui";
+import { ref, onMounted } from "vue";
 import { useRouter } from "vue-router";
 import axios from "axios";
 import { useAuthStore } from "@/stores/authStore";
@@ -61,6 +77,7 @@ const username = ref("");
 const password = ref("");
 const role = ref("user");
 const authStore = useAuthStore();
+const isLoading = ref(true);
 
 const login = async () => {
   if (!username.value || !password.value) {
@@ -93,6 +110,12 @@ const login = async () => {
     alert("登入失敗，請檢查用戶帳號或密碼！");
   }
 };
+
+onMounted(() => {
+  setTimeout(() => {
+    isLoading.value = false;
+  }, 1000);
+});
 </script>
 
 <style scoped>
