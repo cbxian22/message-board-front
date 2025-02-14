@@ -35,7 +35,7 @@
           </div>
 
           <div class="user-content">
-            <p>user</p>
+            <p>{{ userName }}</p>
             <label for="content"></label>
             <textarea
               id="content"
@@ -58,12 +58,15 @@
 
 <script setup>
 import Modal from "./Modal.vue"; // 引入彈窗組件
-import { ref, nextTick, watch } from "vue";
+import { ref, nextTick, watch, computed } from "vue";
 import axios from "../stores/axiosConfig"; // 統一配置後的 axios
 import { useSocketStore } from "../stores/socketStore"; // WebSocket Store
 
 const props = defineProps(["modelValue"]);
 const emit = defineEmits(["update:modelValue"]);
+
+// 取得使用者名稱
+const userName = computed(() => localStorage.getItem("userName") || "未知用户");
 
 // const messagetitle = ref("");
 const content = ref("");
