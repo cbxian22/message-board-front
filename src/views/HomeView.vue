@@ -11,6 +11,7 @@
     <div class="container-box">
       <NavbarUp />
       <div class="container">
+        <!--  -->
         <div v-if="aru" class="aru">
           <h1>最新留言</h1>
           <div
@@ -36,6 +37,7 @@
             <!--  -->
           </div>
         </div>
+        <!--  -->
         <!-- <singleComment /> -->
         <singleComment @loaded="handleLoaded" />
       </div>
@@ -108,9 +110,9 @@ onMounted(() => {
 }
 
 .container {
-  /* background: rgb(16, 16, 16); */
-  border: 0.5px solid #aaa;
-  border-radius: 8px;
+  border: 0.5px solid #373737;
+  border-radius: 30px;
+  overflow: hidden; /* 防止背景超出圓角範圍 */
 }
 
 .aru {

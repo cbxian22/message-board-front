@@ -94,7 +94,8 @@ nav ul {
 
 /* 項目間距 */
 nav ul li {
-  display: flex;
+  /* display: flex; */
+  list-style-type: none;
 }
 
 .nav-link {

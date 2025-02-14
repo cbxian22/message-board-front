@@ -42,7 +42,7 @@ html ::root {
   --n-text-color: rgb(243, 245, 247);
 }
 
-.dark-mode .container-box {
+.dark-mode .container {
   background-color: rgb(24, 24, 24);
   transition: background-color 0.3s ease, color 0.3s ease;
 }
@@ -53,7 +53,7 @@ html ::root {
   --n-text-color: rgb(0, 0, 0);
 }
 
-.light-mode .container-box {
+.light-mode .container {
   background-color: rgb(255, 255, 255);
   transition: background-color 0.3s ease, color 0.3s ease;
 }

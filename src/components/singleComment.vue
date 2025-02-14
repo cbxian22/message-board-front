@@ -1,4 +1,6 @@
 <script setup>
+import Replyicon from "../assets/Replyicon.svg";
+import Favoriteicon from "../assets/Favoriteicon.svg";
 import { ref, onMounted, defineEmits } from "vue";
 // import { useSocketStore } from "../stores/socketStore";
 import axios from "axios";
@@ -35,16 +37,42 @@ const fetchComments = async () => {
 };
 
 // 格式化時間
+// const formatDate = (date) => {
+//   if (!date) return "未知時間";
+//   const options = {
+//     year: "numeric",
+//     month: "2-digit",
+//     day: "2-digit",
+//     hour: "2-digit",
+//     minute: "2-digit",
+//   };
+//   return new Date(date).toLocaleString("zh-TW", options);
+// };
 const formatDate = (date) => {
   if (!date) return "未知時間";
-  const options = {
-    year: "numeric",
-    month: "2-digit",
-    day: "2-digit",
-    hour: "2-digit",
-    minute: "2-digit",
-  };
-  return new Date(date).toLocaleString("zh-TW", options);
+
+  const timestamp = typeof date === "string" ? parseInt(date, 10) : date; // 確保是數字類型
+  const currentTime = new Date();
+  const inputDate = new Date(timestamp); // 轉換成 Date 物件
+  const diffInSeconds = Math.floor((currentTime - inputDate) / 1000); // 轉換秒
+  const diffInMinutes = Math.floor(diffInSeconds / 60); // 轉換分鐘
+  const diffInHours = Math.floor(diffInMinutes / 60); // 轉換小時
+  const diffInDays = Math.floor(diffInHours / 24); // 轉換天數
+  const diffInWeeks = Math.floor(diffInDays / 7); // 轉換週
+
+  if (diffInSeconds < 60) {
+    return "現在";
+  } else if (diffInMinutes < 60) {
+    return `${diffInMinutes} 分鐘`;
+  } else if (diffInHours < 24) {
+    return `${diffInHours} 小時`;
+  } else if (diffInDays < 7) {
+    return `${diffInDays} 天`;
+  } else if (diffInWeeks < 4) {
+    return `${diffInWeeks} 週`;
+  } else {
+    return inputDate.toLocaleDateString("zh-TW"); // 超過 4 週顯示日期
+  }
 };
 
 // 跳轉到 CommentView
@@ -60,6 +88,8 @@ onMounted(() => {
 
 <!-- <script setup>
 import { ref } from "vue";
+import Replyicon from "../assets/Replyicon.svg";
+import Favoriteicon from "../assets/Favoriteicon.svg";
 
 const comments = ref([
   {
@@ -111,7 +141,12 @@ const goToCommentPage = (id) => {
 </script> -->
 
 <template>
-  <div v-for="comment in comments" :key="comment.id" class="comment-box">
+  <div
+    v-for="(comment, index) in comments"
+    :key="comment.id"
+    :class="['comment-box', { 'last-comment': index === comments.length - 1 }]"
+  >
+    <!-- 頭貼 -->
     <div class="photo-content">
       <img
         :src="comment.photo || 'https://fakeimg.pl/50/'"
@@ -119,32 +154,48 @@ const goToCommentPage = (id) => {
         class="photo"
       />
     </div>
+    <!-- 內文 -->
     <div class="comment">
-      <span class="comment-time"
-        >貼文時間: {{ formatDate(comment.timestamp) }}</span
-      >
-      <!-- <h3 class="comment-title">{{ comment.title }}</h3> -->
-      <p class="comment-content">{{ comment.content }}</p>
-      <!-- <span class="comment-author"> {{ comment.name }}</span> -->
-
-      <p v-if="comment.file_url" class="comment-file">
-        附件: <a :href="comment.file_url" target="_blank">下載</a>
-      </p>
-      <div>
-        <button @click="goToCommentPage(comment.id)" class="view-button">
-          回覆
-        </button>
+      <!-- 貼文資訊 -->
+      <div class="">
+        <span class="comment-author"> {{ comment.name }}</span>
+        <span class="comment-time"> {{ formatDate(comment.timestamp) }}</span>
       </div>
+
+      <!-- 貼文內容 -->
+      <p class="comment-content">{{ comment.content }}</p>
+      <!-- <p v-if="comment.file_url" class="comment-file">
+        附件: <a :href="comment.file_url" target="_blank">下載</a>
+      </p> -->
+
+      <!-- 回覆功能 -->
+      <div class="reply">
+        <ul>
+          <li>
+            <button @click="" class="reply-link">
+              <img :src="Favoriteicon" alt="Favoriteicon" />
+            </button>
+          </li>
+          <li>
+            <button @click="goToCommentPage(comment.id)" class="reply-link">
+              <img :src="Replyicon" alt="Replyicon" />
+            </button>
+          </li>
+        </ul>
+      </div>
+      <!-- 內文 comment -->
     </div>
   </div>
 </template>
 
 <style scoped>
 .comment-box {
-  padding: 40px 20px;
-  border-bottom: 0.5px solid rgba(170, 170, 170, 0.5);
+  padding: 40px 20px 15px 20px;
+  border-bottom: 0.5px solid #373737;
   display: flex;
-  border-radius: 8px;
+}
+.comment-box.last-comment {
+  border-bottom: none !important;
 }
 
 .photo-content {
@@ -152,11 +203,28 @@ const goToCommentPage = (id) => {
 }
 
 .comment {
-  flex: 1; /* 讓 comment 占滿剩餘空間 */
+  display: flex;
+  flex-direction: column;
+  flex: 1;
 }
 
 .photo {
   border-radius: 50%;
   width: 50px;
+}
+
+.reply {
+}
+.reply ul {
+  display: flex;
+  flex-direction: row;
+  list-style-type: none;
+}
+
+.reply-link {
+  display: flex; /* 讓 a 內的內容可以對齊 */
+  align-items: center; /* 垂直置中 */
+  justify-content: center; /* 水平置中（可選） */
+  padding: 5px 20px 5px 0px;
 }
 </style>
