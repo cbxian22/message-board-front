@@ -54,13 +54,14 @@
 
 <script setup>
 import { ref, computed, onMounted, onUnmounted } from "vue";
+import { useRouter } from "vue-router";
 import { useAuthStore } from "../stores/authStore";
 import { useThemeStore } from "../stores/themeStore";
 import { NConfigProvider, NSwitch, NCollapseItem, NCollapse } from "naive-ui";
-import Login from "../components/LoginModal.vue";
+
 import Dragicon from "../assets/Dragicon.svg";
 import Sendicon from "../assets/Sendicon.svg";
-
+const router = useRouter();
 const themeStore = useThemeStore();
 const authStore = useAuthStore();
 authStore.checkLoginStatus();
@@ -97,6 +98,7 @@ onUnmounted(() => {
 
 const logout = () => {
   authStore.logout();
+  router.push("/login");
 };
 
 // 變更主題並儲存
