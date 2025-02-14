@@ -23,8 +23,8 @@
         </router-link>
       </li>
 
-      <li v-if="authStore.isLoggedIn">
-        <router-link to="/" class="nav-link">
+      <li v-if="!authStore.isLoggedIn">
+        <router-link to="/profile" class="nav-link">
           <img :src="Accounticon" alt="Accounticon" />
         </router-link>
       </li>

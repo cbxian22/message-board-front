@@ -37,6 +37,12 @@ const router = createRouter({
       // meta: { requiresGuest: true },
     },
     {
+      path: "/profile",
+      name: "Profile",
+      component: () => import("../views/Profile.vue"),
+      // meta: { requiresGuest: true },
+    },
+    {
       path: "/comment/:id",
       name: "Comment",
       component: () => import("../views/CommentView.vue"),
