@@ -1,7 +1,12 @@
 <script setup>
 import Replyicon from "../assets/Replyicon.svg";
 import Favoriteicon from "../assets/Favoriteicon.svg";
-import { ref, onMounted, defineEmits } from "vue";
+import Moreicon from "../assets/Moreicon.svg";
+import Editicon from "../assets/Editicon.svg";
+import Deleteicon from "../assets/Deleteicon.svg";
+import Flagicon from "../assets/Flagicon.svg";
+
+import { ref, defineEmits, computed, onMounted, onUnmounted } from "vue";
 // import { useSocketStore } from "../stores/socketStore";
 import axios from "axios";
 import { useRouter } from "vue-router";
@@ -9,6 +14,57 @@ import { useRouter } from "vue-router";
 const router = useRouter();
 const comments = ref([]);
 const emit = defineEmits();
+
+const authStore = useAuthStore();
+authStore.checkLoginStatus();
+
+const modalState = ref({});
+const modalRefs = ref({});
+const buttonRefs = ref({});
+
+const openModal = (event, commentId) => {
+  event.stopPropagation();
+
+  // 如果當前 Modal 已開啟，則關閉它
+  if (modalState.value[commentId]) {
+    modalState.value[commentId] = false;
+    return;
+  }
+
+  // 先關閉所有其他留言的 Modal
+  Object.keys(modalState.value).forEach((key) => {
+    modalState.value[key] = false;
+  });
+
+  // 只打開當前點擊的留言的 Modal
+  modalState.value[commentId] = true;
+};
+
+// 關閉 Modal
+const closeModal = (event) => {
+  const clickedInsideModal = Object.keys(modalRefs.value).some((id) => {
+    const modal = modalRefs.value[id];
+    const button = buttonRefs.value[id];
+
+    return (
+      modal && (modal.contains(event.target) || button.contains(event.target))
+    );
+  });
+
+  if (!clickedInsideModal) {
+    Object.keys(modalState.value).forEach((key) => {
+      modalState.value[key] = false;
+    });
+  }
+};
+
+onMounted(() => {
+  document.addEventListener("mousedown", closeModal);
+});
+
+onUnmounted(() => {
+  document.removeEventListener("mousedown", closeModal);
+});
 
 // 獲取留言
 const fetchComments = async () => {
@@ -87,10 +143,15 @@ onMounted(() => {
 </script>
 
 <!-- <script setup>
-import { ref } from "vue";
+import { ref, computed, onMounted, onUnmounted } from "vue";
+import { useAuthStore } from "../stores/authStore";
+
 import Replyicon from "../assets/Replyicon.svg";
 import Favoriteicon from "../assets/Favoriteicon.svg";
-
+import Moreicon from "../assets/Moreicon.svg";
+import Editicon from "../assets/Editicon.svg";
+import Deleteicon from "../assets/Deleteicon.svg";
+import Flagicon from "../assets/Flagicon.svg";
 const comments = ref([
   {
     id: 1,
@@ -130,6 +191,56 @@ const comments = ref([
   },
 ]);
 
+const authStore = useAuthStore();
+authStore.checkLoginStatus();
+const modalState = ref({});
+const modalRefs = ref({});
+const buttonRefs = ref({});
+
+const openModal = (event, commentId) => {
+  event.stopPropagation();
+
+  // 如果當前 Modal 已開啟，則關閉它
+  if (modalState.value[commentId]) {
+    modalState.value[commentId] = false;
+    return;
+  }
+
+  // 先關閉所有其他留言的 Modal
+  Object.keys(modalState.value).forEach((key) => {
+    modalState.value[key] = false;
+  });
+
+  // 只打開當前點擊的留言的 Modal
+  modalState.value[commentId] = true;
+};
+
+// 關閉 Modal
+const closeModal = (event) => {
+  const clickedInsideModal = Object.keys(modalRefs.value).some((id) => {
+    const modal = modalRefs.value[id];
+    const button = buttonRefs.value[id];
+
+    return (
+      modal && (modal.contains(event.target) || button.contains(event.target))
+    );
+  });
+
+  if (!clickedInsideModal) {
+    Object.keys(modalState.value).forEach((key) => {
+      modalState.value[key] = false;
+    });
+  }
+};
+
+onMounted(() => {
+  document.addEventListener("mousedown", closeModal);
+});
+
+onUnmounted(() => {
+  document.removeEventListener("mousedown", closeModal);
+});
+
 const formatDate = (timestamp) => {
   const date = new Date(timestamp);
   return date.toLocaleString(); // 格式化日期時間
@@ -157,9 +268,49 @@ const goToCommentPage = (id) => {
     <!-- 內文 -->
     <div class="comment">
       <!-- 貼文資訊 -->
-      <div class="">
-        <span class="comment-author"> {{ comment.name }}</span>
-        <span class="comment-time"> {{ formatDate(comment.timestamp) }}</span>
+      <div class="info">
+        <div class="info-span">
+          <span class="comment-author"> {{ comment.name }}</span>
+          <span class="comment-time"> {{ formatDate(comment.timestamp) }}</span>
+        </div>
+
+        <div class="info-modal">
+          <button
+            ref="buttonRefs"
+            @click="openModal($event, comment.id)"
+            class="info-link"
+          >
+            <img :src="Moreicon" alt="Moreicon" />
+          </button>
+          <div
+            v-show="modalState[comment.id]"
+            class="modal-overlay"
+            ref="modalRefs"
+          >
+            <div class="modal-content" @click.stop>
+              <ul>
+                <li v-if="!authStore.isLoggedIn">
+                  <router-link to="/message" class="modal-link">
+                    <img :src="Editicon" alt="Editicon" />
+                    <span>編輯</span>
+                  </router-link>
+                </li>
+                <li v-if="!authStore.isLoggedIn">
+                  <button class="modal-link">
+                    <img :src="Deleteicon" alt="Deleteicon" />
+                    <span>刪除</span>
+                  </button>
+                </li>
+                <li v-if="authStore.isLoggedIn">
+                  <button class="modal-link">
+                    <img :src="Flagicon" alt="Flagicon" />
+                    <span>檢舉</span>
+                  </button>
+                </li>
+              </ul>
+            </div>
+          </div>
+        </div>
       </div>
 
       <!-- 貼文內容 -->
@@ -190,7 +341,7 @@ const goToCommentPage = (id) => {
 
 <style scoped>
 .comment-box {
-  padding: 40px 20px 15px 20px;
+  padding: 20px 25px 15px 25px;
   border-bottom: 0.5px solid #373737;
   display: flex;
 }
@@ -214,7 +365,9 @@ const goToCommentPage = (id) => {
 }
 
 .reply {
+  margin-left: -15px; /* 根據 padding 的值調整 */
 }
+
 .reply ul {
   display: flex;
   flex-direction: row;
@@ -225,6 +378,110 @@ const goToCommentPage = (id) => {
   display: flex; /* 讓 a 內的內容可以對齊 */
   align-items: center; /* 垂直置中 */
   justify-content: center; /* 水平置中（可選） */
-  padding: 5px 20px 5px 0px;
+  padding: 5px 10px;
+}
+
+.reply-link:hover,
+.info-link:hover {
+  background-color: rgba(128, 128, 128, 0.15) !important;
+  border-radius: 10px;
+  transition: background-color 0.3s ease, color 0.3s ease;
+}
+
+.info {
+  display: flex;
+  flex-direction: row;
+  justify-content: space-between;
+}
+
+.info-span {
+  display: flex;
+  align-items: center;
+}
+
+.info-span .comment-author {
+  color: #fff;
+  font-weight: 900;
+  transition: color 0.3s ease;
+}
+
+.light-mode .info-span .comment-author {
+  color: #000;
+  font-weight: 900;
+  transition: color 0.3s ease;
+}
+
+.info-span .comment-time {
+  margin-left: 10px;
+  color: #707070;
+}
+
+.info-link {
+  display: flex; /* 讓 a 內的內容可以對齊 */
+  align-items: center; /* 垂直置中 */
+  justify-content: center; /* 水平置中（可選） */
+  padding: 5px 10px;
+}
+
+.comment-content {
+  margin-bottom: 5px;
+}
+
+.light-mode .info-link > img,
+.light-mode .reply-link > img {
+  filter: invert(1) grayscale(100%) contrast(100%) brightness(0);
+}
+
+.info-modal {
+  position: relative;
+}
+
+.modal-overlay {
+  position: absolute;
+  top: 110%;
+  right: 0%;
+  border: 0.5px solid #373737;
+  border-radius: 10px;
+  z-index: 1000;
+  padding: 20px;
+}
+
+/* .modal-content {
+  display: flex;
+  flex-direction: column;
+} */
+.modal-content ul {
+  list-style-type: none;
+}
+
+.modal-content li {
+  width: 150px;
+}
+
+li:hover {
+  background-color: rgba(128, 128, 128, 0.15) !important;
+  border-radius: 10px;
+  transition: background-color 0.3s ease, color 0.3s ease;
+}
+
+.modal-link {
+  width: 100%;
+  display: flex;
+  flex: 1;
+  padding: 5px 10px;
+  margin: 5px;
+}
+.modal-link span {
+  margin-left: 10px;
+}
+
+.dark-mode .modal-overlay {
+  background: rgb(24, 24, 24);
+  transition: background-color 0.3s ease, color 0.3s ease;
+}
+
+.light-mode .modal-overlay {
+  background: rgb(255, 255, 255);
+  transition: background-color 0.3s ease, color 0.3s ease;
 }
 </style>
