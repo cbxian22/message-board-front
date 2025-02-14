@@ -290,19 +290,19 @@ const goToCommentPage = (id) => {
           >
             <div class="modal-content" @click.stop>
               <ul>
-                <li v-if="!authStore.isLoggedIn">
+                <li v-if="authStore.isLoggedIn">
                   <router-link to="/message" class="modal-link">
                     <img :src="Editicon" alt="Editicon" />
                     <span>編輯</span>
                   </router-link>
                 </li>
-                <li v-if="!authStore.isLoggedIn">
+                <li v-if="authStore.isLoggedIn">
                   <button class="modal-link">
                     <img :src="Deleteicon" alt="Deleteicon" />
                     <span>刪除</span>
                   </button>
                 </li>
-                <li v-if="authStore.isLoggedIn">
+                <li>
                   <button class="modal-link">
                     <img :src="Flagicon" alt="Flagicon" />
                     <span>檢舉</span>
