@@ -58,6 +58,9 @@ html ::root {
   transition: background-color 0.3s ease, color 0.3s ease;
 }
 
+.light-mode .n-spin .n-base-loading__icon {
+  stroke: rgb(0, 0, 0);
+}
 /* 平板 RWD (寬度小於 768px) */
 @media (max-width: 768px) {
   .container-box {

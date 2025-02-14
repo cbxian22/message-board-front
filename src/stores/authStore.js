@@ -32,6 +32,10 @@ export const useAuthStore = defineStore("auth", {
         localStorage.setItem("userId", this.userId);
         localStorage.setItem("userName", this.userName);
         localStorage.setItem("role", this.role);
+
+        // 登入後連接 WebSocket
+        const chatStore = useChatStore();
+        chatStore.connectWebSocket(this.userId);
       }
     },
     logout() {
@@ -53,6 +57,10 @@ export const useAuthStore = defineStore("auth", {
           this.userId = decodedToken.userId;
           this.userName = decodedToken.userName || "未知用户";
           this.role = decodedToken.role;
+
+          // 確保重新整理後仍然連接 WebSocket
+          const chatStore = useChatStore();
+          chatStore.connectWebSocket(this.userId);
         } else {
           this.logout();
         }

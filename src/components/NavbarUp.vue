@@ -6,8 +6,8 @@
 
     <div>
       <ul>
-        <li>
-          <router-link to="/" class="nav-link">
+        <li v-if="authStore.isLoggedIn">
+          <router-link to="/chat" class="nav-link">
             <img :src="Sendicon" alt="Sendicon" />
           </router-link>
         </li>
