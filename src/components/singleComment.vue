@@ -6,8 +6,9 @@ import Editicon from "../assets/Editicon.svg";
 import Deleteicon from "../assets/Deleteicon.svg";
 import Flagicon from "../assets/Flagicon.svg";
 
-import { ref, defineEmits, computed, onMounted, onUnmounted } from "vue";
+import { ref, defineEmits, onMounted, onUnmounted } from "vue";
 // import { useSocketStore } from "../stores/socketStore";
+import { useAuthStore } from "../stores/authStore";
 import axios from "axios";
 import { useRouter } from "vue-router";
 // const socketStore = useSocketStore();
