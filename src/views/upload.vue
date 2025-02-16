@@ -24,7 +24,7 @@ export default {
       try {
         // 1️⃣ 向後端請求 Signed URL
         const { data } = await axios.get(
-          "https://message-board-server-7yot.onrender.com/api/upload/generate-signed-url",
+          "https://message-board-server-7yot.onrender.com/api/upload",
           {
             params: {
               filename: this.file.name,
