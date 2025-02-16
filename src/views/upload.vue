@@ -51,7 +51,7 @@ export default {
     async submitPost() {
       try {
         await axios.post(
-          "https://message-board-server-7yot.onrender.com/api/posts",
+          "https://message-board-server-7yot.onrender.com/api/posts/39",
           {
             content: this.content,
             fileUrl: this.fileUrl, // 這裡傳遞檔案 URL
