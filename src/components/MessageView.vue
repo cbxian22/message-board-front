@@ -21,9 +21,7 @@
 
         <div class="message-form-mi">
           <div>
-            <!-- 
-            <img :src="userStore.userImageUrl" alt="User Photo" class="photo" />
-            -->
+            <!-- <img :src="userStore.userImageUrl" alt="UserPhoto" class="photo" /> -->
             <img
               :src="'https://fakeimg.pl/50/'"
               alt="頭像"
@@ -39,15 +37,28 @@
               id="content"
               v-model="content"
               placeholder="最近想潑點什麼呢？"
-              required
               @input="adjustHeight"
               ref="textarea"
             ></textarea>
+
+            <div class="file-upload-container">
+              <input
+                type="file"
+                @change="handleFileUpload"
+                class="file-input"
+              />
+              <button @click="submitPost" class="submit-button">
+                <img :src="Noteicon" alt="Noteicon" />
+              </button>
+            </div>
           </div>
         </div>
 
         <div class="message-form-end">
-          <button type="submit" class="submit-btn">發佈</button>
+          <!-- <button type="submit" class="submit-btn">發佈</button> -->
+          <n-button :disabled="isSubmitDisabled" @click="handleMessage"
+            >發佈</n-button
+          >
         </div>
       </form>
     </div>
@@ -55,21 +66,30 @@
 </template>
 
 <script setup>
+import Noteicon from "../assets/Noteicon.svg";
 import Modal from "./Modal.vue"; // 引入彈窗組件
 import { ref, nextTick, watch, computed } from "vue";
+import { NButton } from "naive-ui";
 import axios from "../stores/axiosConfig"; // 統一配置後的 axios
 import { useSocketStore } from "../stores/socketStore"; // WebSocket Store
 
 const props = defineProps(["modelValue"]);
 const emit = defineEmits(["update:modelValue"]);
+const socketStore = useSocketStore();
 
 // 取得使用者名稱
 const userName = computed(() => localStorage.getItem("userName") || "未知用户");
 
-// const messagetitle = ref("");
 const content = ref("");
 const textarea = ref(null); // 取得 textarea DOM 節點
 const prevHeight = ref("auto"); // 儲存上一次高度
+const file = ref(null);
+const fileUrl = ref(null);
+
+// 檢查是否啟用提交按鈕
+const isSubmitDisabled = computed(() => {
+  return !content.value.trim() && !file.value;
+});
 
 const adjustHeight = () => {
   nextTick(() => {
@@ -81,20 +101,35 @@ const adjustHeight = () => {
   });
 };
 
-const socketStore = useSocketStore();
+const handleFileUpload = (event) => {
+  file.value = event.target.files[0];
+  if (!file.value) return;
+  console.log("檔案已選擇:", file.value.name);
+};
 
-// 處理 Modal 關閉的邏輯
-const handleModalClose = (newValue) => {
-  // 當 Modal 關閉時，這個方法會被觸發
-  if (content.value.trim() !== "") {
-    const confirmClose = window.confirm("確認要關閉並清除內容嗎？");
-    if (confirmClose) {
-      content.value = ""; // 清空內容
-      emit("update:modelValue", false);
-      prevHeight.value = null; // 儲存上一次高度
+const submitPost = async () => {
+  try {
+    let uploadedFileUrl = null;
+    if (file.value) {
+      console.log("開始上傳檔案...");
+      const { data } = await axios.get(
+        "https://message-board-server-7yot.onrender.com/api/upload",
+        {
+          params: { filename: file.value.name, contentType: file.value.type },
+        }
+      );
+
+      const { uploadUrl, fileUrl: tempFileUrl } = data;
+      await axios.put(uploadUrl, file.value, {
+        headers: { "Content-Type": file.value.type },
+      });
+      uploadedFileUrl = tempFileUrl;
+      console.log("檔案上傳成功:", uploadedFileUrl);
     }
-  } else {
-    emit("update:modelValue", false);
+    return uploadedFileUrl;
+  } catch (error) {
+    console.error("檔案上傳失敗:", error);
+    return null;
   }
 };
 
@@ -134,6 +169,21 @@ const handleMessage = async () => {
   } catch (error) {
     console.error("留言提交錯誤:", error);
     alert("留言提交失敗");
+  }
+};
+
+// 處理 Modal 關閉的邏輯
+const handleModalClose = (newValue) => {
+  // 當 Modal 關閉時，這個方法會被觸發
+  if (content.value.trim() !== "") {
+    const confirmClose = window.confirm("確認要關閉並清除內容嗎？");
+    if (confirmClose) {
+      content.value = ""; // 清空內容
+      emit("update:modelValue", false);
+      prevHeight.value = null; // 儲存上一次高度
+    }
+  } else {
+    emit("update:modelValue", false);
   }
 };
 
@@ -227,6 +277,23 @@ watch(
 .user-content textarea::placeholder {
   color: #aaa;
   opacity: 0.7; /* 調整透明度 */
+}
+
+/* .user-content .file-upload-container {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+} */
+
+.user-content .file-input {
+  display: none; /* 隱藏預設的文件選擇按鈕 */
+}
+
+.user-content .submit-button {
+  background-color: transparent;
+  border: none;
+  cursor: pointer;
+  padding: 5px;
 }
 
 .message-form-end {

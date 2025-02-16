@@ -43,12 +43,6 @@ const router = createRouter({
       // meta: { requiresGuest: true },
     },
     {
-      path: "/upload",
-      name: "Upload",
-      component: () => import("../views/upload.vue"),
-      // meta: { requiresGuest: true },
-    },
-    {
       path: "/comment/:id",
       name: "Comment",
       component: () => import("../views/CommentView.vue"),

@@ -29,13 +29,6 @@
         </router-link>
       </li>
 
-      <!-- test upload -->
-      <li>
-        <router-link to="/upload" class="nav-link">
-          <img :src="Accounticon" alt="Accounticon" />
-        </router-link>
-      </li>
-
       <!-- <li v-if="authStore.isLoggedIn" class="nav-link">
         <h4>Hi {{ authStore.userName }}</h4>
       </li> -->
