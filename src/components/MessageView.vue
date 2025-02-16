@@ -42,14 +42,34 @@
             ></textarea>
 
             <div class="file-upload-container">
-              <input
-                type="file"
-                @change="handleFileUpload"
-                class="file-input"
-              />
-              <button @click="submitPost" class="submit-button">
-                <img :src="Noteicon" alt="Noteicon" />
-              </button>
+              <div class="file-upload-select">
+                <input
+                  type="file"
+                  @change="handleFileUpload"
+                  class="file-input"
+                  id="fileInput"
+                  style="display: none"
+                />
+                <button
+                  type="button"
+                  @click="triggerFileInput"
+                  class="submit-button"
+                >
+                  <img :src="Noteicon" alt="Noteicon" />
+                </button>
+              </div>
+
+              <!-- 圖片預覽區域 -->
+              <div v-if="fileUrl" class="file-preview">
+                <img :src="fileUrl" alt="File Preview" class="preview-img" />
+                <!-- "X" 按鈕來關閉預覽 -->
+                <button
+                  @click="cancelFilePreview"
+                  class="cancel-preview-button"
+                >
+                  <img :src="Closeicon" alt="Closeicon" />
+                </button>
+              </div>
             </div>
           </div>
         </div>
@@ -67,6 +87,7 @@
 
 <script setup>
 import Noteicon from "../assets/Noteicon.svg";
+import Closeicon from "../assets/Closeicon.svg";
 import Modal from "./Modal.vue"; // 引入彈窗組件
 import { ref, nextTick, watch, computed } from "vue";
 import { NButton } from "naive-ui";
@@ -101,13 +122,122 @@ const adjustHeight = () => {
   });
 };
 
-const handleFileUpload = (event) => {
-  file.value = event.target.files[0];
-  if (!file.value) return;
-  console.log("檔案已選擇:", file.value.name);
+// 用來觸發檔案選擇框
+const triggerFileInput = () => {
+  const fileInput = document.getElementById("fileInput");
+  fileInput.click(); // 觸發隱藏的檔案選擇框
 };
 
-const submitPost = async () => {
+// const handleFileUpload = (event) => {
+//   file.value = event.target.files[0];
+//   if (!file.value) return;
+//   console.log("檔案已選擇:", file.value.name);
+// };
+
+// 檢查檔案上傳處理，並顯示預覽
+const handleFileUpload = (event) => {
+  const selectedFile = event.target.files[0]; // 取得使用者選擇的檔案
+
+  if (selectedFile) {
+    // 顯示檔案名稱
+    console.log("檔案已選擇:", selectedFile.name);
+
+    // 如果是圖片檔案，則顯示預覽
+    if (selectedFile.type.startsWith("image/")) {
+      const reader = new FileReader();
+      reader.onload = (e) => {
+        fileUrl.value = e.target.result; // 設置圖片預覽 URL
+      };
+      reader.readAsDataURL(selectedFile); // 將檔案轉為 Data URL
+    }
+
+    file.value = selectedFile; // 儲存檔案
+  }
+};
+
+// 取消檔案預覽，重設檔案選擇
+const cancelFilePreview = () => {
+  fileUrl.value = null; // 清除圖片預覽 URL
+  file.value = null; // 清除檔案
+};
+
+// const submitPost = async () => {
+//   try {
+//     let uploadedFileUrl = null;
+//     if (file.value) {
+//       console.log("開始上傳檔案...");
+//       const { data } = await axios.get(
+//         "https://message-board-server-7yot.onrender.com/api/upload",
+//         {
+//           params: { filename: file.value.name, contentType: file.value.type },
+//         }
+//       );
+
+//       const { uploadUrl, fileUrl: tempFileUrl } = data;
+//       await axios.put(uploadUrl, file.value, {
+//         headers: { "Content-Type": file.value.type },
+//       });
+//       uploadedFileUrl = tempFileUrl;
+//       console.log("檔案上傳成功:", uploadedFileUrl);
+//     }
+//     return uploadedFileUrl;
+//   } catch (error) {
+//     console.error("檔案上傳失敗:", error);
+//     return null;
+//   }
+// };
+
+// const handleMessage = async () => {
+//   const userId = localStorage.getItem("userId");
+//   const token = localStorage.getItem("token");
+
+//   if (!userId || !token) {
+//     alert("請先登入！");
+//     return;
+//   }
+
+//   try {
+//     const response = await axios.post(
+//       `https://message-board-server-7yot.onrender.com/api/posts/${userId}`,
+//       // { title: messagetitle.value, content: content.value },
+//       { content: content.value },
+//       { headers: { Authorization: `Bearer ${token}` } }
+//     );
+
+//     if (response.status === 201) {
+//       // 發送 WebSocket 訊息
+//       socketStore.sendMessage({
+//         // title: messagetitle.value,
+//         content: content.value,
+//       });
+
+//       // 清空輸入欄
+//       // messagetitle.value = "";
+//       content.value = "";
+
+//       // 關閉 Modal
+//       emit("update:modelValue", false);
+//     } else {
+//       alert("留言提交失敗");
+//     }
+//   } catch (error) {
+//     console.error("留言提交錯誤:", error);
+//     alert("留言提交失敗");
+//   }
+// };
+
+//
+// 處理 Modal 關閉的邏輯
+
+const handleMessage = async () => {
+  const userId = localStorage.getItem("userId");
+  const token = localStorage.getItem("token");
+
+  if (!userId || !token) {
+    alert("請先登入！");
+    return;
+  }
+
   try {
     let uploadedFileUrl = null;
     if (file.value) {
@@ -126,40 +256,24 @@ const submitPost = async () => {
       uploadedFileUrl = tempFileUrl;
       console.log("檔案上傳成功:", uploadedFileUrl);
     }
-    return uploadedFileUrl;
-  } catch (error) {
-    console.error("檔案上傳失敗:", error);
-    return null;
-  }
-};
 
-const handleMessage = async () => {
-  const userId = localStorage.getItem("userId");
-  const token = localStorage.getItem("token");
-
-  if (!userId || !token) {
-    alert("請先登入！");
-    return;
-  }
-
-  try {
     const response = await axios.post(
       `https://message-board-server-7yot.onrender.com/api/posts/${userId}`,
-      // { title: messagetitle.value, content: content.value },
-      { content: content.value },
+      { content: content.value, fileUrl: uploadedFileUrl },
       { headers: { Authorization: `Bearer ${token}` } }
     );
 
     if (response.status === 201) {
       // 發送 WebSocket 訊息
       socketStore.sendMessage({
-        // title: messagetitle.value,
         content: content.value,
+        fileUrl: uploadedFileUrl,
       });
 
       // 清空輸入欄
-      // messagetitle.value = "";
       content.value = "";
+      file.value = null;
+      fileUrl.value = null; // 清空檔案 URL
 
       // 關閉 Modal
       emit("update:modelValue", false);
@@ -172,7 +286,6 @@ const handleMessage = async () => {
   }
 };
 
-// 處理 Modal 關閉的邏輯
 const handleModalClose = (newValue) => {
   // 當 Modal 關閉時，這個方法會被觸發
   if (content.value.trim() !== "") {
@@ -279,11 +392,12 @@ watch(
   opacity: 0.7; /* 調整透明度 */
 }
 
-/* .user-content .file-upload-container {
+/* ai */
+.user-content .file-upload-container {
   display: flex;
-  align-items: center;
-  gap: 10px;
-} */
+  flex-direction: column;
+  align-items: flex-start;
+}
 
 .user-content .file-input {
   display: none; /* 隱藏預設的文件選擇按鈕 */
@@ -296,6 +410,51 @@ watch(
   padding: 5px;
 }
 
+/* 預覽 */
+.file-preview {
+  margin-top: 10px;
+  text-align: center;
+}
+
+.preview-img {
+  max-width: 100%;
+  max-height: 200px;
+  object-fit: contain;
+  border-radius: 8px;
+}
+
+/* 取消預覽 */
+.file-preview {
+  margin-top: 10px;
+  text-align: center;
+  position: relative;
+}
+
+.preview-img {
+  max-width: 100%;
+  max-height: 200px;
+  object-fit: contain;
+  border-radius: 8px;
+}
+
+.cancel-preview-button {
+  position: absolute;
+  top: 0;
+  right: 0;
+  background-color: rgba(255, 0, 0, 0.7);
+  color: white;
+  border: none;
+  border-radius: 50%;
+  width: 25px;
+  height: 25px;
+  font-size: 16px;
+  cursor: pointer;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+}
+
+/* up ai */
 .message-form-end {
   flex: 1;
   display: flex;
