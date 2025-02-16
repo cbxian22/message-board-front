@@ -20,12 +20,10 @@
         </div>
 
         <div class="message-form-mi">
-          <!-- <img
-            :src="comment.photo || 'https://fakeimg.pl/50/'"
-            alt="頭像"
-            class="photo"
-          /> -->
           <div>
+            <!-- 
+            <img :src="userStore.userImageUrl" alt="User Photo" class="photo" />
+            -->
             <img
               :src="'https://fakeimg.pl/50/'"
               alt="頭像"

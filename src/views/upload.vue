@@ -24,7 +24,7 @@ export default {
       try {
         // 1️⃣ 向後端請求 Signed URL
         const { data } = await axios.get(
-          "http://localhost:5000/api/upload/generate-signed-url",
+          "https://message-board-server-7yot.onrender.com/api/upload/generate-signed-url",
           {
             params: {
               filename: this.file.name,
@@ -50,10 +50,13 @@ export default {
 
     async submitPost() {
       try {
-        await axios.post("http://localhost:5000/api/posts", {
-          content: this.content,
-          fileUrl: this.fileUrl, // 這裡傳遞檔案 URL
-        });
+        await axios.post(
+          "https://message-board-server-7yot.onrender.com/api/posts",
+          {
+            content: this.content,
+            fileUrl: this.fileUrl, // 這裡傳遞檔案 URL
+          }
+        );
         console.log("貼文已發送！");
       } catch (error) {
         console.error("發送貼文失敗:", error);

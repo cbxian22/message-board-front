@@ -81,6 +81,7 @@ export const useAuthStore = defineStore("auth", {
     userId: null,
     userName: "",
     role: "",
+    userImageUrl: "", // 改為 userImageUrl 存放用戶頭像
   }),
   actions: {
     setUserData(decodedToken) {
@@ -91,6 +92,7 @@ export const useAuthStore = defineStore("auth", {
       localStorage.setItem("userId", this.userId);
       localStorage.setItem("userName", this.userName);
       localStorage.setItem("role", this.role);
+      localStorage.setItem("userImageUrl", this.userImageUrl); // 使用 userImageUrl
     },
     login(token) {
       const decodedToken = verifyToken(token);
@@ -105,9 +107,10 @@ export const useAuthStore = defineStore("auth", {
         userId: null,
         userName: "",
         role: "",
+        userImageUrl: "", // 使用 userImageUrl
       };
       Object.assign(this, initialState);
-      ["token", "userId", "userName", "role"].forEach((key) =>
+      ["token", "userId", "userName", "role", "userImageUrl"].forEach((key) =>
         localStorage.removeItem(key)
       );
     },
