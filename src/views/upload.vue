@@ -54,7 +54,7 @@ export default {
           "https://message-board-server-7yot.onrender.com/api/posts/2",
           {
             content: "test url",
-            fileUrl: this.fileUrl, // 這裡傳遞檔案 URL
+            fileUrl: this.fileUrl, // 這裡傳i遞檔案 URL
           }
         );
         console.log("貼文已發送！");
