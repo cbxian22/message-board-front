@@ -59,7 +59,14 @@ export default {
         );
         console.log("貼文已發送！");
       } catch (error) {
-        console.error("發送貼文失敗:", error);
+        console.error("檔案上傳失敗:", error);
+        if (error.response) {
+          console.error("Response error:", error.response);
+        } else if (error.request) {
+          console.error("Request error:", error.request);
+        } else {
+          console.error("General error:", error.message);
+        }
       }
     },
   },
