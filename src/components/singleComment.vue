@@ -323,12 +323,11 @@ const goToCommentPage = (id) => {
       <!-- 貼文內容 -->
       <p class="comment-content">{{ comment.content }}</p>
 
-      <a
-        v-if="comment.file_url"
+      <img
+        :src="comment.file_url"
+        alt="comment.file_url"
         class="comment-file"
-        :href="comment.file_url"
-        >{{ comment.file_url }}</a
-      >
+      />
 
       <!-- 回覆功能 -->
       <div class="reply">
