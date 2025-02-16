@@ -257,6 +257,9 @@ const handleMessage = async () => {
       console.log("檔案上傳成功:", uploadedFileUrl);
     }
 
+    // 如果沒有內容，設置為空字串
+    const postContent = content.value || "";
+
     const response = await axios.post(
       `https://message-board-server-7yot.onrender.com/api/posts/${userId}`,
       { content: content.value, fileUrl: uploadedFileUrl },
@@ -266,7 +269,7 @@ const handleMessage = async () => {
     if (response.status === 201) {
       // 發送 WebSocket 訊息
       socketStore.sendMessage({
-        content: content.value,
+        content: postContent,
         fileUrl: uploadedFileUrl,
       });
 

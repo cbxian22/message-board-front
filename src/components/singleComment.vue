@@ -322,9 +322,9 @@ const goToCommentPage = (id) => {
 
       <!-- 貼文內容 -->
       <p class="comment-content">{{ comment.content }}</p>
-      <!-- <p v-if="comment.file_url" class="comment-file">
-        附件: <a :href="comment.file_url" target="_blank">下載</a>
-      </p> -->
+      <span v-if="comment.file_url" class="comment-file">
+        {{ comment.file_url }}
+      </span>
 
       <!-- 回覆功能 -->
       <div class="reply">
