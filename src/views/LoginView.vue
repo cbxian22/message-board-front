@@ -42,15 +42,25 @@
             >
               <input
                 id="password"
-                type="password"
+                :type="ishowing ? 'text' : 'password'"
                 v-model="password"
                 required
+                @input="checkPasswordInput"
               />
               <span>輸入密碼</span>
+              <button
+                v-if="password && password.length > 0"
+                type="button"
+                @click="togglePassword"
+                class="toggle-password"
+              >
+                {{ ishowing ? "隱藏" : "顯示" }}
+              </button>
             </label>
           </div>
+
           <div class="form-group">
-            <button type="submit" class="btn">登入</button>
+            <button :class="['btn', 'login-btn']" type="submit">登入</button>
           </div>
         </form>
       </div>
@@ -78,6 +88,7 @@ const password = ref("");
 const role = ref("user");
 const authStore = useAuthStore();
 const isLoading = ref(true);
+const ishowing = ref(false);
 
 const login = async () => {
   if (!username.value || !password.value) {
@@ -109,6 +120,10 @@ const login = async () => {
     console.error("登錄錯誤:", error);
     alert("登入失敗，請檢查用戶帳號或密碼！");
   }
+};
+
+const togglePassword = () => {
+  ishowing.value = !ishowing.value;
 };
 
 onMounted(() => {
@@ -192,14 +207,14 @@ onMounted(() => {
 }
 /* --------- */
 
-button {
+.login-btn {
   width: 100%;
   padding: 10px;
   background-color: #007bff !important;
   border-radius: 4px;
 }
 
-button:hover {
+.login-btn:hover {
   background-color: #0095f6 !important;
 }
 
@@ -217,5 +232,13 @@ button:hover {
 
 .light-mode input {
   background: rgb(245, 245, 245);
+}
+
+.toggle-password {
+  position: absolute;
+  right: 0;
+  margin-top: 10px;
+  margin-right: 10px;
+  color: #aaa;
 }
 </style>
