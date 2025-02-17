@@ -13,7 +13,7 @@ import { useRouter } from "vue-router";
 const router = useRouter();
 const comments = ref([]);
 const emit = defineEmits();
-// const commentImages = ref([]);
+const commentImages = ref([]);
 const authStore = useAuthStore();
 authStore.checkLoginStatus();
 
@@ -82,18 +82,6 @@ const fetchComments = async () => {
         file_url: comment.file_url, // 如有顯示
       }));
       emit("loaded");
-
-      // 加載完留言後，再對圖片進行檢查
-      comments.value.forEach((comment, index) => {
-        const img = document.querySelector(`#comment-img-${comment.id}`);
-        if (img) {
-          img.onload = () => {
-            if (img.naturalHeight > img.naturalWidth) {
-              img.classList.add("tall-img"); // 直向圖片加上類別
-            }
-          };
-        }
-      });
     } else {
       alert("無法獲取留言，數據格式不正確");
     }
@@ -153,15 +141,15 @@ onMounted(() => {
 });
 
 // 確保對每一個圖片都加載後進行判斷
-// onMounted(() => {
-//   commentImages.value.forEach((img) => {
-//     img.onload = () => {
-//       if (img.naturalHeight > img.naturalWidth) {
-//         img.classList.add("tall-img"); // 直向圖片加上類別
-//       }
-//     };
-//   });
-// });
+onMounted(() => {
+  commentImages.value.forEach((img) => {
+    img.onload = () => {
+      if (img.naturalHeight > img.naturalWidth) {
+        img.classList.add("tall-img"); // 直向圖片加上類別
+      }
+    };
+  });
+});
 </script>
 
 <!-- <script setup>
@@ -362,7 +350,7 @@ onMounted(() => {
         <img
           :src="comment.file_url"
           alt="comment.file_url"
-          :id="'comment-img-' + comment.id"
+          ref="commentImages"
         />
       </span>
 
@@ -533,8 +521,8 @@ li:hover {
 }
 /* 直向 */
 .tall-img {
-  width: 55%;
-  height: auto;
+  width: auto;
+  max-height: 250px;
 }
 
 .dark-mode .modal-overlay {
