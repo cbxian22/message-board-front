@@ -4,17 +4,6 @@
     <!-- @update:modelValue="emit('update:modelValue', $event)" -->
     <div class="message-container">
       <form @submit.prevent="handleMessage" class="message-form">
-        <!-- <div class="form-group">
-          <label for="messagetitle">主題:</label>
-          <input
-            id="messagetitle"
-            v-model="messagetitle"
-            type="text"
-            required
-            class="form-input"
-          />
-        </div> -->
-
         <div class="message-form-up">
           <p>新貼文</p>
         </div>
@@ -62,7 +51,6 @@
               <!-- 圖片預覽區域 -->
               <div v-if="fileUrl" class="file-preview">
                 <img :src="fileUrl" alt="File Preview" class="preview-img" />
-                <!-- "X" 按鈕來關閉預覽 -->
                 <button
                   @click="cancelFilePreview"
                   class="cancel-preview-button"
@@ -259,11 +247,10 @@ const handleMessage = async () => {
 
     // 如果沒有內容，設置為空字串
     const postContent = content.value || "null";
-    console.log(postContent);
 
     const response = await axios.post(
       `https://message-board-server-7yot.onrender.com/api/posts/${userId}`,
-      { content: content.value, fileUrl: uploadedFileUrl },
+      { content: postContent, fileUrl: uploadedFileUrl },
       { headers: { Authorization: `Bearer ${token}` } }
     );
 
