@@ -177,10 +177,10 @@ const handleMessage = async () => {
 
     if (response.status === 201) {
       // 發送 WebSocket 訊息
-      socketStore.sendMessage({
-        content: content.value,
-        fileUrl: uploadedFileUrl,
-      });
+      // socketStore.sendMessage({
+      //   content: content.value,
+      //   fileUrl: uploadedFileUrl,
+      // });
 
       // 清空輸入欄
       content.value = "";
@@ -200,16 +200,13 @@ const handleMessage = async () => {
 
 // 處理 Modal 關閉的邏輯
 const handleModalClose = (newValue) => {
-  if (content.value.trim() !== "") {
-    const confirmClose = window.confirm("確認要關閉並清除內容嗎？");
-    if (confirmClose) {
-      content.value = ""; // 清空內容
-      emit("update:modelValue", false);
-      prevHeight.value = null; // 儲存上一次高度
-    }
-  } else {
-    emit("update:modelValue", false);
+  if (content.value.trim() || file.value) {
+    if (!window.confirm("確認要關閉並清除內容嗎？")) return;
   }
+  content.value = "";
+  file.value = null;
+  fileUrl.value = null;
+  emit("update:modelValue", false);
 };
 
 // 監聽 Modal 開啟，恢復高度
