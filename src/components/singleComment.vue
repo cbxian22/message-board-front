@@ -521,11 +521,9 @@ li:hover {
 }
 /* 直向 */
 .tall-img {
-  /* width: 55%;
-  height: auto;*/
-  object-fit: cover;
-  height: 60%;
-  width: auto;
+  width: 40%; /* 控制圖片寬度 */
+  max-height: 200px; /* 限制圖片的最大高度 */
+  object-fit: contain; /* 保持圖片比例並完整顯示 */
 }
 
 .dark-mode .modal-overlay {
