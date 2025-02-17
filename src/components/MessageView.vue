@@ -33,9 +33,9 @@
               <div class="file-upload-select">
                 <input
                   type="file"
+                  ref="fileInputRef"
                   @change="handleFileUpload"
                   class="file-input"
-                  id="fileInput"
                   style="display: none"
                 />
                 <button
