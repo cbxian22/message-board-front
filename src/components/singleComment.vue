@@ -523,6 +523,7 @@ li:hover {
 .tall-img {
   width: 55%;
   height: auto;
+  object-fit: cover;
 }
 
 .dark-mode .modal-overlay {
