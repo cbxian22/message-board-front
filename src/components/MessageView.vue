@@ -246,7 +246,7 @@ const handleMessage = async () => {
     }
 
     // 如果沒有內容，設置為空字串
-    const postContent = content.value || null;
+    const postContent = content.value || "";
 
     const response = await axios.post(
       `https://message-board-server-7yot.onrender.com/api/posts/${userId}`,
