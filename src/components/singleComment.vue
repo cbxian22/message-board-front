@@ -521,9 +521,11 @@ li:hover {
 }
 /* 直向 */
 .tall-img {
-  width: 55%;
-  height: auto;
+  /* width: 55%;
+  height: auto;*/
   object-fit: cover;
+  height: 60%;
+  width: auto;
 }
 
 .dark-mode .modal-overlay {
