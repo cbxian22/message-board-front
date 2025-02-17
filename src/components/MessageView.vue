@@ -96,19 +96,7 @@ const fileUrl = ref(null);
 const fileInputRef = ref(null);
 
 // 檢查是否啟用提交按鈕
-const isSubmitDisabled = computed(() => {
-  return !content.value.trim() && !file.value;
-});
-
-// const adjustHeight = () => {
-//   nextTick(() => {
-//     if (textarea.value) {
-//       textarea.value.style.height = "auto"; // 先重設高度
-//       textarea.value.style.height = `${textarea.value.scrollHeight}px`; // 設定自動增長
-//       prevHeight.value = textarea.value.style.height; // 儲存當前高度
-//     }
-//   });
-// };
+const isSubmitDisabled = computed(() => !(content.value.trim() || file.value));
 
 const triggerFileInput = () => {
   fileInputRef.value?.click();
@@ -141,6 +129,32 @@ const cancelFilePreview = () => {
   file.value = null; // 清除檔案
 };
 
+// 獨立處理圖片上傳
+const uploadFile = async () => {
+  if (!file.value) return null;
+
+  try {
+    console.log("開始上傳檔案...");
+    const { data } = await axios.get(
+      "https://message-board-server-7yot.onrender.com/api/upload",
+      {
+        params: { filename: file.value.name, contentType: file.value.type },
+      }
+    );
+
+    await axios.put(data.uploadUrl, file.value, {
+      headers: { "Content-Type": file.value.type },
+    });
+
+    console.log("檔案上傳成功:", data.fileUrl);
+    return data.fileUrl;
+  } catch (error) {
+    console.error("檔案上傳失敗:", error);
+    return null;
+  }
+};
+
+// 提交上傳資料庫
 const handleMessage = async () => {
   const userId = localStorage.getItem("userId");
   const token = localStorage.getItem("token");
@@ -149,26 +163,8 @@ const handleMessage = async () => {
     alert("請先登入！");
     return;
   }
-
   try {
-    let uploadedFileUrl = null;
-    if (file.value) {
-      console.log("開始上傳檔案...");
-      const { data } = await axios.get(
-        "https://message-board-server-7yot.onrender.com/api/upload",
-        {
-          params: { filename: file.value.name, contentType: file.value.type },
-        }
-      );
-
-      const { uploadUrl, fileUrl: tempFileUrl } = data;
-      await axios.put(uploadUrl, file.value, {
-        headers: { "Content-Type": file.value.type },
-      });
-      uploadedFileUrl = tempFileUrl;
-      console.log("檔案上傳成功:", uploadedFileUrl);
-    }
-
+    const uploadedFileUrl = await uploadFile(); // 獨立處理圖片上傳
     const response = await axios.post(
       `https://message-board-server-7yot.onrender.com/api/posts/${userId}`,
       { content: content.value, fileUrl: uploadedFileUrl },
@@ -186,9 +182,7 @@ const handleMessage = async () => {
       content.value = "";
       file.value = null;
       fileUrl.value = null; // 清空檔案 URL
-
-      // 關閉 Modal
-      emit("update:modelValue", false);
+      emit("update:modelValue", false); // 關閉 Modal
     } else {
       alert("留言提交失敗");
     }
@@ -210,18 +204,6 @@ const handleModalClose = (newValue) => {
 };
 
 // 監聽 Modal 開啟，恢復高度
-// watch(
-//   () => props.modelValue,
-//   (newValue) => {
-//     if (newValue) {
-//       nextTick(() => {
-//         if (textarea.value) {
-//           textarea.value.style.height = prevHeight.value; // 恢復之前的高度
-//         }
-//       });
-//     }
-//   }
-// );
 watch(content, () => {
   nextTick(() => {
     if (textarea.value) {
