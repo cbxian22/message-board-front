@@ -1,7 +1,6 @@
 <template>
   <!-- 使用 v-bind 和 v-on 來綁定和觸發事件 -->
   <Modal :modelValue="modelValue" @update:modelValue="handleModalClose">
-    <!-- @update:modelValue="emit('update:modelValue', $event)" -->
     <div class="message-container">
       <form @submit.prevent="handleMessage" class="message-form">
         <div class="message-form-up">
@@ -62,7 +61,6 @@
         </div>
 
         <div class="message-form-end">
-          <!-- <button type="submit" class="submit-btn">發佈</button> -->
           <n-button :disabled="isSubmitDisabled" @click="handleMessage"
             >發佈</n-button
           >
@@ -231,7 +229,7 @@ watch(content, () => {
 
 .message-form {
   display: flex;
-  flex-direction: column; /* 讓內部元素垂直排列 */
+  flex-direction: column;
   height: 100%;
 }
 
@@ -288,7 +286,7 @@ watch(content, () => {
 
 .user-content textarea::placeholder {
   color: #aaa;
-  opacity: 0.7; /* 調整透明度 */
+  opacity: 0.7;
 }
 
 /* ai */
@@ -340,12 +338,11 @@ watch(content, () => {
   position: absolute;
   top: 0;
   right: 0;
-  background-color: rgba(255, 0, 0, 0.7);
-  color: white;
-  border: none;
+  color: var(--n-text-color) !important;
+  background-color: var(--n-body-color) !important;
   border-radius: 50%;
-  width: 25px;
-  height: 25px;
+  width: 30px;
+  height: 30px;
   font-size: 16px;
   cursor: pointer;
   display: flex;
@@ -368,6 +365,15 @@ watch(content, () => {
   padding: 10px 20px;
   border: 0.5px solid rgba(102, 102, 102, 0.5);
   border-radius: 10px;
+}
+.n-button {
+  --n-text-color-hover: #000 !important;
+  --n-border-hover: 1px solid #000 !important;
+}
+
+.dark-mode .n-button {
+  --n-text-color-hover: #fff !important;
+  --n-border-hover: 1px solid #fff !important;
 }
 
 .light-mode .message-container {

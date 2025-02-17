@@ -5,17 +5,15 @@ import Moreicon from "../assets/Moreicon.svg";
 import Editicon from "../assets/Editicon.svg";
 import Deleteicon from "../assets/Deleteicon.svg";
 import Flagicon from "../assets/Flagicon.svg";
-
 import { ref, defineEmits, onMounted, onUnmounted } from "vue";
-// import { useSocketStore } from "../stores/socketStore";
 import { useAuthStore } from "../stores/authStore";
 import axios from "axios";
 import { useRouter } from "vue-router";
-// const socketStore = useSocketStore();
+
 const router = useRouter();
 const comments = ref([]);
 const emit = defineEmits();
-
+const commentImages = ref([]);
 const authStore = useAuthStore();
 authStore.checkLoginStatus();
 
@@ -141,6 +139,17 @@ const goToCommentPage = (id) => {
 onMounted(() => {
   fetchComments();
 });
+
+// 確保對每一個圖片都加載後進行判斷
+onMounted(() => {
+  commentImages.value.forEach((img) => {
+    img.onload = () => {
+      if (img.naturalHeight > img.naturalWidth) {
+        img.classList.add("tall-img"); // 直向圖片加上類別
+      }
+    };
+  });
+});
 </script>
 
 <!-- <script setup>
@@ -153,6 +162,8 @@ import Moreicon from "../assets/Moreicon.svg";
 import Editicon from "../assets/Editicon.svg";
 import Deleteicon from "../assets/Deleteicon.svg";
 import Flagicon from "../assets/Flagicon.svg";
+const commentImages = ref([]);
+
 const comments = ref([
   {
     id: 1,
@@ -161,7 +172,8 @@ const comments = ref([
     content: "這是第一個留言的內容，討論一些有趣的話題。",
     name: "小明",
     timestamp: 1675886200000,
-    file_url: "https://example.com/file1.pdf",
+    file_url:
+      "https://storage.googleapis.com/message_board_storage/default_profile.jpg",
   },
   {
     id: 2,
@@ -170,7 +182,8 @@ const comments = ref([
     content: "這是第二個留言的內容，分享一些關於最新技術的見解。",
     name: "小華",
     timestamp: 1675972600000,
-    file_url: "",
+    file_url:
+      "https://storage.googleapis.com/message_board_storage/%E6%88%AA%E5%9C%96%202025-01-12%20%E6%99%9A%E4%B8%8A10.46.29.png",
   },
   {
     id: 3,
@@ -179,7 +192,8 @@ const comments = ref([
     content: "這是第三個留言的內容，這裡有一些問題等待解答。",
     name: "小李",
     timestamp: 1676059000000,
-    file_url: "https://example.com/file2.jpg",
+    file_url:
+      "https://storage.googleapis.com/message_board_storage/%E6%88%AA%E5%9C%96%202025-02-17%20%E4%B8%8B%E5%8D%882.46.25.png",
   },
   {
     id: 4,
@@ -250,6 +264,16 @@ const formatDate = (timestamp) => {
 const goToCommentPage = (id) => {
   console.log(`跳轉到留言頁面，留言ID: ${id}`);
 };
+onMounted(() => {
+  // 確保對每一個圖片都加載後進行判斷
+  commentImages.value.forEach((img) => {
+    img.onload = () => {
+      if (img.naturalHeight > img.naturalWidth) {
+        img.classList.add("tall-img"); // 直向圖片加上類別
+      }
+    };
+  });
+});
 </script> -->
 
 <template>
@@ -323,7 +347,11 @@ const goToCommentPage = (id) => {
       <!-- 貼文內容 -->
       <p class="comment-content">{{ comment.content }}</p>
       <span v-if="comment.file_url" class="comment-file">
-        <img :src="comment.file_url" alt="comment.file_url" />
+        <img
+          :src="comment.file_url"
+          alt="comment.file_url"
+          ref="commentImages"
+        />
       </span>
 
       <!-- 回覆功能 -->
@@ -372,7 +400,7 @@ const goToCommentPage = (id) => {
 }
 
 .reply {
-  margin-left: -15px; /* 根據 padding 的值調整 */
+  margin-left: -15px;
 }
 
 .reply ul {
@@ -382,9 +410,9 @@ const goToCommentPage = (id) => {
 }
 
 .reply-link {
-  display: flex; /* 讓 a 內的內容可以對齊 */
-  align-items: center; /* 垂直置中 */
-  justify-content: center; /* 水平置中（可選） */
+  display: flex;
+  align-items: center;
+  justify-content: center;
   padding: 5px 10px;
 }
 
@@ -453,10 +481,6 @@ const goToCommentPage = (id) => {
   padding: 20px;
 }
 
-/* .modal-content {
-  display: flex;
-  flex-direction: column;
-} */
 .modal-content ul {
   list-style-type: none;
 }
@@ -480,6 +504,25 @@ li:hover {
 }
 .modal-link span {
   margin-left: 10px;
+}
+
+/* url 圖片 */
+
+.comment-file {
+  display: inline-block;
+  max-width: 100%;
+  overflow: hidden;
+}
+
+.comment-file img {
+  max-width: 75%;
+  height: auto;
+  object-fit: cover;
+}
+/* 直向 */
+.tall-img {
+  width: 55%;
+  height: auto;
 }
 
 .dark-mode .modal-overlay {
