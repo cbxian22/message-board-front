@@ -93,6 +93,7 @@ const textarea = ref(null); // 取得 textarea DOM 節點
 const prevHeight = ref("auto"); // 儲存上一次高度
 const file = ref(null);
 const fileUrl = ref(null);
+const fileInputRef = ref(null);
 
 // 檢查是否啟用提交按鈕
 const isSubmitDisabled = computed(() => {
@@ -109,10 +110,8 @@ const isSubmitDisabled = computed(() => {
 //   });
 // };
 
-// 用來觸發檔案選擇框
 const triggerFileInput = () => {
-  const fileInput = document.getElementById("fileInput");
-  fileInput.click(); // 觸發隱藏的檔案選擇框
+  fileInputRef.value?.click();
 };
 
 // 檢查檔案上傳處理，並顯示預覽
