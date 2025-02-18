@@ -60,12 +60,12 @@ const router = createRouter({
   scrollBehavior(to, from, savedPosition) {
     console.log("Restoring scroll position:", savedPosition);
 
-    // 儲存位置由瀏覽器自動提供（如果有）
-    if (savedPosition) {
+    // 如果 savedPosition 不為 null，使用它來恢復位置
+    if (savedPosition && savedPosition.top !== undefined) {
       return { left: 0, top: savedPosition.top }; // 確保只使用 top 屬性
     }
 
-    // 如果是頁面直接跳轉（不會有 savedPosition），則使用 scrollStore 儲存的滾動位置
+    // 如果沒有 savedPosition，則從 store 中獲取儲存的滾動位置
     const scrollStore = useScrollStore();
     const position = scrollStore.getScrollPosition();
     if (position !== 0) {
