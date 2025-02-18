@@ -1,5 +1,5 @@
 <template>
-  <nav>
+  <nav class="navbar-up">
     <div>
       <h1><a href="/">Boardxian</a></h1>
     </div>
@@ -113,7 +113,7 @@ const toggleTheme = (value) => {
 
 <style scoped>
 /* 整體導航條 */
-nav {
+.navbar-up {
   display: flex;
   justify-content: space-between;
   padding: 0 30px;
@@ -124,18 +124,18 @@ nav {
   z-index: 1000;
 }
 
-nav div {
+.navbar-up div {
   display: flex;
   align-items: center;
 }
 
 /* 項目列表樣式 */
-nav ul {
+.navbar-up ul {
   display: flex;
 }
 
 /* 項目間距 */
-nav ul li {
+.navbar-up ul li {
   display: flex;
   position: relative; /* 確保彈出視窗相對於按鈕定位 */
 }

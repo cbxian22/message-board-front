@@ -1,5 +1,5 @@
 <template>
-  <nav>
+  <nav class="navbar">
     <ul>
       <li>
         <router-link to="/" class="nav-link">
@@ -77,25 +77,25 @@ const checkTokenAndOpenModal = () => {
 
 <style scoped>
 /* 整體導航條 */
-nav {
+.navbar {
   display: flex;
   justify-content: center;
   width: 100%;
   position: fixed;
-  bottom: 0; /* 固定在視窗底部 */
+  bottom: 0;
   left: 0;
-  z-index: 1000; /* 確保它不被其他元素遮擋 */
+  z-index: 1000;
 }
 
 /* 項目列表樣式 */
-nav ul {
+.navbar ul {
   display: flex;
   justify-content: space-around;
   width: 60%;
 }
 
 /* 項目間距 */
-nav ul li {
+.navbar ul li {
   /* display: flex; */
   list-style-type: none;
 }

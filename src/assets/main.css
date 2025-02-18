@@ -116,4 +116,14 @@ html ::root {
   .comment-content {
     font-size: 14px;
   }
+
+  .navbar ul {
+    display: flex;
+    justify-content: space-around;
+    width: 100% !important;
+  }
+
+  .navbar-up {
+    padding: 0 10px !important;
+  }
 }
