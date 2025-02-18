@@ -10,7 +10,23 @@ import NavbarUp from "../components/NavbarUp.vue";
 const aru = computed(() => socketStore.messages.length > 0);
 
 const route = useRoute();
-const username = computed(() => route.params.username); // 取得路由中的 username 參數
+// const username = computed(() => route.params.username); // 取得路由中的 username 參數
+const username = ref(route.params.username);
+
+watch(
+  () => route.params.username,
+  (newUsername) => {
+    if (newUsername) {
+      username.value = newUsername;
+      fetchUserData(newUsername);
+    }
+  }
+);
+
+function fetchUserData(username) {
+  console.log("重新加載使用者資料:", username);
+  // 這裡執行 API 請求，重新獲取該用戶的數據
+}
 </script>
 
 <template>
