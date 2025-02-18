@@ -36,12 +36,6 @@ const router = createRouter({
       component: () => import("../views/ChatView.vue"),
       // meta: { requiresGuest: true },
     },
-    // {
-    //   path: "/profile",
-    //   name: "Profile",
-    //   component: () => import("../views/Profile.vue"),
-    //   // meta: { requiresGuest: true },
-    // },
     {
       path: "/:username",
       name: "Profile",
