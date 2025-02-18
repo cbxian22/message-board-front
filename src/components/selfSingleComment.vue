@@ -93,18 +93,6 @@ const fetchComments = async () => {
   }
 };
 
-// 格式化時間
-// const formatDate = (date) => {
-//   if (!date) return "未知時間";
-//   const options = {
-//     year: "numeric",
-//     month: "2-digit",
-//     day: "2-digit",
-//     hour: "2-digit",
-//     minute: "2-digit",
-//   };
-//   return new Date(date).toLocaleString("zh-TW", options);
-// };
 const formatDate = (date) => {
   if (!date) return "未知時間";
 

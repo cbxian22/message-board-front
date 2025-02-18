@@ -1,28 +1,27 @@
 <script setup>
 import { computed, onMounted, ref } from "vue";
-import { NSpin } from "naive-ui";
-import { useSocketStore } from "../stores/socketStore";
+import { useRoute } from "vue-router"; // 引入 useRoute;
+// import { NSpin } from "naive-ui";
 import selfSingleComment from "../components/selfSingleComment.vue";
 import Navbar from "../components/Navbar.vue";
 import NavbarUp from "../components/NavbarUp.vue";
-// import { useRouter } from "vue-router";
-const socketStore = useSocketStore();
 
-// const router = useRouter();
 const isLoading = ref(true);
+const route = useRoute();
+const username = computed(() => route.params.username); // 取得路由中的 username 參數
 
 // 當 singleComment 加載完成時，更新 isLoading
-const handleLoaded = () => {
-  isLoading.value = false;
-  console.log("singleComment is loading");
-  console.log(isLoading.value);
-};
+// const handleLoaded = () => {
+//   isLoading.value = false;
+//   console.log("singleComment is loading");
+//   console.log(isLoading.value);
+// };
 
 // 計算是否有新留言
 const aru = computed(() => socketStore.messages.length > 0);
 
 onMounted(() => {
-  socketStore.connect(); // 确保 WebSocket 连接
+  console.log("User's username:", username.value); // 顯示當前的 username
 });
 </script>
 

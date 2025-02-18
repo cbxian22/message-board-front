@@ -36,11 +36,17 @@ const router = createRouter({
       component: () => import("../views/ChatView.vue"),
       // meta: { requiresGuest: true },
     },
+    // {
+    //   path: "/profile",
+    //   name: "Profile",
+    //   component: () => import("../views/Profile.vue"),
+    //   // meta: { requiresGuest: true },
+    // },
     {
-      path: "/profile",
+      path: "/:username",
       name: "Profile",
       component: () => import("../views/Profile.vue"),
-      // meta: { requiresGuest: true },
+      props: true, // 將路由參數作為 props 傳遞給 Profile.vue
     },
     {
       path: "/comment/:id",
