@@ -31,7 +31,7 @@ onMounted(async () => {
 });
 </script> -->
 <script setup>
-import { ref, computed, onMounted, watch } from "vue";
+import { ref, computed, onMounted, watch, nextTick } from "vue";
 import { useRoute, useRouter } from "vue-router"; // 引入 useRoute;
 import axios from "axios";
 
@@ -46,19 +46,20 @@ const router = useRouter();
 const route = useRoute();
 const username = ref(route.params.username); // 使用 ref 存儲 username
 
+// 監控 route.params.username 變化，並手動重新獲取資料
+watch(
+  () => route.params.username,
+  async (newUsername) => {
+    username.value = newUsername; // 更新 username
+    await fetchUserData(username.value); // 重新加載資料
+  },
+  { immediate: true } // 初次加載時也觸發
+);
+
 // 初始載入時獲取資料
 onMounted(async () => {
   await fetchUserData(username.value);
 });
-
-// 監控 route.params.username 變化，重新獲取資料
-watch(
-  () => route.params.username,
-  async (newUsername) => {
-    username.value = newUsername;
-    await fetchUserData(username.value);
-  }
-);
 
 // 獲取使用者資料
 const fetchUserData = async (username) => {
