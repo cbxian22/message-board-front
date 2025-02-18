@@ -80,6 +80,22 @@ const router = createRouter({
 // });
 
 // 如果已登入者訪問 Login 或 Register 頁面，重定向到首頁
+// router.beforeEach(async (to, from, next) => {
+//   const authStore = useAuthStore();
+
+//   // 等待 Vue 完成所有更新（包括 Pinia 狀態）後再進行導航
+//   await nextTick();
+
+//   console.log("Checking auth status:", authStore.isLoggedIn); // 確認最新的登入狀態
+
+//   // 如果已登入且正在訪問 Login 或 Register 頁面，重定向到首頁
+//   if ((to.name === "Login" || to.name === "Register") && authStore.isLoggedIn) {
+//     console.log("已登入，跳轉到首頁");
+//     return next({ name: "Home" }); // 已登入的使用者跳轉到首頁
+//   }
+
+//   next(); // 其他情況正常導航
+// });
 router.beforeEach(async (to, from, next) => {
   const authStore = useAuthStore();
 
@@ -92,6 +108,12 @@ router.beforeEach(async (to, from, next) => {
   if ((to.name === "Login" || to.name === "Register") && authStore.isLoggedIn) {
     console.log("已登入，跳轉到首頁");
     return next({ name: "Home" }); // 已登入的使用者跳轉到首頁
+  }
+
+  // 檢查是否訪問自己的頁面，並且正在導航到其他頁面
+  if (authStore.isLoggedIn && to.params.username !== authStore.userName) {
+    console.log("跳轉到自己的頁面");
+    return next(`/@${authStore.userName}`); // 重定向到自己的頁面
   }
 
   next(); // 其他情況正常導航
