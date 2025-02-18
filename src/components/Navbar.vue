@@ -25,13 +25,17 @@
 
       <!--登入後將改成圖像 -->
       <li v-if="authStore.isLoggedIn">
-        <router-link
+        <!-- <router-link
           :to="`/@${authStore.userName}`"
           class="nav-link"
           :key="`@${authStore.userName}`"
         >
           <img :src="Accounticon" alt="Accounticon" />
-        </router-link>
+        </router-link> -->
+        <a href="javascript:void(0)" class="nav-link" @click="goToProfile">
+          <img :src="Accounticon" alt="Accounticon" />
+          <img :src="Accounticon" alt="Accounticon" />
+        </a>
       </li>
     </ul>
   </nav>
@@ -46,6 +50,7 @@
 <script setup>
 import { ref } from "vue";
 import { useAuthStore } from "../stores/authStore";
+import { useRouter } from "vue-router";
 import Message from "../components/MessageView.vue";
 import Login from "../components/LoginModal.vue";
 
@@ -55,6 +60,7 @@ import Addicon from "../assets/Addicon.svg";
 import Accounticon from "../assets/Accounticon.svg";
 import Loginicon from "../assets/Loginicon.svg";
 
+const router = useRouter();
 const authStore = useAuthStore();
 authStore.checkLoginStatus();
 
@@ -72,6 +78,11 @@ const checkTokenAndOpenModal = () => {
   } else {
     isPostModalOpen.value = true;
   }
+};
+
+// 跳轉到使用者的 profile 頁面
+const goToProfile = () => {
+  router.push(`/@${authStore.userName}`);
 };
 </script>
 
