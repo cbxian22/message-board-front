@@ -1,4 +1,3 @@
-// stores/scrollStore.js
 import { defineStore } from "pinia";
 
 export const useScrollStore = defineStore("scroll", {
@@ -7,9 +6,11 @@ export const useScrollStore = defineStore("scroll", {
   }),
   actions: {
     setScrollPosition(position) {
+      console.log("Saving scroll position:", position);
       this.scrollPosition = position;
     },
     getScrollPosition() {
+      console.log("Restoring scroll position:", this.scrollPosition);
       return this.scrollPosition;
     },
   },

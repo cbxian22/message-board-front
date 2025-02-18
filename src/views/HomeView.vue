@@ -64,25 +64,25 @@ const isLoading = ref(true);
 // 當 singleComment 加載完成時，更新 isLoading
 const handleLoaded = () => {
   isLoading.value = false;
-  console.log("singleComment is loading");
 };
 
-// 在離開頁面之前保存捲動位置
+// 在離開頁面之前保存滾動位置
 onBeforeRouteLeave((to, from, next) => {
   scrollStore.setScrollPosition(window.scrollY);
   next();
 });
 
-// 計算是否有新留言
-const aru = computed(() => socketStore.messages.length > 0);
-
-onMounted(() => {
-  socketStore.connect(); // 确保 WebSocket 连接
+onMounted(async () => {
+  socketStore.connect(); // 確保 WebSocket 連線
   const position = scrollStore.getScrollPosition();
   if (position !== 0) {
-    window.scrollTo(0, position);
+    await nextTick(); // 確保 DOM 已渲染完畢
+    window.scrollTo({ top: position, behavior: "instant" }); // 確保瞬間滾動
   }
 });
+
+// 計算是否有新留言
+const aru = computed(() => socketStore.messages.length > 0);
 </script>
 
 <style scoped>
