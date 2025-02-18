@@ -111,17 +111,21 @@ router.beforeEach(async (to, from, next) => {
     return next({ name: "Home" }); // 已登入的使用者跳轉到首頁
   }
 
-  // 檢查是否是當前使用者頁面，且如果當前路由不是自己的頁面，才進行重定向
-  // 這裡我們會確保如果用戶點擊自己的頁面時不會被重定向
+  // 如果用戶點擊了自己的 Profile 頁面，我們應該直接停留在當前頁面
+  // 如果當前頁面是用戶的頁面，不做任何跳轉
   if (authStore.isLoggedIn && to.params.username === authStore.userName) {
-    // 如果當前路由就是自己的頁面，則不進行重定向
-    return next();
+    console.log("已在自己的頁面，無需跳轉");
+    return next(); // 讓頁面保持在當前頁面
   }
 
-  // 如果正在訪問的是非當前用戶的頁面，則重定向到自己的頁面
-  if (authStore.isLoggedIn && to.params.username !== authStore.userName) {
+  // 否則，跳轉到自己的頁面
+  if (
+    authStore.isLoggedIn &&
+    to.name !== "Profile" &&
+    to.params.username !== authStore.userName
+  ) {
     console.log("跳轉到自己的頁面");
-    return next(`/@${authStore.userName}`); // 重定向到自己的頁面
+    return next(`/@${authStore.userName}`); // 跳轉到自己的頁面
   }
 
   // 繼續導航
