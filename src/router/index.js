@@ -57,18 +57,15 @@ const router = createRouter({
       component: () => import("../views/NotFound.vue"),
     },
   ],
-  scrollBehavior(to, from, savedPosition) {
-    console.log("Restoring scroll position:", savedPosition);
-
-    // 如果 savedPosition 不為 null，使用它來恢復位置
-    if (savedPosition && savedPosition.top !== undefined) {
-      return { left: 0, top: savedPosition.top }; // 確保只使用 top 屬性
+  scrollBehavior: async (to, from, savedPosition) => {
+    if (savedPosition) {
+      return savedPosition;
     }
 
-    // 如果沒有 savedPosition，則從 store 中獲取儲存的滾動位置
     const scrollStore = useScrollStore();
     const position = scrollStore.getScrollPosition();
     if (position !== 0) {
+      await new Promise((resolve) => setTimeout(resolve, 500)); // 等待數據加載
       return { left: 0, top: position };
     }
     return { left: 0, top: 0 };

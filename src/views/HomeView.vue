@@ -75,12 +75,12 @@ onBeforeRouteLeave((to, from, next) => {
 
 // 頁面加載後，恢復滾動位置
 onMounted(async () => {
+  await nextTick(); // 等待 DOM 更新
   const position = scrollStore.getScrollPosition();
   if (position !== 0) {
-    await nextTick(); // 等待 DOM 完全渲染
     setTimeout(() => {
       window.scrollTo({ top: position, behavior: "smooth" });
-    }, 300); // 設置延遲，確保頁面完全載入後再滾動
+    }, 500); // 延遲時間可以根據實際情況調整
   }
 });
 
