@@ -295,10 +295,11 @@ onMounted(() => {
           <!--  -->
           <!--  -->
           <router-link class="comment-author" :to="`/@${comment.name}`">
+            {{ comment.name }}
           </router-link>
           <!--  -->
           <!-- <router-link to="/profile"> -->
-          <!-- <span class="comment-author"> {{ comment.name }}</span> -->
+          <!-- <span class="comment-author"> </span> -->
           <!-- </router-link> -->
           <span class="comment-time"> {{ formatDate(comment.timestamp) }}</span>
         </div>
