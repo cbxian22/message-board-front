@@ -1,7 +1,7 @@
 import { createRouter, createWebHistory } from "vue-router";
 import { useAuthStore } from "@/stores/authStore"; // 引入 Pinia 授權管理
 import { nextTick } from "vue";
-import { scrollStore } from "@/stores/scrollStore"; // ✅ 正確引入
+import { useScrollStore } from "@/stores/scrollStore"; // ✅ 正確引入
 import HomeView from "../views/HomeView.vue";
 
 const router = createRouter({
@@ -59,11 +59,13 @@ const router = createRouter({
   ],
   scrollBehavior(to, from, savedPosition) {
     console.log("Restoring scroll position:", savedPosition);
+
     if (savedPosition) {
       return savedPosition;
     }
 
-    return { left: 0, top: scrollStore().getScrollPosition() };
+    const scrollStore = useScrollStore();
+    return { left: 0, top: scrollStore.getScrollPosition() };
   },
 });
 
