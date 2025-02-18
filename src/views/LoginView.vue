@@ -53,7 +53,7 @@
 
           <div class="form-group">
             <button :class="['btn', 'login-btn']" type="submit">
-              <n-spin v-if="isTouched" stroke="#FFF" />登入
+              <n-spin v-if="isTouched" stroke="#FFF" :size="20" />登入
             </button>
           </div>
         </form>
@@ -206,6 +206,10 @@ onMounted(() => {
 /* --------- */
 
 .login-btn {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  position: relative;
   width: 100%;
   padding: 10px;
   background-color: #007bff !important;
@@ -239,5 +243,11 @@ onMounted(() => {
   margin-top: 10px;
   margin-right: 10px;
   color: #aaa;
+}
+
+.n-spin-body {
+  position: absolute;
+  right: 1;
+  margin-right: 60px;
 }
 </style>

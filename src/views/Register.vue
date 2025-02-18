@@ -53,7 +53,7 @@
 
         <div class="form-group">
           <button class="register-btn" type="submit">
-            <n-spin v-if="isTouched" stroke="#FFF" />註冊
+            <n-spin v-if="isTouched" stroke="#FFF" :size="20" />註冊
           </button>
         </div>
       </form>
@@ -69,6 +69,7 @@
 </template>
 
 <script setup>
+import { NSpin } from "naive-ui";
 import { ref } from "vue";
 import { useRouter } from "vue-router";
 import axios from "axios";
@@ -187,6 +188,10 @@ const togglePassword = () => {
 /* --------- */
 
 .register-btn {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  position: relative;
   width: 100%;
   padding: 10px;
   background-color: #007bff !important;
@@ -220,5 +225,11 @@ const togglePassword = () => {
   margin-top: 10px;
   margin-right: 10px;
   color: #aaa;
+}
+
+.n-spin-body {
+  position: absolute;
+  right: 1;
+  margin-right: 60px;
 }
 </style>
