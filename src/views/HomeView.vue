@@ -78,7 +78,9 @@ onMounted(async () => {
   const position = scrollStore.getScrollPosition();
   if (position !== 0) {
     await nextTick(); // 確保 DOM 已渲染完畢
-    window.scrollTo({ top: position, behavior: "instant" }); // 確保瞬間滾動
+    setTimeout(() => {
+      window.scrollTo({ top: position, behavior: "instant" }); // 確保瞬間滾動
+    }, 100);
   }
 });
 
