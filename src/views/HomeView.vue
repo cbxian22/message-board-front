@@ -47,7 +47,7 @@
 </template>
 
 <script setup>
-import { computed, onUpdated, ref, onMounted } from "vue";
+import { computed, onUpdated, ref } from "vue";
 import { onBeforeRouteLeave } from "vue-router";
 import { useScrollStore } from "@/stores/scrollStore";
 import { NSpin } from "naive-ui";
@@ -62,9 +62,9 @@ const scrollStore = useScrollStore();
 const isLoading = ref(true);
 
 // 當 singleComment 加載完成時，更新 isLoading
-// const handleLoaded = () => {
-//   isLoading.value = false;
-// };
+const handleLoaded = () => {
+  isLoading.value = false;
+};
 
 // 在離開頁面之前保存滾動位置
 onBeforeRouteLeave((to, from, next) => {
@@ -82,13 +82,6 @@ onUpdated(() => {
 
 // 計算是否有新留言
 const aru = computed(() => socketStore.messages.length > 0);
-
-onMounted(() => {
-  const handleLoaded = () => {
-    isLoading.value = false;
-  };
-  handleLoaded();
-});
 </script>
 
 <style scoped>
