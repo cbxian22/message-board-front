@@ -18,7 +18,7 @@ const isUserExist = ref(true);
 onMounted(async () => {
   try {
     const response = await axios.get(
-      `https://message-board-server-7yot.onrender.com/api/user/${username}`
+      `https://message-board-server-7yot.onrender.com/api/user/@${username}`
     );
     if (!response.data.exists) {
       isUserExist.value = false;
