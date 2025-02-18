@@ -42,8 +42,8 @@
         <singleComment @loaded="handleLoaded" />
       </div>
     </div>
+    <Navbar />
   </div>
-  <Navbar />
 </template>
 
 <script setup>

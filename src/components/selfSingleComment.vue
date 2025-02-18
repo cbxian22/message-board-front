@@ -15,7 +15,7 @@ const comments = ref([]);
 const emit = defineEmits();
 const commentImages = ref([]);
 const authStore = useAuthStore();
-const userId = authStore.user?.id; // 確保取得當前用戶的 ID
+
 authStore.checkLoginStatus();
 
 const modalState = ref({});
@@ -68,11 +68,12 @@ onUnmounted(() => {
 
 // 獲取留言
 const fetchComments = async () => {
+  const userId = localStorage.getItem("userId");
   try {
     const response = await axios.get(
-      "https://message-board-server-7yot.onrender.com/api/posts/user/${userId}"
-      // "http://localhost:3000/api/posts"
+      `https://message-board-server-7yot.onrender.com/api/posts/user/${userId}`
     );
+
     if (response.status === 200 && Array.isArray(response.data)) {
       comments.value = response.data.map((comment) => ({
         id: comment.id,
