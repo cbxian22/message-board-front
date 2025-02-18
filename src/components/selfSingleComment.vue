@@ -1,14 +1,14 @@
 <script setup>
+import { ref, defineEmits, onMounted, onUnmounted } from "vue";
+import { useAuthStore } from "../stores/authStore";
+import { useRouter } from "vue-router";
+import axios from "axios";
+
 import Replyicon from "../assets/Replyicon.svg";
 import Favoriteicon from "../assets/Favoriteicon.svg";
 import Moreicon from "../assets/Moreicon.svg";
 import Editicon from "../assets/Editicon.svg";
 import Deleteicon from "../assets/Deleteicon.svg";
-
-import { ref, defineEmits, onMounted, onUnmounted } from "vue";
-import { useAuthStore } from "../stores/authStore";
-import axios from "axios";
-import { useRouter } from "vue-router";
 
 const router = useRouter();
 const comments = ref([]);
@@ -68,10 +68,10 @@ onUnmounted(() => {
 
 // 獲取留言
 const fetchComments = async () => {
-  const userId = localStorage.getItem("userId");
+  const username = router.currentRoute.value.params.username; // 從路由獲取 username
   try {
     const response = await axios.get(
-      `https://message-board-server-7yot.onrender.com/api/posts/user/${userId}`
+      `https://message-board-server-7yot.onrender.com/api/posts/user/${username}`
     );
 
     if (response.status === 200 && Array.isArray(response.data)) {
@@ -141,130 +141,6 @@ onMounted(() => {
   });
 });
 </script>
-
-<!-- <script setup>
-import { ref, computed, onMounted, onUnmounted } from "vue";
-import { useAuthStore } from "../stores/authStore";
-
-import Replyicon from "../assets/Replyicon.svg";
-import Favoriteicon from "../assets/Favoriteicon.svg";
-import Moreicon from "../assets/Moreicon.svg";
-import Editicon from "../assets/Editicon.svg";
-import Deleteicon from "../assets/Deleteicon.svg";
-
-const commentImages = ref([]);
-
-const comments = ref([
-  {
-    id: 1,
-    photo: "https://fakeimg.pl/300/",
-    title: "這是第一個留言標題",
-    content: "這是第一個留言的內容，討論一些有趣的話題。",
-    name: "小明",
-    timestamp: 1675886200000,
-    file_url:
-      "https://storage.googleapis.com/message_board_storage/default_profile.jpg",
-  },
-  {
-    id: 2,
-    photo: "https://fakeimg.pl/300/",
-    title: "第二個留言標題，討論新技術",
-    content: "這是第二個留言的內容，分享一些關於最新技術的見解。",
-    name: "小華",
-    timestamp: 1675972600000,
-    file_url:
-      "https://storage.googleapis.com/message_board_storage/%E6%88%AA%E5%9C%96%202025-01-12%20%E6%99%9A%E4%B8%8A10.46.29.png",
-  },
-  {
-    id: 3,
-    photo: "https://fakeimg.pl/300/",
-    title: "第三個留言標題，問問題",
-    content: "這是第三個留言的內容，這裡有一些問題等待解答。",
-    name: "小李",
-    timestamp: 1676059000000,
-    file_url:
-      "https://storage.googleapis.com/message_board_storage/%E6%88%AA%E5%9C%96%202025-02-17%20%E4%B8%8B%E5%8D%882.46.25.png",
-  },
-  {
-    id: 4,
-    photo: "https://fakeimg.pl/300/",
-    title: "聊天與討論，第四個留言",
-    content: "這是第四個留言的內容，這裡是關於一些生活中的趣事。",
-    name: "小張",
-    timestamp: 1676145400000,
-    file_url: "",
-  },
-]);
-
-const authStore = useAuthStore();
-authStore.checkLoginStatus();
-const modalState = ref({});
-const modalRefs = ref({});
-const buttonRefs = ref({});
-
-const openModal = (event, commentId) => {
-  event.stopPropagation();
-
-  // 如果當前 Modal 已開啟，則關閉它
-  if (modalState.value[commentId]) {
-    modalState.value[commentId] = false;
-    return;
-  }
-
-  // 先關閉所有其他留言的 Modal
-  Object.keys(modalState.value).forEach((key) => {
-    modalState.value[key] = false;
-  });
-
-  // 只打開當前點擊的留言的 Modal
-  modalState.value[commentId] = true;
-};
-
-// 關閉 Modal
-const closeModal = (event) => {
-  const clickedInsideModal = Object.keys(modalRefs.value).some((id) => {
-    const modal = modalRefs.value[id];
-    const button = buttonRefs.value[id];
-
-    return (
-      modal && (modal.contains(event.target) || button.contains(event.target))
-    );
-  });
-
-  if (!clickedInsideModal) {
-    Object.keys(modalState.value).forEach((key) => {
-      modalState.value[key] = false;
-    });
-  }
-};
-
-onMounted(() => {
-  document.addEventListener("mousedown", closeModal);
-});
-
-onUnmounted(() => {
-  document.removeEventListener("mousedown", closeModal);
-});
-
-const formatDate = (timestamp) => {
-  const date = new Date(timestamp);
-  return date.toLocaleString(); // 格式化日期時間
-};
-
-const goToCommentPage = (id) => {
-  console.log(`跳轉到留言頁面，留言ID: ${id}`);
-};
-onMounted(() => {
-  // 確保對每一個圖片都加載後進行判斷
-  commentImages.value.forEach((img) => {
-    img.onload = () => {
-      if (img.naturalHeight > img.naturalWidth) {
-        img.classList.add("tall-img"); // 直向圖片加上類別
-      }
-    };
-  });
-});
-</script> -->
 
 <template>
   <div

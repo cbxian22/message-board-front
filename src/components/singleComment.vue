@@ -1,14 +1,15 @@
 <script setup>
+import { ref, defineEmits, onMounted, onUnmounted } from "vue";
+import { useAuthStore } from "../stores/authStore";
+import { useRouter } from "vue-router";
+import axios from "axios";
+
 import Replyicon from "../assets/Replyicon.svg";
 import Favoriteicon from "../assets/Favoriteicon.svg";
 import Moreicon from "../assets/Moreicon.svg";
 import Editicon from "../assets/Editicon.svg";
 import Deleteicon from "../assets/Deleteicon.svg";
 import Flagicon from "../assets/Flagicon.svg";
-import { ref, defineEmits, onMounted, onUnmounted } from "vue";
-import { useAuthStore } from "../stores/authStore";
-import axios from "axios";
-import { useRouter } from "vue-router";
 
 const router = useRouter();
 const comments = ref([]);

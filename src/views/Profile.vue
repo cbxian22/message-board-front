@@ -1,39 +1,19 @@
 <script setup>
 import { computed, onMounted, ref } from "vue";
 import { useRoute } from "vue-router"; // 引入 useRoute;
-// import { NSpin } from "naive-ui";
+
 import selfSingleComment from "../components/selfSingleComment.vue";
 import Navbar from "../components/Navbar.vue";
 import NavbarUp from "../components/NavbarUp.vue";
 
-const isLoading = ref(true);
-const route = useRoute();
-const username = computed(() => route.params.username); // 取得路由中的 username 參數
-
-// 當 singleComment 加載完成時，更新 isLoading
-// const handleLoaded = () => {
-//   isLoading.value = false;
-//   console.log("singleComment is loading");
-//   console.log(isLoading.value);
-// };
-
 // 計算是否有新留言
 const aru = computed(() => socketStore.messages.length > 0);
 
-onMounted(() => {
-  console.log("User's username:", username.value); // 顯示當前的 username
-});
+const route = useRoute();
+const username = computed(() => route.params.username); // 取得路由中的 username 參數
 </script>
 
 <template>
-  <!-- <div v-show="isLoading" class="loading-container">
-    <n-spin size="large" stroke="#FFF" />
-    <div class="n-spin-b">
-      <p>produced by</p>
-      <p>BoXian</p>
-    </div>
-  </div>
-  <div v-show="!isLoading"> -->
   <NavbarUp />
   <div class="container-box">
     <div class="container">
@@ -48,12 +28,10 @@ onMounted(() => {
           <p class="comment-content">{{ message.data.content }}</p>
         </div>
       </div> -->
-      <selfSingleComment />
-      <!-- <singleComment @loaded="handleLoaded" /> -->
+      <selfSingleComment :username="username" />
     </div>
   </div>
   <Navbar />
-  <!-- </div> -->
 </template>
 
 <style scoped>
