@@ -8,11 +8,11 @@
       <form @submit.prevent="handleRegister" class="form-container">
         <div class="form-group">
           <label
-            for="username"
-            :class="{ active: username }"
+            for="account"
+            :class="{ active: account }"
             class="floating-label"
           >
-            <input id="username" v-model="username" type="text" required />
+            <input id="account" v-model="account" type="text" required />
             <span>郵件或用戶帳號</span>
           </label>
         </div>
@@ -23,8 +23,6 @@
             :class="{ active: password }"
             class="floating-label"
           >
-            <!-- <input id="password" v-model="password" type="password" required />
-            <span>密碼</span> -->
             <input
               id="password"
               :type="ishowing ? 'text' : 'password'"
@@ -75,7 +73,7 @@ import { useRouter } from "vue-router";
 import axios from "axios";
 
 const name = ref("");
-const username = ref("");
+const account = ref("");
 const password = ref("");
 const role = "user"; // 固定角色為 user
 const router = useRouter();
@@ -90,7 +88,7 @@ const handleRegister = async () => {
       // "http://localhost:3000/api/register",
       {
         name: name.value,
-        username: username.value,
+        account: account.value,
         password: password.value,
         role: role, // 固定傳遞角色
       }

@@ -17,11 +17,11 @@
         <form @submit.prevent="login" class="form-container">
           <div class="form-group">
             <label
-              for="username"
-              :class="{ active: username }"
+              for="account"
+              :class="{ active: account }"
               class="floating-label"
             >
-              <input id="username" type="text" v-model="username" required />
+              <input id="account" type="text" v-model="account" required />
               <span>輸入用戶帳號</span>
             </label>
           </div>
@@ -77,7 +77,7 @@ import axios from "axios";
 import { useAuthStore } from "@/stores/authStore";
 
 const router = useRouter();
-const username = ref("");
+const account = ref("");
 const password = ref("");
 const role = ref("user");
 const authStore = useAuthStore();
@@ -87,7 +87,7 @@ const isTouched = ref(false);
 
 const login = async () => {
   isTouched.value = true; // 發送請求前，顯示 loading 狀態
-  if (!username.value || !password.value) {
+  if (!account.value || !password.value) {
     alert("請輸入用戶名和密碼！");
     return;
   }
@@ -97,7 +97,7 @@ const login = async () => {
       "https://message-board-server-7yot.onrender.com/api/login",
       // "http://localhost:3000/api/login",
       {
-        username: username.value,
+        account: account.value,
         password: password.value,
         role: role.value,
       }
