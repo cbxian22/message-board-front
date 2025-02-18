@@ -28,7 +28,7 @@
         <router-link
           :to="`/@${authStore.userName}`"
           class="nav-link"
-          :key="authStore.userName"
+          :key="$route.fullPath"
         >
           <img :src="Accounticon" alt="Accounticon" />
         </router-link>
