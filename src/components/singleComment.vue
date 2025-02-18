@@ -80,6 +80,7 @@ const fetchComments = async () => {
         name: comment.user_name,
         timestamp: new Date(comment.created_at),
         file_url: comment.file_url, // 如有顯示
+        user_avatar: comment.user_avatar,
       }));
       emit("loaded");
     } else {
@@ -284,11 +285,7 @@ onMounted(() => {
   >
     <!-- 頭貼 -->
     <div class="photo-content">
-      <img
-        :src="comment.photo || 'https://fakeimg.pl/50/'"
-        alt="頭像"
-        class="photo"
-      />
+      <img :src="comment.user_avatar" alt="頭像" class="photo" />
     </div>
     <!-- 內文 -->
     <div class="comment">
