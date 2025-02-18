@@ -73,15 +73,14 @@ onBeforeRouteLeave((to, from, next) => {
   next();
 });
 
+// 頁面加載後，恢復滾動位置
 onMounted(async () => {
-  socketStore.connect(); // 確保 WebSocket 連線
-
   const position = scrollStore.getScrollPosition();
   if (position !== 0) {
-    await nextTick(); // 確保 DOM 已渲染完畢
+    await nextTick(); // 等待 DOM 完全渲染
     setTimeout(() => {
       window.scrollTo({ top: position, behavior: "smooth" });
-    }, 300); // 設置 300ms 延遲，確保畫面完成載入
+    }, 300); // 設置延遲，確保頁面完全載入後再滾動
   }
 });
 

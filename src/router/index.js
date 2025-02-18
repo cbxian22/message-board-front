@@ -58,14 +58,19 @@ const router = createRouter({
     },
   ],
   scrollBehavior(to, from, savedPosition) {
-    console.log("Restoring scroll position:", savedPosition);
-
+    // 儲存的位置由瀏覽器自動提供（如果有）
     if (savedPosition) {
+      console.log("Restoring scroll position:", savedPosition);
       return savedPosition;
     }
 
+    // 如果是頁面直接跳轉（不會有 savedPosition），則使用 scrollStore 儲存的滾動位置
     const scrollStore = useScrollStore();
-    return { left: 0, top: scrollStore.getScrollPosition() };
+    const position = scrollStore.getScrollPosition();
+    if (position !== 0) {
+      return { left: 0, top: position };
+    }
+    return { left: 0, top: 0 };
   },
 });
 
