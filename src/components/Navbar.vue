@@ -23,15 +23,12 @@
         </router-link>
       </li>
 
+      <!--登入後將改成圖像 -->
       <li v-if="authStore.isLoggedIn">
         <router-link to="/profile" class="nav-link">
           <img :src="Accounticon" alt="Accounticon" />
         </router-link>
       </li>
-
-      <!-- <li v-if="authStore.isLoggedIn" class="nav-link">
-        <h4>Hi {{ authStore.userName }}</h4>
-      </li> -->
     </ul>
   </nav>
 

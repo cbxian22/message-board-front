@@ -15,14 +15,6 @@
         </div>
 
         <form @submit.prevent="login" class="form-container">
-          <!-- <div class="form-group">
-        <label for="role">角色</label>
-        <select id="role" v-model="role" required>
-          <option value="user">使用者</option>
-          <option value="admin">管理員</option>
-        </select>
-      </div> -->
-
           <div class="form-group">
             <label
               for="username"
@@ -60,7 +52,9 @@
           </div>
 
           <div class="form-group">
-            <button :class="['btn', 'login-btn']" type="submit">登入</button>
+            <button :class="['btn', 'login-btn']" type="submit">
+              <n-spin v-if="isTouched" stroke="#FFF" />登入
+            </button>
           </div>
         </form>
       </div>
@@ -89,8 +83,10 @@ const role = ref("user");
 const authStore = useAuthStore();
 const isLoading = ref(true);
 const ishowing = ref(false);
+const isTouched = ref(false);
 
 const login = async () => {
+  isTouched.value = true; // 發送請求前，顯示 loading 狀態
   if (!username.value || !password.value) {
     alert("請輸入用戶名和密碼！");
     return;
@@ -119,6 +115,8 @@ const login = async () => {
   } catch (error) {
     console.error("登錄錯誤:", error);
     alert("登入失敗，請檢查用戶帳號或密碼！");
+  } finally {
+    isTouched.value = false; // 無論成功或失敗，最後都應該隱藏 loading
   }
 };
 
@@ -234,6 +232,7 @@ onMounted(() => {
   background: rgb(245, 245, 245);
 }
 
+/* 顯示及隱藏的樣式 */
 .toggle-password {
   position: absolute;
   right: 0;

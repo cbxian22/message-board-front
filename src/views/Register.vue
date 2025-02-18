@@ -7,20 +7,13 @@
 
       <form @submit.prevent="handleRegister" class="form-container">
         <div class="form-group">
-          <label for="name" :class="{ active: name }" class="floating-label">
-            <input id="name" v-model="name" type="text" required />
-            <span>用戶名稱</span>
-          </label>
-        </div>
-
-        <div class="form-group">
           <label
             for="username"
             :class="{ active: username }"
             class="floating-label"
           >
             <input id="username" v-model="username" type="text" required />
-            <span>用戶帳號</span>
+            <span>郵件或用戶帳號</span>
           </label>
         </div>
 
@@ -30,13 +23,38 @@
             :class="{ active: password }"
             class="floating-label"
           >
-            <input id="password" v-model="password" type="password" required />
-            <span>用戶密碼</span>
+            <!-- <input id="password" v-model="password" type="password" required />
+            <span>密碼</span> -->
+            <input
+              id="password"
+              :type="ishowing ? 'text' : 'password'"
+              v-model="password"
+              required
+              @input="checkPasswordInput"
+            />
+            <span>輸入密碼</span>
+            <button
+              v-if="password && password.length > 0"
+              type="button"
+              @click="togglePassword"
+              class="toggle-password"
+            >
+              {{ ishowing ? "隱藏" : "顯示" }}
+            </button>
           </label>
         </div>
 
         <div class="form-group">
-          <button type="submit">註冊</button>
+          <label for="name" :class="{ active: name }" class="floating-label">
+            <input id="name" v-model="name" type="text" required />
+            <span>用戶名稱</span>
+          </label>
+        </div>
+
+        <div class="form-group">
+          <button class="register-btn" type="submit">
+            <n-spin v-if="isTouched" stroke="#FFF" />註冊
+          </button>
         </div>
       </form>
     </div>
@@ -60,8 +78,11 @@ const username = ref("");
 const password = ref("");
 const role = "user"; // 固定角色為 user
 const router = useRouter();
+const ishowing = ref(false);
+const isTouched = ref(false);
 
 const handleRegister = async () => {
+  isTouched.value = true; // 發送請求前，顯示 loading 狀態
   try {
     const response = await axios.post(
       "https://message-board-server-7yot.onrender.com/api/register",
@@ -82,7 +103,13 @@ const handleRegister = async () => {
   } catch (error) {
     console.error("註冊時發生錯誤:", error);
     alert("註冊失敗，請稍後再試！");
+  } finally {
+    isTouched.value = false; // 無論成功或失敗，最後都應該隱藏 loading
   }
+};
+
+const togglePassword = () => {
+  ishowing.value = !ishowing.value;
 };
 </script>
 
@@ -159,14 +186,14 @@ const handleRegister = async () => {
 }
 /* --------- */
 
-button {
+.register-btn {
   width: 100%;
   padding: 10px;
   background-color: #007bff !important;
   border-radius: 4px;
 }
 
-button:hover {
+.register-btn:hover {
   background-color: #0095f6 !important;
 }
 
@@ -184,5 +211,14 @@ button:hover {
 
 .light-mode input {
   background: rgb(245, 245, 245); /* 半透明黑色背景 */
+}
+
+/* 顯示及隱藏的樣式 */
+.toggle-password {
+  position: absolute;
+  right: 0;
+  margin-top: 10px;
+  margin-right: 10px;
+  color: #aaa;
 }
 </style>
