@@ -70,9 +70,12 @@ const handleLoaded = () => {
   isLoading.value = false;
   const position = scrollStore.getScrollPosition();
   if (position !== 0) {
-    setTimeout(() => {
-      window.scrollTo(0, position);
-    }, 300); // 延遲確保 DOM 完全渲染
+    // setTimeout(() => {
+    //   window.scrollTo(0, position);
+    // }, 300); // 延遲確保 DOM 完全渲染
+    if (position !== 0) {
+      window.scrollTo(0, position); // 直接跳轉
+    }
   }
 };
 
