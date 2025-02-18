@@ -1,9 +1,9 @@
 <template>
   <nav class="navbar">
     <ul>
-      <li>
+      <li @click="scrollToTop">
         <router-link to="/" class="nav-link">
-          <img :src="Homeicon" alt="Homeicon" @click="scrollToTop" />
+          <img :src="Homeicon" alt="Homeicon" />
         </router-link>
       </li>
       <li>
