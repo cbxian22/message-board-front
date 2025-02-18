@@ -64,7 +64,6 @@ const isLoading = ref(true);
 const handleLoaded = () => {
   isLoading.value = false;
   console.log("singleComment is loading");
-  console.log(isLoading.value);
 };
 
 // 在離開頁面之前保存捲動位置
