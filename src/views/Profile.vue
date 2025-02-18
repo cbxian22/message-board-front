@@ -1,5 +1,5 @@
 <script setup>
-import { computed, watch, onMounted, ref } from "vue";
+import { computed, watchEffect, ref } from "vue";
 import { useRoute } from "vue-router"; // 引入 useRoute;
 
 import selfSingleComment from "../components/selfSingleComment.vue";
@@ -13,19 +13,13 @@ const route = useRoute();
 // const username = computed(() => route.params.username); // 取得路由中的 username 參數
 const username = ref(route.params.username);
 
-watch(
-  () => route.params.username,
-  (newUsername) => {
-    if (newUsername) {
-      username.value = newUsername;
-      fetchUserData(newUsername);
-    }
-  }
-);
+watchEffect(() => {
+  username.value = route.params.username;
+  fetchUserData(username.value);
+});
 
 function fetchUserData(username) {
-  console.log("重新加載使用者資料:", username);
-  // 這裡執行 API 請求，重新獲取該用戶的數據
+  console.log("載入使用者資料:", username);
 }
 </script>
 
