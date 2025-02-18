@@ -47,7 +47,7 @@
 </template>
 
 <script setup>
-import { computed, onMounted, ref } from "vue";
+import { computed, onMounted, ref, nextTick } from "vue";
 import { onBeforeRouteLeave } from "vue-router";
 import { useScrollStore } from "@/stores/scrollStore";
 import { NSpin } from "naive-ui";
