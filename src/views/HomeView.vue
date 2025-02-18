@@ -47,7 +47,7 @@
 </template>
 
 <script setup>
-import { computed, onMounted, ref, nextTick } from "vue";
+import { computed, onUpdated, ref, nextTick } from "vue";
 import { onBeforeRouteLeave } from "vue-router";
 import { useScrollStore } from "@/stores/scrollStore";
 import { NSpin } from "naive-ui";
@@ -83,13 +83,11 @@ onBeforeRouteLeave((to, from, next) => {
   next();
 });
 
-onMounted(async () => {
-  const position = scrollStore.getScrollPosition();
+onUpdated(() => {
+  const position = useScrollStore().getScrollPosition();
   if (position !== 0) {
-    window.scrollTo(0, position); // 直接跳轉
+    window.scrollTo(0, position);
   }
-  await nextTick(); // 等待 DOM 更新
-  isLoading.value = false; // 顯示內容
 });
 
 // 計算是否有新留言
