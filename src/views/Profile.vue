@@ -13,20 +13,19 @@ const aru = computed(() => socketStore.messages.length > 0);
 const router = useRouter();
 const route = useRoute();
 const username = route.params.username;
-const isUserExist = ref(true);
 
 onMounted(async () => {
   try {
     const response = await axios.get(
       `https://message-board-server-7yot.onrender.com/api/users/${username}`
     );
-    if (!response.data.exists) {
-      isUserExist.value = false;
-      router.replace("/not-found"); // 跳轉到 NotFound.vue
+    if (response.data.message === "使用者不存在") {
+      router.replace("/not-found");
+      return;
     }
   } catch (error) {
     console.error("查詢用戶錯誤:", error);
-    isUserExist.value = false;
+
     router.replace("/not-found");
   }
 });
