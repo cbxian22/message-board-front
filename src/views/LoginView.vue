@@ -245,9 +245,9 @@ onMounted(() => {
   color: #aaa;
 }
 
-/* .form-group .n-spin-body {
+.form-group .n-spin-body {
   position: absolute;
   right: 1;
   margin-right: 60px;
-} */
+}
 </style>

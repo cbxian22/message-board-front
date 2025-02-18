@@ -28,7 +28,7 @@ a {
   text-decoration: none;
   background: none !important;
 }
-/* homeView, loginView */
+/* homeView, loginView loading style*/
 .loading-container {
   width: 100vw;
   height: 100vh;
@@ -41,6 +41,18 @@ a {
   top: 0vh;
   left: 0vw;
 }
+.n-spin-b {
+  position: absolute;
+  top: calc(50% + 200px);
+  text-align: center;
+}
+
+.n-spin-b p:last-child {
+  margin-top: 8px;
+  font-size: 20px;
+}
+/*  */
+
 .app-container,
 html ::root {
   color: var(--n-text-color);

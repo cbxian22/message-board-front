@@ -75,17 +75,6 @@ onMounted(() => {
 </script>
 
 <style scoped>
-.n-spin-b {
-  position: absolute;
-  top: calc(50% + 200px);
-  text-align: center;
-}
-
-.n-spin-b p:last-child {
-  margin-top: 8px;
-  font-size: 20px;
-}
-
 /* 安插 singleComment 容器 */
 .container-box {
   width: 650px;
