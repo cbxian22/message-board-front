@@ -71,7 +71,7 @@ const fetchComments = async () => {
   const username = router.currentRoute.value.params.username; // 從路由獲取 username
   try {
     const response = await axios.get(
-      `https://message-board-server-7yot.onrender.com/api/posts/user/@${username}`
+      `https://message-board-server-7yot.onrender.com/api/posts/user/${username}`
     );
 
     if (response.status === 200 && Array.isArray(response.data)) {
