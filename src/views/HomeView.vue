@@ -62,25 +62,34 @@ const scrollStore = useScrollStore();
 const isLoading = ref(true);
 
 // 當 singleComment 加載完成時，更新 isLoading
-// const handleLoaded = () => {
-//   isLoading.value = false;
-// };
-// 當 singleComment 加載完成時，更新 isLoading 並恢復滾動位置
 const handleLoaded = () => {
-  const position = scrollStore.getScrollPosition();
-  if (position !== 0) {
-    setTimeout(() => {
-      window.scrollTo(0, position);
-    }, 300); // 延遲確保 DOM 完全渲染
-  }
   isLoading.value = false;
 };
+// 當 singleComment 加載完成時，更新 isLoading 並恢復滾動位置
+// const handleLoaded = () => {
+//   const position = scrollStore.getScrollPosition();
+//   if (position !== 0) {
+//     setTimeout(() => {
+//       window.scrollTo(0, position);
+//     }, 300); // 延遲確保 DOM 完全渲染
+//   }
+//   isLoading.value = false;
+// };
 
 // 在離開頁面之前保存滾動位置
 onBeforeRouteLeave((to, from, next) => {
   console.log("Saving scroll position:", window.scrollY);
   scrollStore.setScrollPosition(window.scrollY);
   next();
+});
+
+onMounted(async () => {
+  const position = scrollStore.getScrollPosition();
+  if (position !== 0) {
+    window.scrollTo(0, position); // 直接跳轉
+  }
+  await nextTick(); // 等待 DOM 更新
+  isLoading.value = false; // 顯示內容
 });
 
 // 計算是否有新留言
