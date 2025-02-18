@@ -1,5 +1,5 @@
 <script setup>
-import { computed, onMounted, ref } from "vue";
+import { computed, watch, onMounted, ref } from "vue";
 import { useRoute } from "vue-router"; // 引入 useRoute;
 
 import selfSingleComment from "../components/selfSingleComment.vue";
