@@ -67,11 +67,11 @@ const isLoading = ref(true);
 // };
 // 當 singleComment 加載完成時，更新 isLoading 並恢復滾動位置
 const handleLoaded = () => {
+  isLoading.value = false;
   const position = scrollStore.getScrollPosition();
   if (position !== 0) {
     window.scrollTo(0, position);
   }
-  isLoading.value = false;
 };
 
 // 在離開頁面之前保存滾動位置
