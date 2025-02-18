@@ -1,5 +1,5 @@
 <script setup>
-import { computed, watchEffect, ref } from "vue";
+import { computed } from "vue";
 import { useRoute } from "vue-router"; // 引入 useRoute;
 
 import selfSingleComment from "../components/selfSingleComment.vue";
@@ -10,17 +10,7 @@ import NavbarUp from "../components/NavbarUp.vue";
 const aru = computed(() => socketStore.messages.length > 0);
 
 const route = useRoute();
-// const username = computed(() => route.params.username); // 取得路由中的 username 參數
-const username = ref(route.params.username);
-
-watchEffect(() => {
-  username.value = route.params.username;
-  fetchUserData(username.value);
-});
-
-function fetchUserData(username) {
-  console.log("載入使用者資料:", username);
-}
+const username = computed(() => route.params.username); // 取得路由中的 username 參數
 </script>
 
 <template>
