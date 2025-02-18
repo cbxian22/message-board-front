@@ -75,7 +75,6 @@ const fetchComments = async () => {
     if (response.status === 200 && Array.isArray(response.data)) {
       comments.value = response.data.map((comment) => ({
         id: comment.id,
-        // title: comment.title,
         content: comment.content,
         name: comment.user_name,
         timestamp: new Date(comment.created_at),
@@ -295,9 +294,11 @@ onMounted(() => {
           <!--  -->
           <!--  -->
           <!--  -->
+          <router-link class="comment-author" :to="`/@${comment.name}`">
+          </router-link>
           <!--  -->
           <!-- <router-link to="/profile"> -->
-          <span class="comment-author"> {{ comment.name }}</span>
+          <!-- <span class="comment-author"> {{ comment.name }}</span> -->
           <!-- </router-link> -->
           <span class="comment-time"> {{ formatDate(comment.timestamp) }}</span>
         </div>
