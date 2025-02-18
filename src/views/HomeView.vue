@@ -71,7 +71,7 @@ const handleLoaded = () => {
   const position = scrollStore.getScrollPosition();
   if (position !== 0) {
     setTimeout(() => {
-      window.scrollTo({ top: position, behavior: "smooth" });
+      window.scrollTo(0, position);
     }, 300); // 延遲確保 DOM 完全渲染
   }
 };

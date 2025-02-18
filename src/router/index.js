@@ -60,18 +60,15 @@ const router = createRouter({
   scrollBehavior(to, from, savedPosition) {
     console.log("Restoring scroll position:", savedPosition);
 
-    // 優先使用 savedPosition
+    // 優先使用瀏覽器自帶的 savedPosition
     if (savedPosition) {
-      return savedPosition;
+      return { ...savedPosition, behavior: "auto" }; // 強制無動畫
     }
 
-    // 從 store 中獲取滾動位置
+    // 從 store 獲取位置
     const scrollStore = useScrollStore();
     const position = scrollStore.getScrollPosition();
-    if (position !== 0) {
-      return { left: 0, top: position };
-    }
-    return { left: 0, top: 0 };
+    return { left: 0, top: position, behavior: "auto" }; // 直接跳轉
   },
 });
 
