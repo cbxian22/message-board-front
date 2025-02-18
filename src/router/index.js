@@ -37,7 +37,7 @@ const router = createRouter({
       // meta: { requiresGuest: true },
     },
     {
-      path: "/:username",
+      path: "/profile",
       name: "Profile",
       component: () => import("../views/Profile.vue"),
       props: true, // 將路由參數作為 props 傳遞給 Profile.vue
