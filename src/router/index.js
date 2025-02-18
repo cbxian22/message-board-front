@@ -57,12 +57,10 @@ const router = createRouter({
     },
   ],
   scrollBehavior(to, from, savedPosition) {
-    // 如果 `savedPosition` 存在，則返回該位置，否則不變動
     if (savedPosition) {
       return savedPosition;
-    } else {
-      return false; // 不改變滾動位置
     }
+    return { left: 0, top: useScrollStore().getScrollPosition() };
   },
 });
 

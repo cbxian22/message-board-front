@@ -68,6 +68,7 @@ const handleLoaded = () => {
 
 // 在離開頁面之前保存滾動位置
 onBeforeRouteLeave((to, from, next) => {
+  console.log("Saving scroll position:", window.scrollY);
   scrollStore.setScrollPosition(window.scrollY);
   next();
 });
@@ -79,8 +80,8 @@ onMounted(async () => {
   if (position !== 0) {
     await nextTick(); // 確保 DOM 已渲染完畢
     setTimeout(() => {
-      window.scrollTo({ top: position, behavior: "instant" }); // 確保瞬間滾動
-    }, 100);
+      window.scrollTo({ top: position, behavior: "smooth" });
+    }, 300); // 設置 300ms 延遲，確保畫面完成載入
   }
 });
 
