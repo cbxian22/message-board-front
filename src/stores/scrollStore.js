@@ -6,11 +6,11 @@ export const useScrollStore = defineStore("scroll", {
   }),
   actions: {
     setScrollPosition(position) {
-      console.log("Saving scroll position:", position);
       this.scrollPosition = position;
+      console.log("Scroll position saved:", position);
     },
     getScrollPosition() {
-      console.log("Restoring scroll position:", this.scrollPosition);
+      console.log("Returning stored scroll position:", this.scrollPosition);
       return this.scrollPosition;
     },
   },
