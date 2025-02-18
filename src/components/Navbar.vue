@@ -25,7 +25,7 @@
 
       <!--登入後將改成圖像 -->
       <li v-if="authStore.isLoggedIn">
-        <router-link to="/@profile" class="nav-link">
+        <router-link to="/@:username" class="nav-link">
           <img :src="Accounticon" alt="Accounticon" />
         </router-link>
       </li>
