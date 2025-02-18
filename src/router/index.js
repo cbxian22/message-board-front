@@ -57,15 +57,18 @@ const router = createRouter({
       component: () => import("../views/NotFound.vue"),
     },
   ],
-  scrollBehavior: async (to, from, savedPosition) => {
+  scrollBehavior(to, from, savedPosition) {
+    console.log("Restoring scroll position:", savedPosition);
+
+    // 優先使用 savedPosition
     if (savedPosition) {
       return savedPosition;
     }
 
+    // 從 store 中獲取滾動位置
     const scrollStore = useScrollStore();
     const position = scrollStore.getScrollPosition();
     if (position !== 0) {
-      await new Promise((resolve) => setTimeout(resolve, 500)); // 等待數據加載
       return { left: 0, top: position };
     }
     return { left: 0, top: 0 };

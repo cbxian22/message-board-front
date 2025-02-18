@@ -62,8 +62,18 @@ const scrollStore = useScrollStore();
 const isLoading = ref(true);
 
 // 當 singleComment 加載完成時，更新 isLoading
+// const handleLoaded = () => {
+//   isLoading.value = false;
+// };
+// 當 singleComment 加載完成時，更新 isLoading 並恢復滾動位置
 const handleLoaded = () => {
   isLoading.value = false;
+  const position = scrollStore.getScrollPosition();
+  if (position !== 0) {
+    setTimeout(() => {
+      window.scrollTo({ top: position, behavior: "smooth" });
+    }, 300); // 延遲確保 DOM 完全渲染
+  }
 };
 
 // 在離開頁面之前保存滾動位置
@@ -71,17 +81,6 @@ onBeforeRouteLeave((to, from, next) => {
   console.log("Saving scroll position:", window.scrollY);
   scrollStore.setScrollPosition(window.scrollY);
   next();
-});
-
-// 頁面加載後，恢復滾動位置
-onMounted(async () => {
-  await nextTick(); // 等待 DOM 更新
-  const position = scrollStore.getScrollPosition();
-  if (position !== 0) {
-    setTimeout(() => {
-      window.scrollTo({ top: position, behavior: "smooth" });
-    }, 500); // 延遲時間可以根據實際情況調整
-  }
 });
 
 // 計算是否有新留言
