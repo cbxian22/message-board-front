@@ -8,8 +8,8 @@
   </div>
 
   <div v-show="!isLoading">
+    <NavbarUp />
     <div class="container-box">
-      <NavbarUp />
       <div class="container">
         <!--  -->
         <div v-if="aru" class="aru">
@@ -42,8 +42,8 @@
         <singleComment @loaded="handleLoaded" />
       </div>
     </div>
-    <Navbar />
   </div>
+  <Navbar />
 </template>
 
 <script setup>
