@@ -3,7 +3,7 @@
     <ul>
       <li>
         <router-link to="/" class="nav-link">
-          <img :src="Homeicon" alt="Homeicon" />
+          <img :src="Homeicon" alt="Homeicon" @click="scrollToTop" />
         </router-link>
       </li>
       <li>
@@ -72,6 +72,11 @@ const checkTokenAndOpenModal = () => {
   } else {
     isPostModalOpen.value = true;
   }
+};
+
+// 重置滾動位置
+const scrollToTop = () => {
+  window.scrollTo(0, 0);
 };
 </script>
 

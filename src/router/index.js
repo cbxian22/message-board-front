@@ -68,7 +68,7 @@ const router = createRouter({
     // 從 store 獲取位置
     const scrollStore = useScrollStore();
     const position = scrollStore.getScrollPosition();
-    return { left: 0, top: position, behavior: "auto" }; // 直接跳轉
+    return { left: 0, top: position, behavior: "auto" };
   },
 });
 
