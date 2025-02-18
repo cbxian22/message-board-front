@@ -74,6 +74,7 @@ onBeforeRouteLeave((to, from, next) => {
 
 onMounted(async () => {
   socketStore.connect(); // 確保 WebSocket 連線
+
   const position = scrollStore.getScrollPosition();
   if (position !== 0) {
     await nextTick(); // 確保 DOM 已渲染完畢
