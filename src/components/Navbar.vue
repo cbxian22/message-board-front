@@ -26,7 +26,7 @@
       <!--登入後將改成圖像 -->
       <li v-if="authStore.isLoggedIn">
         <router-link
-          to="/@authStore.userName"
+          :to="`/@${authStore.userName}`"
           class="nav-link"
           :key="$route.fullPath"
         >

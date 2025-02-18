@@ -1,6 +1,7 @@
 <script setup>
-import { computed } from "vue";
-import { useRoute } from "vue-router"; // 引入 useRoute;
+import { ref, computed } from "vue";
+import { useRoute, useRouter } from "vue-router"; // 引入 useRoute;
+import axios from "axios";
 
 import selfSingleComment from "../components/selfSingleComment.vue";
 import Navbar from "../components/Navbar.vue";
@@ -9,8 +10,26 @@ import NavbarUp from "../components/NavbarUp.vue";
 // 計算是否有新留言
 const aru = computed(() => socketStore.messages.length > 0);
 
+const router = useRouter();
 const route = useRoute();
-const username = computed(() => route.params.username); // 取得路由中的 username 參數
+const username = route.params.username;
+const isUserExist = ref(true);
+
+onMounted(async () => {
+  try {
+    const response = await axios.get(
+      `https://message-board-server-7yot.onrender.com/api/user/${username}`
+    );
+    if (!response.data.exists) {
+      isUserExist.value = false;
+      router.replace("/not-found"); // 跳轉到 NotFound.vue
+    }
+  } catch (error) {
+    console.error("查詢用戶錯誤:", error);
+    isUserExist.value = false;
+    router.replace("/not-found");
+  }
+});
 </script>
 
 <template>
