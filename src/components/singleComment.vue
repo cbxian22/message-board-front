@@ -1,15 +1,14 @@
 <script setup>
-import { ref, defineEmits, onMounted, onUnmounted } from "vue";
-import { useAuthStore } from "../stores/authStore";
-import { useRouter } from "vue-router";
-import axios from "axios";
-
 import Replyicon from "../assets/Replyicon.svg";
 import Favoriteicon from "../assets/Favoriteicon.svg";
 import Moreicon from "../assets/Moreicon.svg";
 import Editicon from "../assets/Editicon.svg";
 import Deleteicon from "../assets/Deleteicon.svg";
 import Flagicon from "../assets/Flagicon.svg";
+import { ref, defineEmits, onMounted, onUnmounted } from "vue";
+import { useAuthStore } from "../stores/authStore";
+import axios from "axios";
+import { useRouter } from "vue-router";
 
 const router = useRouter();
 const comments = ref([]);
@@ -70,7 +69,7 @@ onUnmounted(() => {
 const fetchComments = async () => {
   try {
     const response = await axios.get(
-      `https://message-board-server-7yot.onrender.com/api/posts`
+      "https://message-board-server-7yot.onrender.com/api/posts"
       // "http://localhost:3000/api/posts"
     );
     if (response.status === 200 && Array.isArray(response.data)) {
