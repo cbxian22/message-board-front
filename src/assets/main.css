@@ -103,6 +103,9 @@ html ::root {
 
 /* 手機 RWD (寬度小於 480px) */
 @media (max-width: 500px) {
+  body {
+    overflow: hidden;
+  }
   .container-box {
     width: 100% !important;
     padding: 0 5px;
@@ -132,7 +135,7 @@ html ::root {
 
   .message-container {
     width: 95% !important;
-    height: 80vh !important;
+    height: 70vh !important;
   }
 
   .message-form-mi {
