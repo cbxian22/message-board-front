@@ -6,11 +6,13 @@
           <img :src="Homeicon" alt="Homeicon" />
         </router-link>
       </li>
+
       <li>
         <router-link to="/" class="nav-link">
           <img :src="Searchicon" alt="Searchicon" />
         </router-link>
       </li>
+
       <li>
         <button @click="checkTokenAndOpenModal" class="nav-link">
           <img :src="Addicon" alt="Addicon" />
@@ -32,7 +34,6 @@
         >
           <img :src="Accounticon" alt="Accounticon" />
         </router-link>
-        <!-- </li> -->
       </li>
     </ul>
   </nav>

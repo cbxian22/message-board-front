@@ -1,4 +1,5 @@
 <script setup>
+// defineEmits 必要？
 import { ref, defineEmits, onMounted, onUnmounted } from "vue";
 import { useAuthStore } from "../stores/authStore";
 import { useRouter } from "vue-router";
@@ -11,7 +12,7 @@ import Editicon from "../assets/Editicon.svg";
 import Deleteicon from "../assets/Deleteicon.svg";
 
 const router = useRouter();
-const comments = ref([]);
+// const comments = ref([]);
 const emit = defineEmits();
 const commentImages = ref([]);
 const authStore = useAuthStore();
@@ -92,6 +93,48 @@ const fetchComments = async () => {
     alert("留言取得失敗，請檢查網絡或稍後再試");
   }
 };
+
+// const comments = ref([
+//   {
+//     id: 1,
+//     photo: "https://fakeimg.pl/300/",
+//     title: "這是第一個留言標題",
+//     content: "這是第一個留言的內容，討論一些有趣的話題。",
+//     name: "小明",
+//     timestamp: 1675886200000,
+//     file_url:
+//       "https://storage.googleapis.com/message_board_storage/default_profile.jpg",
+//   },
+//   {
+//     id: 2,
+//     photo: "https://fakeimg.pl/300/",
+//     title: "第二個留言標題，討論新技術",
+//     content: "這是第二個留言的內容，分享一些關於最新技術的見解。",
+//     name: "小華",
+//     timestamp: 1675972600000,
+//     file_url:
+//       "https://storage.googleapis.com/message_board_storage/%E6%88%AA%E5%9C%96%202025-01-12%20%E6%99%9A%E4%B8%8A10.46.29.png",
+//   },
+//   {
+//     id: 3,
+//     photo: "https://fakeimg.pl/300/",
+//     title: "第三個留言標題，問問題",
+//     content: "這是第三個留言的內容，這裡有一些問題等待解答。",
+//     name: "小李",
+//     timestamp: 1676059000000,
+//     file_url:
+//       "https://storage.googleapis.com/message_board_storage/%E6%88%AA%E5%9C%96%202025-02-17%20%E4%B8%8B%E5%8D%882.46.25.png",
+//   },
+//   {
+//     id: 4,
+//     photo: "https://fakeimg.pl/300/",
+//     title: "聊天與討論，第四個留言",
+//     content: "這是第四個留言的內容，這裡是關於一些生活中的趣事。",
+//     name: "小張",
+//     timestamp: 1676145400000,
+//     file_url: "",
+//   },
+// ]);
 
 const formatDate = (date) => {
   if (!date) return "未知時間";

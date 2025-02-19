@@ -4,6 +4,7 @@ import { useRoute, useRouter } from "vue-router"; // 引入 useRoute;
 import axios from "axios";
 
 import selfSingleComment from "../components/selfSingleComment.vue";
+import selfInfo from "../components/selfInfo.vue";
 import Navbar from "../components/Navbar.vue";
 import NavbarUp from "../components/NavbarUp.vue";
 import Backicon from "../assets/Backicon.svg";
@@ -56,7 +57,7 @@ const fetchUserData = async (username) => {
     </div>
 
     <div class="container">
-      <!-- selfInfo -->
+      <selfInfo :username="username" />
       <!-- <div v-if="aru" class="aru">
         <h1>最新留言</h1>
         <div
