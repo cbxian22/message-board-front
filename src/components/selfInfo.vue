@@ -119,8 +119,8 @@ onMounted(() => {
       <n-drawer-content title="編輯個人檔案">
         <form @submit.prevent="handleUpdate" class="form-container">
           <div class="form-group">
-            <label for="avatar">更換頭貼</label>
-            <input type="file" id="avatar" accept="image/*" />
+            <label for="userAvatar">更換頭貼</label>
+            <input type="file" id="userAvatar" accept="image/*" />
           </div>
 
           <div class="form-group">
