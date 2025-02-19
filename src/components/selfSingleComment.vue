@@ -12,7 +12,7 @@ import Editicon from "../assets/Editicon.svg";
 import Deleteicon from "../assets/Deleteicon.svg";
 
 const router = useRouter();
-// const comments = ref([]);
+const comments = ref([]);
 const emit = defineEmits();
 const commentImages = ref([]);
 const authStore = useAuthStore();
