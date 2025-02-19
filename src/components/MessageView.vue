@@ -10,7 +10,7 @@
         <div class="message-form-mi">
           <div>
             <img
-              :src="userStore.userAvatar"
+              :src="authStore.userAvatar"
               alt="頭像"
               class="photo"
               draggable="false"
