@@ -40,7 +40,7 @@ const fetchInfo = async () => {
         id: response.data.id,
         name: response.data.name,
         intro: response.data.intro,
-        userAvatar: response.data.user_avatar,
+        userAvatar: response.data.avatar_url,
       };
     } else {
       alert("無法獲取留言，數據格式不正確");
@@ -96,7 +96,7 @@ onMounted(() => {
         <p class="intro">{{ info.intro }}</p>
       </div>
       <div class="info-img">
-        <img :src="info.avatar_url" alt="User Avatar" />
+        <img :src="info.userAvatar" alt="使用者圖片" />
       </div>
     </div>
     <!-- <div v-if="username" class="set">編輯個人檔案</div> -->
