@@ -32,6 +32,7 @@
         >
           <img :src="Accounticon" alt="Accounticon" />
         </router-link>
+        <!-- </li> -->
       </li>
     </ul>
   </nav>

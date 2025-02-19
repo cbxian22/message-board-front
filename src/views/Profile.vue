@@ -1,35 +1,3 @@
-<!-- <script setup>
-import { ref, computed, onMounted } from "vue";
-import { useRoute, useRouter } from "vue-router"; // 引入 useRoute;
-import axios from "axios";
-
-import selfSingleComment from "../components/selfSingleComment.vue";
-import Navbar from "../components/Navbar.vue";
-import NavbarUp from "../components/NavbarUp.vue";
-
-// 計算是否有新留言
-const aru = computed(() => socketStore.messages.length > 0);
-
-const router = useRouter();
-const route = useRoute();
-const username = route.params.username;
-
-onMounted(async () => {
-  try {
-    const response = await axios.get(
-      `https://message-board-server-7yot.onrender.com/api/users/${username}`
-    );
-    if (response.data.message === "使用者不存在") {
-      router.replace("/not-found");
-      return;
-    }
-  } catch (error) {
-    console.error("查詢用戶錯誤:", error);
-
-    router.replace("/not-found");
-  }
-});
-</script> -->
 <script setup>
 import { ref, computed, onMounted, watch, nextTick } from "vue";
 import { useRoute, useRouter } from "vue-router"; // 引入 useRoute;
@@ -38,6 +6,7 @@ import axios from "axios";
 import selfSingleComment from "../components/selfSingleComment.vue";
 import Navbar from "../components/Navbar.vue";
 import NavbarUp from "../components/NavbarUp.vue";
+import Backicon from "../assets/Backicon.svg";
 
 // 計算是否有新留言
 const aru = computed(() => socketStore.messages.length > 0);
@@ -80,6 +49,12 @@ const fetchUserData = async (username) => {
 <template>
   <NavbarUp />
   <div class="container-box">
+    <div class="back-icon">
+      <router-link to="/">
+        <img :src="Backicon" alt="Backicon" />
+      </router-link>
+    </div>
+
     <div class="container">
       <!-- selfInfo -->
       <!-- <div v-if="aru" class="aru">
@@ -104,7 +79,18 @@ const fetchUserData = async (username) => {
   display: flex;
   flex-direction: column;
   justify-self: center;
-  margin: 100px 0;
+  margin-bottom: 100px;
+  margin-top: calc(100px - var(--back-icon-height, 20px));
+}
+
+.back-icon {
+  margin: 0 0 20px 5px;
+  display: flex;
+  height: var(--back-icon-height);
+}
+
+.back-icon a {
+  display: flex;
 }
 
 .container {
