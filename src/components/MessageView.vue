@@ -73,12 +73,15 @@
 import { ref, nextTick, watch, computed } from "vue";
 import { NButton, useLoadingBar } from "naive-ui";
 import { useSocketStore } from "../stores/socketStore";
+import { useAuthStore } from "../stores/authStore";
+
 import axios from "../stores/axiosConfig";
 import Modal from "./Modal.vue";
 
 import Noteicon from "../assets/Noteicon.svg";
 import Closeicon from "../assets/Closeicon.svg";
 
+const authStore = useAuthStore();
 const props = defineProps(["modelValue"]);
 const emit = defineEmits(["update:modelValue"]);
 const socketStore = useSocketStore();
