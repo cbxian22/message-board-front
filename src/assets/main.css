@@ -96,6 +96,9 @@ html ::root {
   .aru {
     padding: 15px 0;
   }
+  .message-container {
+    width: 85% !important;
+  }
 }
 
 /* 手機 RWD (寬度小於 480px) */
@@ -125,5 +128,15 @@ html ::root {
 
   .navbar-up {
     padding: 0 10px !important;
+  }
+
+  .message-container {
+    width: 95% !important;
+    height: 80vh !important;
+  }
+
+  .message-form-mi {
+    flex: auto !important;
+    max-height: none !important;
   }
 }
