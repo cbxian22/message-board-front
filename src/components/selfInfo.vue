@@ -96,7 +96,7 @@ onMounted(() => {
         <p class="intro">{{ info.intro }}</p>
       </div>
       <div class="info-img">
-        <img :src="info.userAvatar" alt="User Avatar" />
+        <img :src="info.avatar_url" alt="User Avatar" />
       </div>
     </div>
     <!-- <div v-if="username" class="set">編輯個人檔案</div> -->
