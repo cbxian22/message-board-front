@@ -12,8 +12,10 @@ import { jwtDecode } from "jwt-decode"; // 使用官方的導入方式
 const verifyToken = (token) => {
   try {
     const decoded = jwtDecode(token);
-    const currentTime = Math.floor(Date.now() / 1000);
+    console.log("Decoded Token:", decoded); // 確認解碼後的 Token 內容
+    const currentTime = Math.floor(Date.now() / 1000); // 當前時間 (秒)
     if (decoded.exp < currentTime) {
+      console.log("Token 已過期");
       return null; // 如果過期，返回 null
     }
     return decoded;
