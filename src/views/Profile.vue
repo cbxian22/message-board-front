@@ -74,6 +74,10 @@ const fetchUserData = async (username) => {
 </template>
 
 <style scoped>
+:root {
+  --back-icon-height: 24px;
+}
+
 .container-box {
   width: 650px;
   display: flex;
