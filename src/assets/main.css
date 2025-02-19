@@ -104,7 +104,7 @@ html ::root {
 /* 手機 RWD (寬度小於 480px) */
 @media (max-width: 500px) {
   body {
-    overflow-x: hidden;
+    overflow-x: hidden !important;
   }
 
   .container-box {
