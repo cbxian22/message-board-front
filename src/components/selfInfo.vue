@@ -60,16 +60,25 @@ const fetchInfo = async () => {
 // });
 
 const handleUpdate = async () => {
-  const formData = new FormData(); // 創建 FormData 實例
-  formData.append("name", name.value); // 如果有其他欄位一併提交
-  formData.append("intro", intro.value);
-  formData.append("avatar_url", userAvatar.value); // 上傳圖片檔案
-
+  //   const formData = new FormData(); // 創建 FormData 實例
+  //   formData.append("name", name.value); // 如果有其他欄位一併提交
+  //   formData.append("intro", intro.value);
+  //   formData.append("avatar_url", userAvatar.value); // 上傳圖片檔案
+  const username = router.currentRoute.value.params.username;
+  //   try {
+  //     const response = await axios.put(
+  //       `https://message-board-server-7yot.onrender.com/api/users/${info.value.name}`,
+  //       formData,
+  //       { headers: { "Content-Type": "multipart/form-data" } } // 設置適當的 Content-Type
+  //     );
   try {
-    const response = await axios.put(
-      `https://message-board-server-7yot.onrender.com/api/users/${info.value.name}`,
-      formData,
-      { headers: { "Content-Type": "multipart/form-data" } } // 設置適當的 Content-Type
+    const response = await axios.post(
+      `https://message-board-server-7yot.onrender.com/api/users/${username}`,
+      {
+        name: name.value,
+        intro: intro.value,
+        avatar_url: userAvatar.value,
+      }
     );
     if (response.data.success) {
       alert("更新成功！");
