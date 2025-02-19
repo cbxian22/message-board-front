@@ -23,7 +23,7 @@ export const useAuthStore = defineStore("auth", {
       if (!decodedToken) return;
       this.userId = decodedToken.userId;
       this.userName = decodedToken.userName || "未知用户";
-      this.userName = decodedToken.userAvatar || "圖片";
+      this.userAvatar = decodedToken.userAvatar || "圖片";
       this.role = decodedToken.role;
       localStorage.setItem("userId", this.userId);
       localStorage.setItem("userName", this.userName);
