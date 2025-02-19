@@ -15,6 +15,7 @@ export const useAuthStore = defineStore("auth", {
     isLoggedIn: false,
     userId: null,
     userName: "",
+    userAvatar: "",
     role: "",
   }),
   actions: {
@@ -22,9 +23,11 @@ export const useAuthStore = defineStore("auth", {
       if (!decodedToken) return;
       this.userId = decodedToken.userId;
       this.userName = decodedToken.userName || "未知用户";
+      this.userName = decodedToken.userAvatar || "圖片";
       this.role = decodedToken.role;
       localStorage.setItem("userId", this.userId);
       localStorage.setItem("userName", this.userName);
+      localStorage.setItem("userAvatar", this.userAvatar);
       localStorage.setItem("role", this.role);
     },
     login(token) {
@@ -39,10 +42,11 @@ export const useAuthStore = defineStore("auth", {
         isLoggedIn: false,
         userId: null,
         userName: "",
+        userAvatar: "",
         role: "",
       };
       Object.assign(this, initialState);
-      ["token", "userId", "userName", "role"].forEach((key) =>
+      ["token", "userId", "userName", "userAvatar", "role"].forEach((key) =>
         localStorage.removeItem(key)
       );
     },

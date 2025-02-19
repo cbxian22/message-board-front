@@ -67,7 +67,7 @@ const isLoginModalOpen = ref(false);
 
 const checkTokenAndOpenModal = () => {
   const token = localStorage.getItem("token");
-  if (!token) {
+  if (token) {
     isLoginModalOpen.value = true;
   } else {
     isPostModalOpen.value = true;

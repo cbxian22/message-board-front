@@ -9,9 +9,8 @@
 
         <div class="message-form-mi">
           <div>
-            <!-- <img :src="userStore.userImageUrl" alt="UserPhoto" class="photo" /> -->
             <img
-              :src="'https://fakeimg.pl/50/'"
+              :src="userStore.userAvatar"
               alt="頭像"
               class="photo"
               draggable="false"
@@ -71,21 +70,21 @@
 </template>
 
 <script setup>
+import { ref, nextTick, watch, computed } from "vue";
+import { NButton, useLoadingBar } from "naive-ui";
+import { useSocketStore } from "../stores/socketStore";
+import axios from "../stores/axiosConfig";
+import Modal from "./Modal.vue";
+
 import Noteicon from "../assets/Noteicon.svg";
 import Closeicon from "../assets/Closeicon.svg";
-import Modal from "./Modal.vue"; // 引入彈窗組件
-import { ref, nextTick, watch, computed } from "vue";
-import { NButton } from "naive-ui";
-import axios from "../stores/axiosConfig"; // 統一配置後的 axios
-import { useSocketStore } from "../stores/socketStore"; // WebSocket Store
 
 const props = defineProps(["modelValue"]);
 const emit = defineEmits(["update:modelValue"]);
 const socketStore = useSocketStore();
+const loadingBar = useLoadingBar();
 
-// 取得使用者名稱
 const userName = computed(() => localStorage.getItem("userName") || "未知用户");
-
 const content = ref("");
 const textarea = ref(null); // 取得 textarea DOM 節點
 const prevHeight = ref("auto"); // 儲存上一次高度
@@ -161,6 +160,9 @@ const handleMessage = async () => {
     alert("請先登入！");
     return;
   }
+
+  loadingBar.start(); // 驗證通過 且 請求開始前 啟動 Loading
+
   try {
     const uploadedFileUrl = await uploadFile(); // 獨立處理圖片上傳
     const response = await axios.post(
@@ -176,17 +178,19 @@ const handleMessage = async () => {
       //   fileUrl: uploadedFileUrl,
       // });
 
-      // 清空輸入欄
       content.value = "";
       file.value = null;
-      fileUrl.value = null; // 清空檔案 URL
+      fileUrl.value = null;
       emit("update:modelValue", false); // 關閉 Modal
     } else {
       alert("留言提交失敗");
+      loadingBar.error();
     }
   } catch (error) {
     console.error("留言提交錯誤:", error);
     alert("留言提交失敗");
+  } finally {
+    loadingBar.finish();
   }
 };
 
