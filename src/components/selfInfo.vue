@@ -72,7 +72,7 @@ const handleUpdate = async () => {
   //       { headers: { "Content-Type": "multipart/form-data" } } // 設置適當的 Content-Type
   //     );
   try {
-    const response = await axios.post(
+    const response = await axios.put(
       `https://message-board-server-7yot.onrender.com/api/users/${username}`,
       {
         name: name.value,
