@@ -1,11 +1,24 @@
 import { defineStore } from "pinia";
 import { jwtDecode } from "jwt-decode"; // 使用官方的導入方式
 
+// const verifyToken = (token) => {
+//   try {
+//     return jwtDecode(token);
+//   } catch (error) {
+//     console.error("Token 解码错误:", error);
+//     return null;
+//   }
+// };
 const verifyToken = (token) => {
   try {
-    return jwtDecode(token);
+    const decoded = jwtDecode(token);
+    const currentTime = Math.floor(Date.now() / 1000);
+    if (decoded.exp < currentTime) {
+      return null; // 如果過期，返回 null
+    }
+    return decoded;
   } catch (error) {
-    console.error("Token 解码错误:", error);
+    console.error("Token 解碼錯誤:", error);
     return null;
   }
 };
