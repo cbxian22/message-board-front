@@ -74,23 +74,18 @@ const fetchUserData = async (username) => {
 </template>
 
 <style scoped>
-:root {
-  --back-icon-height: 24px;
-}
-
 .container-box {
   width: 650px;
   display: flex;
   flex-direction: column;
   justify-self: center;
   margin-bottom: 100px;
-  margin-top: calc(100px - var(--back-icon-height, 20px));
+  margin-top: calc(100px - 44px);
 }
 
 .back-icon {
   margin: 0 0 20px 5px;
   display: flex;
-  height: var(--back-icon-height);
 }
 
 .back-icon a {
