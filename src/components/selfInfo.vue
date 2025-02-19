@@ -28,6 +28,15 @@ const activate = (place) => {
   placement.value = place;
 };
 
+// v-model 不能用在 <input type="file">，因為 file input 是 唯讀的
+// 所以應該用 @change 來監聽變化，然後手動更新 userAvatar.value。
+const handleFileChange = (event) => {
+  const file = event.target.files[0]; // 取得使用者選擇的檔案
+  if (file) {
+    userAvatar.value = file; // 存入 ref
+  }
+};
+
 const fetchInfo = async () => {
   const username = router.currentRoute.value.params.username; // 從路由獲取 username
   try {
@@ -120,7 +129,12 @@ onMounted(() => {
         <form @submit.prevent="handleUpdate" class="form-container">
           <div class="form-group">
             <label for="userAvatar">更換頭貼</label>
-            <input type="file" id="userAvatar" accept="image/*" />
+            <input
+              type="file"
+              @change="handleFileChange"
+              id="userAvatar"
+              accept="image/*"
+            />
           </div>
 
           <div class="form-group">
