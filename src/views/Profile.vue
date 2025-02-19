@@ -92,6 +92,11 @@ const fetchUserData = async (username) => {
   display: flex;
 }
 
+/* 淺色下更改引入 icon 顏色 */
+.light-mode img {
+  filter: invert(1) grayscale(100%) contrast(100%) brightness(0);
+}
+
 .container {
   border: 0.5px solid #373737;
   border-radius: 30px;
