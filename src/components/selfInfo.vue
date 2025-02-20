@@ -77,10 +77,10 @@ const handleFileUpload = (event) => {
 };
 
 // 取消檔案預覽，重設檔案選擇
-// const cancelFilePreview = () => {
-//   fileUrl.value = null; // 清除圖片預覽 URL
-//   file.value = null; // 清除檔案
-// };
+const cancelFilePreview = () => {
+  fileUrl.value = null; // 清除圖片預覽 URL
+  file.value = null; // 清除檔案
+};
 
 // 獨立處理圖片上傳
 const uploadFile = async () => {
@@ -118,6 +118,7 @@ const handleUpdate = async () => {
     alert("請先登入！");
     return;
   }
+
   loadingBar.start(); // 驗證通過 且 請求開始前 啟動 Loading
 
   try {
@@ -311,6 +312,9 @@ onUnmounted(() => {
 .n-button {
   --n-text-color-hover: #000 !important;
   --n-border-hover: 1px solid #000 !important;
+  --n-text-color-pressed: none !important;
+  --n-border-focus: none !important;
+  --n-text-color-focus: none !important;
 }
 
 .dark-mode .n-button {
@@ -324,9 +328,6 @@ onUnmounted(() => {
   padding: 10px 20px;
   border: 0.5px solid rgba(102, 102, 102, 0.5);
   border-radius: 10px;
-  --n-text-color-pressed: none;
-  --n-border-focus: none;
-  --n-text-color-focus: none;
 }
 
 /* 抽屜視窗 */
