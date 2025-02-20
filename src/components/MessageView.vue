@@ -263,8 +263,10 @@ watch(content, () => {
 }
 
 .photo {
-  border-radius: 50%;
   width: 50px;
+  height: 50px;
+  border-radius: 50%;
+  object-fit: cover;
   margin-right: 10px;
   display: flex;
 }

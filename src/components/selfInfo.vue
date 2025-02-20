@@ -140,7 +140,8 @@ const handleUpdate = async () => {
       intro.value = "";
       file.value = null;
       fileUrl.value = null;
-      fetchInfo();
+      show.value = false;
+      await fetchInfo();
     } else {
       alert("留言提交失敗");
       loadingBar.error();
@@ -232,13 +233,6 @@ onUnmounted(() => {
                   class="submit-button"
                 />
 
-                <!-- <button
-                  type="button"
-                  @click="triggerFileInput"
-                  class="submit-button"
-                >
-                  按鈕
-                </button> -->
                 <!-- 圖片預覽區域 -->
                 <div v-if="fileUrl" class="file-preview">
                   <img :src="fileUrl" alt="File Preview" class="preview-img" />
