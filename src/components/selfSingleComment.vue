@@ -1,6 +1,6 @@
 <script setup>
 // defineEmits 必要？
-import { ref, defineEmits, onMounted, onUnmounted } from "vue";
+import { ref, defineEmits, onMounted, onUnmounted, watch } from "vue";
 import { useAuthStore } from "../stores/authStore";
 import { useRouter } from "vue-router";
 import axios from "axios";
@@ -183,6 +183,16 @@ onMounted(() => {
     };
   });
 });
+
+watch(
+  () => route.params.username,
+  async (newUsername) => {
+    username.value = newUsername;
+    await fetchUserData(username.value);
+    await fetchComments(); // 重新獲取留言
+  },
+  { immediate: true }
+);
 </script>
 
 <template>
