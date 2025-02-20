@@ -99,6 +99,7 @@ const fetchUserData = async (username) => {
 .back-icon {
   margin: 0 0 20px 5px;
   display: flex;
+  visibility: hidden;
 }
 
 .back-icon a {
