@@ -231,7 +231,7 @@ onMounted(() => {
             <div v-if="fileUrl" class="file-preview">
               <img :src="fileUrl" alt="File Preview" class="preview-img" />
               <button @click="cancelFilePreview" class="cancel-preview-button">
-                <img :src="Closeicon" alt="Closeicon" />
+                Ｘ
               </button>
             </div>
           </div>
