@@ -23,6 +23,13 @@ const modalState = ref({});
 const modalRefs = ref({});
 const buttonRefs = ref({});
 
+const scrollToTop = () => {
+  window.scrollTo({
+    top: 0,
+    left: 0,
+  });
+};
+
 const openModal = (event, commentId) => {
   event.stopPropagation();
 
@@ -200,13 +207,9 @@ onMounted(() => {
       <!-- 貼文資訊 -->
       <div class="info">
         <div class="info-span">
-          <!--  -->
-          <!--  -->
-          <!--  -->
-          <!--  -->
-          <!-- <router-link to="/profile"> -->
-          <span class="comment-author"> {{ comment.name }}</span>
-          <!-- </router-link> -->
+          <span class="comment-author" @click="scrollToTop">
+            {{ comment.name }}</span
+          >
           <span class="comment-time"> {{ formatDate(comment.timestamp) }}</span>
         </div>
 
