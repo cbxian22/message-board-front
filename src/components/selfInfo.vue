@@ -30,8 +30,10 @@ const fileUrl = ref(null);
 const fileInputRef = ref(null);
 
 // 獲取 user 資料
-const fetchInfo = async (username) => {
-  const username = router.currentRoute.value.params.username; // 這裡重新獲取 username
+const fetchInfo = async (
+  username = router.currentRoute.value.params.username
+) => {
+  // const username = router.currentRoute.value.params.username; // 這裡重新獲取 username
   try {
     const response = await axios.get(
       `https://message-board-server-7yot.onrender.com/api/users/${username}`
