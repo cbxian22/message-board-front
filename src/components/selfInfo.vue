@@ -136,12 +136,12 @@ const handleUpdate = async () => {
       //   fileUrl: uploadedFileUrl,
       // });
 
+      await fetchInfo(name.value);
       name.value = "";
       intro.value = "";
       file.value = null;
       fileUrl.value = null;
       show.value = false;
-      await fetchInfo(username);
       location.reload();
     } else {
       alert("留言提交失敗");
