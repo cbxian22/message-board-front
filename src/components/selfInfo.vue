@@ -35,6 +35,7 @@ const activate = (place) => {
 
 // 獲取 user 資料
 const fetchInfo = async () => {
+  const username = router.currentRoute.value.params.username; // 這裡重新獲取 username
   try {
     const response = await axios.get(
       `https://message-board-server-7yot.onrender.com/api/users/${username}`
@@ -113,6 +114,7 @@ const uploadFile = async () => {
 };
 
 const handleUpdate = async () => {
+  const username = router.currentRoute.value.params.username; // 這裡重新獲取 username
   // 即使是自己也需要登入後修改
   const userId = localStorage.getItem("userId");
   const token = localStorage.getItem("token");
