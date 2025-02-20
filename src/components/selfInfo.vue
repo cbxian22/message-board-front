@@ -187,7 +187,7 @@ onUnmounted(() => {
       </div>
     </div>
     <!-- v-if="loggedInUser === username" -->
-    <div class="set-btn">
+    <div class="set-btn" v-if="loggedInUser === username">
       <n-button @click="show = true"> 編輯個人檔案 </n-button>
     </div>
     <n-drawer v-model:show="show" :width="rwdwidth">
