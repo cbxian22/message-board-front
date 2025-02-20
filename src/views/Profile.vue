@@ -62,7 +62,7 @@ const fetchUserData = async (username) => {
 <template>
   <NavbarUp />
   <div class="container-box">
-    <div class="back-icon" v-if="loggedInUser !== username">
+    <div class="back-icon" v-show="loggedInUser !== username">
       <router-link to="/">
         <img :src="Backicon" alt="Backicon" />
       </router-link>
