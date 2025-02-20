@@ -45,7 +45,7 @@
         <div class="form-group">
           <label for="name" :class="{ active: name }" class="floating-label">
             <input id="name" v-model="name" type="text" required />
-            <span>用戶名稱</span>
+            <span>全名</span>
           </label>
         </div>
 
