@@ -187,10 +187,12 @@ onUnmounted(() => {
         <img :src="info.userAvatar" />
       </div>
     </div>
-    <!-- v-if="loggedInUser === username" -->
+
     <div class="set-btn" v-if="loggedInUser === username">
       <n-button @click="show = true"> 編輯個人檔案 </n-button>
     </div>
+
+    <!-- 抽屜視窗 -->
     <n-drawer v-model:show="show" :width="rwdwidth">
       <n-drawer-content
         title="編輯個人檔案"
@@ -262,7 +264,7 @@ onUnmounted(() => {
 
           <div class="form-box">
             <div class="form-mod">
-              <n-button type="submit">保存變更</n-button>
+              <n-button @click="handleUpdate">保存變更</n-button>
             </div>
           </div>
         </form>
@@ -314,6 +316,7 @@ onUnmounted(() => {
   --n-border-hover: 1px solid #000 !important;
   --n-text-color-pressed: none !important;
   --n-border-focus: none !important;
+  --n-border-pressed: none !important;
   --n-text-color-focus: none !important;
 }
 
