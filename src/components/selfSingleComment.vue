@@ -341,6 +341,7 @@ onMounted(() => {
   color: #fff;
   font-weight: 900;
   transition: color 0.3s ease;
+  cursor: pointer;
 }
 
 .info-span .comment-author:hover {
