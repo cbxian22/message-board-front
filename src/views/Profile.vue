@@ -1,6 +1,7 @@
 <script setup>
 import { ref, computed, onMounted, watch, nextTick, onUpdated } from "vue";
 import { useRoute, useRouter } from "vue-router"; // 引入 useRoute;
+import { useAuthStore } from "../stores/authStore";
 import axios from "axios";
 
 import selfSingleComment from "../components/selfSingleComment.vue";
@@ -14,6 +15,9 @@ const aru = computed(() => socketStore.messages.length > 0);
 
 const router = useRouter();
 const route = useRoute();
+const authStore = useAuthStore();
+
+const loggedInUser = authStore.userName;
 const username = ref(route.params.username); // 使用 ref 存儲 username
 
 // 監控 route.params.username 變化，並手動重新獲取資料
@@ -58,7 +62,7 @@ const fetchUserData = async (username) => {
 <template>
   <NavbarUp />
   <div class="container-box">
-    <div class="back-icon">
+    <div class="back-icon" v-if="loggedInUser !== username">
       <router-link to="/">
         <img :src="Backicon" alt="Backicon" />
       </router-link>
