@@ -431,7 +431,10 @@ onMounted(() => {
   color: #fff;
   font-weight: 900;
   transition: color 0.3s ease;
-  text-decoration: dashed;
+}
+
+.info-span .comment-author:hover {
+  text-decoration: underline;
 }
 
 .light-mode .info-span .comment-author {

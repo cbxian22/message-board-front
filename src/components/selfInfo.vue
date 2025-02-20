@@ -183,7 +183,7 @@ onUnmounted(() => {
         <p class="intro">{{ info.intro }}</p>
       </div>
       <div class="info-img">
-        <img :src="info.userAvatar" alt="使用者圖片" />
+        <img :src="info.userAvatar" />
       </div>
     </div>
     <!-- v-if="loggedInUser === username" -->
@@ -325,6 +325,8 @@ onUnmounted(() => {
   border: 0.5px solid rgba(102, 102, 102, 0.5);
   border-radius: 10px;
   --n-text-color-pressed: none;
+  --n-border-focus: none;
+  --n-text-color-focus: none;
 }
 
 /* 抽屜視窗 */
