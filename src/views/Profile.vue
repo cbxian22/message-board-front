@@ -22,6 +22,9 @@ watch(
   async (newUsername) => {
     username.value = newUsername; // 更新 username
     await fetchUserData(username.value); // 重新加載資料
+    nextTick(() => {
+      console.log("route 參數更新後，username 是：", username.value);
+    });
   },
   { immediate: true } // 初次加載時也觸發
 );
