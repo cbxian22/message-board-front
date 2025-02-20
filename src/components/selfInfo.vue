@@ -115,7 +115,12 @@ const uploadFile = async () => {
 
 const handleUpdate = async () => {
   const username = router.currentRoute.value.params.username;
-
+  const userId = localStorage.getItem("userId");
+  const token = localStorage.getItem("token");
+  if (!userId || !token) {
+    alert("請先登入！");
+    return;
+  }
   //   loadingBar.start(); // 驗證通過 且 請求開始前 啟動 Loading
 
   try {
@@ -200,7 +205,7 @@ onMounted(() => {
         <img :src="info.userAvatar" alt="使用者圖片" />
       </div>
     </div>
-    <!-- <div v-if="username" class="set">編輯個人檔案</div> -->
+
     <div class="set">
       <n-button @click="activate('top')"> 編輯個人檔案 </n-button>
     </div>
