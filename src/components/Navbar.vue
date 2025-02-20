@@ -78,6 +78,8 @@ const checkTokenAndOpenModal = () => {
 
 // 重置滾動位置
 const scrollToTop = () => {
+  const scrollStore = useScrollStore();
+  scrollStore.setScrollPosition(0);
   window.scrollTo({
     top: 0,
     left: 0,
