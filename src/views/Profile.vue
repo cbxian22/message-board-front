@@ -1,5 +1,5 @@
 <script setup>
-import { ref, computed, onMounted, watch, nextTick } from "vue";
+import { ref, computed, onMounted, watch, nextTick, onUpdated } from "vue";
 import { useRoute, useRouter } from "vue-router"; // 引入 useRoute;
 import axios from "axios";
 
@@ -29,6 +29,11 @@ watch(
 // 初始載入時獲取資料
 onMounted(async () => {
   await fetchUserData(username.value);
+});
+
+// 每次組件更新後觸發的操作
+onUpdated(() => {
+  console.log("組件已更新！當前的 username 是：", username.value);
 });
 
 // 獲取使用者資料
