@@ -98,6 +98,7 @@ const fileInputRef = ref(null);
 // 檢查是否啟用提交按鈕
 const isSubmitDisabled = computed(() => !(content.value.trim() || file.value));
 
+// 獲取 <input type="file">
 const triggerFileInput = () => {
   fileInputRef.value?.click();
 };

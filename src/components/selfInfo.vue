@@ -28,12 +28,29 @@ const activate = (place) => {
   placement.value = place;
 };
 
-// v-model 不能用在 <input type="file">，因為 file input 是 唯讀的
-// 所以應該用 @change 來監聽變化，然後手動更新 userAvatar.value。
-const handleFileChange = (event) => {
-  const file = event.target.files[0]; // 取得使用者選擇的檔案
-  if (file) {
-    userAvatar.value = file; // 存入 ref
+// 獲取 <input type="file">
+const triggerFileInput = () => {
+  fileInputRef.value?.click();
+};
+
+// 檢查檔案上傳處理，並顯示預覽
+const handleFileUpload = (event) => {
+  const selectedFile = event.target.files[0]; // 取得使用者選擇的檔案
+
+  if (selectedFile) {
+    // 顯示檔案名稱
+    console.log("檔案已選擇:", selectedFile.name);
+
+    // 如果是圖片檔案，則顯示預覽
+    if (selectedFile.type.startsWith("image/")) {
+      const reader = new FileReader();
+      reader.onload = (e) => {
+        fileUrl.value = e.target.result; // 設置圖片預覽 URL
+      };
+      reader.readAsDataURL(selectedFile); // 將檔案轉為 Data URL
+    }
+
+    file.value = selectedFile; // 儲存檔案
   }
 };
 
@@ -131,7 +148,8 @@ onMounted(() => {
             <label for="userAvatar">更換頭貼</label>
             <input
               type="file"
-              @change="handleFileChange"
+              ref="fileInputRef"
+              @change="handleFileUpload"
               id="userAvatar"
               accept="image/*"
             />

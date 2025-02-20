@@ -84,18 +84,16 @@ const handleRegister = async () => {
   isTouched.value = true; // 發送請求前，顯示 loading 狀態
   try {
     const response = await axios.post(
-      "https://message-board-server-7yot.onrender.com/api/register",
-      // "http://localhost:3000/api/register",
+      "https://message-board-server-7yot.onrender.com/api/auth/register",
       {
         name: name.value,
         account: account.value,
         password: password.value,
-        role: role, // 固定傳遞角色
+        role: role,
       }
     );
     if (response.data.success) {
-      // alert("註冊成功！");
-      router.push("/login"); // 註冊成功後跳轉到登入頁面
+      router.push("/login");
     } else {
       alert(response.data.message || "註冊失敗！");
     }
@@ -103,7 +101,7 @@ const handleRegister = async () => {
     console.error("註冊時發生錯誤:", error);
     alert("註冊失敗，請稍後再試！");
   } finally {
-    isTouched.value = false; // 無論成功或失敗，最後都應該隱藏 loading
+    isTouched.value = false;
   }
 };
 

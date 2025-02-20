@@ -70,7 +70,6 @@ const fetchComments = async () => {
   try {
     const response = await axios.get(
       "https://message-board-server-7yot.onrender.com/api/posts"
-      // "http://localhost:3000/api/posts"
     );
     if (response.status === 200 && Array.isArray(response.data)) {
       comments.value = response.data.map((comment) => ({
@@ -78,7 +77,7 @@ const fetchComments = async () => {
         content: comment.content,
         name: comment.user_name,
         timestamp: new Date(comment.created_at),
-        file_url: comment.file_url, // 如有顯示
+        file_url: comment.file_url,
         user_avatar: comment.user_avatar,
       }));
       emit("loaded");
