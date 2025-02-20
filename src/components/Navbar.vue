@@ -48,6 +48,7 @@
 <script setup>
 import { ref } from "vue";
 import { useAuthStore } from "../stores/authStore";
+import { useScrollStore } from "@/stores/scrollStore";
 import Message from "../components/MessageView.vue";
 import Login from "../components/LoginModal.vue";
 
@@ -59,6 +60,7 @@ import Loginicon from "../assets/Loginicon.svg";
 
 const authStore = useAuthStore();
 authStore.checkLoginStatus();
+const scrollStore = useScrollStore();
 
 const isPostModalOpen = ref(false);
 const isLoginModalOpen = ref(false);
@@ -78,13 +80,13 @@ const checkTokenAndOpenModal = () => {
 
 // 重置滾動位置
 const scrollToTop = () => {
-  const scrollStore = useScrollStore();
-  scrollStore.setScrollPosition(0);
   window.scrollTo({
     top: 0,
     left: 0,
     behavior: "smooth",
   });
+
+  scrollStore.setScrollPosition(0);
 };
 </script>
 
