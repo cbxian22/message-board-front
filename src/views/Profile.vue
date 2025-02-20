@@ -65,7 +65,7 @@ const fetchUserData = async (username) => {
     </div>
 
     <div class="container">
-      <selfInfo :username="username" />
+      <selfInfo :username="username" :key="username" />
       <!-- <div v-if="aru" class="aru">
         <h1>最新留言</h1>
         <div
@@ -76,7 +76,7 @@ const fetchUserData = async (username) => {
           <p class="comment-content">{{ message.data.content }}</p>
         </div>
       </div> -->
-      <selfSingleComment :username="username" />
+      <selfSingleComment :username="username" :key="username" />
     </div>
   </div>
   <Navbar />
