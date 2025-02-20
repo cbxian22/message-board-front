@@ -388,6 +388,8 @@ onMounted(() => {
 .photo {
   border-radius: 50%;
   width: 50px;
+  height: 50px;
+  object-fit: cover;
 }
 
 .reply {
@@ -429,6 +431,7 @@ onMounted(() => {
   color: #fff;
   font-weight: 900;
   transition: color 0.3s ease;
+  text-decoration: dashed;
 }
 
 .light-mode .info-span .comment-author {

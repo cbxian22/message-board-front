@@ -295,6 +295,8 @@ onMounted(() => {
 .photo {
   border-radius: 50%;
   width: 50px;
+  height: 50px;
+  object-fit: cover;
 }
 
 .reply {
