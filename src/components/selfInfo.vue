@@ -6,32 +6,28 @@
 
 <script setup>
 import { ref, onMounted, onUnmounted } from "vue";
-import { NButton, NDrawerContent, NDrawer } from "naive-ui";
+import { NButton, NDrawerContent, NDrawer, useLoadingBar } from "naive-ui";
 import { useAuthStore } from "../stores/authStore";
+import { useThemeStore } from "../stores/themeStore";
+
 import { useRouter } from "vue-router";
 import axios from "axios";
 
+const themeStore = useThemeStore();
+const loadingBar = useLoadingBar();
 const router = useRouter();
 const authStore = useAuthStore();
 const loggedInUser = authStore.userName;
 const username = router.currentRoute.value.params.username;
 
+const show = ref(false);
+const rwdwidth = ref("100vw"); // 預設手機版
 const info = ref([]); // 用來儲存獲取的數據
 const name = ref("");
 const intro = ref("");
-const userAvatar = ref("");
 const file = ref(null);
 const fileUrl = ref(null);
 const fileInputRef = ref(null);
-
-const active = ref(false);
-const placement = ref("top");
-
-// 抽屜視窗彈出
-const activate = (place) => {
-  active.value = true;
-  placement.value = place;
-};
 
 // 獲取 user 資料
 const fetchInfo = async () => {
@@ -64,29 +60,27 @@ const triggerFileInput = () => {
 
 // 檢查檔案上傳處理，並顯示預覽
 const handleFileUpload = (event) => {
-  const selectedFile = event.target.files[0]; // 取得使用者選擇的檔案
+  const selectedFile = event.target.files[0];
 
   if (selectedFile) {
-    // 顯示檔案名稱
     console.log("檔案已選擇:", selectedFile.name);
 
-    // 如果是圖片檔案，則顯示預覽
     if (selectedFile.type.startsWith("image/")) {
       const reader = new FileReader();
       reader.onload = (e) => {
-        fileUrl.value = e.target.result; // 設置圖片預覽 URL
+        info.value.userAvatar = e.target.result; // 讓 <img> 直接顯示新圖片
       };
-      reader.readAsDataURL(selectedFile); // 將檔案轉為 Data URL
+      reader.readAsDataURL(selectedFile);
     }
-    file.value = selectedFile; // 儲存檔案
+    file.value = selectedFile; // 存檔案，確保後續上傳
   }
 };
 
 // 取消檔案預覽，重設檔案選擇
-const cancelFilePreview = () => {
-  fileUrl.value = null; // 清除圖片預覽 URL
-  file.value = null; // 清除檔案
-};
+// const cancelFilePreview = () => {
+//   fileUrl.value = null; // 清除圖片預覽 URL
+//   file.value = null; // 清除檔案
+// };
 
 // 獨立處理圖片上傳
 const uploadFile = async () => {
@@ -113,8 +107,9 @@ const uploadFile = async () => {
   }
 };
 
+// 提交更新
 const handleUpdate = async () => {
-  const username = router.currentRoute.value.params.username; // 這裡重新獲取 username
+  const username = router.currentRoute.value.params.username;
 
   // 即使是自己也需要登入後修改
   const userId = localStorage.getItem("userId");
@@ -123,7 +118,7 @@ const handleUpdate = async () => {
     alert("請先登入！");
     return;
   }
-  //   loadingBar.start(); // 驗證通過 且 請求開始前 啟動 Loading
+  loadingBar.start(); // 驗證通過 且 請求開始前 啟動 Loading
 
   try {
     const uploadedFileUrl = await uploadFile(); // 獨立處理圖片上傳
@@ -147,19 +142,36 @@ const handleUpdate = async () => {
       fetchInfo();
     } else {
       alert("留言提交失敗");
-      //   loadingBar.error();
+      loadingBar.error();
     }
   } catch (error) {
     console.error("留言提交錯誤:", error);
     alert("留言提交失敗");
+  } finally {
+    loadingBar.finish();
   }
-  //   finally {
-  //     loadingBar.finish();
-  //   }
+};
+
+// 更新抽屜視窗寬度
+const updateWidth = () => {
+  const width = window.innerWidth;
+  if (width >= 1024) {
+    rwdwidth.value = 800;
+  } else if (width >= 768) {
+    rwdwidth.value = 600;
+  } else {
+    rwdwidth.value = "100vw";
+  }
 };
 
 onMounted(() => {
   fetchInfo();
+  updateWidth();
+  window.addEventListener("resize", updateWidth);
+});
+
+onUnmounted(() => {
+  window.removeEventListener("resize", updateWidth);
 });
 </script>
 
@@ -174,60 +186,83 @@ onMounted(() => {
         <img :src="info.userAvatar" alt="使用者圖片" />
       </div>
     </div>
-
-    <div class="set" v-if="loggedInUser === username">
-      <n-button @click="activate('top')"> 編輯個人檔案 </n-button>
+    <!-- v-if="loggedInUser === username" -->
+    <div class="set-btn">
+      <n-button @click="show = true"> 編輯個人檔案 </n-button>
     </div>
-    <n-drawer v-model:show="active" :width="502" :placement="placement">
-      <n-drawer-content title="編輯個人檔案">
-        <form @submit.prevent="handleUpdate" class="form-container">
-          <div class="form-group">
-            <label for="userAvatar">更換頭貼</label>
-            <input
-              type="file"
-              ref="fileInputRef"
-              @change="handleFileUpload"
-              id="userAvatar"
-              accept="image/*"
-              style="display: none"
-            />
-            <button
-              type="button"
-              @click="triggerFileInput"
-              class="submit-button"
-            >
-              按鈕
-            </button>
-            <!-- 圖片預覽區域 -->
-            <div v-if="fileUrl" class="file-preview">
-              <img :src="fileUrl" alt="File Preview" class="preview-img" />
-              <button @click="cancelFilePreview" class="cancel-preview-button">
-                Ｘ
-              </button>
+    <n-drawer v-model:show="show" :width="rwdwidth">
+      <n-drawer-content
+        title="編輯個人檔案"
+        closable
+        :class="themeStore.isDarkMode ? 'dark-mode' : 'light-mode'"
+      >
+        <form @submit.prevent="handleUpdate" class="container">
+          <div class="form-box">
+            <div class="form-inner">
+              <div class="form-mod full">
+                <label for="name">名稱</label>
+                <input
+                  v-model="name"
+                  id="name"
+                  type="text"
+                  placeholder="請輸入您的姓名"
+                />
+              </div>
+              <div class="form-mod">
+                <label for="userAvatar"></label>
+                <input
+                  type="file"
+                  ref="fileInputRef"
+                  @change="handleFileUpload"
+                  id="userAvatar"
+                  accept="image/*"
+                  style="display: none"
+                />
+                <img
+                  :src="
+                    info.userAvatar ||
+                    'https://storage.googleapis.com/message_board_storage/default_profile.jpg'
+                  "
+                  alt="更新圖片"
+                  type="button"
+                  @click="triggerFileInput"
+                  class="submit-button"
+                />
+
+                <!-- <button
+                  type="button"
+                  @click="triggerFileInput"
+                  class="submit-button"
+                >
+                  按鈕
+                </button> -->
+                <!-- 圖片預覽區域 -->
+                <div v-if="fileUrl" class="file-preview">
+                  <img :src="fileUrl" alt="File Preview" class="preview-img" />
+                  <button
+                    @click="cancelFilePreview"
+                    class="cancel-preview-button"
+                  ></button>
+                </div>
+              </div>
             </div>
           </div>
 
-          <div class="form-group">
-            <label for="name">姓名</label>
-            <input
-              v-model="name"
-              id="name"
-              type="text"
-              placeholder="請輸入您的姓名"
-            />
+          <div class="form-box">
+            <div class="form-mod">
+              <label for="intro">個人介紹</label>
+              <textarea
+                v-model="intro"
+                id="intro"
+                placeholder="請輸入您的介紹"
+              ></textarea>
+            </div>
           </div>
 
-          <div class="form-group">
-            <label for="intro">個人介紹</label>
-            <textarea
-              v-model="intro"
-              id="intro"
-              placeholder="請輸入您的介紹"
-            ></textarea>
-          </div>
-
-          <div class="form-group">
-            <button type="submit">保存變更</button>
+          <div class="form-box">
+            <div class="form-mod">
+              <n-button type="submit">保存變更</n-button>
+            </div>
           </div>
         </form>
       </n-drawer-content>
@@ -235,7 +270,7 @@ onMounted(() => {
   </div>
 </template>
 
-<style scoped>
+<style>
 .info-box {
   padding: 40px 50px 25px;
   border-bottom: 0.5px solid #373737;
@@ -246,7 +281,9 @@ onMounted(() => {
 }
 .info-box img {
   width: 100px;
+  height: 100px;
   border-radius: 50%;
+  object-fit: cover;
 }
 
 .info-box .info-content {
@@ -264,36 +301,84 @@ onMounted(() => {
   font-size: 13px !important;
 }
 
-.set {
-  margin-top: 20px;
+.set-btn {
+  margin-top: 40px;
+  flex: 1;
+  display: flex;
+  align-items: center;
 }
 
-.set .n-button {
+.n-button {
+  --n-text-color-hover: #000 !important;
+  --n-border-hover: 1px solid #000 !important;
+}
+
+.dark-mode .n-button {
+  --n-text-color-hover: #fff !important;
+  --n-border-hover: 1px solid #fff !important;
+}
+
+.set-btn .n-button,
+.form-mod .n-button {
   width: 100%;
-  --n-text-color: #fff !important;
-  --n-border: 1px solid #fff !important;
+  padding: 10px 20px;
+  border: 0.5px solid rgba(102, 102, 102, 0.5);
+  border-radius: 10px;
+  --n-text-color-pressed: none;
 }
 
-.set .n-button {
-  width: 100%;
-  --n-text-color-hover: none !important;
-  --n-border-hover: 1px solid #aaa !important;
-}
-
-/* ai */
-.form-container {
+/* 抽屜視窗 */
+.container {
+  background-color: rgb(24, 24, 24);
+  padding: 30px;
+  border-radius: 30px;
   display: flex;
   flex-direction: column;
-  gap: 16px;
+  gap: 30px;
 }
 
-.form-item {
+.form-box {
+  border-bottom: 0.5px solid #373737;
+}
+
+.form-box:last-child {
+  border-bottom: none;
+}
+
+.form-inner {
+  display: flex;
+  display: row;
+  justify-content: space-between;
+}
+
+.form-inner .full {
+  flex: 1;
+  /* margin-right: 50px; */
+}
+
+.form-box textarea,
+.form-box input {
+  border: none;
+  outline: none;
+  resize: none;
+  background: transparent;
+  width: 100%;
+  font-size: 14px;
+  padding: 20px 0;
+  color: rgb(243, 245, 247);
+}
+
+.form-mod {
   display: flex;
   flex-direction: column;
 }
 
-.form-item label {
-  margin-bottom: 4px;
-  font-weight: bold;
+/* 頭貼按鈕 */
+.submit-button {
+  cursor: pointer;
+  width: 70px;
+  height: 70px;
+  border-radius: 50%;
+  object-fit: cover;
 }
 </style>

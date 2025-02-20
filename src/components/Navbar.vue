@@ -26,15 +26,15 @@
       </li>
 
       <!--登入後將改成圖像 -->
-      <li v-if="authStore.isLoggedIn">
-        <router-link
-          :to="`/@${authStore.userName}`"
-          class="nav-link"
-          :key="`${authStore.userName}`"
-        >
-          <img :src="Accounticon" alt="Accounticon" />
-        </router-link>
-      </li>
+      <!-- <li v-if="authStore.isLoggedIn"> -->
+      <router-link
+        :to="`/@${authStore.userName}`"
+        class="nav-link"
+        :key="`${authStore.userName}`"
+      >
+        <img :src="Accounticon" alt="Accounticon" />
+      </router-link>
+      <!-- </li> -->
     </ul>
   </nav>
 

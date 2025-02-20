@@ -32,19 +32,19 @@ onMounted(async () => {
 });
 
 // 獲取使用者資料
-const fetchUserData = async (username) => {
-  try {
-    const response = await axios.get(
-      `https://message-board-server-7yot.onrender.com/api/users/${username}`
-    );
-    if (response.data.message === "使用者不存在") {
-      router.replace("/not-found");
-    }
-  } catch (error) {
-    console.error("查詢用戶錯誤:", error);
-    router.replace("/not-found");
-  }
-};
+// const fetchUserData = async (username) => {
+//   try {
+//     const response = await axios.get(
+//       `https://message-board-server-7yot.onrender.com/api/users/${username}`
+//     );
+//     if (response.data.message === "使用者不存在") {
+//       router.replace("/not-found");
+//     }
+//   } catch (error) {
+//     console.error("查詢用戶錯誤:", error);
+//     router.replace("/not-found");
+//   }
+// };
 </script>
 
 <template>

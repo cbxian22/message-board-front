@@ -67,7 +67,7 @@ html ::root {
 }
 
 .dark-mode .container {
-  background-color: rgb(24, 24, 24);
+  background-color: rgb(24, 24, 24) !important;
   transition: background-color 0.3s ease, color 0.3s ease;
 }
 
@@ -78,7 +78,7 @@ html ::root {
 }
 
 .light-mode .container {
-  background-color: rgb(255, 255, 255);
+  background-color: rgb(255, 255, 255) !important;
   transition: background-color 0.3s ease, color 0.3s ease;
 }
 
