@@ -13,7 +13,7 @@ import axios from "axios";
 
 const router = useRouter();
 const authStore = useAuthStore();
-const loggedInUser = authStore.user.username;
+const loggedInUser = authStore.userName;
 const username = router.currentRoute.value.params.username;
 
 const info = ref([]); // 用來儲存獲取的數據
@@ -115,6 +115,7 @@ const uploadFile = async () => {
 
 const handleUpdate = async () => {
   const username = router.currentRoute.value.params.username; // 這裡重新獲取 username
+
   // 即使是自己也需要登入後修改
   const userId = localStorage.getItem("userId");
   const token = localStorage.getItem("token");
