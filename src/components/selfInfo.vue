@@ -142,6 +142,7 @@ const handleUpdate = async () => {
       fileUrl.value = null;
       show.value = false;
       await fetchInfo();
+      location.reload();
     } else {
       alert("留言提交失敗");
       loadingBar.error();
