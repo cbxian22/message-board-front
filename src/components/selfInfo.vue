@@ -30,7 +30,7 @@ const fileUrl = ref(null);
 const fileInputRef = ref(null);
 
 // 獲取 user 資料
-const fetchInfo = async () => {
+const fetchInfo = async (username) => {
   const username = router.currentRoute.value.params.username; // 這裡重新獲取 username
   try {
     const response = await axios.get(
@@ -141,7 +141,7 @@ const handleUpdate = async () => {
       file.value = null;
       fileUrl.value = null;
       show.value = false;
-      await fetchInfo();
+      await fetchInfo(username);
       location.reload();
     } else {
       alert("留言提交失敗");
