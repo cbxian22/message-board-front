@@ -336,7 +336,7 @@ onMounted(() => {
                 <li
                   v-if="
                     authStore.isLoggedIn &&
-                    authStore.userName !== message.username
+                    authStore.userName !== comment.user_name
                   "
                 >
                   <button class="modal-link">
