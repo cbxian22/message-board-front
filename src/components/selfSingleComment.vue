@@ -2,6 +2,7 @@
 // defineEmits 必要？
 import { ref, defineEmits, onMounted, onUnmounted } from "vue";
 import { useAuthStore } from "../stores/authStore";
+import { usePostStore } from "@/stores/postStore";
 import { useRouter } from "vue-router";
 import axios from "axios";
 
@@ -14,6 +15,7 @@ import Flagicon from "../assets/Flagicon.svg";
 
 const authStore = useAuthStore();
 const router = useRouter();
+const postStore = usePostStore();
 
 const loggedInUser = authStore.userName;
 const username = router.currentRoute.value.params.username;
@@ -102,6 +104,17 @@ const fetchComments = async () => {
   }
 };
 
+// 刪除留言
+const handleDelete = async (postId) => {
+  try {
+    const userId = authStore.userId;
+    const message = await postStore.deletePost(postId, userId);
+    console.log(message);
+  } catch {
+    alert("刪除失敗");
+  }
+};
+
 // const comments = ref([
 //   {
 //     id: 1,
@@ -144,6 +157,7 @@ const fetchComments = async () => {
 //   },
 // ]);
 
+// 格式化時間
 const formatDate = (date) => {
   if (!date) return "未知時間";
 
@@ -236,7 +250,7 @@ onMounted(() => {
                   </router-link>
                 </li>
                 <li v-if="loggedInUser === username">
-                  <button class="modal-link">
+                  <button class="modal-link" @click="handleDelete">
                     <img class="icon" :src="Deleteicon" alt="Deleteicon" />
                     <span>刪除</span>
                   </button>
