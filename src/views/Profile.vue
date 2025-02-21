@@ -1,7 +1,6 @@
 <script setup>
-import { ref, computed, onMounted, watch, nextTick, onUpdated } from "vue";
-import { useRoute, useRouter } from "vue-router"; // 引入 useRoute;
-import { useAuthStore } from "../stores/authStore";
+import { ref, computed, onMounted, watch } from "vue";
+import { useRoute, useRouter } from "vue-router";
 import axios from "axios";
 
 import selfSingleComment from "../components/selfSingleComment.vue";
@@ -15,8 +14,7 @@ import Backicon from "../assets/Backicon.svg";
 
 const props = defineProps(["username"]);
 const router = useRouter();
-const authStore = useAuthStore();
-const loggedInUser = authStore.userName;
+const route = useRoute(); // 新增 useRoute
 
 watch(
   () => props.username,
@@ -48,12 +46,17 @@ const fetchUserData = async (username) => {
     router.replace("/not-found");
   }
 };
+
+// 計算是否從 Navbar 跳轉過來
+const isFromNavbar = () => {
+  return route.from?.name === "Home"; // 假設 Navbar 出現在首頁
+};
 </script>
 
 <template>
   <NavbarUp />
   <div class="container-box">
-    <div class="back-icon" :class="{ hidden: loggedInUser === username }">
+    <div class="back-icon" :class="{ hidden: isFromNavbar() }">
       <router-link to="/">
         <img :src="Backicon" alt="Backicon" />
       </router-link>
