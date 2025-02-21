@@ -1,5 +1,5 @@
 <script setup>
-import { ref, onMounted, onUnmounted, computed } from "vue";
+import { ref, onMounted, onUnmounted, computed, watch } from "vue";
 import { NButton, NDrawerContent, NDrawer, useLoadingBar } from "naive-ui";
 import { useAuthStore } from "../stores/authStore";
 import { useThemeStore } from "../stores/themeStore";
@@ -24,22 +24,18 @@ const fileUrl = ref(null);
 const fileInputRef = ref(null);
 const tempAvatar = ref(null); // 初始為 null 存放暫存圖片（選擇的圖片）
 
-// 抽屜關閉時觸發的事件
-const handleDrawerClose = () => {
-  console.log("Drawer is closing..."); // 加入調試訊息
-
-  show.value = false;
-  tempAvatar.value = null; // 清空圖片預覽
-  name.value = ""; // 清空名稱
-  intro.value = ""; // 清空介紹
-  file.value = null; // 清空選擇的檔案
-  fileInputRef.value.value = null; // 清空 file input
-
-  console.log("After clearing values:", {
-    name: name.value,
-    intro: intro.value,
-  });
-};
+watch(show, (newValue) => {
+  if (!newValue) {
+    // 當 show 為 false 時觸發
+    tempAvatar.value = null; // 清空圖片預覽
+    name.value = ""; // 清空名稱
+    intro.value = ""; // 清空介紹
+    file.value = null; // 清空選擇的檔案
+    if (fileInputRef.value) {
+      fileInputRef.value.value = null; // 清空 file input
+    }
+  }
+});
 
 // 計算 placeholder
 const namePlaceholder = computed(() => (name.value ? "" : info.value.name));
@@ -231,7 +227,7 @@ onUnmounted(() => {
     </div>
 
     <!-- 抽屜視窗 -->
-    <n-drawer v-model:show="show" @close="handleDrawerClose" :width="rwdwidth">
+    <n-drawer v-model:show="show" :width="rwdwidth">
       <n-drawer-content
         title="編輯個人檔案"
         closable
