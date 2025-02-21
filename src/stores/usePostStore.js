@@ -10,12 +10,9 @@ export const usePostStore = defineStore("post", {
     // 刪除貼文
     async deletePost(postId, userId) {
       try {
-        const response = await axios.delete(`/posts/${postId}/${userId}`);
-
-        // 刪除成功後，更新本地 posts 狀態
+        const response = await apiClient.delete(`/posts/${postId}/${userId}`);
         this.posts = this.posts.filter((post) => post.id !== postId);
-
-        return response.data.message; // 返回 "帖子已删除"
+        return response.data.message;
       } catch (error) {
         console.error("刪除貼文失敗", error);
         throw error;
