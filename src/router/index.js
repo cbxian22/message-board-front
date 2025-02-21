@@ -37,28 +37,11 @@ const router = createRouter({
       component: () => import("../views/ChatView.vue"),
       // meta: { requiresGuest: true },
     },
-    // {
-    //   path: "/@:username",
-    //   // path: "/profile",
-    //   name: "Profile",
-    //   component: () => import("../views/Profile.vue"),
-    //   props: true, // 將路由參數作為 props 傳遞給 Profile.vue
-    // },
-
     {
       path: "/@:username",
       name: "Profile",
       component: () => import("../views/Profile.vue"),
       props: true,
-      beforeEnter: (to, from, next) => {
-        const authStore = useAuthStore();
-        const usernameFromUrl = to.params.username;
-        if (usernameFromUrl !== authStore.userName) {
-          next(`/@${authStore.userName}`);
-        } else {
-          next();
-        }
-      },
     },
     {
       path: "/SinglePosts/:id",

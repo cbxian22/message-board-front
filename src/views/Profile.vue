@@ -14,13 +14,12 @@ import Backicon from "../assets/Backicon.svg";
 // const aru = computed(() => socketStore.messages.length > 0);
 // 接收來自路由的 `props`
 const props = defineProps(["username"]);
-
 const router = useRouter();
-const route = useRoute();
+// const route = useRoute();
 const authStore = useAuthStore();
 
 const loggedInUser = authStore.userName;
-const username = ref(route.params.username); // 使用 ref 存儲 username
+// const username = ref(route.params.username); // 使用 ref 存儲 username
 
 // 監控 route.params.username 變化，並手動重新獲取資料
 // watch(
@@ -42,7 +41,7 @@ watch(
       await fetchUserData(newUsername);
     }
   },
-  { immediate: true } // 組件掛載時立即執行
+  { immediate: true }
 );
 
 // // 初始載入時獲取資料
@@ -86,7 +85,7 @@ const fetchUserData = async (username) => {
     </div>
 
     <div class="container">
-      <selfInfo :username="username" />
+      <selfInfo :username="props.username" />
       <!-- <selfInfo :username="username" :key="username" /> -->
       <!-- <div v-if="aru" class="aru">
         <h1>最新留言</h1>
@@ -99,7 +98,7 @@ const fetchUserData = async (username) => {
         </div>
       </div> -->
       <!-- <selfSingleComment :username="username" :key="username" /> -->
-      <selfSingleComment :username="username" />
+      <selfSingleComment :username="props.username" />
     </div>
   </div>
   <Navbar />
