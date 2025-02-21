@@ -16,7 +16,7 @@ const loggedInUser = authStore.userName;
 const username = router.currentRoute.value.params.username;
 const show = ref(false);
 const rwdwidth = ref("100vw"); // 預設手機版
-const info = ref([]); // 用來儲存獲取的數據
+const info = ref({}); // 初始為空物件
 const name = ref("");
 const intro = ref("");
 const file = ref(null);
@@ -43,7 +43,7 @@ const fetchInfo = async () => {
         intro: response.data.intro,
         userAvatar: response.data.avatar_url,
       };
-      tempAvatar.value = info.value.userAvatar || "###"; // 如果沒有圖片，使用預設圖片
+      tempAvatar.value = info.value.userAvatar; // 如果沒有圖片，使用預設圖片
     } else {
       alert("無法獲取留言，數據格式不正確");
     }
@@ -68,7 +68,8 @@ const handleFileUpload = (event) => {
     if (selectedFile.type.startsWith("image/")) {
       const reader = new FileReader();
       reader.onload = (e) => {
-        info.value.userAvatar = e.target.result; // 讓 <img> 直接顯示新圖片
+        // info.value.userAvatar = e.target.result; // 讓 <img> 直接顯示新圖片
+        tempAvatar.value = e.target.result; // 讓 <img> 直接顯示新圖片
       };
       reader.readAsDataURL(selectedFile);
     }
