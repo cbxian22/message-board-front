@@ -331,11 +331,7 @@ onMounted(() => {
                     <span>刪除</span>
                   </button>
                 </li>
-                <li
-                  v-if="
-                    authStore.isLoggedIn && authStore.userName !== comment.name
-                  "
-                >
+                <li v-if="authStore.userName !== comment.name">
                   <button class="modal-link">
                     <img :src="Flagicon" alt="Flagicon" />
                     <span>檢舉</span>
