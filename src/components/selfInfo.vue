@@ -26,7 +26,6 @@ const tempAvatar = ref(null); // 初始為 null 存放暫存圖片（選擇的�
 
 watch(show, (newValue) => {
   if (!newValue) {
-    // 當 show 為 false 時觸發
     tempAvatar.value = null; // 清空圖片預覽
     name.value = ""; // 清空名稱
     intro.value = ""; // 清空介紹
@@ -89,30 +88,6 @@ const handleFileUpload = (event) => {
     file.value = selectedFile; // 存檔案，確保後續上傳
   }
 };
-
-// const handleFileUpload = (event) => {
-//   const selectedFile = event.target.files[0];
-
-//   if (selectedFile) {
-//     console.log("檔案已選擇:", selectedFile.name);
-
-//     if (selectedFile.type.startsWith("image/")) {
-//       const reader = new FileReader();
-//       reader.onload = (e) => {
-//         // info.value.userAvatar = e.target.result; // 讓 <img> 直接顯示新圖片
-//         tempAvatar.value = e.target.result; // 讓 <img> 直接顯示新圖片
-//       };
-//       reader.readAsDataURL(selectedFile);
-//     }
-//     file.value = selectedFile; // 存檔案，確保後續上傳
-//   }
-// };
-
-// 取消檔案預覽，重設檔案選擇
-// const cancelFilePreview = () => {
-//   fileUrl.value = null; // 清除圖片預覽 URL
-//   file.value = null; // 清除檔案
-// };
 
 // 獨立處理圖片上傳
 const uploadFile = async () => {
@@ -256,7 +231,7 @@ onUnmounted(() => {
                   style="display: none"
                 />
                 <img
-                  :src="tempAvatar"
+                  :src="tempAvatar || info.userAvatar"
                   alt="更新圖片"
                   type="button"
                   @click="triggerFileInput"
