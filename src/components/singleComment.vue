@@ -1,6 +1,7 @@
 <script setup>
 import { ref, defineEmits, onMounted, onUnmounted } from "vue";
 import { useAuthStore } from "../stores/authStore";
+import { usePostStore } from "../stores/usePostStore";
 import { useRouter } from "vue-router";
 import axios from "axios";
 import Replyicon from "../assets/Replyicon.svg";
@@ -15,6 +16,7 @@ const comments = ref([]);
 const emit = defineEmits();
 const commentImages = ref([]);
 const authStore = useAuthStore();
+const postStore = usePostStore();
 
 const modalState = ref({});
 const modalRefs = ref({});
@@ -89,18 +91,19 @@ const fetchComments = async () => {
   }
 };
 
+// 刪除留言
+const handleDelete = async (postId) => {
+  try {
+    const userId = authStore.userId;
+    const message = await postStore.deletePost(postId, userId);
+    console.log(message);
+    location.reload();
+  } catch {
+    console.log(刪除失敗);
+  }
+};
+
 // 格式化時間
-// const formatDate = (date) => {
-//   if (!date) return "未知時間";
-//   const options = {
-//     year: "numeric",
-//     month: "2-digit",
-//     day: "2-digit",
-//     hour: "2-digit",
-//     minute: "2-digit",
-//   };
-//   return new Date(date).toLocaleString("zh-TW", options);
-// };
 const formatDate = (date) => {
   if (!date) return "未知時間";
 
@@ -326,7 +329,7 @@ onMounted(() => {
                     authStore.isLoggedIn && authStore.userName === comment.name
                   "
                 >
-                  <button class="modal-link">
+                  <button class="modal-link" @click="handleDelete(comment.id)">
                     <img class="icon" :src="Deleteicon" alt="Deleteicon" />
                     <span>刪除</span>
                   </button>
