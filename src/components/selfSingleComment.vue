@@ -2,7 +2,7 @@
 // defineEmits 必要？
 import { ref, defineEmits, onMounted, onUnmounted } from "vue";
 import { useAuthStore } from "../stores/authStore";
-import { usePostStore } from "@/stores/postStore";
+import { usePostStore } from "../stores/usePostStore";
 import { useRouter } from "vue-router";
 import axios from "axios";
 
@@ -158,6 +158,7 @@ const handleDelete = async (postId) => {
 // ]);
 
 // 格式化時間
+
 const formatDate = (date) => {
   if (!date) return "未知時間";
 
