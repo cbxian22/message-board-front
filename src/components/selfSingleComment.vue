@@ -108,10 +108,12 @@ const fetchComments = async () => {
 const handleDelete = async (postId) => {
   try {
     const userId = authStore.userId;
-    const message = await postStore.deletePost(postId, userId);
-    console.log(message);
-  } catch {
-    alert("刪除失敗");
+    const response = await apiClient.delete(`/posts/${postId}/${userId}`);
+    this.posts = this.posts.filter((post) => post.id !== postId);
+    return response.data.message;
+  } catch (error) {
+    console.error("刪除貼文失敗", error);
+    throw error;
   }
 };
 
