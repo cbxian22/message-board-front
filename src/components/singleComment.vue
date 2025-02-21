@@ -466,10 +466,10 @@ onMounted(() => {
   margin-bottom: 5px;
 }
 
-.light-mode .info-link > img,
+/* .light-mode .info-link > img,
 .light-mode .reply-link > img {
   filter: invert(1) grayscale(100%) contrast(100%) brightness(0);
-}
+} */
 
 .info-modal {
   position: relative;

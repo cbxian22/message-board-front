@@ -62,6 +62,11 @@ a {
   padding: 5px 10px;
 }
 
+.light-mode .info-modal > img,
+.light-mode .info-modal > img {
+  filter: invert(1) grayscale(100%) contrast(100%) brightness(0);
+}
+
 /* homeView, loginView loading style*/
 .loading-container {
   width: 100vw;
