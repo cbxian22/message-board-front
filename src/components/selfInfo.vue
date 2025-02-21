@@ -23,6 +23,13 @@ const file = ref(null);
 const fileUrl = ref(null);
 const fileInputRef = ref(null);
 const tempAvatar = ref(null); // 初始為 null 存放暫存圖片（選擇的圖片）
+const drawerVisible = ref(false); // 控制抽屜顯示與隱藏
+
+// 抽屜關閉時觸發的事件
+const handleDrawerClose = () => {
+  // 清除圖片
+  tempAvatar.value = null;
+};
 
 // 計算 placeholder
 const namePlaceholder = computed(() => (name.value ? "" : info.value.name));
@@ -217,7 +224,9 @@ onUnmounted(() => {
     <n-drawer v-model:show="show" :width="rwdwidth">
       <n-drawer-content
         title="編輯個人檔案"
-        closable
+        v-model:visible="drawerVisible"
+        :closable="true"
+        @close="handleDrawerClose"
         :class="themeStore.isDarkMode ? 'dark-mode' : 'light-mode'"
       >
         <form @submit.prevent="handleUpdate" class="container">
