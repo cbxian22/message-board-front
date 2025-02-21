@@ -49,7 +49,7 @@ const fetchUserData = async (username) => {
 
 // 計算是否從 Navbar 跳轉過來
 const isFromNavbar = () => {
-  return route.from?.name === "Home"; // 假設 Navbar 出現在首頁
+  return route.from?.name === "/"; // 假設 Navbar 出現在首頁
 };
 </script>
 
