@@ -27,7 +27,6 @@ const drawerVisible = ref(false); // 控制抽屜顯示與隱藏
 
 // 抽屜關閉時觸發的事件
 const handleDrawerClose = () => {
-  // 清除圖片
   tempAvatar.value = null;
 };
 
