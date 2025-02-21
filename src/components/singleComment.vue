@@ -475,38 +475,6 @@ onMounted(() => {
   position: relative;
 }
 
-.modal-overlay {
-  position: absolute;
-  top: 110%;
-  right: 0%;
-  border: 1px solid #373737;
-  border-radius: 10px;
-  z-index: 1000;
-  padding: 10px;
-}
-
-.modal-content ul {
-  list-style-type: none;
-}
-
-.modal-content li {
-  width: 150px;
-}
-
-li:hover {
-  background-color: rgba(128, 128, 128, 0.15) !important;
-  border-radius: 10px;
-  transition: background-color 0.3s ease, color 0.3s ease;
-}
-
-.modal-link {
-  width: 100%;
-  display: flex;
-  justify-content: space-between;
-  align-items: center;
-  padding: 5px 10px;
-}
-
 /* url 圖片 */
 
 .comment-file {
