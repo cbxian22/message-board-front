@@ -243,7 +243,7 @@ onUnmounted(() => {
                   style="display: none"
                 />
                 <img
-                  :src="tempAvatar.value"
+                  :src="tempAvatar"
                   alt="更新圖片"
                   type="button"
                   @click="triggerFileInput"
