@@ -1,5 +1,5 @@
 import { defineStore } from "pinia";
-import apiClient from "../stores/axiosConfig"; // 確保你的 axios 設置正確
+import apiClient from "../stores/axiosConfig";
 
 export const usePostStore = defineStore("post", {
   state: () => ({

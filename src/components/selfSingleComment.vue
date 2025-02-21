@@ -110,8 +110,9 @@ const handleDelete = async (postId) => {
     const userId = authStore.userId;
     const message = await postStore.deletePost(postId, userId);
     console.log(message);
+    location.reload();
   } catch {
-    alert("刪除失敗");
+    console.log(刪除失敗);
   }
 };
 
