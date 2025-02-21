@@ -366,8 +366,8 @@ onUnmounted(() => {
 }
 
 .light-mode .form-box textarea,
-.form-box input {
-  --n-text-color: rgb(0, 0, 0) !important;
+.light-mode .form-box input {
+  color: rgb(0, 0, 0) !important;
 }
 
 .form-mod {
