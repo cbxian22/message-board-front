@@ -335,6 +335,7 @@ onUnmounted(() => {
   border-radius: 30px;
   display: flex;
   flex-direction: column;
+  border-bottom: 0.5px solid #373737;
   gap: 30px;
 }
 
