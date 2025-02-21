@@ -68,14 +68,32 @@ const handleFileUpload = (event) => {
     if (selectedFile.type.startsWith("image/")) {
       const reader = new FileReader();
       reader.onload = (e) => {
-        // info.value.userAvatar = e.target.result; // 讓 <img> 直接顯示新圖片
-        tempAvatar.value = e.target.result; // 讓 <img> 直接顯示新圖片
+        console.log("圖片資料 URL:", e.target.result); // 在這裡檢查圖片資料
+        tempAvatar.value = e.target.result; // 更新 tempAvatar
       };
       reader.readAsDataURL(selectedFile);
     }
     file.value = selectedFile; // 存檔案，確保後續上傳
   }
 };
+
+// const handleFileUpload = (event) => {
+//   const selectedFile = event.target.files[0];
+
+//   if (selectedFile) {
+//     console.log("檔案已選擇:", selectedFile.name);
+
+//     if (selectedFile.type.startsWith("image/")) {
+//       const reader = new FileReader();
+//       reader.onload = (e) => {
+//         // info.value.userAvatar = e.target.result; // 讓 <img> 直接顯示新圖片
+//         tempAvatar.value = e.target.result; // 讓 <img> 直接顯示新圖片
+//       };
+//       reader.readAsDataURL(selectedFile);
+//     }
+//     file.value = selectedFile; // 存檔案，確保後續上傳
+//   }
+// };
 
 // 取消檔案預覽，重設檔案選擇
 // const cancelFilePreview = () => {
