@@ -57,12 +57,17 @@ const fetchUserData = async (username) => {
     router.replace("/not-found");
   }
 };
+onMounted(() => {
+  const referrer = document.referrer;
+  console.log("User came from: ", referrer);
+});
 </script>
 
 <template>
   <NavbarUp />
   <div class="container-box">
-    <div class="back-icon" :class="{ hidden: loggedInUser === username }">
+    <div class="back-icon" :class="{}">
+      <!-- <div class="back-icon" :class="{ hidden: loggedInUser === username }"> -->
       <router-link to="/">
         <img :src="Backicon" alt="Backicon" />
       </router-link>
