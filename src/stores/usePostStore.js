@@ -10,7 +10,7 @@ export const usePostStore = defineStore("post", {
     // 刪除貼文
     async deletePost(postId, userId) {
       try {
-        const response = await apiClient.delete(`/posts/${postId}/${userId}`);
+        const response = await axios.delete(`/posts/${postId}/${userId}`);
         this.posts = this.posts.filter((post) => post.id !== postId);
         return response.data.message;
       } catch (error) {
