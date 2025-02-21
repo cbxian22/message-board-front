@@ -237,15 +237,6 @@ onUnmounted(() => {
                   @click="triggerFileInput"
                   class="submit-button"
                 />
-
-                <!-- 圖片預覽區域 -->
-                <!-- <div v-if="fileUrl" class="file-preview">
-                  <img :src="fileUrl" alt="File Preview" class="preview-img" />
-                  <button
-                    @click="cancelFilePreview"
-                    class="cancel-preview-button"
-                  ></button>
-                </div> -->
               </div>
             </div>
           </div>

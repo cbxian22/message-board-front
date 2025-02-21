@@ -21,6 +21,7 @@ const postStore = usePostStore();
 const modalState = ref({});
 const modalRefs = ref({});
 const buttonRefs = ref({});
+const OpenModal = ref(false);
 
 const openModal = (event, commentId) => {
   event.stopPropagation();
@@ -119,6 +120,11 @@ const handleUpdate = async (postId) => {
   } catch {
     console.log(更新失敗);
   }
+};
+
+// checkTokenAndOpenModal
+const isOpenModal = () => {
+  OpenModal.value = true;
 };
 
 // 格式化時間
@@ -337,11 +343,17 @@ onMounted(() => {
                     authStore.isLoggedIn && authStore.userName === comment.name
                   "
                 >
-                  <button class="modal-link" @click="handleUpdate(comment.id)">
+                  <button class="modal-link" @click="isOpenModal">
+                    <!-- <button class="modal-link" @click="handleUpdate(comment.id)"> -->
+                    <!-- <router-link to="/message" class="modal-link"> -->
                     <img class="icon" :src="Editicon" alt="Editicon" />
                     <span>編輯</span>
+                    <!-- </router-link> -->
                   </button>
                 </li>
+
+                <Message v-model="isOpenModal" />
+
                 <li
                   v-if="
                     authStore.isLoggedIn && authStore.userName === comment.name
