@@ -11,14 +11,14 @@ import Moreicon from "../assets/Moreicon.svg";
 import Editicon from "../assets/Editicon.svg";
 import Deleteicon from "../assets/Deleteicon.svg";
 
+const authStore = useAuthStore();
 const router = useRouter();
+
+const loggedInUser = authStore.userName;
+const username = router.currentRoute.value.params.username;
+const commentImages = ref([]);
 const comments = ref([]);
 const emit = defineEmits();
-const commentImages = ref([]);
-const authStore = useAuthStore();
-
-authStore.checkLoginStatus();
-
 const modalState = ref({});
 const modalRefs = ref({});
 const buttonRefs = ref({});
@@ -228,16 +228,22 @@ onMounted(() => {
           >
             <div class="modal-content" @click.stop>
               <ul>
-                <li>
+                <li v-if="loggedInUser === username">
                   <router-link to="/message" class="modal-link">
                     <img :src="Editicon" alt="Editicon" />
                     <span>編輯</span>
                   </router-link>
                 </li>
-                <li>
+                <li v-if="loggedInUser === username">
                   <button class="modal-link">
                     <img :src="Deleteicon" alt="Deleteicon" />
                     <span>刪除</span>
+                  </button>
+                </li>
+                <li v-if="loggedInUser !== username">
+                  <button class="modal-link">
+                    <img :src="Flagicon" alt="Flagicon" />
+                    <span>檢舉</span>
                   </button>
                 </li>
               </ul>
