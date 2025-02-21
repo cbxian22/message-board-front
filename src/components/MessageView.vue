@@ -186,6 +186,7 @@ const handleMessage = async () => {
       file.value = null;
       fileUrl.value = null;
       emit("update:modelValue", false); // 關閉 Modal
+      location.reload();
     } else {
       alert("留言提交失敗");
       loadingBar.error();
