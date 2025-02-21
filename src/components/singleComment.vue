@@ -159,8 +159,8 @@ const formatDate = (date) => {
 };
 
 // 跳轉到 CommentView
-const goToCommentPage = (id) => {
-  router.push({ name: "Comment", params: { id } });
+const goToSinglePosts = (id) => {
+  router.push({ name: "SinglePosts", params: { id } });
 };
 
 // 頁面加載時執行
@@ -396,7 +396,7 @@ onMounted(() => {
             </button>
           </li>
           <li>
-            <button @click="goToCommentPage(comment.id)" class="reply-link">
+            <button @click="goToSinglePosts(comment.id)" class="reply-link">
               <img class="icon" :src="Replyicon" alt="Replyicon" />
             </button>
           </li>
