@@ -250,7 +250,7 @@ onMounted(() => {
                   </router-link>
                 </li>
                 <li v-if="loggedInUser === username">
-                  <button class="modal-link" @click="handleDelete">
+                  <button class="modal-link" @click="handleDelete(comment.id)">
                     <img class="icon" :src="Deleteicon" alt="Deleteicon" />
                     <span>刪除</span>
                   </button>
