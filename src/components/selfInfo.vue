@@ -369,6 +369,10 @@ onUnmounted(() => {
   color: rgb(243, 245, 247);
 }
 
+.light-mode {
+  --n-text-color: rgb(0, 0, 0);
+}
+
 .form-mod {
   display: flex;
   flex-direction: column;
