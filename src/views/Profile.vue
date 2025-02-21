@@ -12,52 +12,27 @@ import Backicon from "../assets/Backicon.svg";
 
 // 計算是否有新留言
 // const aru = computed(() => socketStore.messages.length > 0);
-// 接收來自路由的 `props`
+
 const props = defineProps(["username"]);
 const router = useRouter();
-// const route = useRoute();
 const authStore = useAuthStore();
-
 const loggedInUser = authStore.userName;
-// const username = ref(route.params.username); // 使用 ref 存儲 username
 
-// 監控 route.params.username 變化，並手動重新獲取資料
-// watch(
-//   () => route.params.username,
-//   async (newUsername) => {
-//     username.value = newUsername; // 更新 username
-//     await fetchUserData(username.value); // 重新加載資料
-//     nextTick(() => {
-//       console.log("route 參數更新後，username 是：", username.value);
-//     });
-//   },
-//   { immediate: true } // 初次加載時也觸發
-// );
-// 監聽 `props.username` 變更，確保數據同步
 watch(
   () => props.username,
   async (newUsername) => {
     if (newUsername) {
       await fetchUserData(newUsername);
     }
-  },
-  { immediate: true }
+  }
 );
-
-// // 初始載入時獲取資料
-// onMounted(async () => {
-//   await fetchUserData(username.value);
-// });
 
 // 組件掛載時載入資料
 onMounted(async () => {
-  await fetchUserData(props.username);
+  if (props.username) {
+    await fetchUserData(props.username);
+  }
 });
-
-// 每次組件更新後觸發的操作
-// onUpdated(() => {
-//   console.log("組件已更新！當前的 username 是：", username.value);
-// });
 
 // 獲取使用者資料
 const fetchUserData = async (username) => {
