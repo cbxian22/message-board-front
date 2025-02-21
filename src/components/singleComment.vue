@@ -1,4 +1,4 @@
-<script setup>
+<!-- <script setup>
 import { ref, defineEmits, onMounted, onUnmounted } from "vue";
 import { useAuthStore } from "../stores/authStore";
 import { useRouter } from "vue-router";
@@ -148,9 +148,9 @@ onMounted(() => {
     };
   });
 });
-</script>
+</script> -->
 
-<!-- <script setup>
+<script setup>
 import { ref, computed, onMounted, onUnmounted } from "vue";
 import { useAuthStore } from "../stores/authStore";
 
@@ -272,7 +272,7 @@ onMounted(() => {
     };
   });
 });
-</script> -->
+</script>
 
 <template>
   <div
@@ -479,10 +479,10 @@ onMounted(() => {
   position: absolute;
   top: 110%;
   right: 0%;
-  border: 0.5px solid #373737;
+  border: 1px solid #373737;
   border-radius: 10px;
   z-index: 1000;
-  padding: 20px;
+  padding: 10px;
 }
 
 .modal-content ul {
@@ -502,12 +502,9 @@ li:hover {
 .modal-link {
   width: 100%;
   display: flex;
-  flex: 1;
+  justify-content: space-between;
+  align-items: center;
   padding: 5px 10px;
-  margin: 5px;
-}
-.modal-link span {
-  margin-left: 10px;
 }
 
 /* url 圖片 */
