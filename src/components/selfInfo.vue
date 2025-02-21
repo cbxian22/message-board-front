@@ -335,12 +335,12 @@ onUnmounted(() => {
   border-radius: 30px;
   display: flex;
   flex-direction: column;
-  border-bottom: 0.5px solid #373737;
+  border: 0.5px solid rgb(55, 55, 55);
   gap: 30px;
 }
 
 .form-box {
-  border-bottom: 0.5px solid #373737;
+  border-bottom: 0.5px solid rgb(55, 55, 55);
 }
 
 .form-box:last-child {
@@ -370,8 +370,9 @@ onUnmounted(() => {
   color: rgb(243, 245, 247);
 }
 
-.light-mode {
-  --n-text-color: rgb(0, 0, 0);
+.light-mode .form-box textarea,
+.form-box input {
+  --n-text-color: rgb(0, 0, 0) !important;
 }
 
 .form-mod {
