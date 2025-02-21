@@ -313,8 +313,7 @@ onMounted(() => {
               <ul>
                 <li
                   v-if="
-                    authStore.isLoggedIn &&
-                    authStore.userName === comment.user_name
+                    authStore.isLoggedIn && authStore.userName === comment.name
                   "
                 >
                   <router-link to="/message" class="modal-link">
@@ -324,8 +323,7 @@ onMounted(() => {
                 </li>
                 <li
                   v-if="
-                    authStore.isLoggedIn &&
-                    authStore.userName === comment.user_name
+                    authStore.isLoggedIn && authStore.userName === comment.name
                   "
                 >
                   <button class="modal-link">
@@ -335,8 +333,7 @@ onMounted(() => {
                 </li>
                 <li
                   v-if="
-                    authStore.isLoggedIn &&
-                    authStore.userName !== comment.user_name
+                    authStore.isLoggedIn && authStore.userName !== comment.name
                   "
                 >
                   <button class="modal-link">
