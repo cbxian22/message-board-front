@@ -1,21 +1,20 @@
 <script setup>
+import { ref, defineEmits, onMounted, onUnmounted } from "vue";
+import { useAuthStore } from "../stores/authStore";
+import { useRouter } from "vue-router";
+import axios from "axios";
 import Replyicon from "../assets/Replyicon.svg";
 import Favoriteicon from "../assets/Favoriteicon.svg";
 import Moreicon from "../assets/Moreicon.svg";
 import Editicon from "../assets/Editicon.svg";
 import Deleteicon from "../assets/Deleteicon.svg";
 import Flagicon from "../assets/Flagicon.svg";
-import { ref, defineEmits, onMounted, onUnmounted } from "vue";
-import { useAuthStore } from "../stores/authStore";
-import axios from "axios";
-import { useRouter } from "vue-router";
 
 const router = useRouter();
 const comments = ref([]);
 const emit = defineEmits();
 const commentImages = ref([]);
 const authStore = useAuthStore();
-authStore.checkLoginStatus();
 
 const modalState = ref({});
 const modalRefs = ref({});
@@ -312,19 +311,34 @@ onMounted(() => {
           >
             <div class="modal-content" @click.stop>
               <ul>
-                <li v-if="authStore.isLoggedIn">
+                <li
+                  v-if="
+                    authStore.isLoggedIn &&
+                    authStore.userName === comment.user_name
+                  "
+                >
                   <router-link to="/message" class="modal-link">
                     <img :src="Editicon" alt="Editicon" />
                     <span>編輯</span>
                   </router-link>
                 </li>
-                <li v-if="authStore.isLoggedIn">
+                <li
+                  v-if="
+                    authStore.isLoggedIn &&
+                    authStore.userName === comment.user_name
+                  "
+                >
                   <button class="modal-link">
                     <img :src="Deleteicon" alt="Deleteicon" />
                     <span>刪除</span>
                   </button>
                 </li>
-                <li>
+                <li
+                  v-if="
+                    authStore.isLoggedIn &&
+                    authStore.userName !== message.username
+                  "
+                >
                   <button class="modal-link">
                     <img :src="Flagicon" alt="Flagicon" />
                     <span>檢舉</span>

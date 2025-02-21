@@ -1,14 +1,6 @@
 import { defineStore } from "pinia";
 import { jwtDecode } from "jwt-decode"; // 使用官方的導入方式
 
-// const verifyToken = (token) => {
-//   try {
-//     return jwtDecode(token);
-//   } catch (error) {
-//     console.error("Token 解码错误:", error);
-//     return null;
-//   }
-// };
 const verifyToken = (token) => {
   try {
     const decoded = jwtDecode(token);

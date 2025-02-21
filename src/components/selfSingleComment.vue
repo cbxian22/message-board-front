@@ -10,6 +10,7 @@ import Favoriteicon from "../assets/Favoriteicon.svg";
 import Moreicon from "../assets/Moreicon.svg";
 import Editicon from "../assets/Editicon.svg";
 import Deleteicon from "../assets/Deleteicon.svg";
+import Flagicon from "../assets/Flagicon.svg";
 
 const authStore = useAuthStore();
 const router = useRouter();
