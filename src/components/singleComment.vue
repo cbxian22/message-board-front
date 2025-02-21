@@ -347,7 +347,6 @@ onMounted(() => {
       <p class="comment-content">{{ comment.content }}</p>
       <span v-if="comment.file_url" class="comment-file">
         <img
-          class="icon"
           :src="comment.file_url"
           alt="comment.file_url"
           ref="commentImages"
