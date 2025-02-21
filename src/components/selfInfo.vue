@@ -5,7 +5,7 @@
 <!-- selfSingleComment  -->
 
 <script setup>
-import { ref, onMounted, onUnmounted } from "vue";
+import { ref, onMounted, onUnmounted, computed } from "vue";
 import { NButton, NDrawerContent, NDrawer, useLoadingBar } from "naive-ui";
 import { useAuthStore } from "../stores/authStore";
 import { useThemeStore } from "../stores/themeStore";
@@ -28,6 +28,10 @@ const intro = ref("");
 const file = ref(null);
 const fileUrl = ref(null);
 const fileInputRef = ref(null);
+
+// 計算 placeholder
+const namePlaceholder = computed(() => (name.value ? "" : info.value.name));
+const introPlaceholder = computed(() => (intro.value ? "" : info.value.intro));
 
 // 獲取 user 資料
 const fetchInfo = async () => {
@@ -210,7 +214,7 @@ onUnmounted(() => {
                   v-model="name"
                   id="name"
                   type="text"
-                  placeholder="請輸入您的姓名"
+                  :placeholder="namePlaceholder"
                 />
               </div>
               <div class="form-mod">
@@ -252,7 +256,7 @@ onUnmounted(() => {
               <textarea
                 v-model="intro"
                 id="intro"
-                placeholder="請輸入您的介紹"
+                :placeholder="introPlaceholder"
               ></textarea>
             </div>
           </div>

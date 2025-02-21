@@ -103,6 +103,24 @@ const handleDelete = async (postId) => {
   }
 };
 
+// 修改留言
+const handleUpdate = async (postId) => {
+  try {
+    const userId = authStore.userId;
+    const message = await postStore.updatePost(
+      postId,
+      userId,
+      content,
+      fileUrl
+    );
+    console.log(message);
+    // location.reload();
+    await postStore.fetchPosts(); // 重新獲取貼文，而不是整個刷新頁面
+  } catch {
+    console.log(更新失敗);
+  }
+};
+
 // 格式化時間
 const formatDate = (date) => {
   if (!date) return "未知時間";
@@ -319,10 +337,10 @@ onMounted(() => {
                     authStore.isLoggedIn && authStore.userName === comment.name
                   "
                 >
-                  <router-link to="/message" class="modal-link">
+                  <button class="modal-link" @click="handleUpdate(comment.id)">
                     <img class="icon" :src="Editicon" alt="Editicon" />
                     <span>編輯</span>
-                  </router-link>
+                  </button>
                 </li>
                 <li
                   v-if="
