@@ -27,16 +27,20 @@
 
       <!--登入後將改成圖像 -->
       <li v-if="authStore.isLoggedIn">
-        <router-link
+        <!-- <router-link
           :to="`/@${authStore.userName}`"
           class="nav-link"
           :key="`${authStore.userName}`"
-        >
+        > -->
+        <button @click="OpenAccount" class="nav-link">
           <img :src="Accounticon" alt="Accounticon" />
-        </router-link>
+        </button>
+        <!-- </router-link> -->
       </li>
     </ul>
   </nav>
+
+  <Profile v-model="isAccountOpen" />
 
   <!-- 貼文 Modal -->
   <Message v-model="isPostModalOpen" />
@@ -49,6 +53,7 @@
 import { ref } from "vue";
 import { useAuthStore } from "../stores/authStore";
 import { useScrollStore } from "@/stores/scrollStore";
+import Profile from "../views/Profile.vue";
 import Message from "../components/MessageView.vue";
 import Login from "../components/LoginModal.vue";
 
@@ -64,6 +69,11 @@ const scrollStore = useScrollStore();
 
 const isPostModalOpen = ref(false);
 const isLoginModalOpen = ref(false);
+const isAccountOpen = ref(false);
+
+const OpenAccount = () => {
+  isAccountOpen.value = true;
+};
 
 const checkTokenAndOpenModal = () => {
   const token = localStorage.getItem("token");
