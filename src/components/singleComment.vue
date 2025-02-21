@@ -4,6 +4,9 @@ import { useAuthStore } from "../stores/authStore";
 import { usePostStore } from "../stores/usePostStore";
 import { useRouter } from "vue-router";
 import axios from "axios";
+
+import Message from "../components/MessageView.vue";
+
 import Replyicon from "../assets/Replyicon.svg";
 import Favoriteicon from "../assets/Favoriteicon.svg";
 import Moreicon from "../assets/Moreicon.svg";
