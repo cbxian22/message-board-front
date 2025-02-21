@@ -302,7 +302,7 @@ onMounted(() => {
             @click="openModal($event, comment.id)"
             class="info-link"
           >
-            <img :src="Moreicon" alt="Moreicon" />
+            <img class="icon" :src="Moreicon" alt="Moreicon" />
           </button>
           <div
             v-show="modalState[comment.id]"
@@ -317,7 +317,7 @@ onMounted(() => {
                   "
                 >
                   <router-link to="/message" class="modal-link">
-                    <img :src="Editicon" alt="Editicon" />
+                    <img class="icon" :src="Editicon" alt="Editicon" />
                     <span>編輯</span>
                   </router-link>
                 </li>
@@ -327,13 +327,13 @@ onMounted(() => {
                   "
                 >
                   <button class="modal-link">
-                    <img :src="Deleteicon" alt="Deleteicon" />
+                    <img class="icon" :src="Deleteicon" alt="Deleteicon" />
                     <span>刪除</span>
                   </button>
                 </li>
                 <li v-if="authStore.userName !== comment.name">
                   <button class="modal-link">
-                    <img :src="Flagicon" alt="Flagicon" />
+                    <img class="icon" :src="Flagicon" alt="Flagicon" />
                     <span>檢舉</span>
                   </button>
                 </li>
@@ -347,6 +347,7 @@ onMounted(() => {
       <p class="comment-content">{{ comment.content }}</p>
       <span v-if="comment.file_url" class="comment-file">
         <img
+          class="icon"
           :src="comment.file_url"
           alt="comment.file_url"
           ref="commentImages"
@@ -358,12 +359,12 @@ onMounted(() => {
         <ul>
           <li>
             <button @click="" class="reply-link">
-              <img :src="Favoriteicon" alt="Favoriteicon" />
+              <img class="icon" :src="Favoriteicon" alt="Favoriteicon" />
             </button>
           </li>
           <li>
             <button @click="goToCommentPage(comment.id)" class="reply-link">
-              <img :src="Replyicon" alt="Replyicon" />
+              <img class="icon" :src="Replyicon" alt="Replyicon" />
             </button>
           </li>
         </ul>

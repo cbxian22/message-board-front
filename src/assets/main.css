@@ -62,7 +62,7 @@ a {
   padding: 5px 10px;
 }
 
-.light-mode .info-modal img {
+.light-mode .icon {
   filter: invert(1) grayscale(100%) contrast(100%) brightness(0);
 }
 
