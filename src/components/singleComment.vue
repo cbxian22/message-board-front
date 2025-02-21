@@ -1,4 +1,4 @@
-<!-- <script setup>
+<script setup>
 import { ref, defineEmits, onMounted, onUnmounted } from "vue";
 import { useAuthStore } from "../stores/authStore";
 import { useRouter } from "vue-router";
@@ -148,9 +148,9 @@ onMounted(() => {
     };
   });
 });
-</script> -->
+</script>
 
-<script setup>
+<!-- <script setup>
 import { ref, computed, onMounted, onUnmounted } from "vue";
 import { useAuthStore } from "../stores/authStore";
 
@@ -272,7 +272,7 @@ onMounted(() => {
     };
   });
 });
-</script>
+</script> -->
 
 <template>
   <div
@@ -342,7 +342,7 @@ onMounted(() => {
           </div>
         </div>
       </div>
-
+      <!--  -->
       <!-- 貼文內容 -->
       <p class="comment-content">{{ comment.content }}</p>
       <span v-if="comment.file_url" class="comment-file">
