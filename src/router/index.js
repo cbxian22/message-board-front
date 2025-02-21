@@ -1,8 +1,7 @@
 import { createRouter, createWebHistory } from "vue-router";
-import { useAuthStore } from "@/stores/authStore"; // 引入 Pinia 授權管理
+import { useAuthStore } from "@/stores/authStore";
 import { nextTick } from "vue";
-import { useScrollStore } from "@/stores/scrollStore"; // ✅ 正確引入
-const authStore = useAuthStore();
+import { useScrollStore } from "@/stores/scrollStore";
 import HomeView from "../views/HomeView.vue";
 
 const router = createRouter({
@@ -50,15 +49,14 @@ const router = createRouter({
       path: "/@:username",
       name: "Profile",
       component: () => import("../views/Profile.vue"),
-      props: true, // 將路由參數作為 props 傳遞給 Profile.vue
+      props: true,
       beforeEnter: (to, from, next) => {
+        const authStore = useAuthStore();
         const usernameFromUrl = to.params.username;
-
-        // 如果路由中的 username 不是你當前的使用者，就進行導向
         if (usernameFromUrl !== authStore.userName) {
-          next(`/@${authStore.userName}`); // 直接跳轉到自己的 Profile 頁面
+          next(`/@${authStore.userName}`);
         } else {
-          next(); // 保持在當前頁面
+          next();
         }
       },
     },
