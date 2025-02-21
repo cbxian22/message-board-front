@@ -1,9 +1,3 @@
-<!-- homeview -->
-<!-- index.js -->
-<!-- profile 註解 -->
-<!-- navbar 註解 -->
-<!-- selfSingleComment  -->
-
 <script setup>
 import { ref, onMounted, onUnmounted, computed } from "vue";
 import { NButton, NDrawerContent, NDrawer, useLoadingBar } from "naive-ui";
@@ -17,9 +11,9 @@ const themeStore = useThemeStore();
 const loadingBar = useLoadingBar();
 const router = useRouter();
 const authStore = useAuthStore();
+
 const loggedInUser = authStore.userName;
 const username = router.currentRoute.value.params.username;
-
 const show = ref(false);
 const rwdwidth = ref("100vw"); // 預設手機版
 const info = ref([]); // 用來儲存獲取的數據
@@ -28,6 +22,7 @@ const intro = ref("");
 const file = ref(null);
 const fileUrl = ref(null);
 const fileInputRef = ref(null);
+const tempAvatar = ref(info.userAvatar); // 存放暫存圖片（選擇的圖片）
 
 // 計算 placeholder
 const namePlaceholder = computed(() => (name.value ? "" : info.value.name));
@@ -81,10 +76,10 @@ const handleFileUpload = (event) => {
 };
 
 // 取消檔案預覽，重設檔案選擇
-const cancelFilePreview = () => {
-  fileUrl.value = null; // 清除圖片預覽 URL
-  file.value = null; // 清除檔案
-};
+// const cancelFilePreview = () => {
+//   fileUrl.value = null; // 清除圖片預覽 URL
+//   file.value = null; // 清除檔案
+// };
 
 // 獨立處理圖片上傳
 const uploadFile = async () => {
@@ -228,10 +223,7 @@ onUnmounted(() => {
                   style="display: none"
                 />
                 <img
-                  :src="
-                    info.userAvatar ||
-                    'https://storage.googleapis.com/message_board_storage/default_profile.jpg'
-                  "
+                  :src="tempAvatar.value"
                   alt="更新圖片"
                   type="button"
                   @click="triggerFileInput"
@@ -239,13 +231,13 @@ onUnmounted(() => {
                 />
 
                 <!-- 圖片預覽區域 -->
-                <div v-if="fileUrl" class="file-preview">
+                <!-- <div v-if="fileUrl" class="file-preview">
                   <img :src="fileUrl" alt="File Preview" class="preview-img" />
                   <button
                     @click="cancelFilePreview"
                     class="cancel-preview-button"
                   ></button>
-                </div>
+                </div> -->
               </div>
             </div>
           </div>
