@@ -355,8 +355,6 @@ onMounted(() => {
                   </button>
                 </li>
 
-                <Message v-model="isOpenModal" />
-
                 <li
                   v-if="
                     authStore.isLoggedIn && authStore.userName === comment.name
@@ -406,6 +404,7 @@ onMounted(() => {
       </div>
     </div>
   </div>
+  <Message v-model="isOpenModal" />
 </template>
 
 <style scoped>
