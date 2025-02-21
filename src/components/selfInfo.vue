@@ -22,7 +22,7 @@ const intro = ref("");
 const file = ref(null);
 const fileUrl = ref(null);
 const fileInputRef = ref(null);
-const tempAvatar = ref(info.userAvatar); // 存放暫存圖片（選擇的圖片）
+const tempAvatar = ref(null); // 初始為 null 存放暫存圖片（選擇的圖片）
 
 // 計算 placeholder
 const namePlaceholder = computed(() => (name.value ? "" : info.value.name));
@@ -43,6 +43,7 @@ const fetchInfo = async () => {
         intro: response.data.intro,
         userAvatar: response.data.avatar_url,
       };
+      tempAvatar.value = info.value.userAvatar || "###"; // 如果沒有圖片，使用預設圖片
     } else {
       alert("無法獲取留言，數據格式不正確");
     }
