@@ -26,11 +26,19 @@ const tempAvatar = ref(null); // 初始為 null 存放暫存圖片（選擇的�
 
 // 抽屜關閉時觸發的事件
 const handleDrawerClose = () => {
+  console.log("Drawer is closing..."); // 加入調試訊息
+
   show.value = false;
   tempAvatar.value = null; // 清空圖片預覽
   name.value = ""; // 清空名稱
   intro.value = ""; // 清空介紹
   file.value = null; // 清空選擇的檔案
+  fileInputRef.value.value = null; // 清空 file input
+
+  console.log("After clearing values:", {
+    name: name.value,
+    intro: intro.value,
+  });
 };
 
 // 計算 placeholder
