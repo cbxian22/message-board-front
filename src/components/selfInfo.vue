@@ -288,11 +288,11 @@ onUnmounted(() => {
   max-width: 250px;
   display: flex;
   flex-direction: column;
-  justify-content: space-around;
 }
 
 .info-content > .name {
   font-size: 25px !important;
+  margin-bottom: 10px;
 }
 
 .info-content > .intro {
