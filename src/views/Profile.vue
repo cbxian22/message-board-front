@@ -62,7 +62,7 @@ const fetchUserData = async (username) => {
 <template>
   <NavbarUp />
   <div class="container-box">
-    <div class="back-icon" v-show="loggedInUser !== username">
+    <div class="back-icon" :class="{ hidden: loggedInUser === username }">
       <router-link to="/">
         <img :src="Backicon" alt="Backicon" />
       </router-link>
@@ -100,6 +100,11 @@ const fetchUserData = async (username) => {
   margin: 0 0 20px 5px;
   display: flex;
   visibility: hidden;
+}
+
+.hidden {
+  visibility: hidden;
+  pointer-events: none;
 }
 
 .back-icon a {
