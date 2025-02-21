@@ -65,10 +65,6 @@ const scrollStore = useScrollStore();
 const isPostModalOpen = ref(false);
 const isLoginModalOpen = ref(false);
 
-// const logout = () => {
-//   authStore.logout();
-// };
-
 const checkTokenAndOpenModal = () => {
   const token = localStorage.getItem("token");
   if (!token) {

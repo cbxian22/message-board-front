@@ -44,10 +44,17 @@ const router = createRouter({
       component: () => import("../views/Profile.vue"),
       props: true, // 將路由參數作為 props 傳遞給 Profile.vue
     },
+    // {
+    //   path: "/comment/:id",
+    //   name: "Comment",
+    //   component: () => import("../views/CommentView.vue"),
+    //   props: true, // 允許將路由參數作為 props 傳遞
+    //   // meta: { requiresGuest: true },
+    // },
     {
-      path: "/comment/:id",
-      name: "Comment",
-      component: () => import("../views/CommentView.vue"),
+      path: "/SinglePosts/:id",
+      name: "SinglePosts",
+      component: () => import("../views/SinglePosts.vue"),
       props: true, // 允許將路由參數作為 props 傳遞
       // meta: { requiresGuest: true },
     },
