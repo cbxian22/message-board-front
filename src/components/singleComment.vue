@@ -11,6 +11,7 @@ import Message from "../components/MessageView.vue";
 
 import Replyicon from "../assets/Replyicon.svg";
 import Favoriteicon from "../assets/Favoriteicon.svg";
+import FavoriteRedicon from "../assets/FavoriteRedicon.svg";
 import Moreicon from "../assets/Moreicon.svg";
 import Editicon from "../assets/Editicon.svg";
 import Deleteicon from "../assets/Deleteicon.svg";
@@ -22,6 +23,7 @@ const emit = defineEmits();
 const commentImages = ref([]);
 const authStore = useAuthStore();
 const postStore = usePostStore();
+const unlike = ref(true);
 
 const modalState = ref({});
 const modalRefs = ref({});
@@ -157,8 +159,10 @@ const handlelike = async (id) => {
       // 根據後端返回的動作更新 likes
       if (response.data.action === "liked") {
         comment.likes += 1;
+        unlike.value = true;
       } else if (response.data.action === "unliked") {
         comment.likes = Math.max(comment.likes - 1, 0);
+        unlike.value = false;
       }
 
       // 可選：使用後端返回的最新點贊數（更準確）
@@ -240,6 +244,7 @@ import Deleteicon from "../assets/Deleteicon.svg";
 import Flagicon from "../assets/Flagicon.svg";
 const commentImages = ref([]);
 const value = ref(0);
+const unlike = ref(true);
 const comments = ref([
   {
     id: 1,
@@ -441,9 +446,20 @@ onMounted(() => {
       <div class="reply">
         <ul>
           <li>
-            <div class="reply-count">
-              <button @click="handlelike(comment.id)" class="reply-link">
-                <img class="icon" :src="Favoriteicon" alt="Favoriteicon" />
+            <div class="reply-count" @click="handlelike(comment.id)">
+              <button class="reply-link">
+                <img
+                  v-if="unlike"
+                  class="icon"
+                  :src="Favoriteicon"
+                  alt="Favoriteicon"
+                />
+                <img
+                  v-else
+                  class="icon"
+                  :src="FavoriteRedicon"
+                  alt="FavoriteRedicon"
+                />
               </button>
               <n-badge :value="comment.likes || 0" />
             </div>
@@ -453,7 +469,7 @@ onMounted(() => {
               <button @click="goToSinglePosts(comment.id)" class="reply-link">
                 <img class="icon" :src="Replyicon" alt="Replyicon" />
               </button>
-              <n-badge :value="value" />
+              <!-- <n-badge :value="value" /> -->
             </div>
           </li>
         </ul>
@@ -491,7 +507,7 @@ onMounted(() => {
 }
 
 .reply {
-  margin-left: -15px;
+  margin-left: -10px;
 }
 
 .reply ul {
@@ -504,7 +520,9 @@ onMounted(() => {
   display: flex;
   flex-direction: row;
   align-items: center;
-  margin-right: 5px;
+  padding: 5px 5px;
+  margin-right: 10px;
+  cursor: pointer;
 }
 
 .reply-count .n-badge {
@@ -515,10 +533,9 @@ onMounted(() => {
   display: flex;
   align-items: center;
   justify-content: center;
-  padding: 5px 10px;
 }
 
-.reply-link:hover,
+.reply-count:hover,
 .info-link:hover {
   background-color: rgba(128, 128, 128, 0.15) !important;
   border-radius: 10px;
@@ -558,9 +575,9 @@ onMounted(() => {
 }
 
 .info-link {
-  display: flex; /* 讓 a 內的內容可以對齊 */
-  align-items: center; /* 垂直置中 */
-  justify-content: center; /* 水平置中（可選） */
+  display: flex;
+  align-items: center;
+  justify-content: center;
   padding: 5px 10px;
 }
 
