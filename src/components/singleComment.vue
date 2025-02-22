@@ -153,6 +153,7 @@ const modalState = ref({});
 const modalRefs = ref({});
 const buttonRefs = ref({});
 const isOpenModal = ref(false);
+const isLikeProcessing = ref(false); // 用於追踪點讚狀態
 
 const openModal = (event, commentId) => {
   event.stopPropagation();
@@ -265,6 +266,13 @@ const handlelike = async (id) => {
     return;
   }
 
+  if (isLikeProcessing.value) {
+    console.log("點讚操作正在進行中，忽略此次請求");
+    return;
+  }
+
+  isLikeProcessing.value = true;
+
   try {
     const response = await axios.post(
       `https://message-board-server-7yot.onrender.com/api/like/${userId}`,
@@ -298,6 +306,8 @@ const handlelike = async (id) => {
     const errorMsg = error.response ? error.response.data.error : error.message;
     console.error("提交錯誤:", errorMsg);
     alert(errorMsg);
+  } finally {
+    isLikeProcessing.value = false;
   }
 };
 
