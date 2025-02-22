@@ -203,7 +203,8 @@ onUnmounted(() => {
 const fetchComments = async () => {
   try {
     const response = await axios.get(
-      "https://message-board-server-7yot.onrender.com/api/posts"
+      "https://message-board-server-7yot.onrender.com/api/posts",
+      { params: { userId } } // 傳遞 userId 給後端
     );
     if (response.status === 200 && Array.isArray(response.data)) {
       comments.value = response.data.map((comment) => ({
@@ -214,7 +215,7 @@ const fetchComments = async () => {
         file_url: comment.file_url,
         user_avatar: comment.user_avatar,
         likes: comment.likes || 0,
-        userLiked: comment.user_liked, // 後端返回的用戶是否點贊
+        userLiked: comment.user_liked || false, // 後端返回的用戶是否點贊
       }));
       emit("loaded");
     } else {
