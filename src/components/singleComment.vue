@@ -202,6 +202,7 @@ onUnmounted(() => {
 // 獲取留言
 const fetchComments = async () => {
   try {
+    const userId = authStore.userId || localStorage.getItem("userId"); // 備用來源
     const response = await axios.get(
       "https://message-board-server-7yot.onrender.com/api/posts",
       { params: { userId } } // 傳遞 userId 給後端
