@@ -266,10 +266,6 @@ const handlelike = async (id) => {
   }
 
   try {
-    // 禁用按鈕以防止重複點擊（可選）
-    const button = document.querySelector(`[data-comment-id="${id}"]`); // 需添加 data-comment-id 屬性
-    if (button) button.disabled = true;
-
     const response = await axios.post(
       `https://message-board-server-7yot.onrender.com/api/like/${userId}`,
       { targetType: "post", targetId: id },
@@ -302,8 +298,6 @@ const handlelike = async (id) => {
     const errorMsg = error.response ? error.response.data.error : error.message;
     console.error("提交錯誤:", errorMsg);
     alert(errorMsg);
-  } finally {
-    if (button) button.disabled = false; // 重新啟用按鈕
   }
 };
 
