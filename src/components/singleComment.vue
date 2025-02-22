@@ -145,7 +145,7 @@ const handlelike = async (id) => {
       { headers: { Authorization: `Bearer ${token}` } }
     );
 
-    if (response.status === 201) {
+    if (response.status === 200) {
       // 發送 WebSocket 訊息
       // socketStore.sendMessage({
       //   content: content.value,
