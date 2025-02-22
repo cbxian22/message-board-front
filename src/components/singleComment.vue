@@ -231,7 +231,7 @@ onMounted(() => {
 <!-- <script setup>
 import { ref, computed, onMounted, onUnmounted } from "vue";
 import { useAuthStore } from "../stores/authStore";
-
+import { NBadge } from "naive-ui";
 import Replyicon from "../assets/Replyicon.svg";
 import Favoriteicon from "../assets/Favoriteicon.svg";
 import Moreicon from "../assets/Moreicon.svg";
@@ -239,7 +239,7 @@ import Editicon from "../assets/Editicon.svg";
 import Deleteicon from "../assets/Deleteicon.svg";
 import Flagicon from "../assets/Flagicon.svg";
 const commentImages = ref([]);
-
+const value = ref(0);
 const comments = ref([
   {
     id: 1,
@@ -426,30 +426,35 @@ onMounted(() => {
       </div>
       <!--  -->
       <!-- 貼文內容 -->
-      <p class="comment-content">{{ comment.content }}</p>
-      <span v-if="comment.file_url" class="comment-file">
-        <img
-          :src="comment.file_url"
-          alt="comment.file_url"
-          ref="commentImages"
-        />
-      </span>
+      <div class="comment-content">
+        <p>{{ comment.content }}</p>
+        <span v-if="comment.file_url" class="comment-file">
+          <img
+            :src="comment.file_url"
+            alt="comment.file_url"
+            ref="commentImages"
+          />
+        </span>
+      </div>
 
       <!-- 回覆功能 -->
       <div class="reply">
         <ul>
           <li>
-            <button @click="handlelike(comment.id)" class="reply-link">
-              <!-- <button @click="value = Math.min(value + 1)" class="reply-link"> -->
-              <img class="icon" :src="Favoriteicon" alt="Favoriteicon" />
-            </button>
-            <n-badge :value="comment.likes || 0" />
-            <!-- 顯示每個帖子的點贊數 -->
+            <div class="reply-count">
+              <button @click="handlelike(comment.id)" class="reply-link">
+                <img class="icon" :src="Favoriteicon" alt="Favoriteicon" />
+              </button>
+              <n-badge :value="comment.likes || 0" />
+            </div>
           </li>
           <li>
-            <button @click="goToSinglePosts(comment.id)" class="reply-link">
-              <img class="icon" :src="Replyicon" alt="Replyicon" />
-            </button>
+            <div class="reply-count">
+              <button @click="goToSinglePosts(comment.id)" class="reply-link">
+                <img class="icon" :src="Replyicon" alt="Replyicon" />
+              </button>
+              <n-badge :value="value" />
+            </div>
           </li>
         </ul>
       </div>
@@ -493,6 +498,17 @@ onMounted(() => {
   display: flex;
   flex-direction: row;
   list-style-type: none;
+}
+
+.reply-count {
+  display: flex;
+  flex-direction: row;
+  align-items: center;
+  margin-right: 5px;
+}
+
+.reply-count .n-badge {
+  --n-color: transition !important;
 }
 
 .reply-link {
@@ -549,13 +565,12 @@ onMounted(() => {
 }
 
 .comment-content {
-  margin-bottom: 5px;
+  margin-bottom: 10px;
 }
 
-/* .light-mode .info-link > img,
-.light-mode .reply-link > img {
-  filter: invert(1) grayscale(100%) contrast(100%) brightness(0);
-} */
+.comment-content p {
+  margin-bottom: 10px;
+}
 
 .info-modal {
   position: relative;
