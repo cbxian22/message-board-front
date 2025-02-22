@@ -139,47 +139,39 @@ const handlelike = async (id) => {
   }
 
   try {
-    // 檢查是否已點贊
-    const checkResponse = await axios.get(
-      `https://message-board-server-7yot.onrender.com/api/check-like/${userId}`,
-      {
-        params: { targetType: "post", targetId: id },
-        headers: { Authorization: `Bearer ${token}` },
-      }
+    const response = await axios.post(
+      `https://message-board-server-7yot.onrender.com/api/like/${userId}`,
+      { targetType: "post", targetId: id },
+      { headers: { Authorization: `Bearer ${token}` } }
     );
 
-    if (checkResponse.data.liked) {
-      // 已點贊，執行取消
-      const response = await axios.delete(
-        `https://message-board-server-7yot.onrender.com/api/like/${userId}`,
-        {
-          data: { targetType: "post", targetId: id },
-          headers: { Authorization: `Bearer ${token}` },
-        }
-      );
-      if (response.status === 200) {
-        value.value = Math.max(value.value - 1, 0); // 減少計數
-        location.reload();
+    if (response.status === 200) {
+      // 找到對應的 comment
+      const comment = comments.value.find((c) => c.id === id);
+      if (!comment) return; // 如果沒找到，直接返回
+
+      // 初始化 likes 屬性（如果不存在）
+      if (!comment.likes) comment.likes = 0;
+
+      // 根據後端返回的動作更新 likes
+      if (response.data.action === "liked") {
+        comment.likes += 1;
+      } else if (response.data.action === "unliked") {
+        comment.likes = Math.max(comment.likes - 1, 0);
       }
-    } else {
-      // 未點贊，執行點贊
-      const response = await axios.post(
-        `https://message-board-server-7yot.onrender.com/api/like/${userId}`,
-        { targetType: "post", targetId: id },
-        { headers: { Authorization: `Bearer ${token}` } }
-      );
-      if (response.status === 200) {
-        value.value = value.value + 1;
-        location.reload();
+
+      // 可選：使用後端返回的最新點贊數（更準確）
+      if (response.data.likesCount !== undefined) {
+        comment.likes = response.data.likesCount;
       }
     }
   } catch (error) {
-    console.error(
-      "提交錯誤:",
-      error.response ? error.response.data : error.message
-    );
+    const errorMsg = error.response ? error.response.data.error : error.message;
+    console.error("提交錯誤:", errorMsg);
+    alert(errorMsg);
   }
 };
+
 // checkTokenAndOpenModal
 const OpenModal = () => {
   isOpenModal.value = true;
@@ -450,7 +442,8 @@ onMounted(() => {
               <!-- <button @click="value = Math.min(value + 1)" class="reply-link"> -->
               <img class="icon" :src="Favoriteicon" alt="Favoriteicon" />
             </button>
-            <n-badge :value="value" />
+            <n-badge :value="comment.likes || 0" />
+            <!-- 顯示每個帖子的點贊數 -->
           </li>
           <li>
             <button @click="goToSinglePosts(comment.id)" class="reply-link">
