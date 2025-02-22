@@ -23,7 +23,7 @@ const emit = defineEmits();
 const commentImages = ref([]);
 const authStore = useAuthStore();
 const postStore = usePostStore();
-const unlike = ref(true);
+const islike = ref(false);
 
 const modalState = ref({});
 const modalRefs = ref({});
@@ -159,10 +159,10 @@ const handlelike = async (id) => {
       // 根據後端返回的動作更新 likes
       if (response.data.action === "liked") {
         comment.likes += 1;
-        unlike.value = true;
+        islike.value = true;
       } else if (response.data.action === "unliked") {
         comment.likes = Math.max(comment.likes - 1, 0);
-        unlike.value = false;
+        islike.value = false;
       }
 
       // 可選：使用後端返回的最新點贊數（更準確）
@@ -449,16 +449,16 @@ onMounted(() => {
             <div class="reply-count" @click="handlelike(comment.id)">
               <button class="reply-link">
                 <img
-                  v-if="unlike"
+                  v-if="islike"
                   class="icon"
-                  :src="Favoriteicon"
-                  alt="Favoriteicon"
+                  :src="FavoriteRedicon"
+                  alt="FavoriteRedicon"
                 />
                 <img
                   v-else
                   class="icon"
-                  :src="FavoriteRedicon"
-                  alt="FavoriteRedicon"
+                  :src="Favoriteicon"
+                  alt="Favoriteicon"
                 />
               </button>
               <n-badge :value="comment.likes || 0" />
