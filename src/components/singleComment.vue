@@ -128,6 +128,39 @@ const handleUpdate = async (postId) => {
   }
 };
 
+// 按讚
+const handlelike = async (id) => {
+  const userId = localStorage.getItem("userId");
+  const token = localStorage.getItem("token");
+
+  if (!userId || !token) {
+    alert("請先登入！");
+    return;
+  }
+
+  try {
+    const response = await axios.post(
+      `https://message-board-server-7yot.onrender.com/api/like/${userId}`,
+      { targetType: "post", targetId: id },
+      { headers: { Authorization: `Bearer ${token}` } }
+    );
+
+    if (response.status === 201) {
+      // 發送 WebSocket 訊息
+      // socketStore.sendMessage({
+      //   content: content.value,
+      //   fileUrl: uploadedFileUrl,
+      // });
+      value.value = Math.min(value + 1);
+      location.reload();
+    } else {
+      console.error("留言提交錯誤:", error);
+    }
+  } catch (error) {
+    console.error("留言提交錯誤:", error);
+  }
+};
+
 // checkTokenAndOpenModal
 const OpenModal = () => {
   isOpenModal.value = true;
@@ -394,7 +427,8 @@ onMounted(() => {
       <div class="reply">
         <ul>
           <li>
-            <button @click="value = Math.min(value + 1)" class="reply-link">
+            <button @click="handlelike(comment.id)" class="reply-link">
+              <!-- <button @click="value = Math.min(value + 1)" class="reply-link"> -->
               <img class="icon" :src="Favoriteicon" alt="Favoriteicon" />
             </button>
             <n-badge :value="value" />
