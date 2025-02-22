@@ -1,5 +1,7 @@
 <script setup>
 import { ref, defineEmits, onMounted, onUnmounted } from "vue";
+import { MdAdd, MdRemove } from "@vicons/ionicons4";
+import { NBadge } from "naive-ui";
 import { useAuthStore } from "../stores/authStore";
 import { usePostStore } from "../stores/usePostStore";
 import { useRouter } from "vue-router";
@@ -25,6 +27,7 @@ const modalState = ref({});
 const modalRefs = ref({});
 const buttonRefs = ref({});
 const isOpenModal = ref(false);
+const value = ref(0);
 
 const openModal = (event, commentId) => {
   event.stopPropagation();
@@ -391,9 +394,10 @@ onMounted(() => {
       <div class="reply">
         <ul>
           <li>
-            <button @click="" class="reply-link">
+            <button @click="value = Math.min(value + 1)" class="reply-link">
               <img class="icon" :src="Favoriteicon" alt="Favoriteicon" />
             </button>
+            <n-badge :value="value" />
           </li>
           <li>
             <button @click="goToSinglePosts(comment.id)" class="reply-link">
