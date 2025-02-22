@@ -151,7 +151,7 @@ const handlelike = async (id) => {
       //   content: content.value,
       //   fileUrl: uploadedFileUrl,
       // });
-      value.value = Math.min(value + 1);
+      value.value = Math.min(value.value + 1);
       location.reload();
     } else {
       console.log("提交錯誤:");
