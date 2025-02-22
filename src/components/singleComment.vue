@@ -1,6 +1,6 @@
 <script setup>
 import { ref, defineEmits, onMounted, onUnmounted } from "vue";
-import { MdAdd, MdRemove } from "@vicons/ionicons4";
+
 import { NBadge } from "naive-ui";
 import { useAuthStore } from "../stores/authStore";
 import { usePostStore } from "../stores/usePostStore";
