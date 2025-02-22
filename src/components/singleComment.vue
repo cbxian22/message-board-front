@@ -335,7 +335,11 @@ const handlelike = async (id) => {
   } catch (error) {
     const errorMsg = error.response ? error.response.data.error : error.message;
     console.error("提交錯誤:", errorMsg);
-    alert(errorMsg);
+    //
+    // **發送 API 失敗時，回滾 UI 狀態**
+    comment.likes = previousLikes;
+    comment.userLiked = previousUserLiked;
+    //
   } finally {
     isLikeProcessing.value = false;
   }
