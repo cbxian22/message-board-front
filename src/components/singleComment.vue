@@ -87,6 +87,7 @@ const fetchComments = async () => {
         timestamp: new Date(comment.created_at),
         file_url: comment.file_url,
         user_avatar: comment.user_avatar,
+        likes: comment.likes || 0, // 如果後端已提供 likes，否則預設為 0
       }));
       emit("loaded");
     } else {
