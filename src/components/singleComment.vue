@@ -503,8 +503,8 @@ onMounted(() => {
             </div>
           </li>
           <li>
-            <div class="reply-count">
-              <button @click="goToSinglePosts(comment.id)" class="reply-link">
+            <div class="reply-count" @click="goToSinglePosts(comment.id)">
+              <button class="reply-link">
                 <img class="icon" :src="Replyicon" alt="Replyicon" />
               </button>
               <n-badge :value="comment.replies || 0" />
