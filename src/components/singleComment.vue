@@ -217,6 +217,7 @@ const fetchComments = async () => {
         user_avatar: comment.user_avatar,
         likes: comment.likes || 0,
         userLiked: comment.user_liked || false, // 後端返回的用戶是否點贊
+        replies: comment.replies,
       }));
       emit("loaded");
     } else {
@@ -506,7 +507,7 @@ onMounted(() => {
               <button @click="goToSinglePosts(comment.id)" class="reply-link">
                 <img class="icon" :src="Replyicon" alt="Replyicon" />
               </button>
-              <!-- <n-badge :value="value" /> -->
+              <n-badge :value="comment.replies || 0" />
             </div>
           </li>
         </ul>
