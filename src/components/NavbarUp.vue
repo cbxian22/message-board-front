@@ -14,7 +14,7 @@
 
         <li>
           <button ref="modalButton" @click="openModal" class="nav-link">
-            <img :src="Dragicon" alt="Dragicon" />
+            <img :src="Menuicon" alt="Menuicon" />
           </button>
 
           <div v-show="isModalOpen" class="modal-overlay">
@@ -59,7 +59,7 @@ import { useAuthStore } from "../stores/authStore";
 import { useThemeStore } from "../stores/themeStore";
 import { NConfigProvider, NSwitch, NCollapseItem, NCollapse } from "naive-ui";
 
-import Dragicon from "../assets/Dragicon.svg";
+import Menuicon from "../assets/Menuicon.svg";
 import Sendicon from "../assets/Sendicon.svg";
 const router = useRouter();
 const themeStore = useThemeStore();
