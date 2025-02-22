@@ -23,13 +23,11 @@ const emit = defineEmits();
 const commentImages = ref([]);
 const authStore = useAuthStore();
 const postStore = usePostStore();
-const islike = ref(false);
 
 const modalState = ref({});
 const modalRefs = ref({});
 const buttonRefs = ref({});
 const isOpenModal = ref(false);
-const value = ref();
 
 const openModal = (event, commentId) => {
   event.stopPropagation();
@@ -89,7 +87,8 @@ const fetchComments = async () => {
         timestamp: new Date(comment.created_at),
         file_url: comment.file_url,
         user_avatar: comment.user_avatar,
-        likes: comment.likes || 0, // 如果後端已提供 likes，否則預設為 0
+        likes: comment.likes || 0,
+        userLiked: comment.user_liked || false, // 後端返回的用戶是否點贊
       }));
       emit("loaded");
     } else {
@@ -151,7 +150,7 @@ const handlelike = async (id) => {
     if (response.status === 200) {
       // 找到對應的 comment
       const comment = comments.value.find((c) => c.id === id);
-      if (!comment) return; // 如果沒找到，直接返回
+      if (!comment) return;
 
       // 初始化 likes 屬性（如果不存在）
       if (!comment.likes) comment.likes = 0;
@@ -159,10 +158,10 @@ const handlelike = async (id) => {
       // 根據後端返回的動作更新 likes
       if (response.data.action === "liked") {
         comment.likes += 1;
-        islike.value = true;
+        comment.userLiked = true;
       } else if (response.data.action === "unliked") {
         comment.likes = Math.max(comment.likes - 1, 0);
-        islike.value = false;
+        comment.userLiked = false;
       }
 
       // 可選：使用後端返回的最新點贊數（更準確）
@@ -449,16 +448,10 @@ onMounted(() => {
             <div class="reply-count" @click="handlelike(comment.id)">
               <button class="reply-link">
                 <img
-                  v-if="islike"
                   class="icon"
-                  :src="FavoriteRedicon"
-                  alt="FavoriteRedicon"
-                />
-                <img
-                  v-else
-                  class="icon"
-                  :src="Favoriteicon"
-                  alt="Favoriteicon"
+                  :src="comment.userLiked ? FavoriteRedicon : Favoriteicon"
+                  alt="Like"
+                  @click="handlelike(comment.id)"
                 />
               </button>
               <n-badge :value="comment.likes || 0" />
