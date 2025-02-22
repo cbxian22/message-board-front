@@ -273,6 +273,25 @@ const handlelike = async (id) => {
     return;
   }
 
+  //樂觀更新 UI，然後再發送 API
+  // 找到對應的 comment
+  const comment = comments.value.find((c) => c.id === id);
+  if (!comment) return;
+
+  // 初始化 likes 屬性（如果不存在）
+  if (!comment.likes) comment.likes = 0;
+
+  // 根據後端返回的動作更新 likes
+  if (response.data.action === "liked") {
+    comment.likes += 1;
+    comment.userLiked = true;
+  } else if (response.data.action === "unliked") {
+    comment.likes = Math.max(comment.likes - 1, 0);
+    comment.userLiked = false;
+  }
+
+  // 樂觀更新 UI，然後再發送 API
+
   isLikeProcessing.value = true;
 
   try {
@@ -283,22 +302,7 @@ const handlelike = async (id) => {
     );
 
     if (response.status === 200) {
-      // 找到對應的 comment
-      const comment = comments.value.find((c) => c.id === id);
-      if (!comment) return;
-
-      // 初始化 likes 屬性（如果不存在）
-      if (!comment.likes) comment.likes = 0;
-
-      // 根據後端返回的動作更新 likes
-      if (response.data.action === "liked") {
-        comment.likes += 1;
-        comment.userLiked = true;
-      } else if (response.data.action === "unliked") {
-        comment.likes = Math.max(comment.likes - 1, 0);
-        comment.userLiked = false;
-      }
-
+      //樂觀更新 UI，然後再發送 API 替換回來
       // 可選：使用後端返回的最新點贊數（更準確）
       if (response.data.likesCount !== undefined) {
         comment.likes = response.data.likesCount;
