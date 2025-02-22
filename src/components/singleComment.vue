@@ -88,7 +88,7 @@ const fetchComments = async () => {
         file_url: comment.file_url,
         user_avatar: comment.user_avatar,
         likes: comment.likes || 0,
-        userLiked: comment.user_liked || false, // 後端返回的用戶是否點贊
+        // userLiked: comment.user_liked || false, // 後端返回的用戶是否點贊
       }));
       emit("loaded");
     } else {
@@ -158,10 +158,10 @@ const handlelike = async (id) => {
       // 根據後端返回的動作更新 likes
       if (response.data.action === "liked") {
         comment.likes += 1;
-        comment.userLiked = true;
+        // comment.userLiked = true;
       } else if (response.data.action === "unliked") {
         comment.likes = Math.max(comment.likes - 1, 0);
-        comment.userLiked = false;
+        // comment.userLiked = false;
       }
 
       // 可選：使用後端返回的最新點贊數（更準確）
