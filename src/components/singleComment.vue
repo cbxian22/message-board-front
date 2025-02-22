@@ -27,7 +27,7 @@ const modalState = ref({});
 const modalRefs = ref({});
 const buttonRefs = ref({});
 const isOpenModal = ref(false);
-const value = ref(0);
+const value = ref();
 
 const openModal = (event, commentId) => {
   event.stopPropagation();
@@ -139,28 +139,47 @@ const handlelike = async (id) => {
   }
 
   try {
-    const response = await axios.post(
-      `https://message-board-server-7yot.onrender.com/api/like/${userId}`,
-      { targetType: "post", targetId: id },
-      { headers: { Authorization: `Bearer ${token}` } }
+    // 檢查是否已點贊
+    const checkResponse = await axios.get(
+      `https://message-board-server-7yot.onrender.com/api/check-like/${userId}`,
+      {
+        params: { targetType: "post", targetId: id },
+        headers: { Authorization: `Bearer ${token}` },
+      }
     );
 
-    if (response.status === 200) {
-      // 發送 WebSocket 訊息
-      // socketStore.sendMessage({
-      //   content: content.value,
-      //   fileUrl: uploadedFileUrl,
-      // });
-      value.value = Math.min(value.value + 1);
-      location.reload();
+    if (checkResponse.data.liked) {
+      // 已點贊，執行取消
+      const response = await axios.delete(
+        `https://message-board-server-7yot.onrender.com/api/like/${userId}`,
+        {
+          data: { targetType: "post", targetId: id },
+          headers: { Authorization: `Bearer ${token}` },
+        }
+      );
+      if (response.status === 200) {
+        value.value = Math.max(value.value - 1, 0); // 減少計數
+        location.reload();
+      }
     } else {
-      console.log("提交錯誤:");
+      // 未點贊，執行點贊
+      const response = await axios.post(
+        `https://message-board-server-7yot.onrender.com/api/like/${userId}`,
+        { targetType: "post", targetId: id },
+        { headers: { Authorization: `Bearer ${token}` } }
+      );
+      if (response.status === 200) {
+        value.value = value.value + 1;
+        location.reload();
+      }
     }
   } catch (error) {
-    console.error("提交錯誤:", error);
+    console.error(
+      "提交錯誤:",
+      error.response ? error.response.data : error.message
+    );
   }
 };
-
 // checkTokenAndOpenModal
 const OpenModal = () => {
   isOpenModal.value = true;
