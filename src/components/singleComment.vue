@@ -273,9 +273,12 @@ const handlelike = async (id) => {
     );
 
     if (response.status === 200) {
-      // // 找到對應的 comment
+      // 找到對應的 comment
       const comment = comments.value.find((c) => c.id === id);
       if (!comment) return;
+
+      // 初始化 likes 屬性（如果不存在）
+      if (!comment.likes) comment.likes = 0;
 
       // 根據後端返回的動作更新 likes
       if (response.data.action === "liked") {
