@@ -268,12 +268,12 @@ const handlelike = async (id) => {
     return;
   }
 
-  if (isLikeProcessing.value) {
-    console.log("點讚操作正在進行中，忽略此次請求");
-    return;
-  }
+  // if (isLikeProcessing.value) {
+  //   console.log("點讚操作正在進行中，忽略此次請求");
+  //   return;
+  // }
 
-  isLikeProcessing.value = true;
+  // isLikeProcessing.value = true;
 
   try {
     const response = await axios.post(
@@ -308,9 +308,10 @@ const handlelike = async (id) => {
     const errorMsg = error.response ? error.response.data.error : error.message;
     console.error("提交錯誤:", errorMsg);
     alert(errorMsg);
-  } finally {
-    isLikeProcessing.value = false;
   }
+  // finally {
+  //   isLikeProcessing.value = false;
+  // }
 };
 
 // checkTokenAndOpenModal
