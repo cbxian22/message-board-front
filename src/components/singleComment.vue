@@ -154,10 +154,10 @@ const handlelike = async (id) => {
       value.value = Math.min(value + 1);
       location.reload();
     } else {
-      console.error("留言提交錯誤:", error);
+      console.log("提交錯誤:");
     }
   } catch (error) {
-    console.error("留言提交錯誤:", error);
+    console.error("提交錯誤:", error);
   }
 };
 
