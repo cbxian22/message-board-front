@@ -31,7 +31,7 @@
           class="nav-link"
         >
           <!-- <img :src="Accounticon" alt="Accounticon" /> -->
-          <img :src="authStore.isLoggedIn ? Accounticon : authStore.userName" />
+          <img :src="authStore.userAvatar" alt="Accounticon" />
         </router-link>
       </li>
     </ul>
