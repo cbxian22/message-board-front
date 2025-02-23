@@ -2,6 +2,7 @@
 import { ref, computed, onMounted, onUnmounted } from "vue";
 import { useAuthStore } from "../stores/authStore";
 import { NBadge } from "naive-ui";
+import UpdatePostView from "./UpdatePostView.vue";
 import Replyicon from "../assets/Replyicon.svg";
 import Favoriteicon from "../assets/Favoriteicon.svg";
 import Moreicon from "../assets/Moreicon.svg";
@@ -11,6 +12,7 @@ import Flagicon from "../assets/Flagicon.svg";
 const commentImages = ref([]);
 const value = ref(0);
 const unlike = ref(true);
+
 const comments = ref([
   {
     id: 1,
@@ -58,6 +60,7 @@ authStore.checkLoginStatus();
 const modalState = ref({});
 const modalRefs = ref({});
 const buttonRefs = ref({});
+const isOpenModal = ref(false);
 
 const openModal = (event, commentId) => {
   event.stopPropagation();
@@ -95,6 +98,24 @@ const closeModal = (event) => {
   }
 };
 
+const handleUpdate = async (postId) => {
+  isOpenModal.value = true;
+  // try {
+  //   const userId = authStore.userId;
+  //   const message = await postStore.updatePost(
+  //     postId,
+  //     userId,
+  //     content,
+  //     fileUrl
+  //   );
+  //   console.log(message);
+  //   // location.reload();
+  //   await postStore.fetchPosts(); // 重新獲取貼文，而不是整個刷新頁面
+  // } catch {
+  //   console.log(更新失敗);
+  // }
+};
+
 onMounted(() => {
   document.addEventListener("mousedown", closeModal);
 });
@@ -111,6 +132,7 @@ const formatDate = (timestamp) => {
 const goToCommentPage = (id) => {
   console.log(`跳轉到留言頁面，留言ID: ${id}`);
 };
+
 onMounted(() => {
   // 確保對每一個圖片都加載後進行判斷
   commentImages.value.forEach((img) => {
@@ -131,8 +153,6 @@ import { useAuthStore } from "../stores/authStore";
 import { usePostStore } from "../stores/usePostStore";
 import { useRouter } from "vue-router";
 import axios from "axios";
-
-import Message from "./PostView.vue";
 
 import Replyicon from "../assets/Replyicon.svg";
 import Favoriteicon from "../assets/Favoriteicon.svg";
@@ -155,6 +175,7 @@ const modalRefs = ref({});
 const buttonRefs = ref({});
 const isOpenModal = ref(false);
 const isLikeProcessing = ref(false); // 用於追踪點讚狀態
+const selectedComment = ref(null); // 用於儲存當前選中的單一留言
 
 const openModal = (event, commentId) => {
   event.stopPropagation();
@@ -230,6 +251,36 @@ const fetchComments = async () => {
   }
 };
 
+// 獲取單一留言
+const fetchSingleComment = async (postId) => {
+  try {
+    const userId = authStore.userId || localStorage.getItem("userId");
+    const response = await axios.get(
+      `https://message-board-server-7yot.onrender.com/api/posts/${postId}`,
+      { params: { userId } }
+    );
+    if (response.status === 200) {
+      const comment = response.data;
+      selectedComment.value = {
+        id: comment.id,
+        content: comment.content,
+        name: comment.user_name,
+        timestamp: new Date(comment.created_at),
+        file_url: comment.file_url,
+        user_avatar: comment.user_avatar,
+        likes: comment.likes || 0,
+        userLiked: comment.user_liked || false,
+        replies: comment.replies,
+      };
+    } else {
+      alert("無法獲取單一留言，數據格式不正確");
+    }
+  } catch (error) {
+    console.error("取得單一留言錯誤:", error);
+    alert("單一留言取得失敗，請檢查網絡或稍後再試");
+  }
+};
+
 // 刪除留言
 const handleDelete = async (postId) => {
   try {
@@ -244,20 +295,8 @@ const handleDelete = async (postId) => {
 
 // 修改留言
 const handleUpdate = async (postId) => {
-  try {
-    const userId = authStore.userId;
-    const message = await postStore.updatePost(
-      postId,
-      userId,
-      content,
-      fileUrl
-    );
-    console.log(message);
-    // location.reload();
-    await postStore.fetchPosts(); // 重新獲取貼文，而不是整個刷新頁面
-  } catch {
-    console.log(更新失敗);
-  }
+  isOpenModal.value = true;
+  await fetchSingleComment(postId); // 獲取單一留言
 };
 
 // 按讚
@@ -347,11 +386,6 @@ const handlelike = async (id) => {
   }
 };
 
-// checkTokenAndOpenModal
-const OpenModal = () => {
-  isOpenModal.value = true;
-};
-
 // 格式化時間
 const formatDate = (date) => {
   if (!date) return "未知時間";
@@ -439,17 +473,15 @@ onMounted(() => {
           >
             <div class="modal-content" @click.stop>
               <ul>
-                <li
+                <!-- <li
                   v-if="
                     authStore.isLoggedIn && authStore.userName === comment.name
                   "
-                >
-                  <button class="modal-link" @click="OpenModal">
-                    <!-- <button class="modal-link" @click="handleUpdate(comment.id)"> -->
-                    <!-- <router-link to="/message" class="modal-link"> -->
+                > -->
+                <li>
+                  <button class="modal-link" @click="handleUpdate(comment.id)">
                     <img class="icon" :src="Editicon" alt="Editicon" />
                     <span>編輯</span>
-                    <!-- </router-link> -->
                   </button>
                 </li>
 
@@ -514,7 +546,7 @@ onMounted(() => {
       </div>
     </div>
   </div>
-  <UpdatePostView v-model="isOpenModal" />
+  <UpdatePostView v-model="isOpenModal" :comment="selectedComment" />
 </template>
 
 <style scoped>

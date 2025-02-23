@@ -1,6 +1,6 @@
 <template>
   <transition name="fade">
-    <div v-if="modelValue" class="modal-overlay" @click.self="close">
+    <div v-if="modelValue" class="modal-overlay-inner" @click.self="close">
       <button class="close-btn" @click="close">
         <img
           class="material-symbols-outlined"
@@ -40,7 +40,7 @@ watch(
 </script>
 
 <style scoped>
-.modal-overlay {
+.modal-overlay-inner {
   background: rgba(0, 0, 0, 0.5);
   display: flex;
   flex-direction: column;

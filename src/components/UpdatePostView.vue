@@ -82,7 +82,12 @@ import Noteicon from "../assets/Noteicon.svg";
 import Closeicon from "../assets/Closeicon.svg";
 
 const authStore = useAuthStore();
-const props = defineProps(["modelValue"]);
+// const props = defineProps(["modelValue"]);
+const props = defineProps({
+  modelValue: Boolean,
+  comment: Object, // 接收從 singleComment 傳來的單一留言資料
+});
+
 const emit = defineEmits(["update:modelValue"]);
 const socketStore = useSocketStore();
 const loadingBar = useLoadingBar();
@@ -97,6 +102,18 @@ const fileInputRef = ref(null);
 
 // 檢查是否啟用提交按鈕
 const isSubmitDisabled = computed(() => !(content.value.trim() || file.value));
+
+// 當收到 comment 時，初始化表單資料
+watch(
+  () => props.comment,
+  (newComment) => {
+    if (newComment) {
+      content.value = newComment.content || "";
+      fileUrl.value = newComment.file_url || null;
+    }
+  },
+  { immediate: true }
+);
 
 // 獲取 <input type="file">
 const triggerFileInput = () => {
@@ -169,8 +186,8 @@ const handleMessage = async () => {
 
   try {
     const uploadedFileUrl = await uploadFile(); // 獨立處理圖片上傳
-    const response = await axios.post(
-      `https://message-board-server-7yot.onrender.com/api/posts/${userId}`,
+    const response = await axios.put(
+      `https://message-board-server-7yot.onrender.com/api/posts/${props.comment.id}/${userId}`,
       { content: content.value, fileUrl: uploadedFileUrl },
       { headers: { Authorization: `Bearer ${token}` } }
     );
