@@ -150,8 +150,11 @@ const uploadFile = async () => {
 // 提交上傳資料庫
 const handleMessage = async () => {
   if (!authStore.userId || !authStore.accessToken) {
-    alert("請先登入！");
-    return;
+    await authStore.checkLoginStatus(); // 等待登入狀態確認
+    if (!authStore.userId || !authStore.accessToken) {
+      alert("請先登入！");
+      return;
+    }
   }
 
   loadingBar.start();

@@ -119,37 +119,6 @@ const uploadFile = async () => {
   }
 };
 
-// 通用的 API 請求函數，處理 token 過期
-const apiRequest = async (url, options = {}) => {
-  const response = await axios({
-    url,
-    ...options,
-    headers: {
-      Authorization: `Bearer ${authStore.accessToken}`,
-      "Content-Type": "application/json",
-      ...options.headers,
-    },
-  }).catch(async (error) => {
-    if (error.response?.status === 401) {
-      const refreshed = await authStore.refreshAccessToken();
-      if (refreshed) {
-        return axios({
-          url,
-          ...options,
-          headers: {
-            Authorization: `Bearer ${authStore.accessToken}`,
-            "Content-Type": "application/json",
-            ...options.headers,
-          },
-        });
-      }
-      throw new Error("無法刷新 Token，請重新登入");
-    }
-    throw error;
-  });
-  return response;
-};
-
 // 提交更新
 const handleUpdate = async () => {
   if (
@@ -163,10 +132,12 @@ const handleUpdate = async () => {
 
   const username = router.currentRoute.value.params.username;
 
-  if (!authStore.accessToken || !authStore.userId) {
-    alert("請先登入！");
-    isLoginModalOpen.value = true;
-    return;
+  if (!authStore.userId || !authStore.accessToken) {
+    await authStore.checkLoginStatus(); // 等待登入狀態確認
+    if (!authStore.userId || !authStore.accessToken) {
+      alert("請先登入！");
+      return;
+    }
   }
 
   loadingBar.start();
