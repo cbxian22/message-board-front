@@ -144,9 +144,19 @@ const handleUpdate = async () => {
     });
 
     if (response.status === 200) {
+      // 直接更新本地狀態
+      info.value = {
+        ...info.value,
+        name: name.value,
+        intro: intro.value,
+        userAvatar: uploadedFileUrl || info.value.userAvatar,
+      };
+      tempAvatar.value = info.value.userAvatar;
+
+      // 更新 authStore
       authStore.updateUserData({
         userName: name.value,
-        userAvatar: uploadedFileUrl || info.value.userAvatar,
+        userAvatar: info.value.userAvatar,
       });
 
       name.value = "";
@@ -155,7 +165,6 @@ const handleUpdate = async () => {
       fileUrl.value = null;
       show.value = false;
       await fetchInfo();
-      location.reload();
     } else {
       alert("留言提交失敗");
       loadingBar.error();
