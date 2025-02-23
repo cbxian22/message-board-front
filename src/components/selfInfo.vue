@@ -98,14 +98,11 @@ const uploadFile = async () => {
 
   try {
     console.log("開始上傳檔案...");
-    const { data } = await axios.get(
-      "https://message-board-server-7yot.onrender.com/api/upload",
-      {
-        params: { filename: file.value.name, contentType: file.value.type },
-      }
-    );
+    const { data } = await apiClient.get("/upload", {
+      params: { filename: file.value.name, contentType: file.value.type },
+    });
 
-    await axios.put(data.uploadUrl, file.value, {
+    await apiClient.put(data.uploadUrl, file.value, {
       headers: { "Content-Type": file.value.type },
     });
 
