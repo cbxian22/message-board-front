@@ -232,13 +232,9 @@ onUnmounted(() => {
             <div class="form-inner">
               <div class="form-mod full">
                 <label for="name">名稱</label>
-                <input
-                  v-model="name"
-                  id="name"
-                  type="text"
-                  :placeholder="namePlaceholder"
-                />
+                <input v-model="name" id="name" type="text" />
               </div>
+              {{ namePlaceholder }}
               <div class="form-mod">
                 <label for="userAvatar"></label>
                 <input
@@ -263,11 +259,9 @@ onUnmounted(() => {
           <div class="form-box">
             <div class="form-mod">
               <label for="intro">個人介紹</label>
-              <textarea
-                v-model="intro"
-                id="intro"
-                :placeholder="introPlaceholder"
-              ></textarea>
+              <textarea v-model="intro" id="intro">{{
+                introPlaceholder
+              }}</textarea>
             </div>
           </div>
 
