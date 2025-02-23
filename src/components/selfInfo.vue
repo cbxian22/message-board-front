@@ -4,7 +4,7 @@ import { NButton, NDrawerContent, NDrawer, useLoadingBar } from "naive-ui";
 import { useAuthStore } from "../stores/authStore";
 import { useThemeStore } from "../stores/themeStore";
 import { useRouter } from "vue-router";
-import axios from "axios";
+import apiClient from "../stores/axiosConfig"; // 引入 apiClient
 import Login from "../components/LoginModal.vue";
 
 const themeStore = useThemeStore();
@@ -55,9 +55,7 @@ const checkTokenAndOpenModal = () => {
 const fetchInfo = async () => {
   const username = router.currentRoute.value.params.username; // 這裡重新獲取 username
   try {
-    const response = await axios.get(
-      `https://message-board-server-7yot.onrender.com/api/users/${username}`
-    );
+    const response = await apiClient.get(`/users/${username}`);
 
     if (response.status === 200 && response.data) {
       info.value = {
@@ -141,17 +139,12 @@ const handleUpdate = async () => {
 
   try {
     const uploadedFileUrl = await uploadFile(); // 獨立處理圖片上傳
-    const response = await apiRequest(
-      `https://message-board-server-7yot.onrender.com/api/users/${username}`,
-      {
-        method: "PUT",
-        data: {
-          name: name.value,
-          intro: intro.value,
-          fileUrl: uploadedFileUrl,
-        },
-      }
-    );
+
+    const response = await apiClient.put(`/users/${username}`, {
+      name: name.value,
+      intro: intro.value,
+      fileUrl: uploadedFileUrl || tempAvatar.value, // 如果沒有新上傳，使用現有頭像
+    });
 
     if (response.status === 200) {
       authStore.updateUserData({
