@@ -102,7 +102,18 @@ const fileInputRef = ref(null);
 
 // 檢查是否啟用提交按鈕
 const isSubmitDisabled = computed(() => {
-  return !(content.value.trim() || file.value || fileUrl.value);
+  // 如果沒有原始資料（props.comment），只要有內容就啟用
+  if (!props.comment) {
+    return !(content.value.trim() || file.value);
+  }
+
+  // 比較當前值與原始值
+  const isContentUnchanged = content.value === (props.comment.content || "");
+  const isFileUrlUnchanged = fileUrl.value === (props.comment.file_url || null);
+  const noNewFile = !file.value;
+
+  // 如果內容和圖片都未改變，且沒有新上傳檔案，則禁用
+  return isContentUnchanged && isFileUrlUnchanged && noNewFile;
 });
 
 // 當收到 comment 時，初始化表單資料
