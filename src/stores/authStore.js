@@ -113,7 +113,6 @@ export const useAuthStore = defineStore("auth", {
       localStorage.setItem("userAvatar", this.userAvatar);
       localStorage.setItem("role", this.role);
     },
-    // 新增的更新用戶資料方法
     updateUserData({ userName, userAvatar, role }) {
       if (userName) this.userName = userName;
       if (userAvatar) this.userAvatar = userAvatar;
@@ -122,14 +121,19 @@ export const useAuthStore = defineStore("auth", {
       localStorage.setItem("userAvatar", this.userAvatar);
       localStorage.setItem("role", this.role);
     },
-    login({ accessToken, refreshToken }) {
+    login(data) {
+      const { success, accessToken, refreshToken } = data;
+      if (!success || !accessToken) {
+        console.error("登入數據無效:", data);
+        return;
+      }
       const decodedToken = verifyToken(accessToken);
       if (!decodedToken) return;
       this.isLoggedIn = true;
       this.accessToken = accessToken;
-      this.refreshToken = refreshToken;
+      this.refreshToken = refreshToken || null;
       localStorage.setItem("accessToken", accessToken);
-      localStorage.setItem("refreshToken", refreshToken);
+      if (refreshToken) localStorage.setItem("refreshToken", refreshToken);
       this.setUserData(decodedToken);
     },
     async refreshAccessToken() {
@@ -139,16 +143,26 @@ export const useAuthStore = defineStore("auth", {
         return false;
       }
       try {
-        const response = await fetch("/refresh-token", {
-          method: "POST",
-          headers: { "Content-Type": "application/json" },
-          body: JSON.stringify({ refreshToken }),
-        });
-        const { accessToken } = await response.json();
-        const decodedToken = verifyToken(accessToken);
+        const response = await fetch(
+          "https://message-board-server-7yot.onrender.com/api/auth/refresh-token",
+          {
+            method: "POST",
+            headers: { "Content-Type": "application/json" },
+            body: JSON.stringify({ refreshToken }),
+          }
+        );
+        const data = await response.json();
+        if (!data.success || !data.accessToken) {
+          console.error("刷新失敗:", data);
+          this.logout();
+          return false;
+        }
+        const decodedToken = verifyToken(data.accessToken);
         if (decodedToken) {
-          this.accessToken = accessToken;
-          localStorage.setItem("accessToken", accessToken);
+          this.accessToken = data.accessToken;
+          this.refreshToken = data.refreshToken; // 更新新的 refreshToken
+          localStorage.setItem("accessToken", data.accessToken);
+          localStorage.setItem("refreshToken", data.refreshToken);
           this.setUserData(decodedToken);
           return true;
         }
@@ -180,13 +194,17 @@ export const useAuthStore = defineStore("auth", {
       ].forEach((key) => localStorage.removeItem(key));
     },
     async checkLoginStatus() {
-      let accessToken = localStorage.getItem("accessToken");
+      const accessToken = localStorage.getItem("accessToken");
+      if (!accessToken || typeof accessToken !== "string") {
+        console.log("無效的 accessToken，嘗試登出");
+        this.logout();
+        return;
+      }
       let decodedToken = verifyToken(accessToken);
       if (!decodedToken) {
         const refreshed = await this.refreshAccessToken();
         if (!refreshed) return;
-        accessToken = this.accessToken;
-        decodedToken = verifyToken(accessToken);
+        decodedToken = verifyToken(this.accessToken);
       }
       this.isLoggedIn = true;
       this.setUserData(decodedToken);
