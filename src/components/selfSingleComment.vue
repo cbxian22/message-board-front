@@ -9,6 +9,7 @@ import axios from "axios";
 
 import Replyicon from "../assets/Replyicon.svg";
 import Favoriteicon from "../assets/Favoriteicon.svg";
+import FavoriteRedicon from "../assets/FavoriteRedicon.svg";
 import Moreicon from "../assets/Moreicon.svg";
 import Editicon from "../assets/Editicon.svg";
 import Deleteicon from "../assets/Deleteicon.svg";
