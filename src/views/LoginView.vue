@@ -76,11 +76,12 @@ import { useRouter } from "vue-router";
 import axios from "axios";
 import { useAuthStore } from "@/stores/authStore";
 
+const authStore = useAuthStore();
+
 const router = useRouter();
 const account = ref("");
 const password = ref("");
 const role = ref("user");
-const authStore = useAuthStore();
 const isLoading = ref(true);
 const ishowing = ref(false);
 const isTouched = ref(false);
@@ -89,6 +90,7 @@ const login = async () => {
   isTouched.value = true; // 發送請求前，顯示 loading 狀態
   if (!account.value || !password.value) {
     alert("請輸入用戶名和密碼！");
+    isTouched.value = false;
     return;
   }
 
@@ -102,11 +104,12 @@ const login = async () => {
       }
     );
 
-    console.log(response.data); // 獲取後端響應(含生成令牌token)
+    console.log("後端回應:", response.data);
 
     if (response.data.success) {
-      const { token, userId } = response.data; // 儲存 token 和 userId
-      authStore.login(token, userId); // 儲存進 pinia
+      // const { token, userId } = response.data; // 儲存 token 和 userId
+      // authStore.login(token, userId); // 儲存進 pinia
+      authStore.login(response.data); // 傳入整個回應物件
       router.push("/");
     } else {
       alert(response.data.message || "登錄失敗，請檢查用戶名或密碼！");

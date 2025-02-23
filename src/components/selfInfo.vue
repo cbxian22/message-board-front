@@ -44,11 +44,16 @@ watch(show, (newValue) => {
   }
 });
 
+// const checkTokenAndOpenModal = () => {
+//   const token = localStorage.getItem("token");
+//   if (!token) {
+//     isLoginModalOpen.value = true;
+//   } else {
+//   }
+// };
 const checkTokenAndOpenModal = () => {
-  const token = localStorage.getItem("token");
-  if (!token) {
+  if (!authStore.accessToken) {
     isLoginModalOpen.value = true;
-  } else {
   }
 };
 
@@ -67,7 +72,7 @@ const fetchInfo = async () => {
         intro: response.data.intro,
         userAvatar: response.data.avatar_url,
       };
-      tempAvatar.value = info.value.userAvatar; // 如果沒有圖片，使用預設圖片
+      tempAvatar.value = info.value.userAvatar;
     } else {
       alert("無法獲取留言，數據格式不正確");
     }
@@ -83,21 +88,28 @@ const triggerFileInput = () => {
 };
 
 // 檢查檔案上傳處理，並顯示預覽
+// const handleFileUpload = (event) => {
+//   const selectedFile = event.target.files[0];
+//   if (selectedFile) {
+//     if (selectedFile.type.startsWith("image/")) {
+//       const reader = new FileReader();
+//       reader.onload = (e) => {
+//         tempAvatar.value = e.target.result;
+//       };
+//       reader.readAsDataURL(selectedFile);
+//     }
+//     file.value = selectedFile;
+//   }
+// };
 const handleFileUpload = (event) => {
   const selectedFile = event.target.files[0];
-
-  if (selectedFile) {
-    console.log("檔案已選擇:", selectedFile.name);
-
-    if (selectedFile.type.startsWith("image/")) {
-      const reader = new FileReader();
-      reader.onload = (e) => {
-        console.log("圖片資料 URL:", e.target.result); // 在這裡檢查圖片資料
-        tempAvatar.value = e.target.result; // 更新 tempAvatar
-      };
-      reader.readAsDataURL(selectedFile);
-    }
-    file.value = selectedFile; // 存檔案，確保後續上傳
+  if (selectedFile && selectedFile.type.startsWith("image/")) {
+    const reader = new FileReader();
+    reader.onload = (e) => {
+      tempAvatar.value = e.target.result;
+    };
+    reader.readAsDataURL(selectedFile);
+    file.value = selectedFile;
   }
 };
 
@@ -126,6 +138,37 @@ const uploadFile = async () => {
   }
 };
 
+// 通用的 API 請求函數，處理 token 過期
+const apiRequest = async (url, options = {}) => {
+  const response = await axios({
+    url,
+    ...options,
+    headers: {
+      Authorization: `Bearer ${authStore.accessToken}`,
+      "Content-Type": "application/json",
+      ...options.headers,
+    },
+  }).catch(async (error) => {
+    if (error.response?.status === 401) {
+      const refreshed = await authStore.refreshAccessToken();
+      if (refreshed) {
+        return axios({
+          url,
+          ...options,
+          headers: {
+            Authorization: `Bearer ${authStore.accessToken}`,
+            "Content-Type": "application/json",
+            ...options.headers,
+          },
+        });
+      }
+      throw new Error("無法刷新 Token，請重新登入");
+    }
+    throw error;
+  });
+  return response;
+};
+
 // 提交更新
 const handleUpdate = async () => {
   if (
@@ -139,30 +182,33 @@ const handleUpdate = async () => {
 
   const username = router.currentRoute.value.params.username;
 
-  // 即使是自己也需要登入後修改
-  const userId = localStorage.getItem("userId");
-  const token = localStorage.getItem("token");
-  if (!userId || !token) {
+  if (!authStore.accessToken || !authStore.userId) {
     alert("請先登入！");
+    isLoginModalOpen.value = true;
     return;
   }
 
-  loadingBar.start(); // 驗證通過 且 請求開始前 啟動 Loading
+  loadingBar.start();
 
   try {
     const uploadedFileUrl = await uploadFile(); // 獨立處理圖片上傳
-    const response = await axios.put(
+    const response = await apiRequest(
       `https://message-board-server-7yot.onrender.com/api/users/${username}`,
-      { name: name.value, intro: intro.value, fileUrl: uploadedFileUrl },
-      { headers: { Authorization: `Bearer ${token}` } }
+      {
+        method: "PUT",
+        data: {
+          name: name.value,
+          intro: intro.value,
+          fileUrl: uploadedFileUrl,
+        },
+      }
     );
 
     if (response.status === 200) {
-      // 發送 WebSocket 訊息
-      // socketStore.sendMessage({
-      //   content: content.value,
-      //   fileUrl: uploadedFileUrl,
-      // });
+      authStore.updateUserData({
+        userName: name.value,
+        userAvatar: uploadedFileUrl || info.value.userAvatar,
+      });
 
       name.value = "";
       intro.value = "";
@@ -244,12 +290,6 @@ onUnmounted(() => {
             <div class="form-inner">
               <div class="form-mod full">
                 <label for="name">名稱</label>
-                <!-- <input
-                  v-model="name"
-                  id="name"
-                  type="text"
-                  :placeholder="namePlaceholder"
-                /> -->
                 <input v-model="name" id="name" type="text" />
               </div>
               <div class="form-mod">
@@ -276,11 +316,6 @@ onUnmounted(() => {
           <div class="form-box">
             <div class="form-mod">
               <label for="intro">個人介紹</label>
-              <!-- <textarea
-                v-model="intro"
-                id="intro"
-                :placeholder="introPlaceholder"
-              ></textarea> -->
               <textarea v-model="intro" id="intro"></textarea>
             </div>
           </div>

@@ -177,6 +177,37 @@ const isOpenModal = ref(false);
 const isLikeProcessing = ref(false); // 用於追踪點讚狀態
 const selectedComment = ref(null); // 用於儲存當前選中的單一留言
 
+// 通用的 API 請求函數，處理 token 過期
+const apiRequest = async (url, options = {}) => {
+  const response = await axios({
+    url,
+    ...options,
+    headers: {
+      Authorization: `Bearer ${authStore.accessToken}`,
+      "Content-Type": "application/json",
+      ...options.headers,
+    },
+  }).catch(async (error) => {
+    if (error.response?.status === 401) {
+      const refreshed = await authStore.refreshAccessToken();
+      if (refreshed) {
+        return axios({
+          url,
+          ...options,
+          headers: {
+            Authorization: `Bearer ${authStore.accessToken}`,
+            "Content-Type": "application/json",
+            ...options.headers,
+          },
+        });
+      }
+      throw new Error("無法刷新 Token，請重新登入");
+    }
+    throw error;
+  });
+  return response;
+};
+
 // 打開 Modal
 const openModal = (event, commentId) => {
   event.stopPropagation();
@@ -225,10 +256,10 @@ onUnmounted(() => {
 // 獲取留言
 const fetchComments = async () => {
   try {
-    const userId = authStore.userId || localStorage.getItem("userId"); // 備用來源
-    const response = await axios.get(
+    const userId = authStore.userId || localStorage.getItem("userId");
+    const response = await apiRequest(
       "https://message-board-server-7yot.onrender.com/api/posts",
-      { params: { userId } } // 傳遞 userId 給後端
+      { params: { userId } }
     );
     if (response.status === 200 && Array.isArray(response.data)) {
       comments.value = response.data.map((comment) => ({
@@ -256,7 +287,7 @@ const fetchComments = async () => {
 const fetchSingleComment = async (postId) => {
   try {
     const userId = authStore.userId || localStorage.getItem("userId");
-    const response = await axios.get(
+    const response = await apiRequest(
       `https://message-board-server-7yot.onrender.com/api/posts/${postId}`,
       { params: { userId } }
     );
@@ -283,14 +314,26 @@ const fetchSingleComment = async (postId) => {
 };
 
 // 刪除留言
+// const handleDelete = async (postId) => {
+//   try {
+//     const userId = authStore.userId;
+//     const message = await postStore.deletePost(postId, userId);
+//     console.log(message);
+//     location.reload();
+//   } catch {
+//     console.log(刪除失敗);
+//   }
+// };
+// CommentView.vue 中的 handleDelete
 const handleDelete = async (postId) => {
   try {
     const userId = authStore.userId;
     const message = await postStore.deletePost(postId, userId);
     console.log(message);
     location.reload();
-  } catch {
-    console.log(刪除失敗);
+  } catch (error) {
+    console.error("刪除失敗:", error.message);
+    alert("刪除失敗: " + error.message); // 顯示具體錯誤訊息
   }
 };
 
@@ -302,10 +345,7 @@ const handleUpdate = async (postId) => {
 
 // 按讚
 const handlelike = async (id) => {
-  const userId = localStorage.getItem("userId");
-  const token = localStorage.getItem("token");
-
-  if (!userId || !token) {
+  if (!authStore.userId || !authStore.accessToken) {
     alert("請先登入！");
     return;
   }
@@ -315,7 +355,6 @@ const handlelike = async (id) => {
     return;
   }
 
-  //-------------------
   // 找到對應的 comment
   const comment = comments.value.find((c) => c.id === id);
   if (!comment) return;
@@ -331,57 +370,28 @@ const handlelike = async (id) => {
     comment.likes = Math.max(comment.likes - 1, 0);
     comment.userLiked = false;
   }
-  //----------------------
-  //
 
   isLikeProcessing.value = true;
 
   try {
-    const response = await axios.post(
-      `https://message-board-server-7yot.onrender.com/api/like/${userId}`,
-      { targetType: "post", targetId: id },
-      { headers: { Authorization: `Bearer ${token}` } }
+    const response = await apiRequest(
+      `https://message-board-server-7yot.onrender.com/api/like/${authStore.userId}`,
+      {
+        method: "POST",
+        data: { targetType: "post", targetId: id },
+      }
     );
 
-    //-----------------------------
-    // if (response.status === 200) {
-    //   // 找到對應的 comment
-    //   const comment = comments.value.find((c) => c.id === id);
-    //   if (!comment) return;
-
-    //   // 初始化 likes 屬性（如果不存在）
-    //   if (!comment.likes) comment.likes = 0;
-
-    //   // 根據後端返回的動作更新 likes
-    //   if (response.data.action === "liked") {
-    //     comment.likes += 1;
-    //     comment.userLiked = true;
-    //   } else if (response.data.action === "unliked") {
-    //     comment.likes = Math.max(comment.likes - 1, 0);
-    //     comment.userLiked = false;
-    //   }
-
-    // // 可選：使用後端返回的最新點贊數（更準確）
-    // if (response.data.likesCount !== undefined) {
-    //   comment.likes = response.data.likesCount;
-    // }
-    //---------------------------
-    //
-    if (response.status === 200) {
-      // 可選：使用後端返回的最新點贊數（確保數據一致）
-      if (response.data.likesCount !== undefined) {
-        comment.likes = response.data.likesCount;
-      }
+    if (response.status === 200 && response.data.likesCount !== undefined) {
+      comment.likes = response.data.likesCount;
     }
-    //
   } catch (error) {
-    const errorMsg = error.response ? error.response.data.error : error.message;
-    console.error("提交錯誤:", errorMsg);
-    //
-    // **發送 API 失敗時，回滾 UI 狀態**
+    console.error(
+      "提交錯誤:",
+      error.response ? error.response.data.error : error.message
+    );
     comment.likes = previousLikes;
     comment.userLiked = previousUserLiked;
-    //
   } finally {
     isLikeProcessing.value = false;
   }
