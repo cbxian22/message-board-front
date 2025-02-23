@@ -164,12 +164,12 @@ import Flagicon from "../assets/Flagicon.svg";
 import UpdatePostView from "./UpdatePostView.vue";
 
 const router = useRouter();
-const comments = ref([]);
 const emit = defineEmits();
-const commentImages = ref([]);
 const authStore = useAuthStore();
 const postStore = usePostStore();
 
+const comments = ref([]);
+const commentImages = ref([]);
 const modalState = ref({});
 const modalRefs = ref({});
 const buttonRefs = ref({});

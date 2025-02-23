@@ -89,9 +89,11 @@ onUnmounted(() => {
 // 獲取留言（指定用戶）
 const fetchComments = async () => {
   const username = router.currentRoute.value.params.username; // 從路由獲取 username
+  const userId = authStore.userId || localStorage.getItem("userId"); // 備用來源
   try {
     const response = await axios.get(
-      `https://message-board-server-7yot.onrender.com/api/posts/user/${username}`
+      `https://message-board-server-7yot.onrender.com/api/posts/user/${username}`,
+      { params: { userId } } // 傳遞 userId 給後端
     );
 
     if (response.status === 200 && Array.isArray(response.data)) {
