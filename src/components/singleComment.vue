@@ -473,12 +473,11 @@ onMounted(() => {
           >
             <div class="modal-content" @click.stop>
               <ul>
-                <!-- <li
+                <li
                   v-if="
                     authStore.isLoggedIn && authStore.userName === comment.name
                   "
-                > -->
-                <li>
+                >
                   <button class="modal-link" @click="handleUpdate(comment.id)">
                     <img class="icon" :src="Editicon" alt="Editicon" />
                     <span>編輯</span>
