@@ -177,6 +177,7 @@ const isOpenModal = ref(false);
 const isLikeProcessing = ref(false); // 用於追踪點讚狀態
 const selectedComment = ref(null); // 用於儲存當前選中的單一留言
 
+// 打開 Modal
 const openModal = (event, commentId) => {
   event.stopPropagation();
 
@@ -233,9 +234,9 @@ const fetchComments = async () => {
       comments.value = response.data.map((comment) => ({
         id: comment.id,
         content: comment.content,
-        name: comment.user_name,
         timestamp: new Date(comment.created_at),
         file_url: comment.file_url,
+        name: comment.user_name,
         user_avatar: comment.user_avatar,
         likes: comment.likes || 0,
         userLiked: comment.user_liked || false, // 後端返回的用戶是否點贊

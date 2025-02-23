@@ -1,6 +1,7 @@
 <script setup>
 // defineEmits 必要？
 import { ref, defineEmits, onMounted, onUnmounted } from "vue";
+import { NBadge } from "naive-ui";
 import { useAuthStore } from "../stores/authStore";
 import { usePostStore } from "../stores/usePostStore";
 import { useRouter } from "vue-router";
@@ -12,20 +13,26 @@ import Moreicon from "../assets/Moreicon.svg";
 import Editicon from "../assets/Editicon.svg";
 import Deleteicon from "../assets/Deleteicon.svg";
 import Flagicon from "../assets/Flagicon.svg";
+import UpdatePostView from "./UpdatePostView.vue";
 
-const authStore = useAuthStore();
 const router = useRouter();
+const emit = defineEmits();
+const authStore = useAuthStore();
 const postStore = usePostStore();
 
 const loggedInUser = authStore.userName;
 const username = router.currentRoute.value.params.username;
-const commentImages = ref([]);
+
 const comments = ref([]);
-const emit = defineEmits();
+const commentImages = ref([]);
 const modalState = ref({});
 const modalRefs = ref({});
 const buttonRefs = ref({});
+const isOpenModal = ref(false);
+const isLikeProcessing = ref(false); // 用於追踪點讚狀態
+const selectedComment = ref(null); // 用於儲存當前選中的單一留言
 
+// 點擊圖示回到最上
 const scrollToTop = () => {
   window.scrollTo({
     top: 0,
@@ -33,6 +40,7 @@ const scrollToTop = () => {
   });
 };
 
+// 打開 Modal
 const openModal = (event, commentId) => {
   event.stopPropagation();
 
@@ -77,7 +85,7 @@ onUnmounted(() => {
   document.removeEventListener("mousedown", closeModal);
 });
 
-// 獲取留言
+// 獲取留言（指定用戶）
 const fetchComments = async () => {
   const username = router.currentRoute.value.params.username; // 從路由獲取 username
   try {
@@ -89,10 +97,13 @@ const fetchComments = async () => {
       comments.value = response.data.map((comment) => ({
         id: comment.id,
         content: comment.content,
-        name: comment.user_name,
         timestamp: new Date(comment.created_at),
         file_url: comment.file_url,
+        name: comment.user_name,
         user_avatar: comment.user_avatar,
+        likes: comment.likes || 0,
+        userLiked: comment.user_liked || false, // 後端返回的用戶是否點贊
+        replies: comment.replies,
       }));
       emit("loaded");
     } else {
@@ -101,6 +112,36 @@ const fetchComments = async () => {
   } catch (error) {
     console.error("取得留言錯誤:", error);
     alert("留言取得失敗，請檢查網絡或稍後再試");
+  }
+};
+
+// 獲取單一留言
+const fetchSingleComment = async (postId) => {
+  try {
+    const userId = authStore.userId || localStorage.getItem("userId");
+    const response = await axios.get(
+      `https://message-board-server-7yot.onrender.com/api/posts/${postId}`,
+      { params: { userId } }
+    );
+    if (response.status === 200) {
+      const comment = response.data;
+      selectedComment.value = {
+        id: comment.id,
+        content: comment.content,
+        name: comment.user_name,
+        timestamp: new Date(comment.created_at),
+        file_url: comment.file_url,
+        user_avatar: comment.user_avatar,
+        likes: comment.likes || 0,
+        userLiked: comment.user_liked || false,
+        replies: comment.replies,
+      };
+    } else {
+      alert("無法獲取單一留言，數據格式不正確");
+    }
+  } catch (error) {
+    console.error("取得單一留言錯誤:", error);
+    alert("單一留言取得失敗，請檢查網絡或稍後再試");
   }
 };
 
@@ -116,50 +157,100 @@ const handleDelete = async (postId) => {
   }
 };
 
-// const comments = ref([
-//   {
-//     id: 1,
-//     photo: "https://fakeimg.pl/300/",
-//     title: "這是第一個留言標題",
-//     content: "這是第一個留言的內容，討論一些有趣的話題。",
-//     name: "小明",
-//     timestamp: 1675886200000,
-//     file_url:
-//       "https://storage.googleapis.com/message_board_storage/default_profile.jpg",
-//   },
-//   {
-//     id: 2,
-//     photo: "https://fakeimg.pl/300/",
-//     title: "第二個留言標題，討論新技術",
-//     content: "這是第二個留言的內容，分享一些關於最新技術的見解。",
-//     name: "小華",
-//     timestamp: 1675972600000,
-//     file_url:
-//       "https://storage.googleapis.com/message_board_storage/%E6%88%AA%E5%9C%96%202025-01-12%20%E6%99%9A%E4%B8%8A10.46.29.png",
-//   },
-//   {
-//     id: 3,
-//     photo: "https://fakeimg.pl/300/",
-//     title: "第三個留言標題，問問題",
-//     content: "這是第三個留言的內容，這裡有一些問題等待解答。",
-//     name: "小李",
-//     timestamp: 1676059000000,
-//     file_url:
-//       "https://storage.googleapis.com/message_board_storage/%E6%88%AA%E5%9C%96%202025-02-17%20%E4%B8%8B%E5%8D%882.46.25.png",
-//   },
-//   {
-//     id: 4,
-//     photo: "https://fakeimg.pl/300/",
-//     title: "聊天與討論，第四個留言",
-//     content: "這是第四個留言的內容，這裡是關於一些生活中的趣事。",
-//     name: "小張",
-//     timestamp: 1676145400000,
-//     file_url: "",
-//   },
-// ]);
+// 修改留言
+const handleUpdate = async (postId) => {
+  isOpenModal.value = true;
+  await fetchSingleComment(postId); // 獲取單一留言
+};
+
+// 按讚
+const handlelike = async (id) => {
+  const userId = localStorage.getItem("userId");
+  const token = localStorage.getItem("token");
+
+  if (!userId || !token) {
+    alert("請先登入！");
+    return;
+  }
+
+  if (isLikeProcessing.value) {
+    console.log("點讚操作正在進行中，忽略此次請求");
+    return;
+  }
+
+  //-------------------
+  // 找到對應的 comment
+  const comment = comments.value.find((c) => c.id === id);
+  if (!comment) return;
+
+  // 樂觀更新 UI（假設點讚成功）
+  const previousLikes = comment.likes;
+  const previousUserLiked = comment.userLiked;
+
+  if (!comment.userLiked) {
+    comment.likes += 1;
+    comment.userLiked = true;
+  } else {
+    comment.likes = Math.max(comment.likes - 1, 0);
+    comment.userLiked = false;
+  }
+  //----------------------
+  //
+
+  isLikeProcessing.value = true;
+
+  try {
+    const response = await axios.post(
+      `https://message-board-server-7yot.onrender.com/api/like/${userId}`,
+      { targetType: "post", targetId: id },
+      { headers: { Authorization: `Bearer ${token}` } }
+    );
+
+    //-----------------------------
+    // if (response.status === 200) {
+    //   // 找到對應的 comment
+    //   const comment = comments.value.find((c) => c.id === id);
+    //   if (!comment) return;
+
+    //   // 初始化 likes 屬性（如果不存在）
+    //   if (!comment.likes) comment.likes = 0;
+
+    //   // 根據後端返回的動作更新 likes
+    //   if (response.data.action === "liked") {
+    //     comment.likes += 1;
+    //     comment.userLiked = true;
+    //   } else if (response.data.action === "unliked") {
+    //     comment.likes = Math.max(comment.likes - 1, 0);
+    //     comment.userLiked = false;
+    //   }
+
+    // // 可選：使用後端返回的最新點贊數（更準確）
+    // if (response.data.likesCount !== undefined) {
+    //   comment.likes = response.data.likesCount;
+    // }
+    //---------------------------
+    //
+    if (response.status === 200) {
+      // 可選：使用後端返回的最新點贊數（確保數據一致）
+      if (response.data.likesCount !== undefined) {
+        comment.likes = response.data.likesCount;
+      }
+    }
+    //
+  } catch (error) {
+    const errorMsg = error.response ? error.response.data.error : error.message;
+    console.error("提交錯誤:", errorMsg);
+    //
+    // **發送 API 失敗時，回滾 UI 狀態**
+    comment.likes = previousLikes;
+    comment.userLiked = previousUserLiked;
+    //
+  } finally {
+    isLikeProcessing.value = false;
+  }
+};
 
 // 格式化時間
-
 const formatDate = (date) => {
   if (!date) return "未知時間";
 
@@ -246,10 +337,10 @@ onMounted(() => {
             <div class="modal-content" @click.stop>
               <ul>
                 <li v-if="loggedInUser === username">
-                  <router-link to="/message" class="modal-link">
+                  <button class="modal-link" @click="handleUpdate(comment.id)">
                     <img class="icon" :src="Editicon" alt="Editicon" />
                     <span>編輯</span>
-                  </router-link>
+                  </button>
                 </li>
                 <li v-if="loggedInUser === username">
                   <button class="modal-link" @click="handleDelete(comment.id)">
@@ -270,32 +361,44 @@ onMounted(() => {
       </div>
 
       <!-- 貼文內容 -->
-      <p class="comment-content">{{ comment.content }}</p>
-      <span v-if="comment.file_url" class="comment-file">
-        <img
-          :src="comment.file_url"
-          alt="comment.file_url"
-          ref="commentImages"
-        />
-      </span>
-
+      <div class="comment-content">
+        <p>{{ comment.content }}</p>
+        <span v-if="comment.file_url" class="comment-file">
+          <img
+            :src="comment.file_url"
+            alt="comment.file_url"
+            ref="commentImages"
+          />
+        </span>
+      </div>
       <!-- 回覆功能 -->
       <div class="reply">
         <ul>
           <li>
-            <button @click="" class="reply-link">
-              <img class="icon" :src="Favoriteicon" alt="Favoriteicon" />
-            </button>
+            <div class="reply-count" @click="handlelike(comment.id)">
+              <button class="reply-link">
+                <img
+                  :class="{ icon: !comment.userLiked }"
+                  :src="comment.userLiked ? FavoriteRedicon : Favoriteicon"
+                  alt="Like"
+                />
+              </button>
+              <n-badge :value="comment.likes || 0" />
+            </div>
           </li>
           <li>
-            <button @click="goToCommentPage(comment.id)" class="reply-link">
-              <img class="icon" :src="Replyicon" alt="Replyicon" />
-            </button>
+            <div class="reply-count" @click="goToSinglePosts(comment.id)">
+              <button class="reply-link">
+                <img class="icon" :src="Replyicon" alt="Replyicon" />
+              </button>
+              <n-badge :value="comment.replies || 0" />
+            </div>
           </li>
         </ul>
       </div>
     </div>
   </div>
+  <UpdatePostView v-model="isOpenModal" :comment="selectedComment" />
 </template>
 
 <style scoped>
@@ -326,7 +429,7 @@ onMounted(() => {
 }
 
 .reply {
-  margin-left: -15px;
+  margin-left: -10px;
 }
 
 .reply ul {
@@ -335,11 +438,23 @@ onMounted(() => {
   list-style-type: none;
 }
 
+.reply-count {
+  display: flex;
+  flex-direction: row;
+  align-items: center;
+  padding: 5px 5px;
+  margin-right: 10px;
+  cursor: pointer;
+}
+
+.reply-count .n-badge {
+  --n-color: transition !important;
+}
+
 .reply-link {
   display: flex;
   align-items: center;
   justify-content: center;
-  padding: 5px 10px;
 }
 
 .reply-link:hover,
@@ -383,20 +498,19 @@ onMounted(() => {
 }
 
 .info-link {
-  display: flex; /* 讓 a 內的內容可以對齊 */
-  align-items: center; /* 垂直置中 */
-  justify-content: center; /* 水平置中（可選） */
+  display: flex;
+  align-items: center;
+  justify-content: center;
   padding: 5px 10px;
 }
 
 .comment-content {
-  margin-bottom: 5px;
+  margin-bottom: 10px;
 }
 
-/* .light-mode .info-link > img,
-.light-mode .reply-link > img {
-  filter: invert(1) grayscale(100%) contrast(100%) brightness(0);
-} */
+.comment-content p {
+  margin-bottom: 10px;
+}
 
 .info-modal {
   position: relative;
