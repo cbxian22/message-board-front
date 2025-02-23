@@ -31,7 +31,7 @@
           class="nav-link"
         >
           <!-- <img :src="Accounticon" alt="Accounticon" /> -->
-          <img :src="authStore.userAvatar" alt="Accounticon" />
+          <img class="user-img" :src="authStore.userAvatar" alt="Accounticon" />
         </router-link>
       </li>
     </ul>
@@ -121,6 +121,13 @@ const scrollToTop = () => {
   background-color: rgba(128, 128, 128, 0.15) !important;
   border-radius: 10px;
   transition: background-color 0.3s ease, color 0.3s ease;
+}
+
+.user-img {
+  width: 24px;
+  height: 24px;
+  object-fit: cover;
+  border-radius: 50%;
 }
 
 /* 淺色下更改引入 icon 顏色 */
