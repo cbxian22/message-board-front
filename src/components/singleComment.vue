@@ -493,6 +493,7 @@ onMounted(() => {
             <div class="reply-count" @click="handlelike(comment.id)">
               <button class="reply-link">
                 <img
+                  :class="{ icon: !comment.userLiked }"
                   :src="comment.userLiked ? FavoriteRedicon : Favoriteicon"
                   alt="Like"
                 />
