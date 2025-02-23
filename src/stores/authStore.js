@@ -6,6 +6,7 @@ const verifyToken = (token) => {
     const decoded = jwtDecode(token);
     console.log("Decoded Token:", decoded);
     const currentTime = Math.floor(Date.now() / 1000);
+    console.log("當前時間:", currentTime, "過期時間:", decoded.exp);
     if (decoded.exp < currentTime) {
       console.log("Token 已過期");
       return null;
@@ -78,6 +79,7 @@ export const useAuthStore = defineStore("auth", {
           }
         );
         const data = await response.json();
+        console.log("刷新回應:", data);
         if (!data.success || !data.accessToken) {
           console.error("刷新失敗:", data);
           this.logout();
@@ -133,6 +135,7 @@ export const useAuthStore = defineStore("auth", {
         decodedToken = verifyToken(this.accessToken);
       }
       this.isLoggedIn = true;
+      this.accessToken = accessToken; // 確保設置 accessToken
       this.setUserData(decodedToken);
     },
   },
