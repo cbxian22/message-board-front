@@ -74,25 +74,23 @@ import { ref, nextTick, watch, computed } from "vue";
 import { NButton, useLoadingBar } from "naive-ui";
 import { useSocketStore } from "../stores/socketStore";
 import { useAuthStore } from "../stores/authStore";
-
-import axios from "../stores/axiosConfig";
+import apiClient from "../stores/axiosConfig"; // 引入 apiClient
 import Modal from "./Modal.vue";
 
 import Noteicon from "../assets/Noteicon.svg";
 import Closeicon from "../assets/Closeicon.svg";
 
 const authStore = useAuthStore();
-// const props = defineProps(["modelValue"]);
 const props = defineProps({
   modelValue: Boolean,
-  comment: Object, // 接收從 singleComment 傳來的單一留言資料
+  comment: Object,
 });
 
 const emit = defineEmits(["update:modelValue"]);
 const socketStore = useSocketStore();
 const loadingBar = useLoadingBar();
 
-const userName = computed(() => localStorage.getItem("userName") || "未知用户");
+const userName = computed(() => authStore.userName || "未知用户");
 const content = ref("");
 const textarea = ref(null); // 取得 textarea DOM 節點
 const prevHeight = ref("auto"); // 儲存上一次高度
@@ -136,22 +134,17 @@ const triggerFileInput = () => {
 
 // 檢查檔案上傳處理，並顯示預覽
 const handleFileUpload = (event) => {
-  const selectedFile = event.target.files[0]; // 取得使用者選擇的檔案
-
+  const selectedFile = event.target.files[0];
   if (selectedFile) {
-    // 顯示檔案名稱
     console.log("檔案已選擇:", selectedFile.name);
-
-    // 如果是圖片檔案，則顯示預覽
     if (selectedFile.type.startsWith("image/")) {
       const reader = new FileReader();
       reader.onload = (e) => {
-        fileUrl.value = e.target.result; // 設置圖片預覽 URL
+        fileUrl.value = e.target.result;
       };
-      reader.readAsDataURL(selectedFile); // 將檔案轉為 Data URL
+      reader.readAsDataURL(selectedFile);
     }
-
-    file.value = selectedFile; // 儲存檔案
+    file.value = selectedFile;
   }
 };
 
@@ -167,14 +160,11 @@ const uploadFile = async () => {
 
   try {
     console.log("開始上傳檔案...");
-    const { data } = await axios.get(
-      "https://message-board-server-7yot.onrender.com/api/upload",
-      {
-        params: { filename: file.value.name, contentType: file.value.type },
-      }
-    );
+    const { data } = await apiClient.get("/upload", {
+      params: { filename: file.value.name, contentType: file.value.type },
+    });
 
-    await axios.put(data.uploadUrl, file.value, {
+    await apiClient.put(data.uploadUrl, file.value, {
       headers: { "Content-Type": file.value.type },
     });
 
@@ -188,29 +178,28 @@ const uploadFile = async () => {
 
 // 提交上傳資料庫
 const handleMessage = async () => {
-  const userId = localStorage.getItem("userId");
-  const token = localStorage.getItem("token");
-
-  if (!userId || !token) {
+  if (!authStore.userId || !authStore.accessToken) {
     alert("請先登入！");
     return;
   }
 
-  loadingBar.start(); // 驗證通過 且 請求開始前 啟動 Loading
+  loadingBar.start();
 
   try {
     const uploadedFileUrl = await uploadFile(); // 獨立處理圖片上傳
-    const response = await axios.put(
-      `https://message-board-server-7yot.onrender.com/api/posts/${props.comment.id}/${userId}`,
-      { content: content.value, fileUrl: uploadedFileUrl },
-      { headers: { Authorization: `Bearer ${token}` } }
+    const response = await apiClient.put(
+      `/${props.comment.id}/${authStore.userId}`,
+      {
+        content: content.value,
+        fileUrl: uploadedFileUrl,
+      }
     );
 
     if (response.status === 200) {
       content.value = "";
       file.value = null;
       fileUrl.value = null;
-      emit("update:modelValue", false); // 關閉 Modal
+      emit("update:modelValue", false);
       location.reload();
     } else {
       alert("留言提交失敗");

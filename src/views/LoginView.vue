@@ -75,13 +75,14 @@ import { ref, onMounted } from "vue";
 import { useRouter } from "vue-router";
 import axios from "axios";
 import { useAuthStore } from "@/stores/authStore";
+import apiClient from "@/stores/axiosConfig"; // 引入 apiClient
 
 const authStore = useAuthStore();
-
 const router = useRouter();
+
+const role = ref("user");
 const account = ref("");
 const password = ref("");
-const role = ref("user");
 const isLoading = ref(true);
 const ishowing = ref(false);
 const isTouched = ref(false);
@@ -95,20 +96,15 @@ const login = async () => {
   }
 
   try {
-    const response = await axios.post(
-      "https://message-board-server-7yot.onrender.com/api/auth/login",
-      {
-        account: account.value,
-        password: password.value,
-        role: role.value,
-      }
-    );
+    const response = await apiClient.post("/auth/login", {
+      account: account.value,
+      password: password.value,
+      role: role.value,
+    });
 
     console.log("後端回應:", response.data);
 
     if (response.data.success) {
-      // const { token, userId } = response.data; // 儲存 token 和 userId
-      // authStore.login(token, userId); // 儲存進 pinia
       authStore.login(response.data); // 傳入整個回應物件
       router.push("/");
     } else {

@@ -44,13 +44,6 @@ watch(show, (newValue) => {
   }
 });
 
-// const checkTokenAndOpenModal = () => {
-//   const token = localStorage.getItem("token");
-//   if (!token) {
-//     isLoginModalOpen.value = true;
-//   } else {
-//   }
-// };
 const checkTokenAndOpenModal = () => {
   if (!authStore.accessToken) {
     isLoginModalOpen.value = true;
@@ -88,19 +81,6 @@ const triggerFileInput = () => {
 };
 
 // 檢查檔案上傳處理，並顯示預覽
-// const handleFileUpload = (event) => {
-//   const selectedFile = event.target.files[0];
-//   if (selectedFile) {
-//     if (selectedFile.type.startsWith("image/")) {
-//       const reader = new FileReader();
-//       reader.onload = (e) => {
-//         tempAvatar.value = e.target.result;
-//       };
-//       reader.readAsDataURL(selectedFile);
-//     }
-//     file.value = selectedFile;
-//   }
-// };
 const handleFileUpload = (event) => {
   const selectedFile = event.target.files[0];
   if (selectedFile && selectedFile.type.startsWith("image/")) {

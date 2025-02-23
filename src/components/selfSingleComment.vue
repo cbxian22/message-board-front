@@ -1,11 +1,10 @@
 <script setup>
-// defineEmits 必要？
 import { ref, defineEmits, onMounted, onUnmounted } from "vue";
 import { NBadge } from "naive-ui";
 import { useAuthStore } from "../stores/authStore";
 import { usePostStore } from "../stores/usePostStore";
 import { useRouter } from "vue-router";
-import axios from "axios";
+import apiClient from "../stores/axiosConfig"; // 引入 apiClient
 
 import Replyicon from "../assets/Replyicon.svg";
 import Favoriteicon from "../assets/Favoriteicon.svg";
@@ -89,13 +88,11 @@ onUnmounted(() => {
 // 獲取留言（指定用戶）
 const fetchComments = async () => {
   const username = router.currentRoute.value.params.username; // 從路由獲取 username
-  const userId = authStore.userId || localStorage.getItem("userId"); // 備用來源
+  const userId = authStore.userId || localStorage.getItem("userId");
   try {
-    const response = await axios.get(
-      `https://message-board-server-7yot.onrender.com/api/posts/user/${username}`,
-      { params: { userId } } // 傳遞 userId 給後端
-    );
-
+    const response = await apiClient.get(`/posts/user/${username}`, {
+      params: { userId },
+    });
     if (response.status === 200 && Array.isArray(response.data)) {
       comments.value = response.data.map((comment) => ({
         id: comment.id,
@@ -122,10 +119,9 @@ const fetchComments = async () => {
 const fetchSingleComment = async (postId) => {
   try {
     const userId = authStore.userId || localStorage.getItem("userId");
-    const response = await axios.get(
-      `https://message-board-server-7yot.onrender.com/api/posts/${postId}`,
-      { params: { userId } }
-    );
+    const response = await apiClient.get(`/posts/${postId}`, {
+      params: { userId },
+    });
     if (response.status === 200) {
       const comment = response.data;
       selectedComment.value = {
@@ -163,15 +159,12 @@ const handleDelete = async (postId) => {
 // 修改留言
 const handleUpdate = async (postId) => {
   isOpenModal.value = true;
-  await fetchSingleComment(postId); // 獲取單一留言
+  await fetchSingleComment(postId);
 };
 
 // 按讚
 const handlelike = async (id) => {
-  const userId = localStorage.getItem("userId");
-  const token = localStorage.getItem("token");
-
-  if (!userId || !token) {
+  if (!authStore.userId || !authStore.accessToken) {
     alert("請先登入！");
     return;
   }
@@ -181,8 +174,6 @@ const handlelike = async (id) => {
     return;
   }
 
-  //-------------------
-  // 找到對應的 comment
   const comment = comments.value.find((c) => c.id === id);
   if (!comment) return;
 
@@ -197,57 +188,24 @@ const handlelike = async (id) => {
     comment.likes = Math.max(comment.likes - 1, 0);
     comment.userLiked = false;
   }
-  //----------------------
-  //
 
   isLikeProcessing.value = true;
 
   try {
-    const response = await axios.post(
-      `https://message-board-server-7yot.onrender.com/api/like/${userId}`,
-      { targetType: "post", targetId: id },
-      { headers: { Authorization: `Bearer ${token}` } }
-    );
-
-    //-----------------------------
-    // if (response.status === 200) {
-    //   // 找到對應的 comment
-    //   const comment = comments.value.find((c) => c.id === id);
-    //   if (!comment) return;
-
-    //   // 初始化 likes 屬性（如果不存在）
-    //   if (!comment.likes) comment.likes = 0;
-
-    //   // 根據後端返回的動作更新 likes
-    //   if (response.data.action === "liked") {
-    //     comment.likes += 1;
-    //     comment.userLiked = true;
-    //   } else if (response.data.action === "unliked") {
-    //     comment.likes = Math.max(comment.likes - 1, 0);
-    //     comment.userLiked = false;
-    //   }
-
-    // // 可選：使用後端返回的最新點贊數（更準確）
-    // if (response.data.likesCount !== undefined) {
-    //   comment.likes = response.data.likesCount;
-    // }
-    //---------------------------
-    //
-    if (response.status === 200) {
-      // 可選：使用後端返回的最新點贊數（確保數據一致）
-      if (response.data.likesCount !== undefined) {
-        comment.likes = response.data.likesCount;
-      }
+    const response = await apiClient.post(`/like/${authStore.userId}`, {
+      targetType: "post",
+      targetId: id,
+    });
+    if (response.status === 200 && response.data.likesCount !== undefined) {
+      comment.likes = response.data.likesCount;
     }
-    //
   } catch (error) {
-    const errorMsg = error.response ? error.response.data.error : error.message;
-    console.error("提交錯誤:", errorMsg);
-    //
-    // **發送 API 失敗時，回滾 UI 狀態**
+    console.error(
+      "提交錯誤:",
+      error.response ? error.response.data.error : error.message
+    );
     comment.likes = previousLikes;
     comment.userLiked = previousUserLiked;
-    //
   } finally {
     isLikeProcessing.value = false;
   }

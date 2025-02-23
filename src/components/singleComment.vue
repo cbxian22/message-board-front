@@ -147,12 +147,11 @@ onMounted(() => {
 
 <script setup>
 import { ref, defineEmits, onMounted, onUnmounted } from "vue";
-
 import { NBadge } from "naive-ui";
 import { useAuthStore } from "../stores/authStore";
 import { usePostStore } from "../stores/usePostStore";
 import { useRouter } from "vue-router";
-import axios from "axios";
+import apiClient from "../stores/axiosConfig"; // 引入 apiClient
 
 import Replyicon from "../assets/Replyicon.svg";
 import Favoriteicon from "../assets/Favoriteicon.svg";
@@ -176,37 +175,6 @@ const buttonRefs = ref({});
 const isOpenModal = ref(false);
 const isLikeProcessing = ref(false); // 用於追踪點讚狀態
 const selectedComment = ref(null); // 用於儲存當前選中的單一留言
-
-// 通用的 API 請求函數，處理 token 過期
-const apiRequest = async (url, options = {}) => {
-  const response = await axios({
-    url,
-    ...options,
-    headers: {
-      Authorization: `Bearer ${authStore.accessToken}`,
-      "Content-Type": "application/json",
-      ...options.headers,
-    },
-  }).catch(async (error) => {
-    if (error.response?.status === 401) {
-      const refreshed = await authStore.refreshAccessToken();
-      if (refreshed) {
-        return axios({
-          url,
-          ...options,
-          headers: {
-            Authorization: `Bearer ${authStore.accessToken}`,
-            "Content-Type": "application/json",
-            ...options.headers,
-          },
-        });
-      }
-      throw new Error("無法刷新 Token，請重新登入");
-    }
-    throw error;
-  });
-  return response;
-};
 
 // 打開 Modal
 const openModal = (event, commentId) => {
@@ -257,10 +225,7 @@ onUnmounted(() => {
 const fetchComments = async () => {
   try {
     const userId = authStore.userId || localStorage.getItem("userId");
-    const response = await apiRequest(
-      "https://message-board-server-7yot.onrender.com/api/posts",
-      { params: { userId } }
-    );
+    const response = await apiClient.get("/posts", { params: { userId } });
     if (response.status === 200 && Array.isArray(response.data)) {
       comments.value = response.data.map((comment) => ({
         id: comment.id,
@@ -287,10 +252,9 @@ const fetchComments = async () => {
 const fetchSingleComment = async (postId) => {
   try {
     const userId = authStore.userId || localStorage.getItem("userId");
-    const response = await apiRequest(
-      `https://message-board-server-7yot.onrender.com/api/posts/${postId}`,
-      { params: { userId } }
-    );
+    const response = await apiClient.get(`/posts/${postId}`, {
+      params: { userId },
+    });
     if (response.status === 200) {
       const comment = response.data;
       selectedComment.value = {
@@ -314,17 +278,6 @@ const fetchSingleComment = async (postId) => {
 };
 
 // 刪除留言
-// const handleDelete = async (postId) => {
-//   try {
-//     const userId = authStore.userId;
-//     const message = await postStore.deletePost(postId, userId);
-//     console.log(message);
-//     location.reload();
-//   } catch {
-//     console.log(刪除失敗);
-//   }
-// };
-// CommentView.vue 中的 handleDelete
 const handleDelete = async (postId) => {
   try {
     const userId = authStore.userId;
@@ -374,14 +327,10 @@ const handlelike = async (id) => {
   isLikeProcessing.value = true;
 
   try {
-    const response = await apiRequest(
-      `https://message-board-server-7yot.onrender.com/api/like/${authStore.userId}`,
-      {
-        method: "POST",
-        data: { targetType: "post", targetId: id },
-      }
-    );
-
+    const response = await apiClient.post(`/like/${authStore.userId}`, {
+      targetType: "post",
+      targetId: id,
+    });
     if (response.status === 200 && response.data.likesCount !== undefined) {
       comment.likes = response.data.likesCount;
     }

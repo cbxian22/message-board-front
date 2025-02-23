@@ -52,7 +52,7 @@ apiClient.interceptors.response.use(
   async (error) => {
     const originalRequest = error.config;
     if (error.response?.status === 401 && !originalRequest._retry) {
-      originalRequest._retry = true; // 标记为重试，避免无限循环
+      originalRequest._retry = true;
       const authStore = useAuthStore();
       const refreshed = await authStore.refreshAccessToken();
       if (refreshed) {

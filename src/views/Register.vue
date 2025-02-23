@@ -70,28 +70,26 @@
 import { NSpin } from "naive-ui";
 import { ref } from "vue";
 import { useRouter } from "vue-router";
-import axios from "axios";
+import apiClient from "../stores/axiosConfig";
 
+const router = useRouter();
+
+const role = "user";
 const name = ref("");
 const account = ref("");
 const password = ref("");
-const role = "user"; // 固定角色為 user
-const router = useRouter();
 const ishowing = ref(false);
 const isTouched = ref(false);
 
 const handleRegister = async () => {
-  isTouched.value = true; // 發送請求前，顯示 loading 狀態
+  isTouched.value = true;
   try {
-    const response = await axios.post(
-      "https://message-board-server-7yot.onrender.com/api/auth/register",
-      {
-        name: name.value,
-        account: account.value,
-        password: password.value,
-        role: role,
-      }
-    );
+    const response = await apiClient.post("/auth/register", {
+      name: name.value,
+      account: account.value,
+      password: password.value,
+      role: role,
+    });
     if (response.data.success) {
       router.push("/login");
     } else {
