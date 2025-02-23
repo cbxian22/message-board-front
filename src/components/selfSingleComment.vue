@@ -270,7 +270,7 @@ onMounted(() => {
   >
     <!-- 頭貼 -->
     <div class="photo-content">
-      <img :src="comment.user_avatar" alt="頭像" class="photo" />
+      <img :src="authStore.userAvatar" alt="頭像" class="photo" />
     </div>
     <!-- 內文 -->
     <div class="comment">
