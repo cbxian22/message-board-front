@@ -101,7 +101,9 @@ const fileUrl = ref(null);
 const fileInputRef = ref(null);
 
 // 檢查是否啟用提交按鈕
-const isSubmitDisabled = computed(() => !(content.value.trim() || file.value));
+const isSubmitDisabled = computed(() => {
+  return !(content.value.trim() || file.value || fileUrl.value);
+});
 
 // 當收到 comment 時，初始化表單資料
 watch(
@@ -109,7 +111,8 @@ watch(
   (newComment) => {
     if (newComment) {
       content.value = newComment.content || "";
-      fileUrl.value = newComment.file_url || null;
+      fileUrl.value = newComment.file_url || null; // 直接使用後端 URL
+      file.value = null; // 重置 file，避免誤認為有新檔案
     }
   },
   { immediate: true }
@@ -149,7 +152,7 @@ const cancelFilePreview = () => {
 
 // 獨立處理圖片上傳
 const uploadFile = async () => {
-  if (!file.value) return null;
+  if (!file.value) return fileUrl.value || null; // 如果沒有新檔案，保留現有 fileUrl
 
   try {
     console.log("開始上傳檔案...");
@@ -192,13 +195,7 @@ const handleMessage = async () => {
       { headers: { Authorization: `Bearer ${token}` } }
     );
 
-    if (response.status === 201) {
-      // 發送 WebSocket 訊息
-      // socketStore.sendMessage({
-      //   content: content.value,
-      //   fileUrl: uploadedFileUrl,
-      // });
-
+    if (response.status === 200) {
       content.value = "";
       file.value = null;
       fileUrl.value = null;
