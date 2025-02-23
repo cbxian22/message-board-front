@@ -179,13 +179,19 @@ const uploadFile = async () => {
 
 // 提交上傳資料庫
 const handleMessage = async () => {
+  console.log("authStore 狀態:", {
+    userId: authStore.userId,
+    accessToken: authStore.accessToken,
+  });
   if (!authStore.userId || !authStore.accessToken) {
-    await authStore.checkLoginStatus(); // 等待登入狀態確認
-    if (!authStore.userId || !authStore.accessToken) {
-      alert("請先登入！");
-      return;
-    }
+    alert("請先登入！");
+    return;
   }
+  if (!authStore.userId || !authStore.accessToken) {
+    alert("請先登入！");
+    return;
+  }
+
   loadingBar.start();
 
   try {
