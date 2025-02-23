@@ -25,13 +25,13 @@
         </router-link>
       </li>
 
-      <!--登入後將改成圖像 -->
       <li v-if="authStore.isLoggedIn">
         <router-link
           :to="{ path: `/@${authStore.userName}`, query: { from: 'navbar' } }"
           class="nav-link"
         >
-          <img :src="Accounticon" alt="Accounticon" />
+          <!-- <img :src="Accounticon" alt="Accounticon" /> -->
+          <img :src="authStore.isLoggedIn ? Accounticon : authStore.userName" />
         </router-link>
       </li>
     </ul>
