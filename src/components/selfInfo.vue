@@ -133,11 +133,8 @@ const handleUpdate = async () => {
   const username = router.currentRoute.value.params.username;
 
   if (!authStore.userId || !authStore.accessToken) {
-    await authStore.checkLoginStatus(); // 等待登入狀態確認
-    if (!authStore.userId || !authStore.accessToken) {
-      alert("請先登入！");
-      return;
-    }
+    alert("請先登入！");
+    return;
   }
 
   loadingBar.start();

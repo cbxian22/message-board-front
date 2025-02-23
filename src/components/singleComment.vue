@@ -300,11 +300,8 @@ const handleUpdate = async (postId) => {
 // 按讚
 const handlelike = async (id) => {
   if (!authStore.userId || !authStore.accessToken) {
-    await authStore.checkLoginStatus(); // 等待登入狀態確認
-    if (!authStore.userId || !authStore.accessToken) {
-      alert("請先登入！");
-      return;
-    }
+    alert("請先登入！");
+    return;
   }
 
   if (isLikeProcessing.value) {
