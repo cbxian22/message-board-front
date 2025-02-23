@@ -141,6 +141,7 @@ import Moreicon from "../assets/Moreicon.svg";
 import Editicon from "../assets/Editicon.svg";
 import Deleteicon from "../assets/Deleteicon.svg";
 import Flagicon from "../assets/Flagicon.svg";
+import UpdatePostView from "./UpdatePostView.vue";
 
 const router = useRouter();
 const comments = ref([]);
@@ -513,7 +514,7 @@ onMounted(() => {
       </div>
     </div>
   </div>
-  <Message v-model="isOpenModal" />
+  <UpdatePostView v-model="isOpenModal" />
 </template>
 
 <style scoped>
