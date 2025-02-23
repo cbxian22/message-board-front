@@ -128,7 +128,11 @@ const uploadFile = async () => {
 
 // 提交更新
 const handleUpdate = async () => {
-  if (name.value === info.value.name && intro.value === info.value.intro) {
+  if (
+    name.value === info.value.name &&
+    intro.value === info.value.intro &&
+    tempAvatar.value === info.value.userAvatar
+  ) {
     show.value = false;
     return;
   }
