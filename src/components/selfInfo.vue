@@ -11,6 +11,7 @@ const themeStore = useThemeStore();
 const loadingBar = useLoadingBar();
 const router = useRouter();
 const authStore = useAuthStore();
+authStore.checkLoginStatus();
 
 const loggedInUser = authStore.userName;
 const username = router.currentRoute.value.params.username;

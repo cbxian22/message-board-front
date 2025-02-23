@@ -164,8 +164,9 @@ import UpdatePostView from "./UpdatePostView.vue";
 
 const router = useRouter();
 const emit = defineEmits();
-const authStore = useAuthStore();
 const postStore = usePostStore();
+const authStore = useAuthStore();
+authStore.checkLoginStatus();
 
 const comments = ref([]);
 const commentImages = ref([]);
