@@ -28,7 +28,7 @@ const router = createRouter({
     {
       path: "/message",
       name: "Message",
-      component: () => import("../components/MessageView.vue"),
+      component: () => import("../components/PostView.vue"),
       // meta: { requiresGuest: true },
     },
     {

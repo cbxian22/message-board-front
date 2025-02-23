@@ -38,7 +38,7 @@
   </nav>
 
   <!-- 貼文 Modal -->
-  <Message v-model="isPostModalOpen" />
+  <PostView v-model="isPostModalOpen" />
 
   <!-- 登入 Modal -->
   <Login v-model="isLoginModalOpen" />
@@ -49,7 +49,7 @@ import { ref } from "vue";
 import { useAuthStore } from "../stores/authStore";
 import { useScrollStore } from "@/stores/scrollStore";
 
-import Message from "../components/MessageView.vue";
+import PostView from "./PostView.vue";
 import Login from "../components/LoginModal.vue";
 
 import Homeicon from "../assets/Homeicon.svg";
