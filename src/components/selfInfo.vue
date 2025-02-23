@@ -3,9 +3,9 @@ import { ref, onMounted, onUnmounted, computed, watch } from "vue";
 import { NButton, NDrawerContent, NDrawer, useLoadingBar } from "naive-ui";
 import { useAuthStore } from "../stores/authStore";
 import { useThemeStore } from "../stores/themeStore";
-
 import { useRouter } from "vue-router";
 import axios from "axios";
+import Login from "../components/LoginModal.vue";
 
 const themeStore = useThemeStore();
 const loadingBar = useLoadingBar();
@@ -23,6 +23,7 @@ const file = ref(null);
 const fileUrl = ref(null);
 const fileInputRef = ref(null);
 const tempAvatar = ref(null); // 初始為 null 存放暫存圖片（選擇的圖片）
+const isLoginModalOpen = ref(false);
 
 watch(show, (newValue) => {
   if (!newValue) {
@@ -39,6 +40,14 @@ watch(show, (newValue) => {
 // 計算 placeholder
 const namePlaceholder = computed(() => (name.value ? "" : info.value.name));
 const introPlaceholder = computed(() => (intro.value ? "" : info.value.intro));
+
+const checkTokenAndOpenModal = () => {
+  const token = localStorage.getItem("token");
+  if (!token) {
+    isLoginModalOpen.value = true;
+  } else {
+  }
+};
 
 // 獲取 user 資料
 const fetchInfo = async () => {
@@ -197,11 +206,18 @@ onUnmounted(() => {
       </div>
     </div>
 
+    <!-- 切換 -->
     <div class="set-btn" v-if="loggedInUser === username">
       <n-button @click="show = true"> 編輯個人檔案 </n-button>
     </div>
-    <div class="set-btn" v-if="loggedInUser !== username">
-      <n-button @click=""> 加入好友 </n-button>
+
+    <!-- 切換 -->
+    <div
+      @click="checkTokenAndOpenModal"
+      class="set-btn"
+      v-if="loggedInUser !== username"
+    >
+      <n-button> 加入好友 </n-button>
     </div>
 
     <!-- 抽屜視窗 -->
@@ -264,6 +280,9 @@ onUnmounted(() => {
       </n-drawer-content>
     </n-drawer>
   </div>
+
+  <!-- 登入 Modal -->
+  <Login v-model="isLoginModalOpen" />
 </template>
 
 <style scoped>
