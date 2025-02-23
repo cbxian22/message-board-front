@@ -1,5 +1,5 @@
 <script setup>
-import { ref, onMounted, onUnmounted, computed, watch } from "vue";
+import { ref, onMounted, onUnmounted, watch } from "vue";
 import { NButton, NDrawerContent, NDrawer, useLoadingBar } from "naive-ui";
 import { useAuthStore } from "../stores/authStore";
 import { useThemeStore } from "../stores/themeStore";
@@ -25,21 +25,40 @@ const fileInputRef = ref(null);
 const tempAvatar = ref(null); // 初始為 null 存放暫存圖片（選擇的圖片）
 const isLoginModalOpen = ref(false);
 
+// watch(show, (newValue) => {
+//   if (!newValue) {
+//     tempAvatar.value = null; // 清空圖片預覽
+//     name.value = ""; // 清空名稱
+//     intro.value = ""; // 清空介紹
+//     file.value = null; // 清空選擇的檔案
+//     if (fileInputRef.value) {
+//       fileInputRef.value.value = null; // 清空 file input
+//     }
+//   }
+// });
+
+// 當抽屜顯示時，預填入現有資料
 watch(show, (newValue) => {
-  if (!newValue) {
-    tempAvatar.value = null; // 清空圖片預覽
-    name.value = ""; // 清空名稱
-    intro.value = ""; // 清空介紹
-    file.value = null; // 清空選擇的檔案
+  if (newValue) {
+    // 抽屜打開時，將 info 的值填入 name 和 intro
+    name.value = info.value.name || "";
+    intro.value = info.value.intro || "";
+    tempAvatar.value = info.value.userAvatar;
+  } else {
+    // 抽屜關閉時清空
+    tempAvatar.value = null;
+    name.value = "";
+    intro.value = "";
+    file.value = null;
     if (fileInputRef.value) {
-      fileInputRef.value.value = null; // 清空 file input
+      fileInputRef.value.value = null;
     }
   }
 });
 
 // 計算 placeholder
-const namePlaceholder = computed(() => (name.value ? "" : info.value.name));
-const introPlaceholder = computed(() => (intro.value ? "" : info.value.intro));
+// const namePlaceholder = computed(() => (name.value ? "" : info.value.name));
+// const introPlaceholder = computed(() => (intro.value ? "" : info.value.intro));
 
 const checkTokenAndOpenModal = () => {
   const token = localStorage.getItem("token");
@@ -232,12 +251,13 @@ onUnmounted(() => {
             <div class="form-inner">
               <div class="form-mod full">
                 <label for="name">名稱</label>
-                <input
+                <!-- <input
                   v-model="name"
                   id="name"
                   type="text"
-                  :value="info.name"
-                />
+                  :placeholder="namePlaceholder"
+                /> -->
+                <input v-model="name" id="name" type="text" />
               </div>
               <div class="form-mod">
                 <label for="userAvatar"></label>
@@ -263,11 +283,12 @@ onUnmounted(() => {
           <div class="form-box">
             <div class="form-mod">
               <label for="intro">個人介紹</label>
-              <textarea
+              <!-- <textarea
                 v-model="intro"
                 id="intro"
-                :value="info.intro"
-              ></textarea>
+                :placeholder="introPlaceholder"
+              ></textarea> -->
+              <textarea v-model="intro" id="intro"></textarea>
             </div>
           </div>
 
