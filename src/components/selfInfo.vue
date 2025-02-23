@@ -236,7 +236,7 @@ onUnmounted(() => {
                   v-model="name"
                   id="name"
                   type="text"
-                  :value="name || info.name"
+                  :value="info.name"
                 />
               </div>
               <div class="form-mod">
@@ -266,7 +266,7 @@ onUnmounted(() => {
               <textarea
                 v-model="intro"
                 id="intro"
-                :value="intro || info.intro"
+                :value="info.intro"
               ></textarea>
             </div>
           </div>
