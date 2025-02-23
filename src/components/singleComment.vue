@@ -496,7 +496,6 @@ onMounted(() => {
                   class="icon"
                   :src="comment.userLiked ? FavoriteRedicon : Favoriteicon"
                   alt="Like"
-                  @click="handlelike(comment.id)"
                 />
               </button>
               <n-badge :value="comment.likes || 0" />
