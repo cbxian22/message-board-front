@@ -188,7 +188,7 @@ const handleMessage = async () => {
   try {
     const uploadedFileUrl = await uploadFile(); // 獨立處理圖片上傳
     const response = await apiClient.put(
-      `/${props.comment.id}/${authStore.userId}`,
+      `/posts/${props.comment.id}/${authStore.userId}`,
       {
         content: content.value,
         fileUrl: uploadedFileUrl,
