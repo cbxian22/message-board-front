@@ -25,18 +25,6 @@ const fileInputRef = ref(null);
 const tempAvatar = ref(null); // 初始為 null 存放暫存圖片（選擇的圖片）
 const isLoginModalOpen = ref(false);
 
-// watch(show, (newValue) => {
-//   if (!newValue) {
-//     tempAvatar.value = null; // 清空圖片預覽
-//     name.value = ""; // 清空名稱
-//     intro.value = ""; // 清空介紹
-//     file.value = null; // 清空選擇的檔案
-//     if (fileInputRef.value) {
-//       fileInputRef.value.value = null; // 清空 file input
-//     }
-//   }
-// });
-
 // 當抽屜顯示時，預填入現有資料
 watch(show, (newValue) => {
   if (newValue) {
@@ -55,10 +43,6 @@ watch(show, (newValue) => {
     }
   }
 });
-
-// 計算 placeholder
-// const namePlaceholder = computed(() => (name.value ? "" : info.value.name));
-// const introPlaceholder = computed(() => (intro.value ? "" : info.value.intro));
 
 const checkTokenAndOpenModal = () => {
   const token = localStorage.getItem("token");
@@ -144,6 +128,11 @@ const uploadFile = async () => {
 
 // 提交更新
 const handleUpdate = async () => {
+  if (name.value === info.value.name && intro.value === info.value.intro) {
+    show.value = false;
+    return;
+  }
+
   const username = router.currentRoute.value.params.username;
 
   // 即使是自己也需要登入後修改
