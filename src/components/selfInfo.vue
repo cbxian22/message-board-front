@@ -149,13 +149,11 @@ const handleUpdate = async () => {
     if (response.status === 200) {
       authStore.updateUserData({
         userName: name.value,
-        userAvatar: info.value.userAvatar,
+        userAvatar: info.value,
       });
 
-      if (name.value !== tempName.value) {
-        await router.push(`/@${name.value}`);
-        await nextTick();
-      }
+      await router.push(`/@${name.value}`);
+      await nextTick();
 
       location.reload();
       // name.value = "";
