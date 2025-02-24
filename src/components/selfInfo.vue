@@ -157,13 +157,8 @@ const handleUpdate = async () => {
       file.value = null;
       fileUrl.value = null;
       show.value = false;
-      await fetchInfo();
-
-      // 獲取新數據
-      console.log(
-        "Fetching info after route change:",
-        router.currentRoute.value.params.username
-      );
+      // await fetchInfo();
+      location.reload();
     } else {
       alert("留言提交失敗");
       loadingBar.error();

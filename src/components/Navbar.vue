@@ -30,7 +30,7 @@
           :to="{ path: `/@${authStore.userName}`, query: { from: 'navbar' } }"
           class="nav-link"
         >
-          <img class="user-img" :src="userAvatarWithCache" alt="Accounticon" />
+          <img class="user-img" :src="authStore.userAvatar" alt="Accounticon" />
         </router-link>
       </li>
     </ul>
@@ -44,7 +44,7 @@
 </template>
 
 <script setup>
-import { ref, computed } from "vue";
+import { ref } from "vue";
 import { useAuthStore } from "../stores/authStore";
 import { useScrollStore } from "@/stores/scrollStore";
 
@@ -81,11 +81,6 @@ const scrollToTop = () => {
   });
   scrollStore.setScrollPosition(0);
 };
-
-const userAvatarWithCache = computed(() => {
-  if (!authStore.userAvatar) return "/default-avatar.png";
-  return `${authStore.userAvatar}?t=${new Date().getTime()}`; // 加上時間戳記
-});
 </script>
 
 <style scoped>
