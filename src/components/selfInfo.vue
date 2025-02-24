@@ -144,15 +144,16 @@ const handleUpdate = async () => {
     });
 
     if (response.status === 200) {
-      // 直接更新本地狀態
-      info.value = {
-        ...info.value,
-        name: name.value,
-        intro: intro.value,
-        userAvatar: uploadedFileUrl || info.value.userAvatar,
-      };
-      tempAvatar.value = info.value.userAvatar;
+      // // 直接更新本地狀態
+      // info.value = {
+      //   ...info.value,
+      //   name: name.value,
+      //   intro: intro.value,
+      //   userAvatar: uploadedFileUrl || info.value.userAvatar,
+      // };
+      // tempAvatar.value = info.value.userAvatar;
 
+      location.reload();
       // 更新 authStore
       authStore.updateUserData({
         userName: name.value,
