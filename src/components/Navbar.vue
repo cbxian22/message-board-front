@@ -67,8 +67,7 @@ const isLoginModalOpen = ref(false);
 const userAvatar = computed(() => authStore.userAvatar);
 
 const checkTokenAndOpenModal = () => {
-  const token = localStorage.getItem("token");
-  if (!token) {
+  if (!authStore.userId || !authStore.accessToken) {
     isLoginModalOpen.value = true;
   } else {
     isPostModalOpen.value = true;
