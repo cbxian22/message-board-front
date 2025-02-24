@@ -151,7 +151,7 @@ const handleUpdate = async () => {
       });
 
       // 手動導航到新路徑
-      router.push(`/@${name.value}`);
+      router.push(`/@${authStore.userName}`);
 
       name.value = "";
       intro.value = "";
