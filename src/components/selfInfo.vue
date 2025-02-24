@@ -24,6 +24,7 @@ const file = ref(null);
 const fileUrl = ref(null);
 const fileInputRef = ref(null);
 const tempAvatar = ref(null); // 初始為 null 存放暫存圖片（選擇的圖片）
+const tempName = ref(null); // 初始為 null
 const isLoginModalOpen = ref(false);
 
 // 當抽屜顯示時，預填入現有資料
@@ -65,7 +66,8 @@ const fetchInfo = async () => {
         intro: response.data.intro,
         userAvatar: response.data.avatar_url,
       };
-      tempAvatar.value = info.value.userAvatar;
+      tempAvatar.value = info.value.userAvatar; // 圖片存入暫存
+      tempName.value = info.value.name; // 圖片存入暫存
     } else {
       alert("無法獲取留言，數據格式不正確");
     }
@@ -149,8 +151,12 @@ const handleUpdate = async () => {
         userName: name.value,
         userAvatar: info.value.userAvatar,
       });
-      await router.push(`/@${name.value}`);
-      await nextTick();
+
+      if (name.value !== tempName.value) {
+        await router.push(`/@${name.value}`);
+        await nextTick();
+      }
+
       location.reload();
       // name.value = "";
       // intro.value = "";
