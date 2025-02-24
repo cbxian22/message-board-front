@@ -138,8 +138,15 @@ export const useAuthStore = defineStore("auth", {
         decodedToken = verifyToken(this.accessToken);
       }
       this.isLoggedIn = true;
-      this.accessToken = accessToken; // 確保設置 accessToken
-      this.setUserData(decodedToken);
+      this.accessToken = accessToken;
+
+      // 優先從 localStorage 載入 userAvatar，避免被 token 覆蓋
+      const storedAvatar = localStorage.getItem("userAvatar");
+      if (storedAvatar && storedAvatar !== "圖片") {
+        this.userAvatar = storedAvatar;
+      } else {
+        this.setUserData(decodedToken); // 否則從 token 初始化
+      }
     },
   },
 });
