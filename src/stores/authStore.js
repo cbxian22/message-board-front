@@ -4,9 +4,9 @@ import { jwtDecode } from "jwt-decode";
 const verifyToken = (token) => {
   try {
     const decoded = jwtDecode(token);
-    console.log("Decoded Token:", decoded);
+    // console.log("Decoded Token:", decoded);
     const currentTime = Math.floor(Date.now() / 1000);
-    console.log("當前時間:", currentTime, "過期時間:", decoded.exp);
+    // console.log("當前時間:", currentTime, "過期時間:", decoded.exp);
     if (decoded.exp < currentTime) {
       console.log("Token 已過期");
       return null;

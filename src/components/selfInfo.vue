@@ -54,7 +54,6 @@ const checkTokenAndOpenModal = () => {
 // 獲取 user 資料
 const fetchInfo = async () => {
   const username = router.currentRoute.value.params.username; // 這裡重新獲取 username
-  console.log("Fetching info for username:", username);
   try {
     const response = await apiClient.get(`/users/${username}`);
 
@@ -138,7 +137,6 @@ const handleUpdate = async () => {
   try {
     const uploadedFileUrl = await uploadFile(); // 獨立處理圖片上傳
 
-    console.log("ori:" + uploadedFileUrl + "ori+" + info.value.userAvatar);
     const response = await apiClient.put(`/users/${username}`, {
       name: name.value,
       intro: intro.value,
@@ -150,9 +148,7 @@ const handleUpdate = async () => {
         userName: name.value,
         userAvatar: uploadedFileUrl || info.value.userAvatar,
       });
-      console.log(
-        "after:" + uploadedFileUrl + "after+" + info.value.userAvatar
-      );
+
       await router.push(`/@${name.value}`);
       await nextTick();
       location.reload();
