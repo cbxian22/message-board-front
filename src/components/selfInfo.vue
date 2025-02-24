@@ -5,6 +5,7 @@ import { useAuthStore } from "../stores/authStore";
 import { useThemeStore } from "../stores/themeStore";
 import { useRouter } from "vue-router";
 import apiClient from "../stores/axiosConfig"; // 引入 apiClient
+import { emitter } from "../main";
 import Login from "../components/LoginModal.vue";
 
 const themeStore = useThemeStore();
@@ -162,6 +163,7 @@ const handleUpdate = async () => {
       await router.push(`/@${name.value}`);
       await nextTick();
       await fetchInfo(); // 重新獲取資料
+      emitter.emit("refreshPost"); // 發送刷新事件
       show.value = false; // 關閉抽屜
     } else {
       alert("留言提交失敗");

@@ -5,6 +5,7 @@ import { useAuthStore } from "../stores/authStore";
 import { usePostStore } from "../stores/usePostStore";
 import { useRouter } from "vue-router";
 import apiClient from "../stores/axiosConfig"; // 引入 apiClient
+import { emitter } from "../main";
 
 import Replyicon from "../assets/Replyicon.svg";
 import Favoriteicon from "../assets/Favoriteicon.svg";
@@ -249,6 +250,12 @@ const goToSinglePosts = (id) => {
 // 頁面加載時執行
 onMounted(() => {
   fetchComments();
+  emitter.on("refreshPost", fetchSingleComment); // 監聽刷新事件
+});
+
+// 清理監聽
+onUnmounted(() => {
+  emitter.off("refreshPost", fetchSingleComment); // 清理監聽
 });
 
 // 確保對每一個圖片都加載後進行判斷
