@@ -68,7 +68,7 @@ const handleLoaded = () => {
 
 // 在離開頁面之前保存滾動位置
 onBeforeRouteLeave((to, from, next) => {
-  console.log("Saving scroll position:", window.scrollY);
+  // console.log("Saving scroll position:", window.scrollY);
   scrollStore.setScrollPosition(window.scrollY);
   next();
 });
