@@ -33,7 +33,10 @@ export const useAuthStore = defineStore("auth", {
       if (!decodedToken) return;
       this.userId = decodedToken.userId;
       this.userName = decodedToken.userName || "未知用户";
-      this.userAvatar = decodedToken.userAvatar || "圖片";
+      // 只在 userAvatar 未定義時從 token 更新，避免覆蓋 localStorage 的值
+      if (!this.userAvatar) {
+        this.userAvatar = decodedToken.userAvatar || "圖片";
+      }
       this.role = decodedToken.role;
       localStorage.setItem("userId", this.userId);
       localStorage.setItem("userName", this.userName);
@@ -137,7 +140,14 @@ export const useAuthStore = defineStore("auth", {
       }
       this.isLoggedIn = true;
       this.accessToken = accessToken;
-      this.setUserData(decodedToken);
+
+      // 優先從 localStorage 載入 userAvatar
+      const storedAvatar = localStorage.getItem("userAvatar");
+      if (storedAvatar && storedAvatar !== "圖片") {
+        this.userAvatar = storedAvatar;
+      } else {
+        this.setUserData(decodedToken); // 否則從 token 初始化
+      }
       console.log("最終 userAvatar:", this.userAvatar);
     },
   },
