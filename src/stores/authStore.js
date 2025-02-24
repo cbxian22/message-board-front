@@ -40,16 +40,13 @@ export const useAuthStore = defineStore("auth", {
       localStorage.setItem("userAvatar", this.userAvatar);
       localStorage.setItem("role", this.role);
     },
-    setUserData(decodedToken) {
-      if (!decodedToken) return;
-      this.userId = decodedToken.userId;
-      this.userName = decodedToken.userName || "未知用户";
-      // 只在 userAvatar 未定義時才從 token 更新
-      if (!this.userAvatar) {
-        this.userAvatar = decodedToken.userAvatar || "圖片";
-      }
-      this.role = decodedToken.role;
-      localStorage.setItem("userId", this.userId);
+    updateUserData({ userName, userAvatar, role }) {
+      // 使用條件更新並觸發響應式變化
+      if (userName !== undefined) this.userName = userName;
+      if (userAvatar !== undefined) this.userAvatar = userAvatar;
+      if (role !== undefined) this.role = role;
+
+      // 更新 localStorage
       localStorage.setItem("userName", this.userName);
       localStorage.setItem("userAvatar", this.userAvatar);
       localStorage.setItem("role", this.role);
