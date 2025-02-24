@@ -100,13 +100,6 @@ router.beforeEach(async (to, from, next) => {
   if ((to.name === "Login" || to.name === "Register") && authStore.isLoggedIn) {
     return next({ name: "Home" });
   }
-  if (to.name === "Profile") {
-    const routeUsername = to.params.username;
-    if (routeUsername !== authStore.userName) {
-      // 如果路由參數與 authStore.userName 不一致，重定向到正確路徑
-      return next(`/@${authStore.userName}`);
-    }
-  }
 
   next(); // 其他情況正常導航
 });
