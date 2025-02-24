@@ -30,7 +30,7 @@
           :to="{ path: `/@${authStore.userName}`, query: { from: 'navbar' } }"
           class="nav-link"
         >
-          <img class="user-img" :src="authStore.userAvatar" alt="Accounticon" />
+          <img class="user-img" :src="userAvatar" alt="Accounticon" />
         </router-link>
       </li>
     </ul>
