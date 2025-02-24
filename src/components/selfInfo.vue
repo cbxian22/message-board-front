@@ -362,10 +362,12 @@ const handleUpdate = async () => {
     });
 
     if (response.status === 200) {
-      authStore.updateUserData({
-        userName: name.value,
-        userAvatar: uploadedFileUrl || info.value.userAvatar,
-      });
+      // 直接更新 authStore 的狀態
+      authStore.userName = name.value;
+      authStore.userAvatar = uploadedFileUrl || info.value.userAvatar;
+      localStorage.setItem("userName", authStore.userName);
+      localStorage.setItem("userAvatar", authStore.userAvatar);
+
       await router.push(`/@${name.value}`);
       await nextTick();
       await fetchInfo();
@@ -378,13 +380,18 @@ const handleUpdate = async () => {
     }
   } catch (error) {
     console.error("更新錯誤:", error);
-    alert("更新失敗，請稍後再試");
+    if (error.response?.status === 401) {
+      alert("登入已過期，請重新登入");
+      authStore.logout();
+      isLoginModalOpen.value = true;
+    } else {
+      alert("更新失敗，請稍後再試");
+    }
     loadingBar.error();
   } finally {
     loadingBar.finish();
   }
 };
-
 // 更新抽屜寬度
 const updateWidth = () => {
   const width = window.innerWidth;
