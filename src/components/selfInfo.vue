@@ -162,10 +162,10 @@ const handleUpdate = async () => {
       );
       await router.push(`/@${name.value}`);
       await nextTick();
-      emitter.emit("refreshPost"); // 發送刷新事件
-      await fetchInfo(); // 重新獲取資料
-      // window.scrollTo(0, 0); // 回到頂部
-      show.value = false; // 關閉抽屜
+      await fetchInfo();
+      emitter.emit("refreshPost");
+      window.scrollTo(0, 0);
+      show.value = false;
     } else {
       alert("留言提交失敗");
       loadingBar.error();
