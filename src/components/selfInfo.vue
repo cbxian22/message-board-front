@@ -138,10 +138,11 @@ const handleUpdate = async () => {
   try {
     const uploadedFileUrl = await uploadFile(); // 獨立處理圖片上傳
 
+    console.log("ori:" + uploadedFileUrl + "ori+" + info.value.userAvatar);
     const response = await apiClient.put(`/users/${username}`, {
       name: name.value,
       intro: intro.value,
-      fileUrl: uploadedFileUrl || tempAvatar.value, // 如果沒有新上傳，使用現有頭像
+      fileUrl: uploadedFileUrl || info.value.userAvatar, // 如果沒有新上傳，使用現有頭像
     });
 
     if (response.status === 200) {
@@ -149,7 +150,9 @@ const handleUpdate = async () => {
         userName: name.value,
         userAvatar: uploadedFileUrl || info.value.userAvatar,
       });
-
+      console.log(
+        "after:" + uploadedFileUrl + "after+" + info.value.userAvatar
+      );
       await router.push(`/@${name.value}`);
       await nextTick();
       location.reload();
