@@ -250,12 +250,12 @@ const goToSinglePosts = (id) => {
 // 頁面加載時執行
 onMounted(() => {
   fetchComments();
-  emitter.on("refreshPost", fetchSingleComment); // 監聽刷新事件
+  emitter.on("refreshPost", fetchComments); // 監聽刷新事件
 });
 
 // 清理監聽
 onUnmounted(() => {
-  emitter.off("refreshPost", fetchSingleComment); // 清理監聽
+  emitter.off("refreshPost", fetchComments); // 清理監聽
 });
 
 // 確保對每一個圖片都加載後進行判斷
