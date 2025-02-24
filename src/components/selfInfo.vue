@@ -1,4 +1,4 @@
-<script setup>
+<!-- <script setup>
 import { ref, onMounted, onUnmounted, watch, nextTick } from "vue";
 import { NButton, NDrawerContent, NDrawer, useLoadingBar } from "naive-ui";
 import { useAuthStore } from "../stores/authStore";
@@ -204,6 +204,198 @@ onMounted(() => {
 onUnmounted(() => {
   window.removeEventListener("resize", updateWidth);
 });
+</script> -->
+<script setup>
+import { ref, onMounted, onUnmounted, watch, nextTick } from "vue";
+import { NButton, NDrawerContent, NDrawer, useLoadingBar } from "naive-ui";
+import { useAuthStore } from "../stores/authStore";
+import { useThemeStore } from "../stores/themeStore";
+import { useRouter } from "vue-router";
+import apiClient from "../stores/axiosConfig";
+import { emitter } from "../main";
+import Login from "../components/LoginModal.vue";
+
+const themeStore = useThemeStore();
+const loadingBar = useLoadingBar();
+const router = useRouter();
+const authStore = useAuthStore();
+
+const loggedInUser = ref(authStore.userName);
+const username = router.currentRoute.value.params.username;
+const show = ref(false);
+const rwdwidth = ref("100vw");
+const info = ref({});
+const name = ref("");
+const intro = ref("");
+const file = ref(null);
+const fileUrl = ref(null);
+const fileInputRef = ref(null);
+const tempAvatar = ref(null);
+const isLoginModalOpen = ref(false);
+
+// 初始化檢查登入狀態，並監聽 authStore 變化
+onMounted(async () => {
+  await authStore.checkLoginStatus();
+  loggedInUser.value = authStore.userName;
+  fetchInfo();
+  updateWidth();
+  window.addEventListener("resize", updateWidth);
+});
+
+onUnmounted(() => {
+  window.removeEventListener("resize", updateWidth);
+});
+
+// 監聽 authStore.userName 變化
+watch(
+  () => authStore.userName,
+  (newValue) => {
+    loggedInUser.value = newValue;
+  }
+);
+// 當抽屜顯示時，預填入現有資料
+watch(show, (newValue) => {
+  if (newValue) {
+    name.value = info.value.name || "";
+    intro.value = info.value.intro || "";
+    tempAvatar.value = info.value.userAvatar;
+  } else {
+    tempAvatar.value = null;
+    name.value = "";
+    intro.value = "";
+    file.value = null;
+    if (fileInputRef.value) fileInputRef.value.value = null;
+  }
+});
+
+const checkTokenAndOpenModal = () => {
+  if (!authStore.accessToken) {
+    isLoginModalOpen.value = true;
+  }
+};
+
+// 獲取用戶資料
+const fetchInfo = async () => {
+  const username = router.currentRoute.value.params.username;
+  try {
+    const response = await apiClient.get(`/users/${username}`);
+    if (response.status === 200 && response.data) {
+      info.value = {
+        id: response.data.id,
+        name: response.data.name,
+        intro: response.data.intro,
+        userAvatar: response.data.avatar_url,
+      };
+      tempAvatar.value = info.value.userAvatar;
+    } else {
+      alert("無法獲取用戶資料，數據格式不正確");
+    }
+  } catch (error) {
+    console.error("取得用戶資料錯誤:", error);
+    alert("用戶資料取得失敗，請檢查網絡或稍後再試");
+  }
+};
+
+// 觸發檔案輸入
+const triggerFileInput = () => {
+  fileInputRef.value?.click();
+};
+
+// 處理檔案上傳並顯示預覽
+const handleFileUpload = (event) => {
+  const selectedFile = event.target.files[0];
+  if (selectedFile && selectedFile.type.startsWith("image/")) {
+    const reader = new FileReader();
+    reader.onload = (e) => {
+      tempAvatar.value = e.target.result;
+    };
+    reader.readAsDataURL(selectedFile);
+    file.value = selectedFile;
+  }
+};
+
+// 上傳檔案到後端
+const uploadFile = async () => {
+  if (!file.value) return null;
+
+  try {
+    const { data } = await apiClient.get("/upload", {
+      params: { filename: file.value.name, contentType: file.value.type },
+    });
+
+    await apiClient.put(data.uploadUrl, file.value, {
+      headers: { "Content-Type": file.value.type },
+    });
+
+    return data.fileUrl;
+  } catch (error) {
+    console.error("檔案上傳失敗:", error);
+    return null;
+  }
+};
+
+// 提交更新
+const handleUpdate = async () => {
+  if (
+    name.value === info.value.name &&
+    intro.value === info.value.intro &&
+    tempAvatar.value === info.value.userAvatar
+  ) {
+    show.value = false;
+    return;
+  }
+
+  if (!authStore.userId || !authStore.accessToken) {
+    alert("請先登入！");
+    isLoginModalOpen.value = true;
+    return;
+  }
+
+  loadingBar.start();
+
+  try {
+    const uploadedFileUrl = await uploadFile();
+    const response = await apiClient.put("/users/profile", {
+      name: name.value,
+      intro: intro.value,
+      fileUrl: uploadedFileUrl || info.value.userAvatar,
+    });
+
+    if (response.status === 200) {
+      authStore.updateUserData({
+        userName: name.value,
+        userAvatar: uploadedFileUrl || info.value.userAvatar,
+      });
+      await router.push(`/@${name.value}`);
+      await nextTick();
+      await fetchInfo();
+      emitter.emit("refreshPost");
+      window.scrollTo(0, 0);
+      show.value = false;
+    } else {
+      alert("更新失敗");
+      loadingBar.error();
+    }
+  } catch (error) {
+    console.error("更新錯誤:", error);
+    alert("更新失敗，請稍後再試");
+    loadingBar.error();
+  } finally {
+    loadingBar.finish();
+  }
+};
+
+// 更新抽屜寬度
+const updateWidth = () => {
+  const width = window.innerWidth;
+  if (width >= 1024) {
+    rwdwidth.value = 800;
+  } else if (width >= 768) {
+    rwdwidth.value = 600;
+  } else {
+    rwdwidth.value = "100vw";
+  }
+};
 </script>
 
 <template>
@@ -225,9 +417,9 @@ onUnmounted(() => {
 
     <!-- 切換 -->
     <div
-      @click="checkTokenAndOpenModal"
       class="set-btn"
       v-if="loggedInUser !== username"
+      @click="checkTokenAndOpenModal"
     >
       <n-button> 加入好友 </n-button>
     </div>
