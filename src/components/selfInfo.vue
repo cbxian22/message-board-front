@@ -54,6 +54,10 @@ const checkTokenAndOpenModal = () => {
 // 獲取 user 資料
 const fetchInfo = async () => {
   const username = router.currentRoute.value.params.username; // 這裡重新獲取 username
+  console.log(
+    "Fetching info for username:",
+    router.currentRoute.value.params.username
+  );
   try {
     const response = await apiClient.get(`/users/${username}`);
 
@@ -158,6 +162,7 @@ const handleUpdate = async () => {
       console.log("After update:", authStore.userName);
       console.log("Current route:", router.currentRoute.value.path);
       router.push(`/@${name.value}`);
+      await nextTick(); // 確保 DOM 和路由更新完成
 
       name.value = "";
       intro.value = "";
