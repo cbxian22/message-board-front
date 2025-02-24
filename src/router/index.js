@@ -58,8 +58,6 @@ const router = createRouter({
     },
   ],
   scrollBehavior(to, from, savedPosition) {
-    console.log("Restoring scroll position:", savedPosition);
-
     // 優先使用瀏覽器自帶的 savedPosition
     if (savedPosition) {
       return { ...savedPosition, behavior: "auto" }; // 強制無動畫
