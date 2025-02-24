@@ -30,7 +30,7 @@
           :to="{ path: `/@${authStore.userName}`, query: { from: 'navbar' } }"
           class="nav-link"
         >
-          <img class="user-img" :src="authStore.userAvatar" alt="Accounticon" />
+          <img class="user-img" :src="avatarSrc" alt="Accounticon" />
         </router-link>
       </li>
     </ul>
@@ -44,7 +44,7 @@
 </template>
 
 <script setup>
-import { ref } from "vue";
+import { ref, computed } from "vue";
 import { useAuthStore } from "../stores/authStore";
 import { useScrollStore } from "@/stores/scrollStore";
 
@@ -81,6 +81,12 @@ const scrollToTop = () => {
   });
   scrollStore.setScrollPosition(0);
 };
+
+// 計算屬性處理頭像 URL，避免緩存
+const avatarSrc = computed(() => {
+  const baseUrl = authStore.userAvatar || "未知圖片";
+  return `${baseUrl}?t=${Date.now()}`; // 添加時間戳
+});
 </script>
 
 <style scoped>

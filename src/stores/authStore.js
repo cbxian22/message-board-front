@@ -41,9 +41,12 @@ export const useAuthStore = defineStore("auth", {
       localStorage.setItem("role", this.role);
     },
     updateUserData({ userName, userAvatar, role }) {
-      if (userName) this.userName = userName;
-      if (userAvatar) this.userAvatar = userAvatar;
-      if (role) this.role = role;
+      // 使用條件更新並觸發響應式變化
+      if (userName !== undefined) this.userName = userName;
+      if (userAvatar !== undefined) this.userAvatar = userAvatar;
+      if (role !== undefined) this.role = role;
+
+      // 更新 localStorage
       localStorage.setItem("userName", this.userName);
       localStorage.setItem("userAvatar", this.userAvatar);
       localStorage.setItem("role", this.role);
