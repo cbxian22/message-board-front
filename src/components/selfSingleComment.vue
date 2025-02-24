@@ -241,8 +241,9 @@ const formatDate = (date) => {
 };
 
 // 跳轉到 CommentView
-const goToCommentPage = (id) => {
-  router.push({ name: "Comment", params: { id } });
+// 跳轉到 CommentView
+const goToSinglePosts = (id) => {
+  router.push({ name: "SinglePosts", params: { id } });
 };
 
 // 頁面加載時執行
@@ -400,7 +401,6 @@ onMounted(() => {
   list-style-type: none;
 }
 
-/* 回覆 */
 .reply-count {
   display: flex;
   flex-direction: row;
@@ -420,7 +420,7 @@ onMounted(() => {
   justify-content: center;
 }
 
-.reply-link:hover,
+.reply-count:hover,
 .info-link:hover {
   background-color: rgba(128, 128, 128, 0.15) !important;
   border-radius: 10px;
