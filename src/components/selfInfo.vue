@@ -154,6 +154,11 @@ const handleUpdate = async () => {
         userName: name.value,
         userAvatar: uploadedFileUrl || info.value.userAvatar,
       });
+      if (response.data.accessToken) {
+        // 如果後端返回新 token
+        authStore.accessToken = response.data.accessToken;
+        localStorage.setItem("accessToken", response.data.accessToken);
+      }
       console.log(
         "更新後 - accessToken:",
         authStore.accessToken,

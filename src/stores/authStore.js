@@ -40,13 +40,16 @@ export const useAuthStore = defineStore("auth", {
       localStorage.setItem("userAvatar", this.userAvatar);
       localStorage.setItem("role", this.role);
     },
-    updateUserData({ userName, userAvatar, role }) {
-      // 使用條件更新並觸發響應式變化
-      if (userName !== undefined) this.userName = userName;
-      if (userAvatar !== undefined) this.userAvatar = userAvatar;
-      if (role !== undefined) this.role = role;
-
-      // 更新 localStorage
+    setUserData(decodedToken) {
+      if (!decodedToken) return;
+      this.userId = decodedToken.userId;
+      this.userName = decodedToken.userName || "未知用户";
+      // 只在 userAvatar 未定義時才從 token 更新
+      if (!this.userAvatar) {
+        this.userAvatar = decodedToken.userAvatar || "圖片";
+      }
+      this.role = decodedToken.role;
+      localStorage.setItem("userId", this.userId);
       localStorage.setItem("userName", this.userName);
       localStorage.setItem("userAvatar", this.userAvatar);
       localStorage.setItem("role", this.role);
@@ -126,22 +129,19 @@ export const useAuthStore = defineStore("auth", {
     },
     async checkLoginStatus() {
       const accessToken = localStorage.getItem("accessToken");
-      if (!accessToken || typeof accessToken !== "string") {
-        console.log("無效的 accessToken");
-        return; // 不直接登出
-      }
+      console.log("accessToken:", accessToken);
       let decodedToken = verifyToken(accessToken);
+      console.log("decodedToken:", decodedToken);
       if (!decodedToken) {
         const refreshed = await this.refreshAccessToken();
-        if (!refreshed) {
-          console.log("刷新失敗，保持當前狀態");
-          return; // 不直接登出
-        }
+        console.log("刷新結果:", refreshed);
+        if (!refreshed) return;
         decodedToken = verifyToken(this.accessToken);
       }
       this.isLoggedIn = true;
       this.accessToken = accessToken;
       this.setUserData(decodedToken);
+      console.log("最終 userAvatar:", this.userAvatar);
     },
   },
 });
