@@ -149,7 +149,7 @@ const handleUpdate = async () => {
     if (response.status === 200) {
       authStore.updateUserData({
         userName: name.value,
-        userAvatar: info.value,
+        userAvatar: fileUrl.value,
       });
 
       await router.push(`/@${name.value}`);
