@@ -30,7 +30,7 @@
           :to="{ path: `/@${authStore.userName}`, query: { from: 'navbar' } }"
           class="nav-link"
         >
-          <img class="user-img" :src="authStore.userAvatar" alt="Accounticon" />
+          <img class="user-img" :src="userAvatar" alt="Accounticon" />
         </router-link>
       </li>
     </ul>
@@ -44,7 +44,7 @@
 </template>
 
 <script setup>
-import { ref } from "vue";
+import { ref, computed } from "vue";
 import { useAuthStore } from "../stores/authStore";
 import { useScrollStore } from "@/stores/scrollStore";
 
@@ -62,6 +62,9 @@ const scrollStore = useScrollStore();
 
 const isPostModalOpen = ref(false);
 const isLoginModalOpen = ref(false);
+
+// 使用 computed 確保獲取最新值
+const userAvatar = computed(() => authStore.userAvatar);
 
 const checkTokenAndOpenModal = () => {
   const token = localStorage.getItem("token");

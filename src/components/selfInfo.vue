@@ -151,13 +151,15 @@ const handleUpdate = async () => {
 
       await router.push(`/@${name.value}`);
       await nextTick();
-      location.reload();
+      // location.reload();
       // name.value = "";
       // intro.value = "";
       // file.value = null;
       // fileUrl.value = null;
       // show.value = false;
       // await fetchInfo();
+      await fetchInfo(); // 重新獲取資料
+      show.value = false; // 關閉抽屜
     } else {
       alert("留言提交失敗");
       loadingBar.error();
