@@ -242,7 +242,6 @@ const formatDate = (date) => {
 };
 
 // 跳轉到 CommentView
-// 跳轉到 CommentView
 const goToSinglePosts = (id) => {
   router.push({ name: "SinglePosts", params: { id } });
 };

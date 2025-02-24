@@ -164,6 +164,7 @@ const handleUpdate = async () => {
       await nextTick();
       await fetchInfo(); // 重新獲取資料
       emitter.emit("refreshPost"); // 發送刷新事件
+      window.scrollTo(0, 0); // 回到頂部
       show.value = false; // 關閉抽屜
     } else {
       alert("留言提交失敗");
