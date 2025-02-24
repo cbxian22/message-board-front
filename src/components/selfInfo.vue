@@ -135,8 +135,13 @@ const handleUpdate = async () => {
   loadingBar.start();
 
   try {
+    console.log(
+      "更新前 - accessToken:",
+      authStore.accessToken,
+      "isLoggedIn:",
+      authStore.isLoggedIn
+    );
     const uploadedFileUrl = await uploadFile(); // 獨立處理圖片上傳
-
     const response = await apiClient.put(`/users/${username}`, {
       name: name.value,
       intro: intro.value,
@@ -148,16 +153,14 @@ const handleUpdate = async () => {
         userName: name.value,
         userAvatar: uploadedFileUrl || info.value.userAvatar,
       });
-
+      console.log(
+        "更新後 - accessToken:",
+        authStore.accessToken,
+        "isLoggedIn:",
+        authStore.isLoggedIn
+      );
       await router.push(`/@${name.value}`);
       await nextTick();
-      // location.reload();
-      // name.value = "";
-      // intro.value = "";
-      // file.value = null;
-      // fileUrl.value = null;
-      // show.value = false;
-      // await fetchInfo();
       await fetchInfo(); // 重新獲取資料
       show.value = false; // 關閉抽屜
     } else {

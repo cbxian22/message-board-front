@@ -127,26 +127,21 @@ export const useAuthStore = defineStore("auth", {
     async checkLoginStatus() {
       const accessToken = localStorage.getItem("accessToken");
       if (!accessToken || typeof accessToken !== "string") {
-        console.log("無效的 accessToken，嘗試登出");
-        this.logout();
-        return;
+        console.log("無效的 accessToken");
+        return; // 不直接登出
       }
       let decodedToken = verifyToken(accessToken);
       if (!decodedToken) {
         const refreshed = await this.refreshAccessToken();
-        if (!refreshed) return;
+        if (!refreshed) {
+          console.log("刷新失敗，保持當前狀態");
+          return; // 不直接登出
+        }
         decodedToken = verifyToken(this.accessToken);
       }
       this.isLoggedIn = true;
       this.accessToken = accessToken;
-
-      // 優先從 localStorage 載入 userAvatar，避免被 token 覆蓋
-      const storedAvatar = localStorage.getItem("userAvatar");
-      if (storedAvatar && storedAvatar !== "圖片") {
-        this.userAvatar = storedAvatar;
-      } else {
-        this.setUserData(decodedToken); // 否則從 token 初始化
-      }
+      this.setUserData(decodedToken);
     },
   },
 });
