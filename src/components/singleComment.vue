@@ -546,7 +546,6 @@ onMounted(() => {
   list-style-type: none;
 }
 
-/* 回覆 */
 .reply-count {
   display: flex;
   flex-direction: row;

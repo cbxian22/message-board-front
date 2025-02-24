@@ -61,6 +61,16 @@ const authStore = useAuthStore();
 authStore.checkLoginStatus();
 const scrollStore = useScrollStore();
 
+//  確保當前頁面也能響應這個變化。可以通過監聽 authStore.userName 的變化來觸發導航
+watch(
+  () => authStore.userName,
+  (newUserName) => {
+    if (newUserName) {
+      router.push(`/@${newUserName}`);
+    }
+  }
+);
+
 const isPostModalOpen = ref(false);
 const isLoginModalOpen = ref(false);
 
