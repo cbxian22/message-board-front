@@ -30,7 +30,7 @@
           :to="{ path: `/@${authStore.userName}`, query: { from: 'navbar' } }"
           class="nav-link"
         >
-          <img class="user-img" :src="avatarSrc" alt="Accounticon" />
+          <img class="user-img" :src="userAvatar" alt="Accounticon" />
         </router-link>
       </li>
     </ul>
@@ -44,7 +44,7 @@
 </template>
 
 <script setup>
-import { ref, computed } from "vue";
+import { ref, computed, watch } from "vue";
 import { useAuthStore } from "../stores/authStore";
 import { useScrollStore } from "@/stores/scrollStore";
 
@@ -54,7 +54,6 @@ import Login from "../components/LoginModal.vue";
 import Homeicon from "../assets/Homeicon.svg";
 import Searchicon from "../assets/Searchicon.svg";
 import Addicon from "../assets/Addicon.svg";
-import Accounticon from "../assets/Accounticon.svg";
 import Loginicon from "../assets/Loginicon.svg";
 
 const authStore = useAuthStore();
@@ -63,6 +62,7 @@ const scrollStore = useScrollStore();
 
 const isPostModalOpen = ref(false);
 const isLoginModalOpen = ref(false);
+const userAvatar = ref(authStore.userAvatar || "/default-avatar.png");
 
 const checkTokenAndOpenModal = () => {
   const token = localStorage.getItem("token");
@@ -82,11 +82,14 @@ const scrollToTop = () => {
   scrollStore.setScrollPosition(0);
 };
 
-// 計算屬性處理頭像 URL，避免緩存
-const avatarSrc = computed(() => {
-  const baseUrl = authStore.userAvatar || "未知圖片";
-  return `${baseUrl}?t=${Date.now()}`; // 添加時間戳
-});
+watch(
+  () => authStore.userAvatar,
+  (newAvatar) => {
+    if (newAvatar) {
+      userAvatar.value = newAvatar;
+    }
+  }
+);
 </script>
 
 <style scoped>

@@ -75,28 +75,6 @@ const fetchInfo = async () => {
   }
 };
 
-// 獲取單一留言
-const fetchSingleComment = async (postId) => {
-  try {
-    const userId = authStore.userId || localStorage.getItem("userId");
-    const response = await apiClient.get(`/posts/${postId}`, {
-      params: { userId },
-    });
-    if (response.status === 200) {
-      const comment = response.data;
-      selectedComment.value = {
-        id: comment.id,
-        user_avatar: comment.user_avatar,
-      };
-    } else {
-      alert("無法獲取單一留言，數據格式不正確");
-    }
-  } catch (error) {
-    console.error("取得單一留言錯誤:", error);
-    alert("單一留言取得失敗，請檢查網絡或稍後再試");
-  }
-};
-
 // 獲取 <input type="file">
 const triggerFileInput = () => {
   fileInputRef.value?.click();
@@ -167,15 +145,12 @@ const handleUpdate = async () => {
     });
 
     if (response.status === 200) {
-      console.log("Before update:", authStore.userName);
       authStore.updateUserData({
         userName: name.value,
         userAvatar: info.value.userAvatar,
       });
-      console.log("After update:", authStore.userName);
-      console.log("Current route:", router.currentRoute.value.path);
       await router.push(`/@${name.value}`);
-      await nextTick(); // 確保 DOM 和路由更新完成
+      await nextTick();
 
       name.value = "";
       intro.value = "";
@@ -183,7 +158,7 @@ const handleUpdate = async () => {
       fileUrl.value = null;
       show.value = false;
       await fetchInfo();
-      await fetchSingleComment();
+
       // 獲取新數據
       console.log(
         "Fetching info after route change:",
