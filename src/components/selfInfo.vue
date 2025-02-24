@@ -144,14 +144,20 @@ const handleUpdate = async () => {
     });
 
     if (response.status === 200) {
-      // 更新 authStore
+      // // 更新 authStore
+      // authStore.updateUserData({
+      //   userName: name.value,
+      //   userAvatar: info.value.userAvatar,
+      // });
+
+      console.log("Before update:", authStore.userName);
       authStore.updateUserData({
         userName: name.value,
         userAvatar: info.value.userAvatar,
       });
-
-      // 手動導航到新路徑
-      router.push(`/@${authStore.userName}`);
+      console.log("After update:", authStore.userName);
+      console.log("Current route:", router.currentRoute.value.path);
+      router.push(`/@${name.value}`);
 
       name.value = "";
       intro.value = "";
