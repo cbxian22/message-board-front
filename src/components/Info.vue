@@ -155,9 +155,12 @@ const handleUpdate = async () => {
       localStorage.setItem("userName", authStore.userName);
       localStorage.setItem("userAvatar", authStore.userAvatar);
       loggedInUser.value = name.value;
-      await router.push(`/@${name.value}`);
+
+      // 通知父組件刷新資料
       emitter.emit("refreshPost");
-      window.scrollTo(0, 0);
+
+      await nextTick(); // 確保 DOM 更新
+      await router.push(`/@${name.value}`);
       show.value = false;
     } else {
       alert("更新失敗");

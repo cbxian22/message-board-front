@@ -32,6 +32,11 @@ onMounted(async () => {
   if (props.username) {
     await fetchUserData(props.username);
   }
+
+  // 監聽刷新事件
+  emitter.on("refreshPost", () => {
+    fetchUserData(props.username);
+  });
 });
 
 // 獲取使用者資料
