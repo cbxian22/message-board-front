@@ -5,8 +5,8 @@ import axios from "axios";
 
 import selfSingleComment from "../components/selfSingleComment.vue";
 import selfInfo from "../components/selfInfo.vue";
-// import Navbar from "../components/Navbar.vue";
-// import NavbarUp from "../components/NavbarUp.vue";
+import Navbar from "../components/Navbar.vue";
+import NavbarUp from "../components/NavbarUp.vue";
 import Backicon from "../assets/Backicon.svg";
 
 // 計算是否有新留言
@@ -54,7 +54,7 @@ const isFromNavbar = () => {
 </script>
 
 <template>
-  <!-- <NavbarUp /> -->
+  <NavbarUp />
   <div class="container-box">
     <div class="back-icon" :class="{ hidden: isFromNavbar() }">
       <router-link to="/">
@@ -79,7 +79,7 @@ const isFromNavbar = () => {
       <selfSingleComment :username="props.username" />
     </div>
   </div>
-  <!-- <Navbar /> -->
+  <Navbar />
 </template>
 
 <style scoped>
