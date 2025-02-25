@@ -375,43 +375,28 @@ const handlelike = async (id) => {
 //   }
 // };
 const formatDate = (date) => {
-  // 檢查 date 是否為字串，若不是則返回錯誤
-  if (typeof date !== "string" || !date.trim()) return "未知時間或格式錯誤";
+  if (!date) return "未知時間";
 
-  // 解析 YYYY-MM-DD HH:mm:ss
-  const [datePart, timePart] = date.split(" ");
-  if (!datePart || !timePart) return "無效時間格式";
+  const inputDate = new Date(date.replace(/-/g, "/")); // 確保跨瀏覽器兼容
+  if (isNaN(inputDate)) return "無效時間"; // 檢查日期是否有效
 
-  const [year, month, day] = datePart.split("-").map(Number);
-  const [hour, minute, second] = timePart.split(":").map(Number);
-
-  // 驗證解析結果是否有效
-  if ([year, month, day, hour, minute, second].some(isNaN))
-    return "無效時間數值";
-
-  // 確保轉換成 UTC 時間
-  const inputDate = new Date(
-    Date.UTC(year, month - 1, day, hour, minute, second)
-  );
-  if (isNaN(inputDate)) return "無效時間";
-
-  const currentTime = new Date(Date.now()); // 改用 UTC 時間
+  const currentTime = new Date();
   const diffInSeconds = Math.floor((currentTime - inputDate) / 1000);
   const diffInMinutes = Math.floor(diffInSeconds / 60);
   const diffInHours = Math.floor(diffInMinutes / 60);
   const diffInDays = Math.floor(diffInHours / 24);
 
   if (diffInSeconds < 60) {
-    return "剛剛";
+    return "現在";
   } else if (diffInMinutes < 60) {
-    return `${diffInMinutes} 分鐘前`;
+    return `${diffInMinutes} 分鐘`;
   } else if (diffInHours < 24) {
-    return `${diffInHours} 小時前`;
-  } else if (diffInDays === 1) {
-    return "昨天";
+    return `${diffInHours} 小時`;
   } else if (diffInDays <= 7) {
-    return `${diffInDays} 天前`;
+    // 7 天以內顯示天數
+    return `${diffInDays} 天`;
   } else {
+    // 超過 7 天顯示 YYYY-MM-DD
     return `${inputDate.getFullYear()}-${String(
       inputDate.getMonth() + 1
     ).padStart(2, "0")}-${String(inputDate.getDate()).padStart(2, "0")}`;
