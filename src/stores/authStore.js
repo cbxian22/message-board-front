@@ -4,8 +4,11 @@
 // const verifyToken = (token) => {
 //   try {
 //     const decoded = jwtDecode(token);
-//     return decoded.exp > Math.floor(Date.now() / 1000) ? decoded : null;
+//     const isValid = decoded.exp > Math.floor(Date.now() / 1000);
+//     console.log("Token decoded:", decoded, "Valid:", isValid);
+//     return isValid ? decoded : null;
 //   } catch (error) {
+//     console.error("Token verification failed:", error);
 //     return null;
 //   }
 // };
@@ -30,6 +33,7 @@
 //             headers: { Authorization: `Bearer ${this.accessToken}` },
 //           }
 //         );
+//         if (!response.ok) throw new Error("Failed to fetch user data");
 //         const data = await response.json();
 //         this.userName = data.name || "未知用戶";
 //         this.userAvatar =
@@ -45,7 +49,7 @@
 //     },
 //     login(data) {
 //       const { success, accessToken, refreshToken } = data;
-//       if (!success || !accessToken) return;
+//       if (!success || !accessToken || !refreshToken) return;
 
 //       const decodedToken = verifyToken(accessToken);
 //       if (!decodedToken) return;
@@ -53,7 +57,7 @@
 //       this.isLoggedIn = true;
 //       this.userId = decodedToken.userId;
 //       this.accessToken = accessToken;
-//       this.refreshToken = refreshToken;
+//       this.refreshToken = refreshToken; // 初始設置 refreshToken
 //       localStorage.setItem("accessToken", accessToken);
 //       localStorage.setItem("refreshToken", refreshToken);
 //       localStorage.setItem("userId", this.userId);
@@ -63,6 +67,15 @@
 //     async refreshAccessToken() {
 //       const refreshToken = localStorage.getItem("refreshToken");
 //       if (!refreshToken) {
+//         console.warn("No refresh token found, logging out.");
+//         this.logout();
+//         return false;
+//       }
+
+//       // 檢查 refreshToken 是否過期
+//       const decodedRefresh = verifyToken(refreshToken);
+//       if (!decodedRefresh) {
+//         console.warn("Refresh token expired, logging out.");
 //         this.logout();
 //         return false;
 //       }
@@ -76,29 +89,42 @@
 //             body: JSON.stringify({ refreshToken }),
 //           }
 //         );
-//         const data = await response.json();
 
+//         if (!response.ok) {
+//           const errorData = await response.json();
+//           console.error(
+//             "Refresh token request failed:",
+//             response.status,
+//             errorData
+//           );
+//           this.logout();
+//           return false;
+//         }
+
+//         const data = await response.json();
 //         if (!data.success || !data.accessToken) {
+//           console.error("Invalid refresh token response:", data);
 //           this.logout();
 //           return false;
 //         }
 
 //         const decodedToken = verifyToken(data.accessToken);
 //         if (!decodedToken) {
+//           console.error("Invalid new access token:", data.accessToken);
 //           this.logout();
 //           return false;
 //         }
 
 //         this.accessToken = data.accessToken;
-//         this.refreshToken = data.refreshToken;
 //         this.userId = decodedToken.userId;
 //         localStorage.setItem("accessToken", data.accessToken);
-//         localStorage.setItem("refreshToken", data.refreshToken);
 //         localStorage.setItem("userId", this.userId);
+//         // 注意：這裡不再更新 refreshToken，除非後端明確要求替換
 
 //         await this.fetchUserData();
 //         return true;
 //       } catch (error) {
+//         console.error("Error during token refresh:", error);
 //         this.logout();
 //         return false;
 //       }
@@ -124,25 +150,41 @@
 //     },
 //     async checkLoginStatus() {
 //       const accessToken = localStorage.getItem("accessToken");
-//       if (!accessToken) return;
+//       if (!accessToken) {
+//         console.warn("No access token found.");
+//         this.isLoggedIn = false;
+//         return false;
+//       }
 
 //       let decodedToken = verifyToken(accessToken);
 //       if (!decodedToken) {
+//         console.log("Access token expired or invalid, attempting refresh.");
 //         const refreshed = await this.refreshAccessToken();
-//         if (!refreshed) return;
+//         if (!refreshed) {
+//           console.warn("Token refresh failed, user not logged in.");
+//           this.isLoggedIn = false;
+//           return false;
+//         }
 //         decodedToken = verifyToken(this.accessToken);
+//         if (!decodedToken) {
+//           console.error("New access token invalid after refresh.");
+//           this.isLoggedIn = false;
+//           return false;
+//         }
 //       }
 
 //       this.isLoggedIn = true;
 //       this.accessToken = accessToken;
 //       this.userId = decodedToken.userId;
 //       await this.fetchUserData();
+//       return true;
 //     },
 //   },
 // });
 
 // export default { verifyToken };
 
+// useAuthStore.js
 import { defineStore } from "pinia";
 import { jwtDecode } from "jwt-decode";
 
@@ -202,7 +244,7 @@ export const useAuthStore = defineStore("auth", {
       this.isLoggedIn = true;
       this.userId = decodedToken.userId;
       this.accessToken = accessToken;
-      this.refreshToken = refreshToken; // 初始設置 refreshToken
+      this.refreshToken = refreshToken;
       localStorage.setItem("accessToken", accessToken);
       localStorage.setItem("refreshToken", refreshToken);
       localStorage.setItem("userId", this.userId);
@@ -217,7 +259,6 @@ export const useAuthStore = defineStore("auth", {
         return false;
       }
 
-      // 檢查 refreshToken 是否過期
       const decodedRefresh = verifyToken(refreshToken);
       if (!decodedRefresh) {
         console.warn("Refresh token expired, logging out.");
@@ -264,7 +305,6 @@ export const useAuthStore = defineStore("auth", {
         this.userId = decodedToken.userId;
         localStorage.setItem("accessToken", data.accessToken);
         localStorage.setItem("userId", this.userId);
-        // 注意：這裡不再更新 refreshToken，除非後端明確要求替換
 
         await this.fetchUserData();
         return true;
@@ -274,7 +314,29 @@ export const useAuthStore = defineStore("auth", {
         return false;
       }
     },
-    logout() {
+    async logout() {
+      const refreshToken = this.refreshToken;
+      if (refreshToken) {
+        try {
+          const response = await fetch(
+            "https://message-board-server-7yot.onrender.com/api/auth/logout",
+            {
+              method: "POST",
+              headers: { "Content-Type": "application/json" },
+              body: JSON.stringify({ refreshToken }),
+            }
+          );
+          if (!response.ok) {
+            console.error("Logout request failed:", await response.json());
+          } else {
+            console.log("Successfully logged out from server.");
+          }
+        } catch (error) {
+          console.error("Error during logout:", error);
+        }
+      }
+
+      // 清空本地狀態和存儲
       Object.assign(this, {
         isLoggedIn: false,
         userId: null,
