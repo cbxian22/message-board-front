@@ -81,7 +81,6 @@ import Noteicon from "../assets/Noteicon.svg";
 import Closeicon from "../assets/Closeicon.svg";
 
 const authStore = useAuthStore();
-// authStore.checkLoginStatus();
 const props = defineProps({
   modelValue: Boolean,
   comment: Object,

@@ -12,7 +12,6 @@ const route = useRoute();
 const fetchComment = async () => {
   try {
     const response = await axios.get(
-      // `http://localhost:3000/api/posts/${route.params.id}`
       `https://message-board-server-7yot.onrender.com/api/posts/${route.params.id}`
     );
     if (response.status === 200) {
@@ -49,6 +48,8 @@ const fetchReplies = async () => {
 
 // 格式化時間
 const formatDate = (date) => {
+  console.log(data);
+
   if (!date) return "未知時間";
   const options = {
     year: "numeric",
