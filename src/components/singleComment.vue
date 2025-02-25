@@ -348,30 +348,68 @@ const handlelike = async (id) => {
 };
 
 // 格式化時間
+// const formatDate = (date) => {
+//   if (!date) return "未知時間";
+
+//   const timestamp = typeof date === "string" ? parseInt(date, 10) : date; // 確保是數字類型
+//   const currentTime = new Date();
+//   const inputDate = new Date(timestamp); // 轉換成 Date 物件
+//   const diffInSeconds = Math.floor((currentTime - inputDate) / 1000); // 轉換秒
+//   const diffInMinutes = Math.floor(diffInSeconds / 60); // 轉換分鐘
+//   const diffInHours = Math.floor(diffInMinutes / 60); // 轉換小時
+//   const diffInDays = Math.floor(diffInHours / 24); // 轉換天數
+//   const diffInWeeks = Math.floor(diffInDays / 7); // 轉換週
+
+//   if (diffInSeconds < 60) {
+//     return "現在";
+//   } else if (diffInMinutes < 60) {
+//     return `${diffInMinutes} 分鐘`;
+//   } else if (diffInHours < 24) {
+//     return `${diffInHours} 小時`;
+//   } else if (diffInDays < 7) {
+//     return `${diffInDays} 天`;
+//   } else if (diffInWeeks < 4) {
+//     return `${diffInWeeks} 週`;
+//   } else {
+//     return inputDate.toLocaleDateString("zh-TW"); // 超過 4 週顯示日期
+//   }
+// };
 const formatDate = (date) => {
   if (!date) return "未知時間";
 
-  const timestamp = typeof date === "string" ? parseInt(date, 10) : date; // 確保是數字類型
+  // 解析 YYYY-MM-DD HH:mm:ss
+  const [datePart, timePart] = date.split(" ");
+  if (!datePart || !timePart) return "無效時間";
+
+  const [year, month, day] = datePart.split("-").map(Number);
+  const [hour, minute, second] = timePart.split(":").map(Number);
+
+  // 確保轉換成 UTC 時間
+  const inputDate = new Date(
+    Date.UTC(year, month - 1, day, hour, minute, second)
+  );
+  if (isNaN(inputDate)) return "無效時間";
+
   const currentTime = new Date();
-  const inputDate = new Date(timestamp); // 轉換成 Date 物件
-  const diffInSeconds = Math.floor((currentTime - inputDate) / 1000); // 轉換秒
-  const diffInMinutes = Math.floor(diffInSeconds / 60); // 轉換分鐘
-  const diffInHours = Math.floor(diffInMinutes / 60); // 轉換小時
-  const diffInDays = Math.floor(diffInHours / 24); // 轉換天數
-  const diffInWeeks = Math.floor(diffInDays / 7); // 轉換週
+  const diffInSeconds = Math.floor((currentTime - inputDate) / 1000);
+  const diffInMinutes = Math.floor(diffInSeconds / 60);
+  const diffInHours = Math.floor(diffInMinutes / 60);
+  const diffInDays = Math.floor(diffInHours / 24);
 
   if (diffInSeconds < 60) {
-    return "現在";
+    return "剛剛";
   } else if (diffInMinutes < 60) {
-    return `${diffInMinutes} 分鐘`;
+    return `${diffInMinutes} 分鐘前`;
   } else if (diffInHours < 24) {
-    return `${diffInHours} 小時`;
-  } else if (diffInDays < 7) {
-    return `${diffInDays} 天`;
-  } else if (diffInWeeks < 4) {
-    return `${diffInWeeks} 週`;
+    return `${diffInHours} 小時前`;
+  } else if (diffInDays === 1) {
+    return "昨天";
+  } else if (diffInDays <= 7) {
+    return `${diffInDays} 天前`;
   } else {
-    return inputDate.toLocaleDateString("zh-TW"); // 超過 4 週顯示日期
+    return `${inputDate.getFullYear()}-${String(
+      inputDate.getMonth() + 1
+    ).padStart(2, "0")}-${String(inputDate.getDate()).padStart(2, "0")}`;
   }
 };
 
