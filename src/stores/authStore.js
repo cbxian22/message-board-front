@@ -29,7 +29,7 @@ export const useAuthStore = defineStore("auth", {
       if (!this.accessToken || !this.userId) return;
       try {
         const response = await fetch(
-          "https://message-board-server-7yot.onrender.com/api/auth/me",
+          "https://message-board-server-7yot.onrender.com/api/users/me",
           {
             headers: { Authorization: `Bearer ${this.accessToken}` },
           }
