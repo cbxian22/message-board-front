@@ -53,6 +53,15 @@ watch(show, (newValue) => {
   }
 });
 
+// 監聽路由變化並刷新資料
+watch(
+  () => router.currentRoute.value.path,
+  () => {
+    fetchInfo();
+  },
+  { immediate: true }
+); // immediate 確保初次載入時也執行
+
 const checkTokenAndOpenModal = () => {
   if (!authStore.accessToken) {
     isLoginModalOpen.value = true;
@@ -61,10 +70,8 @@ const checkTokenAndOpenModal = () => {
 
 // 獲取用戶資料
 const fetchInfo = async () => {
-  const username = router.currentRoute.value.params.username;
-  console.log("Fetching info for username:", username);
   try {
-    const response = await apiClient.get(`/users/${username}`);
+    const response = await apiClient.get(`/users/${username.value}`);
     if (response.status === 200 && response.data) {
       info.value = {
         id: response.data.id,
@@ -122,6 +129,12 @@ const uploadFile = async () => {
 
 // 提交更新
 const handleUpdate = async () => {
+  // 檢查是否在自己的頁面
+  if (username.value !== authStore.userName) {
+    alert("您只能編輯自己的資料！");
+    show.value = false;
+    return;
+  }
   if (
     name.value === info.value.name &&
     intro.value === info.value.intro &&
