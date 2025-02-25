@@ -14,15 +14,14 @@ const router = useRouter();
 const authStore = useAuthStore();
 
 const loggedInUser = ref(authStore.userName);
-// const username = router.currentRoute.value.params.username;
-const username = computed(() => router.currentRoute.value.params.username); // 改為 computed
+const username = computed(() => router.currentRoute.value.params.username);
 const show = ref(false);
 const rwdwidth = ref("100vw");
 const info = ref({});
 const name = ref("");
 const intro = ref("");
 const file = ref(null);
-const fileUrl = ref(null);
+// const fileUrl = ref(null);
 const fileInputRef = ref(null);
 const tempAvatar = ref(null);
 const isLoginModalOpen = ref(false);
@@ -157,7 +156,13 @@ const handleUpdate = async () => {
       // 同步更新 loggedInUser
       loggedInUser.value = name.value;
 
-      await router.push(`/@${name.value}`);
+      // await router.push(`/@${name.value}`);
+      const currentUrl = window.location.href;
+      const targetPath = currentUrl.includes("?from=navbar")
+        ? `/@${name.value}?from=navbar`
+        : `/@${name.value}`;
+
+      await router.push(targetPath);
       await nextTick();
       await fetchInfo();
       emitter.emit("refreshPost");
