@@ -39,7 +39,7 @@
         </div>
         <!--  -->
         <!-- <singleComment /> -->
-        <singleComment @loaded="handleLoaded" />
+        <SinglePosts @loaded="handleLoaded" />
       </div>
     </div>
     <Navbar />
@@ -53,7 +53,7 @@ import { useScrollStore } from "@/stores/scrollStore";
 import { NSpin } from "naive-ui";
 
 import { useSocketStore } from "../stores/socketStore";
-import singleComment from "../components/singleComment.vue";
+import SinglePosts from "../components/singlePosts.vue";
 import Navbar from "../components/Navbar.vue";
 import NavbarUp from "../components/NavbarUp.vue";
 
@@ -91,14 +91,7 @@ const aru = computed(() => socketStore.messages.length > 0);
   display: flex;
   flex-direction: column;
   justify-self: center;
-  /* 預留空間，避免被固定的 Navbar 擋住 */
   margin: 100px 0;
-}
-
-.container {
-  border: 0.5px solid #373737;
-  border-radius: 30px;
-  overflow: hidden; /* 防止背景超出圓角範圍 */
 }
 
 .aru {

@@ -29,6 +29,14 @@ a {
   background: none !important;
 }
 
+/* HomeView, ProfileView, CommentView */
+
+.container {
+  border: 0.5px solid #373737;
+  border-radius: 30px;
+  overflow: hidden;
+}
+
 /* singleComment , selfsingleComment */
 .info-modal .modal-overlay {
   position: absolute;
@@ -71,7 +79,7 @@ a {
   color: #000 !important;
 }
 
-/* homeView, loginView --- loading style --- */
+/* HomeView, loginView --- loading style --- */
 .loading-container {
   width: 100vw;
   height: 100vh;

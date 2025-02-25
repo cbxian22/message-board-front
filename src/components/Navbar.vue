@@ -48,8 +48,8 @@ import { ref, computed } from "vue";
 import { useAuthStore } from "../stores/authStore";
 import { useScrollStore } from "@/stores/scrollStore";
 
-import PostView from "./PostView.vue";
-import Login from "../components/LoginModal.vue";
+import PostView from "./ModalPost.vue";
+import Login from "./ModalLogin.vue";
 
 import Homeicon from "../assets/Homeicon.svg";
 import Searchicon from "../assets/Searchicon.svg";

@@ -6,7 +6,7 @@ import { useThemeStore } from "../stores/themeStore";
 import { useRouter } from "vue-router";
 import apiClient from "../stores/axiosConfig";
 import { emitter } from "../main";
-import Login from "../components/LoginModal.vue";
+import Login from "./ModalLogin.vue";
 
 const themeStore = useThemeStore();
 const loadingBar = useLoadingBar();

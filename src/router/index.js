@@ -25,12 +25,12 @@ const router = createRouter({
       component: () => import("../views/Register.vue"),
       // meta: { requiresGuest: true },
     },
-    {
-      path: "/message",
-      name: "Message",
-      component: () => import("../components/PostView.vue"),
-      // meta: { requiresGuest: true },
-    },
+    // {
+    //   path: "/message",
+    //   name: "Message",
+    //   component: () => import("../components/ModalPost.vue"),
+    //   // meta: { requiresGuest: true },
+    // },
     {
       path: "/chat",
       name: "Chat",
@@ -40,13 +40,13 @@ const router = createRouter({
     {
       path: "/@:username",
       name: "Profile",
-      component: () => import("../views/Profile.vue"),
+      component: () => import("../views/ProfileView.vue"),
       props: true,
     },
     {
-      path: "/SinglePosts/:id",
-      name: "SinglePosts",
-      component: () => import("../views/SinglePosts.vue"),
+      path: "/post/:id",
+      name: "Post",
+      component: () => import("../views/PostView.vue"),
       props: true, // 允許將路由參數作為 props 傳遞
       // meta: { requiresGuest: true },
     },

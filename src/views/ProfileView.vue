@@ -3,7 +3,7 @@ import { ref, computed, onMounted, watch } from "vue";
 import { useRoute, useRouter } from "vue-router";
 import axios from "axios";
 
-import selfSingleComment from "../components/selfSingleComment.vue";
+import selfSingleComment from "../components/InfoSinglePosts.vue";
 import selfInfo from "../components/selfInfo.vue";
 import Navbar from "../components/Navbar.vue";
 import NavbarUp from "../components/NavbarUp.vue";
@@ -111,9 +111,9 @@ const isFromNavbar = () => {
   filter: invert(1) grayscale(100%) contrast(100%) brightness(0);
 }
 
-.container {
+/* .container {
   border: 0.5px solid #373737;
   border-radius: 30px;
   overflow: hidden;
-}
+} */
 </style>

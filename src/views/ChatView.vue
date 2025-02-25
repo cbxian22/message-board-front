@@ -1,6 +1,5 @@
-<template>
+<!-- <template>
   <div class="chat-container">
-    <!-- 好友列表 -->
     <div class="chat-sidebar">
       <h2>好友</h2>
       <ul>
@@ -14,7 +13,6 @@
       </ul>
     </div>
 
-    <!-- 聊天視窗 -->
     <div class="chat-window">
       <div class="chat-header">
         <h2 v-if="activeChatUser">{{ activeChatUser.name }}</h2>
@@ -177,4 +175,4 @@ async function fetchFriends() {
   border: none;
   cursor: pointer;
 }
-</style>
+</style> -->

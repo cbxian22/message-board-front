@@ -1,3 +1,150 @@
+<!-- <script setup>
+import { ref, computed, onMounted, onUnmounted } from "vue";
+import { useAuthStore } from "../stores/authStore";
+import { NBadge } from "naive-ui";
+import UpdatePostView from "./UpdatePostView.vue";
+import Replyicon from "../assets/Replyicon.svg";
+import Favoriteicon from "../assets/Favoriteicon.svg";
+import Moreicon from "../assets/Moreicon.svg";
+import Editicon from "../assets/Editicon.svg";
+import Deleteicon from "../assets/Deleteicon.svg";
+import Flagicon from "../assets/Flagicon.svg";
+const commentImages = ref([]);
+const value = ref(0);
+const unlike = ref(true);
+
+const comments = ref([
+  {
+    id: 1,
+    photo: "https://fakeimg.pl/300/",
+    title: "這是第一個留言標題",
+    content: "這是第一個留言的內容，討論一些有趣的話題。",
+    name: "小明",
+    timestamp: 1675886200000,
+    file_url:
+      "https://storage.googleapis.com/message_board_storage/default_profile.jpg",
+  },
+  {
+    id: 2,
+    photo: "https://fakeimg.pl/300/",
+    title: "第二個留言標題，討論新技術",
+    content: "這是第二個留言的內容，分享一些關於最新技術的見解。",
+    name: "小華",
+    timestamp: 1675972600000,
+    file_url:
+      "https://storage.googleapis.com/message_board_storage/%E6%88%AA%E5%9C%96%202025-01-12%20%E6%99%9A%E4%B8%8A10.46.29.png",
+  },
+  {
+    id: 3,
+    photo: "https://fakeimg.pl/300/",
+    title: "第三個留言標題，問問題",
+    content: "這是第三個留言的內容，這裡有一些問題等待解答。",
+    name: "小李",
+    timestamp: 1676059000000,
+    file_url:
+      "https://storage.googleapis.com/message_board_storage/%E6%88%AA%E5%9C%96%202025-02-17%20%E4%B8%8B%E5%8D%882.46.25.png",
+  },
+  {
+    id: 4,
+    photo: "https://fakeimg.pl/300/",
+    title: "聊天與討論，第四個留言",
+    content: "這是第四個留言的內容，這裡是關於一些生活中的趣事。",
+    name: "小張",
+    timestamp: 1676145400000,
+    file_url: "",
+  },
+]);
+
+const authStore = useAuthStore();
+authStore.checkLoginStatus();
+const modalState = ref({});
+const modalRefs = ref({});
+const buttonRefs = ref({});
+const isOpenModal = ref(false);
+
+const openModal = (event, commentId) => {
+  event.stopPropagation();
+
+  // 如果當前 Modal 已開啟，則關閉它
+  if (modalState.value[commentId]) {
+    modalState.value[commentId] = false;
+    return;
+  }
+
+  // 先關閉所有其他留言的 Modal
+  Object.keys(modalState.value).forEach((key) => {
+    modalState.value[key] = false;
+  });
+
+  // 只打開當前點擊的留言的 Modal
+  modalState.value[commentId] = true;
+};
+
+// 關閉 Modal
+const closeModal = (event) => {
+  const clickedInsideModal = Object.keys(modalRefs.value).some((id) => {
+    const modal = modalRefs.value[id];
+    const button = buttonRefs.value[id];
+
+    return (
+      modal && (modal.contains(event.target) || button.contains(event.target))
+    );
+  });
+
+  if (!clickedInsideModal) {
+    Object.keys(modalState.value).forEach((key) => {
+      modalState.value[key] = false;
+    });
+  }
+};
+
+const handleUpdate = async (postId) => {
+  isOpenModal.value = true;
+  // try {
+  //   const userId = authStore.userId;
+  //   const message = await postStore.updatePost(
+  //     postId,
+  //     userId,
+  //     content,
+  //     fileUrl
+  //   );
+  //   console.log(message);
+  //   // location.reload();
+  //   await postStore.fetchPosts(); // 重新獲取貼文，而不是整個刷新頁面
+  // } catch {
+  //   console.log(更新失敗);
+  // }
+};
+
+onMounted(() => {
+  document.addEventListener("mousedown", closeModal);
+});
+
+onUnmounted(() => {
+  document.removeEventListener("mousedown", closeModal);
+});
+
+const formatDate = (timestamp) => {
+  const date = new Date(timestamp);
+  return date.toLocaleString(); // 格式化日期時間
+};
+
+const goToCommentPage = (id) => {
+  console.log(`跳轉到留言頁面，留言ID: ${id}`);
+};
+
+onMounted(() => {
+  // 確保對每一個圖片都加載後進行判斷
+  commentImages.value.forEach((img) => {
+    img.onload = () => {
+      if (img.naturalHeight > img.naturalWidth) {
+        img.classList.add("tall-img"); // 直向圖片加上類別
+      }
+    };
+  });
+});
+</script> -->
+
 <script setup>
 import { ref, defineEmits, onMounted, onUnmounted } from "vue";
 import { NBadge } from "naive-ui";
@@ -6,7 +153,6 @@ import { usePostStore } from "../stores/usePostStore";
 import { useDateStore } from "../stores/dateStore";
 import { useRouter } from "vue-router";
 import apiClient from "../stores/axiosConfig"; // 引入 apiClient
-import { emitter } from "../main";
 
 import Replyicon from "../assets/Replyicon.svg";
 import Favoriteicon from "../assets/Favoriteicon.svg";
@@ -15,16 +161,13 @@ import Moreicon from "../assets/Moreicon.svg";
 import Editicon from "../assets/Editicon.svg";
 import Deleteicon from "../assets/Deleteicon.svg";
 import Flagicon from "../assets/Flagicon.svg";
-import UpdatePostView from "./UpdatePostView.vue";
+import UpdatePostView from "./ModalUpdatePost.vue";
 
 const router = useRouter();
 const emit = defineEmits();
 const postStore = usePostStore();
 const authStore = useAuthStore();
 const dateStore = useDateStore();
-
-const loggedInUser = authStore.userName;
-const username = router.currentRoute.value.params.username;
 
 const comments = ref([]);
 const commentImages = ref([]);
@@ -34,14 +177,6 @@ const buttonRefs = ref({});
 const isOpenModal = ref(false);
 const isLikeProcessing = ref(false); // 用於追踪點讚狀態
 const selectedComment = ref(null); // 用於儲存當前選中的單一留言
-
-// 點擊圖示回到最上
-const scrollToTop = () => {
-  window.scrollTo({
-    top: 0,
-    left: 0,
-  });
-};
 
 // 打開 Modal
 const openModal = (event, commentId) => {
@@ -88,14 +223,11 @@ onUnmounted(() => {
   document.removeEventListener("mousedown", closeModal);
 });
 
-// 獲取留言（指定用戶）
+// 獲取留言
 const fetchComments = async () => {
-  const username = router.currentRoute.value.params.username; // 從路由獲取 username
-  const userId = authStore.userId || localStorage.getItem("userId");
   try {
-    const response = await apiClient.get(`/posts/user/${username}`, {
-      params: { userId },
-    });
+    const userId = authStore.userId || localStorage.getItem("userId");
+    const response = await apiClient.get("/posts", { params: { userId } });
     if (response.status === 200 && Array.isArray(response.data)) {
       comments.value = response.data.map((comment) => ({
         id: comment.id,
@@ -154,15 +286,16 @@ const handleDelete = async (postId) => {
     const message = await postStore.deletePost(postId, userId);
     console.log(message);
     location.reload();
-  } catch {
-    console.log(刪除失敗);
+  } catch (error) {
+    console.error("刪除失敗:", error.message);
+    alert("刪除失敗: " + error.message); // 顯示具體錯誤訊息
   }
 };
 
 // 修改留言
 const handleUpdate = async (postId) => {
   isOpenModal.value = true;
-  await fetchSingleComment(postId);
+  await fetchSingleComment(postId); // 獲取單一留言
 };
 
 // 按讚
@@ -177,6 +310,7 @@ const handlelike = async (id) => {
     return;
   }
 
+  // 找到對應的 comment
   const comment = comments.value.find((c) => c.id === id);
   if (!comment) return;
 
@@ -214,20 +348,20 @@ const handlelike = async (id) => {
   }
 };
 
-// 跳轉到 CommentView
-const goToSinglePosts = (id) => {
-  router.push({ name: "SinglePosts", params: { id } });
+// 新增回覆
+const handleReply = async (postId) => {
+  router.push({ name: "CommentView", params: { postId } });
+  await fetchSingleComment(postId);
 };
+
+// 跳轉到 CommentView
+// const goToSinglePosts = (id) => {
+//   router.push({ name: "SinglePosts", params: { id } });
+// };
 
 // 頁面加載時執行
 onMounted(() => {
   fetchComments();
-  emitter.on("refreshPost", fetchComments); // 監聽刷新事件
-});
-
-// 清理監聽
-onUnmounted(() => {
-  emitter.off("refreshPost", fetchComments); // 清理監聽
 });
 
 // 確保對每一個圖片都加載後進行判斷
@@ -257,9 +391,10 @@ onMounted(() => {
       <!-- 貼文資訊 -->
       <div class="info">
         <div class="info-span">
-          <span class="comment-author" @click="scrollToTop">
-            {{ comment.name }}</span
-          >
+          <router-link class="comment-author" :to="`/@${comment.name}`">
+            {{ comment.name }}
+          </router-link>
+
           <span class="comment-time">
             {{ dateStore.formatDate(comment.timestamp) }}</span
           >
@@ -280,19 +415,28 @@ onMounted(() => {
           >
             <div class="modal-content" @click.stop>
               <ul>
-                <li v-if="loggedInUser === username">
+                <li
+                  v-if="
+                    authStore.isLoggedIn && authStore.userName === comment.name
+                  "
+                >
                   <button class="modal-link" @click="handleUpdate(comment.id)">
                     <img class="icon" :src="Editicon" alt="Editicon" />
                     <span>編輯</span>
                   </button>
                 </li>
-                <li v-if="loggedInUser === username">
+
+                <li
+                  v-if="
+                    authStore.isLoggedIn && authStore.userName === comment.name
+                  "
+                >
                   <button class="modal-link" @click="handleDelete(comment.id)">
                     <img class="icon" :src="Deleteicon" alt="Deleteicon" />
                     <span>刪除</span>
                   </button>
                 </li>
-                <li v-if="loggedInUser !== username">
+                <li v-if="authStore.userName !== comment.name">
                   <button class="modal-link">
                     <img class="icon" :src="Flagicon" alt="Flagicon" />
                     <span>檢舉</span>
@@ -303,7 +447,7 @@ onMounted(() => {
           </div>
         </div>
       </div>
-
+      <!--  -->
       <!-- 貼文內容 -->
       <div class="comment-content">
         <p>{{ comment.content }}</p>
@@ -315,6 +459,7 @@ onMounted(() => {
           />
         </span>
       </div>
+
       <!-- 回覆功能 -->
       <div class="reply">
         <ul>
@@ -331,7 +476,7 @@ onMounted(() => {
             </div>
           </li>
           <li>
-            <div class="reply-count" @click="goToSinglePosts(comment.id)">
+            <div class="reply-count" @click="handleReply(comment.id)">
               <button class="reply-link">
                 <img class="icon" :src="Replyicon" alt="Replyicon" />
               </button>
@@ -423,7 +568,6 @@ onMounted(() => {
   color: #fff;
   font-weight: 900;
   transition: color 0.3s ease;
-  cursor: pointer;
 }
 
 .info-span .comment-author:hover {
