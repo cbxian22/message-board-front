@@ -53,7 +53,7 @@ import { useScrollStore } from "@/stores/scrollStore";
 import { NSpin } from "naive-ui";
 
 import { useSocketStore } from "../stores/socketStore";
-import SinglePosts from "../components/singlePosts.vue";
+import SinglePosts from "../components/SinglePosts.vue";
 import Navbar from "../components/Navbar.vue";
 import NavbarUp from "../components/NavbarUp.vue";
 
