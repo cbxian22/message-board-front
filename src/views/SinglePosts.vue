@@ -1,7 +1,10 @@
 <script setup>
 import { ref, onMounted } from "vue";
+import { useDateStore } from "../stores/dateStore";
 import { useRoute } from "vue-router";
 import axios from "axios";
+
+const dateStore = useDateStore();
 
 const comment = ref([]);
 const replies = ref([]);
@@ -45,21 +48,6 @@ const fetchReplies = async () => {
     console.error("取得留言詳細錯誤:", error);
     alert("留言詳細取得失敗，請稍後再試");
   }
-};
-
-// 格式化時間
-const formatDate = (date) => {
-  console.log(date);
-
-  if (!date) return "未知時間";
-  const options = {
-    year: "numeric",
-    month: "2-digit",
-    day: "2-digit",
-    hour: "2-digit",
-    minute: "2-digit",
-  };
-  return new Date(date).toLocaleString("zh-TW", options);
 };
 
 // 提交回覆
@@ -106,7 +94,9 @@ onMounted(() => {
     <!-- <h3>{{ comment.title }}</h3> -->
     <p class="comment-content">{{ comment.content }}</p>
     <p class="comment-author">貼文者: {{ comment.user_name }}</p>
-    <p class="comment-time">貼文時間: {{ formatDate(comment.created_at) }}</p>
+    <p class="comment-time">
+      貼文時間: {{ dateStore.formatDate(comment.created_at) }}
+    </p>
     <p v-if="comment.file_url" class="comment-file">
       附件: <a :href="comment.file_url" target="_blank">下載</a>
     </p>
@@ -114,7 +104,9 @@ onMounted(() => {
       <h4>回覆留言</h4>
       <div v-for="reply in replies" :key="reply.id" class="reply">
         <p class="reply-content">回覆內容: {{ reply.content }}</p>
-        <p class="reply-time">回覆時間: {{ formatDate(reply.created_at) }}</p>
+        <p class="reply-time">
+          回覆時間: {{ dateStore.formatDate(reply.created_at) }}
+        </p>
         <p class="reply-author">回覆者: {{ reply.replies_name }}</p>
       </div>
     </div>

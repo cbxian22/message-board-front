@@ -348,37 +348,6 @@ const handlelike = async (id) => {
   }
 };
 
-// 格式化時間
-
-// const formatDate = (date) => {
-//   if (!date) return "未知時間";
-
-//   const timestamp = typeof date === "string" ? parseInt(date, 10) : date;
-//   const currentTime = new Date();
-//   const inputDate = new Date(timestamp);
-//   const diffInSeconds = Math.floor((currentTime - inputDate) / 1000);
-//   const diffInMinutes = Math.floor(diffInSeconds / 60);
-//   const diffInHours = Math.floor(diffInMinutes / 60);
-//   const diffInDays = Math.floor(diffInHours / 24);
-
-//   if (diffInSeconds < 60) {
-//     return "剛剛";
-//   } else if (diffInMinutes < 60) {
-//     return `${diffInMinutes} 分鐘前`;
-//   } else if (diffInHours < 24) {
-//     return `${diffInHours} 小時前`;
-//   } else if (diffInDays === 1) {
-//     return "昨天";
-//   } else if (diffInDays <= 7) {
-//     return `${diffInDays} 天前`;
-//   } else {
-//     const year = inputDate.getFullYear();
-//     const month = String(inputDate.getMonth() + 1).padStart(2, "0"); // 月份從0開始，所以+1
-//     const day = String(inputDate.getDate()).padStart(2, "0");
-//     return `${year}-${month}-${day}`;
-//   }
-// };
-
 // 跳轉到 CommentView
 const goToSinglePosts = (id) => {
   router.push({ name: "SinglePosts", params: { id } });
