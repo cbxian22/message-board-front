@@ -3,25 +3,25 @@
     <ul>
       <li @click="scrollToTop">
         <router-link to="/" class="nav-link">
-          <img :src="Homeicon" alt="Homeicon" />
+          <img class="icon" :src="Homeicon" alt="Homeicon" />
         </router-link>
       </li>
 
       <li>
         <router-link to="/" class="nav-link">
-          <img :src="Searchicon" alt="Searchicon" />
+          <img class="icon" :src="Searchicon" alt="Searchicon" />
         </router-link>
       </li>
 
       <li>
         <button @click="checkTokenAndOpenModal" class="nav-link">
-          <img :src="Addicon" alt="Addicon" />
+          <img class="icon" :src="Addicon" alt="Addicon" />
         </button>
       </li>
 
       <li v-if="!authStore.isLoggedIn">
         <router-link to="/login" class="nav-link">
-          <img :src="Loginicon" alt="Loginicon" />
+          <img class="icon" :src="Loginicon" alt="Loginicon" />
         </router-link>
       </li>
 
@@ -57,7 +57,6 @@ import Addicon from "../assets/Addicon.svg";
 import Loginicon from "../assets/Loginicon.svg";
 
 const authStore = useAuthStore();
-// authStore.checkLoginStatus();
 const scrollStore = useScrollStore();
 
 const isPostModalOpen = ref(false);
@@ -131,9 +130,9 @@ const scrollToTop = () => {
 }
 
 /* 淺色下更改引入 icon 顏色 */
-.light-mode img {
+/* .light-mode img {
   filter: invert(1) grayscale(100%) contrast(100%) brightness(0);
-}
+} */
 
 .dark-mode nav {
   background: rgba(10, 10, 10, 0.6); /* 半透明黑色背景 */

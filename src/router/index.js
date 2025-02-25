@@ -26,12 +26,6 @@ const router = createRouter({
       // meta: { requiresGuest: true },
     },
     // {
-    //   path: "/message",
-    //   name: "Message",
-    //   component: () => import("../components/ModalPost.vue"),
-    //   // meta: { requiresGuest: true },
-    // },
-    // {
     //   path: "/chat",
     //   name: "Chat",
     //   component: () => import("../views/ChatView.vue"),
