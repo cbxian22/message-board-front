@@ -47,7 +47,7 @@
 <script setup>
 import { ref, computed } from "vue";
 import { useAuthStore } from "../stores/authStore";
-import { useScrollStore } from "@/stores/scrollStore";
+// import { useScrollStore } from "@/stores/scrollStore";
 
 import PostView from "./ModalPost.vue";
 import Login from "./ModalLogin.vue";
@@ -58,7 +58,7 @@ import Addicon from "../assets/Addicon.svg";
 import Loginicon from "../assets/Loginicon.svg";
 
 const authStore = useAuthStore();
-const scrollStore = useScrollStore();
+// const scrollStore = useScrollStore();
 
 const isPostModalOpen = ref(false);
 const isLoginModalOpen = ref(false);
@@ -75,13 +75,13 @@ const checkTokenAndOpenModal = () => {
 };
 
 // 重置滾動位置
-const scrollToTop = () => {
-  window.scrollTo({
-    top: 0,
-    left: 0,
-  });
-  scrollStore.setScrollPosition(0);
-};
+// const scrollToTop = () => {
+//   window.scrollTo({
+//     top: 0,
+//     left: 0,
+//   });
+//   scrollStore.setScrollPosition(0);
+// };
 </script>
 
 <style scoped>

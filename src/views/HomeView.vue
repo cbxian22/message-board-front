@@ -49,7 +49,7 @@
 <script setup>
 import { computed, onUpdated, ref } from "vue";
 import { onBeforeRouteLeave } from "vue-router";
-import { useScrollStore } from "@/stores/scrollStore";
+// import { useScrollStore } from "@/stores/scrollStore";
 import { NSpin } from "naive-ui";
 
 import { useSocketStore } from "../stores/socketStore";
@@ -58,7 +58,7 @@ import Navbar from "../components/Navbar.vue";
 import NavbarUp from "../components/NavbarUp.vue";
 
 const socketStore = useSocketStore();
-const scrollStore = useScrollStore();
+// const scrollStore = useScrollStore();
 const isLoading = ref(true);
 
 // 當 singleComment 加載完成時，更新 isLoading
@@ -67,18 +67,18 @@ const handleLoaded = () => {
 };
 
 // 在離開頁面之前保存滾動位置
-onBeforeRouteLeave((to, from, next) => {
-  // console.log("Saving scroll position:", window.scrollY);
-  scrollStore.setScrollPosition(window.scrollY);
-  next();
-});
+// onBeforeRouteLeave((to, from, next) => {
+//   // console.log("Saving scroll position:", window.scrollY);
+//   scrollStore.setScrollPosition(window.scrollY);
+//   next();
+// });
 
-onUpdated(() => {
-  const position = useScrollStore().getScrollPosition();
-  if (position !== 0) {
-    window.scrollTo(0, position);
-  }
-});
+// onUpdated(() => {
+//   const position = useScrollStore().getScrollPosition();
+//   if (position !== 0) {
+//     window.scrollTo(0, position);
+//   }
+// });
 
 // 計算是否有新留言
 const aru = computed(() => socketStore.messages.length > 0);
