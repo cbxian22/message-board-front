@@ -27,6 +27,7 @@ export const useAuthStore = defineStore("auth", {
   actions: {
     async fetchUserData() {
       if (!this.accessToken || !this.userId) return;
+      console.log("Fetching with token:", this.accessToken); // 添加日誌
       try {
         const response = await fetch(
           "https://message-board-server-7yot.onrender.com/api/users/me",
