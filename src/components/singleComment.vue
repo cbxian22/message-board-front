@@ -375,10 +375,10 @@ const handlelike = async (id) => {
 //   }
 // };
 const formatDate = (date) => {
-  if (!date) return "未知時間";
+  if (typeof date !== "string" || !date.trim()) return "未知時間";
 
-  const inputDate = new Date(date.replace(/-/g, "/")); // 確保跨瀏覽器兼容
-  if (isNaN(inputDate)) return "無效時間"; // 檢查日期是否有效
+  const inputDate = new Date(date.replace(/-/g, "/"));
+  if (isNaN(inputDate.getTime())) return "未知時間";
 
   const currentTime = new Date();
   const diffInSeconds = Math.floor((currentTime - inputDate) / 1000);
@@ -386,21 +386,14 @@ const formatDate = (date) => {
   const diffInHours = Math.floor(diffInMinutes / 60);
   const diffInDays = Math.floor(diffInHours / 24);
 
-  if (diffInSeconds < 60) {
-    return "現在";
-  } else if (diffInMinutes < 60) {
-    return `${diffInMinutes} 分鐘`;
-  } else if (diffInHours < 24) {
-    return `${diffInHours} 小時`;
-  } else if (diffInDays <= 7) {
-    // 7 天以內顯示天數
-    return `${diffInDays} 天`;
-  } else {
-    // 超過 7 天顯示 YYYY-MM-DD
-    return `${inputDate.getFullYear()}-${String(
-      inputDate.getMonth() + 1
-    ).padStart(2, "0")}-${String(inputDate.getDate()).padStart(2, "0")}`;
-  }
+  if (diffInSeconds < 60) return "剛剛";
+  if (diffInMinutes < 60) return `${diffInMinutes} 分鐘前`;
+  if (diffInHours < 24) return `${diffInHours} 小時前`;
+  if (diffInDays === 1) return "昨天";
+  if (diffInDays <= 7) return `${diffInDays} 天前`;
+  return `${inputDate.getFullYear()}-${String(
+    inputDate.getMonth() + 1
+  ).padStart(2, "0")}-${String(inputDate.getDate()).padStart(2, "0")}`;
 };
 
 // 跳轉到 CommentView
