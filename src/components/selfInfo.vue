@@ -28,7 +28,6 @@ const isLoginModalOpen = ref(false);
 
 // 初始化檢查登入狀態，並監聽 authStore 變化
 onMounted(async () => {
-  // await authStore.checkLoginStatus();
   loggedInUser.value = authStore.userName;
   fetchInfo();
   updateWidth();
@@ -39,13 +38,6 @@ onUnmounted(() => {
   window.removeEventListener("resize", updateWidth);
 });
 
-// 監聽 authStore.userName 變化
-watch(
-  () => authStore.userName,
-  (newValue) => {
-    loggedInUser.value = newValue;
-  }
-);
 // 當抽屜顯示時，預填入現有資料
 watch(show, (newValue) => {
   if (newValue) {
@@ -160,6 +152,9 @@ const handleUpdate = async () => {
       authStore.userAvatar = uploadedFileUrl || info.value.userAvatar;
       localStorage.setItem("userName", authStore.userName);
       localStorage.setItem("userAvatar", authStore.userAvatar);
+
+      // 同步更新 loggedInUser
+      loggedInUser.value = name.value;
 
       await router.push(`/@${name.value}`);
       await nextTick();
