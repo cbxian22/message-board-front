@@ -28,7 +28,7 @@ const isLoginModalOpen = ref(false);
 
 // 初始化檢查登入狀態，並監聽 authStore 變化
 onMounted(async () => {
-  await authStore.checkLoginStatus();
+  // await authStore.checkLoginStatus();
   loggedInUser.value = authStore.userName;
   fetchInfo();
   updateWidth();

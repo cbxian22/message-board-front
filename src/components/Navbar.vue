@@ -57,7 +57,7 @@ import Addicon from "../assets/Addicon.svg";
 import Loginicon from "../assets/Loginicon.svg";
 
 const authStore = useAuthStore();
-authStore.checkLoginStatus();
+// authStore.checkLoginStatus();
 const scrollStore = useScrollStore();
 
 const isPostModalOpen = ref(false);

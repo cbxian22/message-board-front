@@ -166,7 +166,7 @@ const router = useRouter();
 const emit = defineEmits();
 const postStore = usePostStore();
 const authStore = useAuthStore();
-authStore.checkLoginStatus();
+// authStore.checkLoginStatus();
 
 const comments = ref([]);
 const commentImages = ref([]);
