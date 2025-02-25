@@ -62,6 +62,7 @@ const checkTokenAndOpenModal = () => {
 // 獲取用戶資料
 const fetchInfo = async () => {
   const username = router.currentRoute.value.params.username;
+  console.log("Fetching info for username:", username);
   try {
     const response = await apiClient.get(`/users/${username}`);
     if (response.status === 200 && response.data) {
