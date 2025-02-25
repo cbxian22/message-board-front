@@ -1,5 +1,5 @@
 <script setup>
-import { ref, onMounted, onUnmounted } from "vue";
+import { ref, onMounted, onUnmounted, watch } from "vue";
 import { NBadge } from "naive-ui";
 import { useAuthStore } from "../stores/authStore";
 import { usePostStore } from "../stores/usePostStore";
