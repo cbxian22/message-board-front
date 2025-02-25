@@ -326,6 +326,7 @@ const updateWidth = () => {
   --n-border-focus: none !important;
   --n-border-pressed: none !important;
   --n-text-color-focus: none !important;
+  --n-ripple-color: none !important;
 }
 
 .dark-mode .n-button {
