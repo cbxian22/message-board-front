@@ -155,13 +155,7 @@ const handleUpdate = async () => {
 
       // 同步更新 loggedInUser
       loggedInUser.value = name.value;
-
-      // 判斷從首頁還是個人頁來
-      const currentUrl = window.location.href;
-      const targetPath = currentUrl.includes("?from=navbar")
-        ? `/@${name.value}?from=navbar`
-        : `/@${name.value}`;
-      await router.push(targetPath);
+      await router.push(`/@${name.value}`);
 
       await nextTick();
       await fetchInfo();
