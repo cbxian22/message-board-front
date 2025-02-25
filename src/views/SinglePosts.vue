@@ -64,6 +64,7 @@ const formatDate = (date) => {
 
 // 提交回覆
 const handleReply = async () => {
+  const userId = 2;
   try {
     // 使用 userId 構建正确的 API 路徑
     const response = await axios.post(
