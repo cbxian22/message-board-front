@@ -1,5 +1,5 @@
 <script setup>
-import { ref, onMounted, onUnmounted, watch, nextTick } from "vue";
+import { ref, onMounted, onUnmounted, watch, nextTick, computed } from "vue";
 import { NButton, NDrawerContent, NDrawer, useLoadingBar } from "naive-ui";
 import { useAuthStore } from "../stores/authStore";
 import { useThemeStore } from "../stores/themeStore";
@@ -14,7 +14,8 @@ const router = useRouter();
 const authStore = useAuthStore();
 
 const loggedInUser = ref(authStore.userName);
-const username = router.currentRoute.value.params.username;
+// const username = router.currentRoute.value.params.username;
+const username = computed(() => router.currentRoute.value.params.username); // 改為 computed
 const show = ref(false);
 const rwdwidth = ref("100vw");
 const info = ref({});
