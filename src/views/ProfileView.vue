@@ -1,12 +1,13 @@
 <script setup>
 import { ref, computed, onMounted, watch } from "vue";
 import { useRoute, useRouter } from "vue-router";
-import axios from "axios";
+import apiClient from "../stores/axiosConfig";
 
-import selfSingleComment from "../components/InfoSinglePosts.vue";
-import selfInfo from "../components/selfInfo.vue";
+import Info from "../components/Info.vue";
+import InfoSinglePosts from "../components/InfoSinglePosts.vue";
 import Navbar from "../components/Navbar.vue";
 import NavbarUp from "../components/NavbarUp.vue";
+
 import Backicon from "../assets/Backicon.svg";
 
 // 計算是否有新留言
@@ -35,9 +36,11 @@ onMounted(async () => {
 // 獲取使用者資料
 const fetchUserData = async (username) => {
   try {
-    const response = await axios.get(
-      `https://message-board-server-7yot.onrender.com/api/users/${username}`
-    );
+    // const response = await axios.get(
+    //   `https://message-board-server-7yot.onrender.com/api/users/${username}`
+    // );
+    const response = await apiClient.get(`/users/${username}`);
+
     if (response.data.message === "使用者不存在") {
       router.replace("/not-found");
     }
@@ -63,7 +66,7 @@ const isFromNavbar = () => {
     </div>
 
     <div class="container">
-      <selfInfo :username="props.username" />
+      <Info :username="props.username" />
       <!-- <selfInfo :username="username" :key="username" /> -->
       <!-- <div v-if="aru" class="aru">
         <h1>最新留言</h1>
@@ -76,7 +79,7 @@ const isFromNavbar = () => {
         </div>
       </div> -->
       <!-- <selfSingleComment :username="username" :key="username" /> -->
-      <selfSingleComment :username="props.username" />
+      <InfoSinglePosts :username="props.username" />
     </div>
   </div>
   <Navbar />
