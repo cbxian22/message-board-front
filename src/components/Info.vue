@@ -28,6 +28,14 @@ const fileInputRef = ref(null);
 const tempAvatar = ref(null);
 const isLoginModalOpen = ref(false);
 
+// 監聽 authStore.userName 的變化並同步 loggedInUser
+watch(
+  () => authStore.userName,
+  (newName) => {
+    loggedInUser.value = newName;
+  }
+);
+
 // 初始化檢查登入狀態，並監聽 authStore 變化
 onMounted(() => {
   updateWidth();
@@ -111,7 +119,7 @@ const uploadFile = async () => {
 
 // 提交更新
 const handleUpdate = async () => {
-  if (username.value !== authStore.userName) {
+  if (info.value.name !== authStore.userName) {
     alert("您只能編輯自己的資料！");
     show.value = false;
     return;

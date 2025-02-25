@@ -56,6 +56,7 @@ const fetchUserData = async (username) => {
       intro: userResponse.data.intro,
       userAvatar: userResponse.data.avatar_url,
     };
+
     if (postsResponse.status === 200 && Array.isArray(postsResponse.data)) {
       userPosts.value = postsResponse.data.map((comment) => ({
         id: comment.id,
