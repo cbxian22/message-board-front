@@ -1,5 +1,5 @@
 <script setup>
-import { ref, defineEmits, onMounted, onUnmounted } from "vue";
+import { ref, onMounted, onUnmounted } from "vue";
 import { NBadge } from "naive-ui";
 import { useAuthStore } from "../stores/authStore";
 import { usePostStore } from "../stores/usePostStore";
@@ -7,10 +7,6 @@ import { useDateStore } from "../stores/dateStore";
 import { useRouter } from "vue-router";
 import apiClient from "../stores/axiosConfig"; // 引入 apiClient
 import { emitter } from "../main";
-
-const props = defineProps({
-  posts: Array, // 從父組件接收貼文數據
-});
 
 import UpdatePostView from "./ModalUpdatePost.vue";
 
@@ -22,19 +18,20 @@ import Editicon from "../assets/Editicon.svg";
 import Deleteicon from "../assets/Deleteicon.svg";
 import Flagicon from "../assets/Flagicon.svg";
 
+const props = defineProps({
+  posts: Array, // 從父組件接收貼文數據
+});
+
 const router = useRouter();
-// const emit = defineEmits();
 const postStore = usePostStore();
 const authStore = useAuthStore();
 const dateStore = useDateStore();
 
-// const loggedInUser = authStore.userName;
-// const username = router.currentRoute.value.params.username;
-
+const loggedInUser = ref(authStore.userName);
+const username = ref(router.currentRoute.value.params.username);
 const comments = ref(props.posts || []);
 const modalState = ref({});
 const commentImages = ref([]);
-
 const modalRefs = ref({});
 const buttonRefs = ref({});
 const isOpenModal = ref(false);
@@ -45,6 +42,20 @@ watch(
   () => props.posts,
   (newPosts) => {
     comments.value = newPosts || [];
+  }
+);
+
+watch(
+  () => authStore.userName,
+  (newName) => {
+    loggedInUser.value = newName;
+  }
+);
+
+watch(
+  () => router.currentRoute.value.params.username,
+  (newUsername) => {
+    username.value = newUsername;
   }
 );
 
@@ -105,36 +116,6 @@ onUnmounted(() => {
   emitter.off("refreshPost", () => {});
 });
 
-// 獲取留言（指定用戶）
-// const fetchComments = async () => {
-//   const username = router.currentRoute.value.params.username; // 從路由獲取 username
-//   const userId = authStore.userId || localStorage.getItem("userId");
-//   try {
-//     const response = await apiClient.get(`/posts/user/${username}`, {
-//       params: { userId },
-//     });
-//     if (response.status === 200 && Array.isArray(response.data)) {
-//       comments.value = response.data.map((comment) => ({
-//         id: comment.id,
-//         content: comment.content,
-//         timestamp: new Date(comment.created_at),
-//         file_url: comment.file_url,
-//         name: comment.user_name,
-//         user_avatar: comment.user_avatar,
-//         likes: comment.likes || 0,
-//         userLiked: comment.user_liked || false, // 後端返回的用戶是否點贊
-//         replies: comment.replies,
-//       }));
-//       emit("loaded");
-//     } else {
-//       alert("無法獲取留言，數據格式不正確");
-//     }
-//   } catch (error) {
-//     console.error("取得留言錯誤:", error);
-//     alert("留言取得失敗，請檢查網絡或稍後再試");
-//   }
-// };
-
 // 獲取單一貼文
 const fetchSingleComment = async (postId) => {
   try {
@@ -166,6 +147,10 @@ const fetchSingleComment = async (postId) => {
 
 // 刪除留言
 const handleDelete = async (postId) => {
+  if (!authStore.accessToken) {
+    alert("請先登入！");
+    return;
+  }
   try {
     const userId = authStore.userId;
     const message = await postStore.deletePost(postId, userId);
@@ -178,12 +163,20 @@ const handleDelete = async (postId) => {
 
 // 修改留言
 const handleUpdate = async (postId) => {
+  if (!authStore.accessToken) {
+    alert("請先登入！");
+    return;
+  }
   isOpenModal.value = true;
   await fetchSingleComment(postId);
 };
 
 // 新增回覆
 const handleReply = async (postId) => {
+  if (!authStore.accessToken) {
+    alert("請先登入！");
+    return;
+  }
   await fetchSingleComment(postId);
   router.push({ name: "CommentView", params: { postId } });
 };
@@ -236,28 +229,6 @@ const handlelike = async (id) => {
     isLikeProcessing.value = false;
   }
 };
-
-// 頁面加載時執行
-// onMounted(() => {
-//   fetchComments();
-//   emitter.on("refreshPost", fetchComments); // 監聽刷新事件
-// });
-
-// 清理監聽
-// onUnmounted(() => {
-//   emitter.off("refreshPost", fetchComments); // 清理監聽
-// });
-
-// // 確保對每一個圖片都加載後進行判斷
-// onMounted(() => {
-//   commentImages.value.forEach((img) => {
-//     img.onload = () => {
-//       if (img.naturalHeight > img.naturalWidth) {
-//         img.classList.add("tall-img"); // 直向圖片加上類別
-//       }
-//     };
-//   });
-// });
 </script>
 
 <template>

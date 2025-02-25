@@ -28,14 +28,6 @@ const fileInputRef = ref(null);
 const tempAvatar = ref(null);
 const isLoginModalOpen = ref(false);
 
-onMounted(() => {
-  emitter.on("fetchUserData", () => fetchUserData(props.username));
-});
-
-onUnmounted(() => {
-  emitter.off("fetchUserData", () => {});
-});
-
 // 初始化檢查登入狀態，並監聽 authStore 變化
 onMounted(() => {
   updateWidth();
@@ -72,31 +64,6 @@ watch(show, (newValue) => {
     if (fileInputRef.value) fileInputRef.value.value = null;
   }
 });
-
-// // 獲取用戶資料
-// const fetchInfo = async () => {
-//   if (!username.value) {
-//     console.warn("Username not available, skipping fetchInfo");
-//     return;
-//   }
-//   try {
-//     const response = await apiClient.get(`/users/${username.value}`);
-//     if (response.status === 200 && response.data) {
-//       info.value = {
-//         id: response.data.id,
-//         name: response.data.name,
-//         intro: response.data.intro,
-//         userAvatar: response.data.avatar_url,
-//       };
-//       tempAvatar.value = info.value.userAvatar;
-//     } else {
-//       alert("無法獲取用戶資料，數據格式不正確");
-//     }
-//   } catch (error) {
-//     console.error("取得用戶資料錯誤:", error);
-//     alert("用戶資料取得失敗，請檢查網絡或稍後再試");
-//   }
-// };
 
 const checkTokenAndOpenModal = () => {
   if (!authStore.accessToken) {
@@ -144,7 +111,6 @@ const uploadFile = async () => {
 
 // 提交更新
 const handleUpdate = async () => {
-  // 檢查是否在自己的頁面
   if (username.value !== authStore.userName) {
     alert("您只能編輯自己的資料！");
     show.value = false;
@@ -167,7 +133,6 @@ const handleUpdate = async () => {
   }
 
   loadingBar.start();
-
   try {
     const uploadedFileUrl = await uploadFile();
     const response = await apiClient.put("/users/profile", {

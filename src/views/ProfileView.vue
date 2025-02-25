@@ -1,5 +1,5 @@
 <script setup>
-import { ref, computed, onMounted, watch } from "vue";
+import { ref, onMounted, watch } from "vue";
 import { useRoute, useRouter } from "vue-router";
 import apiClient from "../stores/axiosConfig";
 
@@ -9,15 +9,14 @@ import Navbar from "../components/Navbar.vue";
 import NavbarUp from "../components/NavbarUp.vue";
 import Backicon from "../assets/Backicon.svg";
 
-// 計算是否有新留言
 // const aru = computed(() => socketStore.messages.length > 0);
 
 const props = defineProps(["username"]);
 const router = useRouter();
-const route = useRoute(); // 新增 useRoute
+const route = useRoute();
 
-const userData = ref(null); // 儲存用戶資料
-const userPosts = ref([]); // 儲存用戶貼文
+const userData = ref(null);
+const userPosts = ref([]);
 
 watch(
   () => props.username,
@@ -38,6 +37,7 @@ onMounted(async () => {
 // 獲取使用者資料
 const fetchUserData = async (username) => {
   try {
+    const userId = localStorage.getItem("userId"); // 可選，後端應處理未登錄情況
     const [userResponse, postsResponse] = await Promise.all([
       apiClient.get(`/users/${username}`),
       apiClient.get(`/posts/user/${username}`, {
@@ -133,4 +133,3 @@ const isFromNavbar = () => {
   overflow: hidden;
 } */
 </style>
-－
