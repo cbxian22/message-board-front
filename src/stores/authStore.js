@@ -30,7 +30,7 @@ export const useAuthStore = defineStore("auth", {
       console.log("Fetching with token:", this.accessToken); // 添加日誌
       try {
         const response = await fetch(
-          "https://message-board-server-7yot.onrender.com/api/users/me",
+          "https://message-board-server-7yot.onrender.com/api/auth/me",
           {
             headers: { Authorization: `Bearer ${this.accessToken}` },
           }
