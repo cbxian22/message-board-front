@@ -31,12 +31,12 @@ const router = createRouter({
     //   component: () => import("../components/ModalPost.vue"),
     //   // meta: { requiresGuest: true },
     // },
-    {
-      path: "/chat",
-      name: "Chat",
-      component: () => import("../views/ChatView.vue"),
-      // meta: { requiresGuest: true },
-    },
+    // {
+    //   path: "/chat",
+    //   name: "Chat",
+    //   component: () => import("../views/ChatView.vue"),
+    //   // meta: { requiresGuest: true },
+    // },
     {
       path: "/@:username",
       name: "Profile",
