@@ -20,7 +20,6 @@ const router = useRouter();
 const emit = defineEmits();
 const postStore = usePostStore();
 const authStore = useAuthStore();
-// authStore.checkLoginStatus();
 
 const loggedInUser = authStore.userName;
 const username = router.currentRoute.value.params.username;
