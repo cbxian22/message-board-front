@@ -150,6 +150,7 @@ import { ref, defineEmits, onMounted, onUnmounted } from "vue";
 import { NBadge } from "naive-ui";
 import { useAuthStore } from "../stores/authStore";
 import { usePostStore } from "../stores/usePostStore";
+import { useDateStore } from "@/stores/dateStore";
 import { useRouter } from "vue-router";
 import apiClient from "../stores/axiosConfig"; // 引入 apiClient
 
@@ -166,7 +167,7 @@ const router = useRouter();
 const emit = defineEmits();
 const postStore = usePostStore();
 const authStore = useAuthStore();
-// authStore.checkLoginStatus();
+const dateStore = useDateStore();
 
 const comments = ref([]);
 const commentImages = ref([]);
@@ -348,60 +349,35 @@ const handlelike = async (id) => {
 };
 
 // 格式化時間
+
 // const formatDate = (date) => {
 //   if (!date) return "未知時間";
 
-//   const timestamp = typeof date === "string" ? parseInt(date, 10) : date; // 確保是數字類型
+//   const timestamp = typeof date === "string" ? parseInt(date, 10) : date;
 //   const currentTime = new Date();
-//   const inputDate = new Date(timestamp); // 轉換成 Date 物件
-//   const diffInSeconds = Math.floor((currentTime - inputDate) / 1000); // 轉換秒
-//   const diffInMinutes = Math.floor(diffInSeconds / 60); // 轉換分鐘
-//   const diffInHours = Math.floor(diffInMinutes / 60); // 轉換小時
-//   const diffInDays = Math.floor(diffInHours / 24); // 轉換天數
-//   const diffInWeeks = Math.floor(diffInDays / 7); // 轉換週
+//   const inputDate = new Date(timestamp);
+//   const diffInSeconds = Math.floor((currentTime - inputDate) / 1000);
+//   const diffInMinutes = Math.floor(diffInSeconds / 60);
+//   const diffInHours = Math.floor(diffInMinutes / 60);
+//   const diffInDays = Math.floor(diffInHours / 24);
 
 //   if (diffInSeconds < 60) {
-//     return "現在";
+//     return "剛剛";
 //   } else if (diffInMinutes < 60) {
-//     return `${diffInMinutes} 分鐘`;
+//     return `${diffInMinutes} 分鐘前`;
 //   } else if (diffInHours < 24) {
-//     return `${diffInHours} 小時`;
-//   } else if (diffInDays < 7) {
-//     return `${diffInDays} 天`;
-//   } else if (diffInWeeks < 4) {
-//     return `${diffInWeeks} 週`;
+//     return `${diffInHours} 小時前`;
+//   } else if (diffInDays === 1) {
+//     return "昨天";
+//   } else if (diffInDays <= 7) {
+//     return `${diffInDays} 天前`;
 //   } else {
-//     return inputDate.toLocaleDateString("zh-TW"); // 超過 4 週顯示日期
+//     const year = inputDate.getFullYear();
+//     const month = String(inputDate.getMonth() + 1).padStart(2, "0"); // 月份從0開始，所以+1
+//     const day = String(inputDate.getDate()).padStart(2, "0");
+//     return `${year}-${month}-${day}`;
 //   }
 // };
-const formatDate = (date) => {
-  if (!date) return "未知時間";
-
-  const timestamp = typeof date === "string" ? parseInt(date, 10) : date;
-  const currentTime = new Date();
-  const inputDate = new Date(timestamp);
-  const diffInSeconds = Math.floor((currentTime - inputDate) / 1000);
-  const diffInMinutes = Math.floor(diffInSeconds / 60);
-  const diffInHours = Math.floor(diffInMinutes / 60);
-  const diffInDays = Math.floor(diffInHours / 24);
-
-  if (diffInSeconds < 60) {
-    return "剛剛";
-  } else if (diffInMinutes < 60) {
-    return `${diffInMinutes} 分鐘前`;
-  } else if (diffInHours < 24) {
-    return `${diffInHours} 小時前`;
-  } else if (diffInDays === 1) {
-    return "昨天";
-  } else if (diffInDays <= 7) {
-    return `${diffInDays} 天前`;
-  } else {
-    const year = inputDate.getFullYear();
-    const month = String(inputDate.getMonth() + 1).padStart(2, "0"); // 月份從0開始，所以+1
-    const day = String(inputDate.getDate()).padStart(2, "0");
-    return `${year}-${month}-${day}`;
-  }
-};
 
 // 跳轉到 CommentView
 const goToSinglePosts = (id) => {
@@ -444,7 +420,9 @@ onMounted(() => {
             {{ comment.name }}
           </router-link>
 
-          <span class="comment-time"> {{ formatDate(comment.timestamp) }}</span>
+          <span class="comment-time">
+            {{ dateStore.formatDate(comment.timestamp) }}</span
+          >
         </div>
 
         <div class="info-modal">
