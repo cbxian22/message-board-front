@@ -26,8 +26,10 @@ const fileInputRef = ref(null);
 const tempAvatar = ref(null);
 const isLoginModalOpen = ref(false);
 
-// 初始化及監聽路由變化
-onMounted(() => {
+// 初始化檢查登入狀態，並監聽 authStore 變化
+onMounted(async () => {
+  loggedInUser.value = authStore.userName;
+  fetchInfo();
   updateWidth();
   window.addEventListener("resize", updateWidth);
 });
@@ -35,18 +37,6 @@ onMounted(() => {
 onUnmounted(() => {
   window.removeEventListener("resize", updateWidth);
 });
-
-// 監聽路由參數 username 的變化，確保資料與當前頁面一致
-watch(
-  () => router.currentRoute.value.params.username,
-  (newUsername) => {
-    if (newUsername) {
-      loggedInUser.value = authStore.userName; // 同步更新已登入用戶
-      fetchInfo(); // 重新獲取資料
-    }
-  },
-  { immediate: true } // 立即執行，取代 onMounted 中的 fetchInfo
-);
 
 // 當抽屜顯示時，預填入現有資料
 watch(show, (newValue) => {
@@ -162,14 +152,15 @@ const handleUpdate = async () => {
       authStore.userAvatar = uploadedFileUrl || info.value.userAvatar;
       localStorage.setItem("userName", authStore.userName);
       localStorage.setItem("userAvatar", authStore.userAvatar);
+
+      // 同步更新 loggedInUser
       loggedInUser.value = name.value;
 
-      // 判斷來源並保留查詢參數
-      const currentRoute = router.currentRoute.value;
-      const targetPath =
-        currentRoute.query.from === "navbar"
-          ? { path: `/@${name.value}`, query: { from: "navbar" } }
-          : `/@${name.value}`;
+      // 判斷從首頁還是個人頁來
+      const currentUrl = window.location.href;
+      const targetPath = currentUrl.includes("?from=navbar")
+        ? `/@${name.value}?from=navbar`
+        : `/@${name.value}`;
       await router.push(targetPath);
 
       await nextTick();
@@ -195,7 +186,6 @@ const handleUpdate = async () => {
     loadingBar.finish();
   }
 };
-
 // 更新抽屜寬度
 const updateWidth = () => {
   const width = window.innerWidth;
