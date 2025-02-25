@@ -150,7 +150,7 @@ import { ref, defineEmits, onMounted, onUnmounted } from "vue";
 import { NBadge } from "naive-ui";
 import { useAuthStore } from "../stores/authStore";
 import { usePostStore } from "../stores/usePostStore";
-import { useDateStore } from "@/stores/dateStore";
+import { useDateStore } from "../stores/dateStore";
 import { useRouter } from "vue-router";
 import apiClient from "../stores/axiosConfig"; // 引入 apiClient
 
