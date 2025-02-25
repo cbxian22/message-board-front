@@ -21,7 +21,6 @@ const info = ref({});
 const name = ref("");
 const intro = ref("");
 const file = ref(null);
-// const fileUrl = ref(null);
 const fileInputRef = ref(null);
 const tempAvatar = ref(null);
 const isLoginModalOpen = ref(false);
@@ -29,7 +28,7 @@ const isLoginModalOpen = ref(false);
 // 初始化檢查登入狀態，並監聽 authStore 變化
 onMounted(async () => {
   loggedInUser.value = authStore.userName;
-  fetchInfo();
+  fetchInfo(); // 初次加載資料
   updateWidth();
   window.addEventListener("resize", updateWidth);
 });
@@ -37,6 +36,13 @@ onMounted(async () => {
 onUnmounted(() => {
   window.removeEventListener("resize", updateWidth);
 });
+
+watch(
+  () => router.currentRoute.value.path,
+  () => {
+    fetchInfo(); // 路由變化時刷新
+  }
+);
 
 // 當抽屜顯示時，預填入現有資料
 watch(show, (newValue) => {
@@ -53,23 +59,12 @@ watch(show, (newValue) => {
   }
 });
 
-// 監聽路由變化並刷新資料
-watch(
-  () => router.currentRoute.value.path,
-  () => {
-    fetchInfo();
-  },
-  { immediate: true }
-); // immediate 確保初次載入時也執行
-
-const checkTokenAndOpenModal = () => {
-  if (!authStore.accessToken) {
-    isLoginModalOpen.value = true;
-  }
-};
-
 // 獲取用戶資料
 const fetchInfo = async () => {
+  if (!username.value) {
+    console.warn("Username not available, skipping fetchInfo");
+    return;
+  }
   try {
     const response = await apiClient.get(`/users/${username.value}`);
     if (response.status === 200 && response.data) {
@@ -86,6 +81,12 @@ const fetchInfo = async () => {
   } catch (error) {
     console.error("取得用戶資料錯誤:", error);
     alert("用戶資料取得失敗，請檢查網絡或稍後再試");
+  }
+};
+
+const checkTokenAndOpenModal = () => {
+  if (!authStore.accessToken) {
+    isLoginModalOpen.value = true;
   }
 };
 
@@ -170,7 +171,6 @@ const handleUpdate = async () => {
       // 同步更新 loggedInUser
       loggedInUser.value = name.value;
       await router.push(`/@${name.value}`);
-
       await nextTick();
       await fetchInfo();
       emitter.emit("refreshPost");
