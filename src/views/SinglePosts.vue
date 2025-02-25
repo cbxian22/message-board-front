@@ -63,12 +63,6 @@ const formatDate = (date) => {
 
 // 提交回覆
 const handleReply = async () => {
-  const userId = localStorage.getItem("userId");
-  const token = localStorage.getItem("token");
-  if (!token) {
-    alert("請先登入以新增回覆！");
-    return;
-  }
   try {
     // 使用 userId 構建正确的 API 路徑
     const response = await axios.post(
