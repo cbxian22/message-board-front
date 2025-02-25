@@ -129,11 +129,6 @@ const scrollToTop = () => {
   border-radius: 50%;
 }
 
-/* 淺色下更改引入 icon 顏色 */
-/* .light-mode img {
-  filter: invert(1) grayscale(100%) contrast(100%) brightness(0);
-} */
-
 .dark-mode nav {
   background: rgba(10, 10, 10, 0.6); /* 半透明黑色背景 */
   backdrop-filter: blur(10px); /* 霧化效果 */
