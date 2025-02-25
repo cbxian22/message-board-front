@@ -154,6 +154,8 @@ import { useDateStore } from "../stores/dateStore";
 import { useRouter } from "vue-router";
 import apiClient from "../stores/axiosConfig"; // 引入 apiClient
 
+import UpdatePostView from "./ModalUpdatePost.vue";
+
 import Replyicon from "../assets/Replyicon.svg";
 import Favoriteicon from "../assets/Favoriteicon.svg";
 import FavoriteRedicon from "../assets/FavoriteRedicon.svg";
@@ -161,7 +163,6 @@ import Moreicon from "../assets/Moreicon.svg";
 import Editicon from "../assets/Editicon.svg";
 import Deleteicon from "../assets/Deleteicon.svg";
 import Flagicon from "../assets/Flagicon.svg";
-import UpdatePostView from "./ModalUpdatePost.vue";
 
 const router = useRouter();
 const emit = defineEmits();
