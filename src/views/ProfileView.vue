@@ -2,6 +2,7 @@
 import { ref, onMounted, watch } from "vue";
 import { useRoute, useRouter } from "vue-router";
 import apiClient from "../stores/axiosConfig";
+import { emitter } from "../main";
 
 import Info from "../components/Info.vue";
 import InfoSinglePosts from "../components/InfoSinglePosts.vue";
