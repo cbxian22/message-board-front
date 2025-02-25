@@ -375,14 +375,19 @@ const handlelike = async (id) => {
 //   }
 // };
 const formatDate = (date) => {
-  if (!date) return "未知時間";
+  // 檢查 date 是否為字串，若不是則返回錯誤
+  if (typeof date !== "string" || !date.trim()) return "未知時間或格式錯誤";
 
   // 解析 YYYY-MM-DD HH:mm:ss
   const [datePart, timePart] = date.split(" ");
-  if (!datePart || !timePart) return "無效時間";
+  if (!datePart || !timePart) return "無效時間格式";
 
   const [year, month, day] = datePart.split("-").map(Number);
   const [hour, minute, second] = timePart.split(":").map(Number);
+
+  // 驗證解析結果是否有效
+  if ([year, month, day, hour, minute, second].some(isNaN))
+    return "無效時間數值";
 
   // 確保轉換成 UTC 時間
   const inputDate = new Date(
@@ -390,7 +395,7 @@ const formatDate = (date) => {
   );
   if (isNaN(inputDate)) return "無效時間";
 
-  const currentTime = new Date();
+  const currentTime = new Date(Date.now()); // 改用 UTC 時間
   const diffInSeconds = Math.floor((currentTime - inputDate) / 1000);
   const diffInMinutes = Math.floor(diffInSeconds / 60);
   const diffInHours = Math.floor(diffInMinutes / 60);
