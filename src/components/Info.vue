@@ -1,5 +1,5 @@
 <script setup>
-import { ref, onMounted, onUnmounted, watch, nextTick, computed } from "vue";
+import { ref, onMounted, onUnmounted, watch, nextTick } from "vue";
 import { NButton, NDrawerContent, NDrawer, useLoadingBar } from "naive-ui";
 import { useAuthStore } from "../stores/authStore";
 import { useThemeStore } from "../stores/themeStore";
@@ -8,13 +8,16 @@ import apiClient from "../stores/axiosConfig";
 import { emitter } from "../main";
 import Login from "./ModalLogin.vue";
 
+const props = defineProps({
+  userData: Object, // 從父組件接收用戶資料
+});
+
 const themeStore = useThemeStore();
 const loadingBar = useLoadingBar();
 const router = useRouter();
 const authStore = useAuthStore();
 
 const loggedInUser = ref(authStore.userName);
-const username = computed(() => router.currentRoute.value.params.username);
 const show = ref(false);
 const rwdwidth = ref("100vw");
 const info = ref({});
@@ -25,12 +28,21 @@ const fileInputRef = ref(null);
 const tempAvatar = ref(null);
 const isLoginModalOpen = ref(false);
 
+onMounted(() => {
+  emitter.on("fetchUserData", () => fetchUserData(props.username));
+});
+
+onUnmounted(() => {
+  emitter.off("fetchUserData", () => {});
+});
+
 // 初始化檢查登入狀態，並監聽 authStore 變化
-onMounted(async () => {
-  loggedInUser.value = authStore.userName;
-  fetchInfo(); // 初次加載資料
+onMounted(() => {
   updateWidth();
   window.addEventListener("resize", updateWidth);
+  if (props.userData) {
+    info.value = props.userData;
+  }
 });
 
 onUnmounted(() => {
@@ -38,9 +50,11 @@ onUnmounted(() => {
 });
 
 watch(
-  () => router.currentRoute.value.path,
-  () => {
-    fetchInfo(); // 路由變化時刷新
+  () => props.userData,
+  (newData) => {
+    if (newData) {
+      info.value = newData;
+    }
   }
 );
 
@@ -59,30 +73,30 @@ watch(show, (newValue) => {
   }
 });
 
-// 獲取用戶資料
-const fetchInfo = async () => {
-  if (!username.value) {
-    console.warn("Username not available, skipping fetchInfo");
-    return;
-  }
-  try {
-    const response = await apiClient.get(`/users/${username.value}`);
-    if (response.status === 200 && response.data) {
-      info.value = {
-        id: response.data.id,
-        name: response.data.name,
-        intro: response.data.intro,
-        userAvatar: response.data.avatar_url,
-      };
-      tempAvatar.value = info.value.userAvatar;
-    } else {
-      alert("無法獲取用戶資料，數據格式不正確");
-    }
-  } catch (error) {
-    console.error("取得用戶資料錯誤:", error);
-    alert("用戶資料取得失敗，請檢查網絡或稍後再試");
-  }
-};
+// // 獲取用戶資料
+// const fetchInfo = async () => {
+//   if (!username.value) {
+//     console.warn("Username not available, skipping fetchInfo");
+//     return;
+//   }
+//   try {
+//     const response = await apiClient.get(`/users/${username.value}`);
+//     if (response.status === 200 && response.data) {
+//       info.value = {
+//         id: response.data.id,
+//         name: response.data.name,
+//         intro: response.data.intro,
+//         userAvatar: response.data.avatar_url,
+//       };
+//       tempAvatar.value = info.value.userAvatar;
+//     } else {
+//       alert("無法獲取用戶資料，數據格式不正確");
+//     }
+//   } catch (error) {
+//     console.error("取得用戶資料錯誤:", error);
+//     alert("用戶資料取得失敗，請檢查網絡或稍後再試");
+//   }
+// };
 
 const checkTokenAndOpenModal = () => {
   if (!authStore.accessToken) {
@@ -136,6 +150,7 @@ const handleUpdate = async () => {
     show.value = false;
     return;
   }
+
   if (
     name.value === info.value.name &&
     intro.value === info.value.intro &&
@@ -162,17 +177,12 @@ const handleUpdate = async () => {
     });
 
     if (response.status === 200) {
-      // 直接更新 authStore 的狀態
       authStore.userName = name.value;
       authStore.userAvatar = uploadedFileUrl || info.value.userAvatar;
       localStorage.setItem("userName", authStore.userName);
       localStorage.setItem("userAvatar", authStore.userAvatar);
-
-      // 同步更新 loggedInUser
       loggedInUser.value = name.value;
       await router.push(`/@${name.value}`);
-      await nextTick();
-      await fetchInfo();
       emitter.emit("refreshPost");
       window.scrollTo(0, 0);
       show.value = false;
@@ -194,6 +204,7 @@ const handleUpdate = async () => {
     loadingBar.finish();
   }
 };
+
 // 更新抽屜寬度
 const updateWidth = () => {
   const width = window.innerWidth;
@@ -220,14 +231,14 @@ const updateWidth = () => {
     </div>
 
     <!-- 切換 -->
-    <div class="set-btn" v-if="loggedInUser === username">
+    <div class="set-btn" v-if="loggedInUser === info.name">
       <n-button @click="show = true"> 編輯個人檔案 </n-button>
     </div>
 
     <!-- 切換 -->
     <div
       class="set-btn"
-      v-if="loggedInUser !== username"
+      v-if="loggedInUser !== info.name"
       @click="checkTokenAndOpenModal"
     >
       <n-button> 加入好友 </n-button>

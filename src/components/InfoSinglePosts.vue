@@ -8,6 +8,10 @@ import { useRouter } from "vue-router";
 import apiClient from "../stores/axiosConfig"; // 引入 apiClient
 import { emitter } from "../main";
 
+const props = defineProps({
+  posts: Array, // 從父組件接收貼文數據
+});
+
 import UpdatePostView from "./ModalUpdatePost.vue";
 
 import Replyicon from "../assets/Replyicon.svg";
@@ -19,22 +23,30 @@ import Deleteicon from "../assets/Deleteicon.svg";
 import Flagicon from "../assets/Flagicon.svg";
 
 const router = useRouter();
-const emit = defineEmits();
+// const emit = defineEmits();
 const postStore = usePostStore();
 const authStore = useAuthStore();
 const dateStore = useDateStore();
 
-const loggedInUser = authStore.userName;
-const username = router.currentRoute.value.params.username;
+// const loggedInUser = authStore.userName;
+// const username = router.currentRoute.value.params.username;
 
-const comments = ref([]);
-const commentImages = ref([]);
+const comments = ref(props.posts || []);
 const modalState = ref({});
+const commentImages = ref([]);
+
 const modalRefs = ref({});
 const buttonRefs = ref({});
 const isOpenModal = ref(false);
 const isLikeProcessing = ref(false); // 用於追踪點讚狀態
 const selectedComment = ref(null); // 用於儲存當前選中的單一留言
+
+watch(
+  () => props.posts,
+  (newPosts) => {
+    comments.value = newPosts || [];
+  }
+);
 
 // 點擊圖示回到最上
 const scrollToTop = () => {
@@ -83,41 +95,45 @@ const closeModal = (event) => {
 
 onMounted(() => {
   document.addEventListener("mousedown", closeModal);
+  emitter.on("refreshPost", () => {
+    emitter.emit("fetchUserData"); // 通知父組件刷新
+  });
 });
 
 onUnmounted(() => {
   document.removeEventListener("mousedown", closeModal);
+  emitter.off("refreshPost", () => {});
 });
 
 // 獲取留言（指定用戶）
-const fetchComments = async () => {
-  const username = router.currentRoute.value.params.username; // 從路由獲取 username
-  const userId = authStore.userId || localStorage.getItem("userId");
-  try {
-    const response = await apiClient.get(`/posts/user/${username}`, {
-      params: { userId },
-    });
-    if (response.status === 200 && Array.isArray(response.data)) {
-      comments.value = response.data.map((comment) => ({
-        id: comment.id,
-        content: comment.content,
-        timestamp: new Date(comment.created_at),
-        file_url: comment.file_url,
-        name: comment.user_name,
-        user_avatar: comment.user_avatar,
-        likes: comment.likes || 0,
-        userLiked: comment.user_liked || false, // 後端返回的用戶是否點贊
-        replies: comment.replies,
-      }));
-      emit("loaded");
-    } else {
-      alert("無法獲取留言，數據格式不正確");
-    }
-  } catch (error) {
-    console.error("取得留言錯誤:", error);
-    alert("留言取得失敗，請檢查網絡或稍後再試");
-  }
-};
+// const fetchComments = async () => {
+//   const username = router.currentRoute.value.params.username; // 從路由獲取 username
+//   const userId = authStore.userId || localStorage.getItem("userId");
+//   try {
+//     const response = await apiClient.get(`/posts/user/${username}`, {
+//       params: { userId },
+//     });
+//     if (response.status === 200 && Array.isArray(response.data)) {
+//       comments.value = response.data.map((comment) => ({
+//         id: comment.id,
+//         content: comment.content,
+//         timestamp: new Date(comment.created_at),
+//         file_url: comment.file_url,
+//         name: comment.user_name,
+//         user_avatar: comment.user_avatar,
+//         likes: comment.likes || 0,
+//         userLiked: comment.user_liked || false, // 後端返回的用戶是否點贊
+//         replies: comment.replies,
+//       }));
+//       emit("loaded");
+//     } else {
+//       alert("無法獲取留言，數據格式不正確");
+//     }
+//   } catch (error) {
+//     console.error("取得留言錯誤:", error);
+//     alert("留言取得失敗，請檢查網絡或稍後再試");
+//   }
+// };
 
 // 獲取單一貼文
 const fetchSingleComment = async (postId) => {
@@ -222,26 +238,26 @@ const handlelike = async (id) => {
 };
 
 // 頁面加載時執行
-onMounted(() => {
-  fetchComments();
-  emitter.on("refreshPost", fetchComments); // 監聽刷新事件
-});
+// onMounted(() => {
+//   fetchComments();
+//   emitter.on("refreshPost", fetchComments); // 監聽刷新事件
+// });
 
 // 清理監聽
-onUnmounted(() => {
-  emitter.off("refreshPost", fetchComments); // 清理監聽
-});
+// onUnmounted(() => {
+//   emitter.off("refreshPost", fetchComments); // 清理監聽
+// });
 
-// 確保對每一個圖片都加載後進行判斷
-onMounted(() => {
-  commentImages.value.forEach((img) => {
-    img.onload = () => {
-      if (img.naturalHeight > img.naturalWidth) {
-        img.classList.add("tall-img"); // 直向圖片加上類別
-      }
-    };
-  });
-});
+// // 確保對每一個圖片都加載後進行判斷
+// onMounted(() => {
+//   commentImages.value.forEach((img) => {
+//     img.onload = () => {
+//       if (img.naturalHeight > img.naturalWidth) {
+//         img.classList.add("tall-img"); // 直向圖片加上類別
+//       }
+//     };
+//   });
+// });
 </script>
 
 <template>

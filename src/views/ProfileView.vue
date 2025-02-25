@@ -7,7 +7,6 @@ import Info from "../components/Info.vue";
 import InfoSinglePosts from "../components/InfoSinglePosts.vue";
 import Navbar from "../components/Navbar.vue";
 import NavbarUp from "../components/NavbarUp.vue";
-
 import Backicon from "../assets/Backicon.svg";
 
 // 計算是否有新留言
@@ -16,6 +15,9 @@ import Backicon from "../assets/Backicon.svg";
 const props = defineProps(["username"]);
 const router = useRouter();
 const route = useRoute(); // 新增 useRoute
+
+const userData = ref(null); // 儲存用戶資料
+const userPosts = ref([]); // 儲存用戶貼文
 
 watch(
   () => props.username,
@@ -36,13 +38,36 @@ onMounted(async () => {
 // 獲取使用者資料
 const fetchUserData = async (username) => {
   try {
-    // const response = await axios.get(
-    //   `https://message-board-server-7yot.onrender.com/api/users/${username}`
-    // );
-    const response = await apiClient.get(`/users/${username}`);
+    const [userResponse, postsResponse] = await Promise.all([
+      apiClient.get(`/users/${username}`),
+      apiClient.get(`/posts/user/${username}`, {
+        params: { userId: localStorage.getItem("userId") },
+      }),
+    ]);
 
-    if (response.data.message === "使用者不存在") {
+    if (userResponse.data.message === "使用者不存在") {
       router.replace("/not-found");
+      return;
+    }
+
+    userData.value = {
+      id: userResponse.data.id,
+      name: userResponse.data.name,
+      intro: userResponse.data.intro,
+      userAvatar: userResponse.data.avatar_url,
+    };
+    if (postsResponse.status === 200 && Array.isArray(postsResponse.data)) {
+      userPosts.value = postsResponse.data.map((comment) => ({
+        id: comment.id,
+        content: comment.content,
+        timestamp: new Date(comment.created_at),
+        file_url: comment.file_url,
+        name: comment.user_name,
+        user_avatar: comment.user_avatar,
+        likes: comment.likes || 0,
+        userLiked: comment.user_liked || false,
+        replies: comment.replies,
+      }));
     }
   } catch (error) {
     console.error("查詢用戶錯誤:", error);
@@ -66,20 +91,8 @@ const isFromNavbar = () => {
     </div>
 
     <div class="container">
-      <Info :username="props.username" />
-      <!-- <selfInfo :username="username" :key="username" /> -->
-      <!-- <div v-if="aru" class="aru">
-        <h1>最新留言</h1>
-        <div
-          v-for="(message, index) in socketStore.messages"
-          :key="index"
-          class="comment"
-        >
-          <p class="comment-content">{{ message.data.content }}</p>
-        </div>
-      </div> -->
-      <!-- <selfSingleComment :username="username" :key="username" /> -->
-      <InfoSinglePosts :username="props.username" />
+      <Info :user-data="userData" />
+      <InfoSinglePosts :posts="userPosts" />
     </div>
   </div>
   <Navbar />
@@ -120,3 +133,4 @@ const isFromNavbar = () => {
   overflow: hidden;
 } */
 </style>
+－
