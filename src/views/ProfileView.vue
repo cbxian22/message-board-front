@@ -21,15 +21,6 @@ const authStore = useAuthStore();
 const userData = ref(null);
 const userPosts = ref([]);
 
-// watch(
-//   () => props.username,
-//   async (newUsername) => {
-//     if (newUsername) {
-//       await fetchUserData(newUsername);
-//     }
-//   }
-// );
-
 // 組件掛載時載入資料
 onMounted(async () => {
   if (props.username) {
@@ -37,17 +28,12 @@ onMounted(async () => {
   }
 
   // 監聽刷新事件
-  // emitter.on("refreshPost", () => {
-  //   fetchUserData(props.username);
-  // });
   emitter.on("refreshPost", (data) => {
-    // Use the new username from the event if available
     const usernameToFetch = data?.newUsername || props.username;
     fetchUserData(usernameToFetch);
   });
 });
 
-// Update watcher to handle route changes
 watch(
   () => [props.username, route.params.username],
   async ([newUsername]) => {
