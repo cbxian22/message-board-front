@@ -158,10 +158,9 @@ const handleUpdate = async () => {
       localStorage.setItem("userAvatar", authStore.userAvatar);
       loggedInUser.value = name.value;
 
-      // 通知父組件刷新資料
-      await nextTick(); // 確保 DOM 更新
+      await nextTick();
       emitter.emit("refreshPost");
-      await new Promise((resolve) => setTimeout(resolve, 1000)); // 等待後端更新
+
       await router.push(`/@${name.value}`);
       show.value = false;
     } else {
