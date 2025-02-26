@@ -65,19 +65,22 @@ const saveScrollPosition = () => {
 };
 
 onMounted(() => {
-  // 進入 A 頁面時，恢復滾動位置
-  window.scrollTo(0, scrollStore.getScrollPosition());
+  nextTick(() => {
+    window.scrollTo(0, scrollStore.getScrollPosition());
+  });
   window.addEventListener("scroll", saveScrollPosition);
 });
 
 onUnmounted(() => {
-  // 移除滾動監聽器（避免記憶不必要的滾動）
   window.removeEventListener("scroll", saveScrollPosition);
 });
 
 // 當 singleComment 加載完成時，更新 isLoading
 const handleLoaded = () => {
   isLoading.value = false;
+  nextTick(() => {
+    window.scrollTo(0, scrollStore.getScrollPosition());
+  });
 };
 
 // 計算是否有新留言
