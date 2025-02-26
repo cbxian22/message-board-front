@@ -37,7 +37,6 @@
             <!--  -->
           </div>
         </div>
-        <!--  -->
         <!-- <singleComment /> -->
         <SinglePosts @loaded="handleLoaded" />
       </div>
