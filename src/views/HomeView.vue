@@ -46,7 +46,7 @@
 </template>
 
 <script setup>
-import { computed, ref, onMounted, onUnmounted } from "vue";
+import { computed, ref, onMounted, onUnmounted, nextTick } from "vue";
 import { useScrollStore } from "@/stores/scrollStore";
 import { useSocketStore } from "../stores/socketStore";
 import { useRouter } from "vue-router"; // 新增
@@ -67,11 +67,13 @@ const saveScrollPosition = () => {
   console.log("Saved scroll position in HomeView:", position);
 };
 
-onMounted(() => {
+onMounted(async () => {
   window.addEventListener("scroll", saveScrollPosition);
-  // 恢復滾動位置
+
+  await nextTick(); // 確保 DOM 更新完成後執行滾動
   const savedPosition = scrollStore.getScrollPosition();
   console.log("Restoring scroll position on mount:", savedPosition);
+
   window.scrollTo({
     top: savedPosition,
     behavior: "auto",

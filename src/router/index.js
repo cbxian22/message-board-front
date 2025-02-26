@@ -2,7 +2,6 @@ import { createRouter, createWebHistory } from "vue-router";
 import { useAuthStore } from "@/stores/authStore";
 import { useScrollStore } from "@/stores/scrollStore";
 import { nextTick } from "vue";
-import { useScrollStore } from "@/stores/scrollStore";
 import HomeView from "../views/HomeView.vue";
 
 const router = createRouter({
@@ -73,14 +72,14 @@ router.beforeEach(async (to, from, next) => {
 
   if (from.name === "Home") {
     const position = window.scrollY || document.documentElement.scrollTop;
-    scrollStore.setScrollPosition(position);
     console.log("Saving scroll position before leaving Home:", position);
+    scrollStore.setScrollPosition(position);
   }
 
-  await nextTick();
   if ((to.name === "Login" || to.name === "Register") && authStore.isLoggedIn) {
     return next({ name: "Home" });
   }
+
   next();
 });
 
