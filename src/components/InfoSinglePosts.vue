@@ -273,22 +273,24 @@ const selectedComment = ref(null);
 
 // 判斷是否顯示貼文
 const shouldShowPost = (comment) => {
+  // 防護檢查：確保 comment 存在且有 visibility
+  if (!comment || !comment.visibility) {
+    console.warn("Invalid comment object:", comment);
+    return false; // 如果 comment 無效，不顯示
+  }
+
   const isLoggedIn = authStore.isLoggedIn;
   const currentUserId = authStore.userId;
-  const isOwnProfile = currentUserId && comment.user_id === currentUserId; // 是否為自己的貼文
-  const isFriend = comment.is_friend; // 是否為好友（後端返回）
+  const isOwnProfile = currentUserId && comment.user_id === currentUserId;
+  const isFriend = comment.is_friend;
 
   if (!isLoggedIn) {
-    // 未登入：只顯示公開貼文
     return comment.visibility === "public";
   } else if (isOwnProfile) {
-    // 自己的頁面：顯示所有貼文
     return true;
   } else if (isFriend) {
-    // 好友：顯示公開和好友貼文
     return comment.visibility === "public" || comment.visibility === "friends";
   } else {
-    // 非好友：只顯示公開貼文
     return comment.visibility === "public";
   }
 };
