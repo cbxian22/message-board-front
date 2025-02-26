@@ -163,8 +163,8 @@ const handleUpdate = async () => {
       // emitter.emit("refreshPost");
       emitter.emit("refreshPost", { newUsername: name.value });
 
-      // await router.push(`/@${name.value}`);
-      await router.replace(`/@${name.value}`);
+      await router.push(`/@${name.value}`);
+      // await router.replace(`/@${name.value}`);
       show.value = false;
     } else {
       alert("更新失敗");
