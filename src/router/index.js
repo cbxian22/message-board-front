@@ -54,11 +54,7 @@ const router = createRouter({
   scrollBehavior(to, from, savedPosition) {
     const scrollStore = useScrollStore();
 
-    if (savedPosition) {
-      console.log("Returning savedPosition:", savedPosition);
-      return { ...savedPosition, behavior: "auto" };
-    }
-
+    // 從 Profile 返回 Home，使用 scrollStore 恢復位置
     if (to.name === "Home" && from.name === "Profile") {
       const position = scrollStore.getScrollPosition();
       console.log("Returning to Home from Profile, scrollPosition:", position);
@@ -68,20 +64,21 @@ const router = createRouter({
         });
       });
     }
-
+    // 從 Post 返回 Profile，恢復個人頁位置
     if (to.name === "Profile" && from.name === "Post") {
       const position = scrollStore.getScrollPosition();
       console.log("Returning to Profile from Post, scrollPosition:", position);
       return { top: position, behavior: "auto" };
     }
 
-    // 只在必要的新導航中重置（例如到 Profile 或其他新頁面）
+    // 新導航（包括從首頁到 Profile 或 Post），滾動到頂部並重置
     if (to.name === "Profile" || to.name === "Post") {
       console.log(
         "New navigation to Profile or Post, resetting scrollPosition to 0"
       );
       scrollStore.setScrollPosition(0);
     }
+    console.log("New navigation, scrollPosition reset to 0");
     return { top: 0, behavior: "smooth" };
   },
 });
