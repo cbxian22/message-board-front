@@ -48,6 +48,7 @@
 <script setup>
 import { ref, onMounted, onUnmounted, nextTick } from "vue";
 import { useSocketStore } from "../stores/socketStore";
+import { useScrollStore } from "@/stores/scrollStore";
 import { NSpin } from "naive-ui";
 
 import Navbar from "../components/Navbar.vue";
@@ -55,7 +56,24 @@ import SinglePosts from "../components/SinglePosts.vue";
 import NavbarUp from "../components/NavbarUp.vue";
 
 const socketStore = useSocketStore();
+const scrollStore = useScrollStore();
 const isLoading = ref(true);
+
+// 監聽滾動，記錄滾動位置
+const saveScrollPosition = () => {
+  scrollStore.setScrollPosition(window.scrollY);
+};
+
+onMounted(() => {
+  // 進入 A 頁面時，恢復滾動位置
+  window.scrollTo(0, scrollStore.getScrollPosition());
+  window.addEventListener("scroll", saveScrollPosition);
+});
+
+onUnmounted(() => {
+  // 移除滾動監聽器（避免記憶不必要的滾動）
+  window.removeEventListener("scroll", saveScrollPosition);
+});
 
 // 當 singleComment 加載完成時，更新 isLoading
 const handleLoaded = () => {
