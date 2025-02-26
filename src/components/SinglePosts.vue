@@ -294,59 +294,49 @@ const closeModal = (event) => {
   }
 };
 
-// 判斷是否顯示貼文
-const shouldShowPost = (comment) => {
-  const isLoggedIn = authStore.isLoggedIn;
-  const currentUserId = authStore.userId;
-
-  if (!isLoggedIn) {
-    // 未登入用戶：只顯示公開貼文
-    return comment.visibility === "public";
-  } else {
-    // 登入用戶：顯示公開貼文 + 好友的「好友貼文」
-    return (
-      comment.visibility === "public" || // 公開貼文
-      (comment.visibility === "friends" && comment.is_friend) // 好友的貼文
-    );
-    // 私人貼文（visibility = 'private'）不在主頁顯示
-  }
-};
-
-// 獲取留言
+// 獲取主頁貼文
 const fetchComments = async () => {
   try {
     const userId = authStore.userId || localStorage.getItem("userId");
-    const response = await apiClient.get("/posts", { params: { userId } });
+    const response = await apiClient.get("/posts", {
+      params: { userId }, // 傳遞 userId 給後端
+      headers: authStore.accessToken
+        ? { Authorization: `Bearer ${authStore.accessToken}` }
+        : {}, // 確保帶上 token
+    });
     if (response.status === 200 && Array.isArray(response.data)) {
       comments.value = response.data.map((comment) => ({
         id: comment.id,
         content: comment.content,
         timestamp: new Date(comment.created_at),
         file_url: comment.file_url,
-        visibility: comment.visibility,
+        visibility: comment.visibility, // 可選，保留用於調試
         name: comment.user_name,
         user_avatar: comment.user_avatar,
         likes: comment.likes || 0,
         userLiked: comment.user_liked || false,
-        replies: comment.replies,
-        is_friend: comment.is_friend, // 確保後端返回此欄位
+        replies: comment.replies || 0,
       }));
       emit("loaded");
     } else {
-      alert("無法獲取留言，數據格式不正確");
+      console.error("數據格式不正確:", response.data);
+      alert("無法獲取貼文，數據格式不正確");
     }
   } catch (error) {
-    console.error("取得留言錯誤:", error);
-    alert("留言取得失敗，請檢查網絡或稍後再試");
+    console.error("取得貼文錯誤:", error);
+    alert("貼文取得失敗，請檢查網絡或稍後再試");
   }
 };
 
-// 獲取單一留言
+// 獲取單一貼文
 const fetchSingleComment = async (postId) => {
   try {
     const userId = authStore.userId || localStorage.getItem("userId");
     const response = await apiClient.get(`/posts/${postId}`, {
       params: { userId },
+      headers: authStore.accessToken
+        ? { Authorization: `Bearer ${authStore.accessToken}` }
+        : {},
     });
     if (response.status === 200) {
       const comment = response.data;
@@ -359,32 +349,40 @@ const fetchSingleComment = async (postId) => {
         user_avatar: comment.user_avatar,
         likes: comment.likes || 0,
         userLiked: comment.user_liked || false,
-        replies: comment.replies,
+        replies: comment.replies || 0,
       };
     } else {
-      alert("無法獲取單一留言，數據格式不正確");
+      alert("無法獲取單一貼文，數據格式不正確");
     }
   } catch (error) {
-    console.error("取得單一留言錯誤:", error);
-    alert("單一留言取得失敗，請檢查網絡或稍後再試");
+    console.error("取得單一貼文錯誤:", error);
+    alert("單一貼文取得失敗，請檢查網絡或稍後再試");
   }
 };
 
-// 刪除留言
+// 刪除貼文
 const handleDelete = async (postId) => {
+  if (!authStore.accessToken) {
+    alert("請先登入！");
+    return;
+  }
   try {
     const userId = authStore.userId;
     const message = await postStore.deletePost(postId, userId);
     console.log(message);
-    await fetchComments(); // 重新獲取貼文
+    await fetchComments(); // 重新獲取貼文，而不是刷新頁面
   } catch (error) {
     console.error("刪除失敗:", error.message);
     alert("刪除失敗: " + error.message);
   }
 };
 
-// 修改留言
+// 修改貼文
 const handleUpdate = async (postId) => {
+  if (!authStore.accessToken) {
+    alert("請先登入！");
+    return;
+  }
   isOpenModal.value = true;
   await fetchSingleComment(postId);
 };
@@ -395,7 +393,10 @@ const handlelike = async (id) => {
     alert("請先登入！");
     return;
   }
-  if (isLikeProcessing.value) return;
+  if (isLikeProcessing.value) {
+    console.log("點讚操作正在進行中，忽略此次請求");
+    return;
+  }
 
   const comment = comments.value.find((c) => c.id === id);
   if (!comment) return;
@@ -434,168 +435,58 @@ const handlelike = async (id) => {
 
 // 新增回覆
 const handleReply = async (postId) => {
-  router.push({ name: "CommentView", params: { postId } });
+  if (!authStore.accessToken) {
+    alert("請先登入！");
+    return;
+  }
   await fetchSingleComment(postId);
+  router.push({ name: "CommentView", params: { postId } });
 };
 
 onMounted(() => {
   fetchComments();
   document.addEventListener("mousedown", closeModal);
+
+  // 圖片加載處理
+  setTimeout(() => {
+    commentImages.value.forEach((img) => {
+      if (img) {
+        img.onload = () => {
+          if (img.naturalHeight > img.naturalWidth) {
+            img.classList.add("tall-img");
+          }
+        };
+      }
+    });
+  }, 0);
 });
 
 onUnmounted(() => {
   document.removeEventListener("mousedown", closeModal);
 });
-
-// 圖片加載處理
-onMounted(() => {
-  commentImages.value.forEach((img) => {
-    if (img) {
-      img.onload = () => {
-        if (img.naturalHeight > img.naturalWidth) {
-          img.classList.add("tall-img");
-        }
-      };
-    }
-  });
-});
 </script>
-
-<!-- <template>
-  <div
-    v-for="(comment, index) in comments"
-    :key="comment.id"
-    :class="['comment-box', { 'last-comment': index === comments.length - 1 }]"
-  >
-
-    <div class="photo-content">
-      <img :src="comment.user_avatar" alt="頭像" class="photo" />
-    </div>
-
-    <div class="comment">
-
-      <div class="info">
-        <div class="info-span">
-          <router-link class="comment-author" :to="`/@${comment.name}`">
-            {{ comment.name }}
-          </router-link>
-
-          <span class="comment-time">
-            {{ dateStore.formatDate(comment.timestamp) }}</span
-          >
-        </div>
-
-        <div class="info-modal">
-          <button
-            ref="buttonRefs"
-            @click="openModal($event, comment.id)"
-            class="info-link"
-          >
-            <img class="icon" :src="Moreicon" alt="Moreicon" />
-          </button>
-          <div
-            v-show="modalState[comment.id]"
-            class="modal-overlay"
-            ref="modalRefs"
-          >
-            <div class="modal-content" @click.stop>
-              <ul>
-                <li
-                  v-if="
-                    authStore.isLoggedIn && authStore.userName === comment.name
-                  "
-                >
-                  <button class="modal-link" @click="handleUpdate(comment.id)">
-                    <img class="icon" :src="Editicon" alt="Editicon" />
-                    <span>編輯</span>
-                  </button>
-                </li>
-
-                <li
-                  v-if="
-                    authStore.isLoggedIn && authStore.userName === comment.name
-                  "
-                >
-                  <button class="modal-link" @click="handleDelete(comment.id)">
-                    <img class="icon" :src="Deleteicon" alt="Deleteicon" />
-                    <span>刪除</span>
-                  </button>
-                </li>
-                <li v-if="authStore.userName !== comment.name">
-                  <button class="modal-link">
-                    <img class="icon" :src="Flagicon" alt="Flagicon" />
-                    <span>檢舉</span>
-                  </button>
-                </li>
-              </ul>
-            </div>
-          </div>
-        </div>
-      </div>
-
-      <div class="comment-content">
-        <p>{{ comment.content }}</p>
-        <span v-if="comment.file_url" class="comment-file">
-          <img
-            :src="comment.file_url"
-            alt="comment.file_url"
-            ref="commentImages"
-          />
-        </span>
-      </div>
-
-      <div class="reply">
-        <ul>
-          <li>
-            <div class="reply-count" @click="handlelike(comment.id)">
-              <button class="reply-link">
-                <img
-                  :class="{ icon: !comment.userLiked }"
-                  :src="comment.userLiked ? FavoriteRedicon : Favoriteicon"
-                  alt="Like"
-                />
-              </button>
-              <n-badge :value="comment.likes || 0" />
-            </div>
-          </li>
-          <li>
-            <div class="reply-count" @click="handleReply(comment.id)">
-              <button class="reply-link">
-                <img class="icon" :src="Replyicon" alt="Replyicon" />
-              </button>
-              <n-badge :value="comment.replies || 0" />
-            </div>
-          </li>
-        </ul>
-      </div>
-    </div>
-  </div>
-  <UpdatePostView v-model="isOpenModal" :comment="selectedComment" />
-</template> -->
-
 <template>
   <div
     v-for="(comment, index) in comments"
     :key="comment.id"
-    v-if="shouldShowPost(comment)"
     :class="['comment-box', { 'last-comment': index === comments.length - 1 }]"
   >
-    <!-- 頭貼 -->
     <div class="photo-content">
       <img :src="comment.user_avatar" alt="頭像" class="photo" />
     </div>
-    <!-- 內文 -->
+
     <div class="comment">
-      <!-- 貼文資訊 -->
       <div class="info">
         <div class="info-span">
           <router-link class="comment-author" :to="`/@${comment.name}`">
             {{ comment.name }}
           </router-link>
+
           <span class="comment-time">
             {{ dateStore.formatDate(comment.timestamp) }}</span
           >
         </div>
+
         <div class="info-modal">
           <button
             ref="buttonRefs"
@@ -621,6 +512,7 @@ onMounted(() => {
                     <span>編輯</span>
                   </button>
                 </li>
+
                 <li
                   v-if="
                     authStore.isLoggedIn && authStore.userName === comment.name
@@ -642,7 +534,7 @@ onMounted(() => {
           </div>
         </div>
       </div>
-      <!-- 貼文內容 -->
+
       <div class="comment-content">
         <p>{{ comment.content }}</p>
         <span v-if="comment.file_url" class="comment-file">
@@ -653,7 +545,7 @@ onMounted(() => {
           />
         </span>
       </div>
-      <!-- 回覆功能 -->
+
       <div class="reply">
         <ul>
           <li>
