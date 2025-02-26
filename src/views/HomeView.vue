@@ -60,25 +60,9 @@ const scrollStore = useScrollStore();
 const socketStore = useSocketStore();
 const isLoading = ref(true);
 
-onMounted(async () => {
-  await nextTick();
-  const savedPosition = scrollStore.getScrollPosition();
-  console.log("Restoring scroll position on mount:", savedPosition);
-  // 不立即滾動，依賴 scrollBehavior
-});
-
 // 當 singleComment 加載完成時，更新 isLoading
 const handleLoaded = () => {
   isLoading.value = false;
-  const savedPosition = scrollStore.getScrollPosition();
-  console.log("Content loaded, restoring scroll position:", savedPosition);
-  // 檢查頁面高度並應用滾動
-  const maxScroll = document.documentElement.scrollHeight - window.innerHeight;
-  const position = Math.min(savedPosition, maxScroll);
-  if (window.scrollY !== position) {
-    window.scrollTo({ top: position, behavior: "auto" });
-    console.log("Adjusted scroll position to:", position);
-  }
 };
 
 // 計算是否有新留言
