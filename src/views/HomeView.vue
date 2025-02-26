@@ -49,6 +49,7 @@
 import { computed, ref, onMounted, onUnmounted } from "vue";
 import { useScrollStore } from "@/stores/scrollStore";
 import { useSocketStore } from "../stores/socketStore";
+import { useRouter } from "vue-router"; // 新增
 import { NSpin } from "naive-ui";
 
 import Navbar from "../components/Navbar.vue";
@@ -57,6 +58,7 @@ import NavbarUp from "../components/NavbarUp.vue";
 
 const scrollStore = useScrollStore();
 const socketStore = useSocketStore();
+const router = useRouter(); // 新增
 const isLoading = ref(true);
 
 const saveScrollPosition = () => {
@@ -65,17 +67,25 @@ const saveScrollPosition = () => {
   console.log("Saved scroll position in HomeView:", position);
 };
 
+// 在路由跳轉前保存位置
+router.beforeEach((to, from, next) => {
+  if (from.name === "Home") {
+    saveScrollPosition();
+    console.log(
+      "Saving scroll position before leaving Home:",
+      scrollStore.getScrollPosition()
+    );
+  }
+  next();
+});
+
 onMounted(() => {
   window.addEventListener("scroll", saveScrollPosition);
 });
 
 onUnmounted(() => {
   window.removeEventListener("scroll", saveScrollPosition);
-  saveScrollPosition();
-  console.log(
-    "Final scroll position on unmount:",
-    scrollStore.getScrollPosition()
-  );
+  // 移除 saveScrollPosition()，因為已在 beforeEach 中保存
 });
 
 // 當 singleComment 加載完成時，更新 isLoading
