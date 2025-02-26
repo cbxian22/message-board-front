@@ -47,11 +47,16 @@ const router = createRouter({
     if (to.name === "Home" && from.name === "Profile") {
       const position = scrollStore.getScrollPosition();
       console.log("Returning to Home from Profile, scrollPosition:", position);
-      return { top: position, behavior: "auto" }; // 使用 auto 以避免動畫干擾
+      // 返回一個 Promise，等待內容渲染完成
+      return new Promise((resolve) => {
+        setTimeout(() => {
+          resolve({ top: position, behavior: "auto" });
+        }, 100); // 延遲以確保 DOM 準備好
+      });
     }
 
     if (savedPosition) {
-      return savedPosition; // 瀏覽器後退/前進時使用保存的位置
+      return savedPosition;
     }
 
     console.log("Navigating to:", to.name, "with scroll reset to top");

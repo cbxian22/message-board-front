@@ -60,30 +60,11 @@ const scrollStore = useScrollStore();
 const socketStore = useSocketStore();
 const isLoading = ref(true);
 
-const saveScrollPosition = debounce(() => {
-  const position = window.scrollY || document.documentElement.scrollTop;
-  scrollStore.setScrollPosition(position);
-}, 100);
-
 onMounted(async () => {
-  window.addEventListener("scroll", saveScrollPosition);
-  // 等待 DOM 渲染完成後恢復滾動位置
   await nextTick();
   const savedPosition = scrollStore.getScrollPosition();
   console.log("Restoring scroll position on mount:", savedPosition);
-
-  // 如果內容尚未加載完成，等待 handleLoaded 觸發後再滾動
-  if (!isLoading.value) {
-    window.scrollTo({
-      top: savedPosition,
-      behavior: "auto",
-    });
-  }
-});
-
-onUnmounted(() => {
-  // 移除滾動事件監聽器，避免記憶體洩漏
-  window.removeEventListener("scroll", saveScrollPosition);
+  // 不立即滾動，依賴 scrollBehavior
 });
 
 // 當 singleComment 加載完成時，更新 isLoading
@@ -91,10 +72,13 @@ const handleLoaded = () => {
   isLoading.value = false;
   const savedPosition = scrollStore.getScrollPosition();
   console.log("Content loaded, restoring scroll position:", savedPosition);
-  window.scrollTo({
-    top: savedPosition,
-    behavior: "auto",
-  });
+  // 檢查頁面高度並應用滾動
+  const maxScroll = document.documentElement.scrollHeight - window.innerHeight;
+  const position = Math.min(savedPosition, maxScroll);
+  if (window.scrollY !== position) {
+    window.scrollTo({ top: position, behavior: "auto" });
+    console.log("Adjusted scroll position to:", position);
+  }
 };
 
 // 計算是否有新留言
