@@ -159,7 +159,7 @@ const handleUpdate = async () => {
       // 通知父組件刷新資料
       await nextTick(); // 確保 DOM 更新
       emitter.emit("refreshPost");
-
+      await nextTick();
       await router.push(`/@${name.value}`);
       show.value = false;
     } else {
