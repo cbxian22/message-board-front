@@ -47,7 +47,6 @@
 <script setup>
 import { ref, computed } from "vue";
 import { useAuthStore } from "../stores/authStore";
-import { useScrollStore } from "@/stores/scrollStore";
 
 import PostView from "./ModalPost.vue";
 import Login from "./ModalLogin.vue";
@@ -58,13 +57,12 @@ import Addicon from "../assets/Addicon.svg";
 import Loginicon from "../assets/Loginicon.svg";
 
 const authStore = useAuthStore();
-const scrollStore = useScrollStore();
 const isPostModalOpen = ref(false);
 const isLoginModalOpen = ref(false);
 // 使用 computed 確保獲取最新值
 const userAvatar = computed(() => authStore.userAvatar);
 const toTop = () => {
-  window.scrollTo(0, scrollStore.scrollPosition);
+  window.scrollTo(0, 0);
 };
 
 const checkTokenAndOpenModal = () => {
