@@ -295,34 +295,30 @@ const closeModal = (event) => {
 };
 
 // 獲取主頁貼文
-
 const fetchComments = async () => {
   try {
     const userId = authStore.userId || localStorage.getItem("userId");
     const token = authStore.accessToken;
-    console.log("fetchComments - userId:", userId, "token:", token);
+    console.log("fetchComments - userId:", userId, "token:", token); // 調試用日誌
     const response = await apiClient.get("/posts", {
       params: { userId },
       headers: token ? { Authorization: `Bearer ${token}` } : {},
     });
-    console.log("fetchComments - 後端回應數量:", response.data.length);
-    console.log("fetchComments - 後端回應:", response.data);
+    console.log("fetchComments - 後端回應數量:", response.data.length); // 調試用日誌
+    console.log("fetchComments - 後端回應:", response.data); // 調試用日誌
     if (response.status === 200 && Array.isArray(response.data)) {
-      comments.value = response.data.map((comment) => {
-        console.log("貼文:", comment.id, "visibility:", comment.visibility);
-        return {
-          id: comment.id,
-          content: comment.content,
-          timestamp: new Date(comment.created_at),
-          file_url: comment.file_url,
-          visibility: comment.visibility,
-          name: comment.user_name,
-          user_avatar: comment.user_avatar,
-          likes: comment.likes || 0,
-          userLiked: comment.user_liked || false,
-          replies: comment.replies || 0,
-        };
-      });
+      comments.value = response.data.map((comment) => ({
+        id: comment.id,
+        content: comment.content,
+        timestamp: new Date(comment.created_at),
+        file_url: comment.file_url,
+        visibility: comment.visibility, // 保留用於調試
+        name: comment.user_name,
+        user_avatar: comment.user_avatar,
+        likes: comment.likes || 0,
+        userLiked: comment.user_liked || false,
+        replies: comment.replies || 0,
+      }));
       emit("loaded");
     } else {
       console.error("數據格式不正確:", response.data);
@@ -378,8 +374,8 @@ const handleDelete = async (postId) => {
   try {
     const userId = authStore.userId;
     const message = await postStore.deletePost(postId, userId);
-    console.log(message);
-    await fetchComments(); // 重新獲取貼文，而不是刷新頁面
+    console.log("刪除貼文成功:", message);
+    await fetchComments(); // 重新獲取貼文
   } catch (error) {
     console.error("刪除失敗:", error.message);
     alert("刪除失敗: " + error.message);
@@ -432,7 +428,7 @@ const handlelike = async (id) => {
     }
   } catch (error) {
     console.error(
-      "提交錯誤:",
+      "按讚提交錯誤:",
       error.response ? error.response.data.error : error.message
     );
     comment.likes = previousLikes;
@@ -474,6 +470,7 @@ onUnmounted(() => {
   document.removeEventListener("mousedown", closeModal);
 });
 </script>
+
 <template>
   <div
     v-for="(comment, index) in comments"
