@@ -54,24 +54,19 @@ const router = createRouter({
   scrollBehavior(to, from, savedPosition) {
     const scrollStore = useScrollStore();
 
-    // 如果是瀏覽器後退/前進，返回保存的位置
-    if (savedPosition) {
-      return { ...savedPosition, behavior: "auto" };
+    // 從 Profile 返回 Home，恢復首頁位置
+    if (to.name === "Home" && from.name === "Profile") {
+      return { top: scrollStore.getScrollPosition(), behavior: "auto" };
     }
 
-    // 如果從其他頁面跳轉到 Profile（新導航），滾動到頂部
-    if (to.name === "Profile" && from.name !== "Post") {
-      scrollStore.setScrollPosition(0); // 重置存儲位置
-      return { top: 0, behavior: "smooth" };
-    }
-
-    // 如果從 Post 返回 Profile，恢復之前的位置
+    // 從 Post 返回 Profile，恢復個人頁位置
     if (to.name === "Profile" && from.name === "Post") {
       return { top: scrollStore.getScrollPosition(), behavior: "auto" };
     }
 
-    // 其他情況（例如跳轉到首頁），滾動到頂部
-    return { top: 0, behavior: "smooth" };
+    // 新導航（包括從別人頁到個人頁），滾動到頂部
+    scrollStore.setScrollPosition(0);
+    return { top: 0 };
   },
 });
 

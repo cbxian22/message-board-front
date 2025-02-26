@@ -64,7 +64,6 @@ import Sendicon from "../assets/Sendicon.svg";
 const router = useRouter();
 const themeStore = useThemeStore();
 const authStore = useAuthStore();
-// authStore.checkLoginStatus();
 
 const isModalOpen = ref(false);
 const modalButton = ref(null);

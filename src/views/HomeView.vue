@@ -47,38 +47,37 @@
 </template>
 
 <script setup>
-import { computed, onUpdated, ref } from "vue";
-import { onBeforeRouteLeave } from "vue-router";
-// import { useScrollStore } from "@/stores/scrollStore";
+import { computed, ref } from "vue";
+import { useScrollStore } from "@/stores/scrollStore";
+import { useSocketStore } from "../stores/socketStore";
 import { NSpin } from "naive-ui";
 
-import { useSocketStore } from "../stores/socketStore";
-import SinglePosts from "../components/SinglePosts.vue";
 import Navbar from "../components/Navbar.vue";
+import SinglePosts from "../components/SinglePosts.vue";
 import NavbarUp from "../components/NavbarUp.vue";
 
+const scrollStore = useScrollStore();
 const socketStore = useSocketStore();
-// const scrollStore = useScrollStore();
 const isLoading = ref(true);
+
+const saveScrollPosition = () => {
+  const position = window.scrollY || document.documentElement.scrollTop;
+  scrollStore.setScrollPosition(position);
+};
+
+onMounted(() => {
+  window.addEventListener("scroll", saveScrollPosition);
+});
+
+onUnmounted(() => {
+  window.removeEventListener("scroll", saveScrollPosition);
+  saveScrollPosition(); // 離開前保存最後位置
+});
 
 // 當 singleComment 加載完成時，更新 isLoading
 const handleLoaded = () => {
   isLoading.value = false;
 };
-
-// 在離開頁面之前保存滾動位置
-// onBeforeRouteLeave((to, from, next) => {
-//   // console.log("Saving scroll position:", window.scrollY);
-//   scrollStore.setScrollPosition(window.scrollY);
-//   next();
-// });
-
-// onUpdated(() => {
-//   const position = useScrollStore().getScrollPosition();
-//   if (position !== 0) {
-//     window.scrollTo(0, position);
-//   }
-// });
 
 // 計算是否有新留言
 const aru = computed(() => socketStore.messages.length > 0);
