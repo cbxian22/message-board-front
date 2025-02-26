@@ -67,16 +67,17 @@ const saveScrollPosition = () => {
   console.log("Saved scroll position in HomeView:", position);
 };
 
-onMounted(async () => {
+onMounted(() => {
   window.addEventListener("scroll", saveScrollPosition);
 
-  await nextTick(); // 確保 DOM 更新完成後執行滾動
   const savedPosition = scrollStore.getScrollPosition();
   console.log("Restoring scroll position on mount:", savedPosition);
 
-  window.scrollTo({
-    top: savedPosition,
-    behavior: "auto",
+  nextTick(() => {
+    window.scrollTo({
+      top: savedPosition,
+      behavior: "auto",
+    });
   });
 });
 

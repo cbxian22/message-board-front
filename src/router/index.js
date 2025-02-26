@@ -47,7 +47,8 @@ const router = createRouter({
     if (to.name === "Home" && from.name === "Profile") {
       const position = scrollStore.getScrollPosition();
       console.log("Returning to Home from Profile, scrollPosition:", position);
-      return { top: position, behavior: "auto" };
+
+      return { top: position || 0, behavior: "auto" };
     }
 
     if (to.name === "Profile" && from.name === "Post") {
