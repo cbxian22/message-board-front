@@ -47,7 +47,7 @@
 </template>
 
 <script setup>
-import { computed, ref, onMounted, onUnmounted, nextTick } from "vue";
+import { computed, ref, onMounted, onUnmounted } from "vue";
 import { useScrollStore } from "@/stores/scrollStore";
 import { useSocketStore } from "../stores/socketStore";
 import { NSpin } from "naive-ui";
@@ -61,22 +61,17 @@ const socketStore = useSocketStore();
 const isLoading = ref(true);
 
 const saveScrollPosition = () => {
-  scrollStore.setScrollPosition(window.scrollY);
+  const position = window.scrollY || document.documentElement.scrollTop;
+  scrollStore.setScrollPosition(position);
 };
 
 onMounted(() => {
-  // 監聽滾動事件，記錄滾動位置
   window.addEventListener("scroll", saveScrollPosition);
-
-  // 回到先前儲存的位置
-  nextTick(() => {
-    window.scrollTo(0, scrollStore.getScrollPosition());
-  });
 });
 
 onUnmounted(() => {
-  // 離開頁面時移除事件監聽
   window.removeEventListener("scroll", saveScrollPosition);
+  saveScrollPosition(); // 離開前保存最後位置
 });
 
 // 當 singleComment 加載完成時，更新 isLoading
