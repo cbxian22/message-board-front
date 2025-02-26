@@ -3,6 +3,7 @@ import { ref, onMounted, watch } from "vue";
 import { useRoute, useRouter } from "vue-router";
 import apiClient from "../stores/axiosConfig";
 import { emitter } from "../main";
+import { useAuthStore } from "../stores/authStore";
 
 import Info from "../components/Info.vue";
 import InfoSinglePosts from "../components/InfoSinglePosts.vue";
@@ -15,6 +16,7 @@ import Backicon from "../assets/Backicon.svg";
 const props = defineProps(["username"]);
 const router = useRouter();
 const route = useRoute();
+const authStore = useAuthStore();
 
 const userData = ref(null);
 const userPosts = ref([]);
@@ -43,7 +45,6 @@ onMounted(async () => {
 // 獲取使用者資料
 const fetchUserData = async (username) => {
   try {
-    const userId = localStorage.getItem("userId"); // 可選，後端應處理未登錄情況
     const [userResponse, postsResponse] = await Promise.all([
       apiClient.get(`/users/${username}`),
       apiClient.get(`/posts/user/${username}`, {
@@ -86,12 +87,22 @@ const fetchUserData = async (username) => {
 const isFromNavbar = () => {
   return route.query.from === "navbar";
 };
+
+// 是否為自己的個人頁面
+const isOwnProfile = () => {
+  return authStore.isLoggedIn && props.username === authStore.userName;
+};
+
+// 返回按鈕是否應隱藏
+const shouldHideBackIcon = () => {
+  return isFromNavbar() && isOwnProfile();
+};
 </script>
 
 <template>
   <NavbarUp />
   <div class="container-box">
-    <div class="back-icon" :class="{ hidden: isFromNavbar() }">
+    <div class="back-icon" :class="{ hidden: shouldHideBackIcon() }">
       <router-link to="/">
         <img :src="Backicon" alt="Backicon" />
       </router-link>

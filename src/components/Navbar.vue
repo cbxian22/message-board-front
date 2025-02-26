@@ -26,10 +26,6 @@
       </li>
 
       <li v-if="authStore.isLoggedIn">
-        <!-- <router-link
-          :to="{ path: `/@${authStore.userName}`, query: { from: 'navbar' } }"
-          class="nav-link"
-        > -->
         <router-link :to="`/@${authStore.userName}`" class="nav-link">
           <img class="user-img" :src="userAvatar" alt="Accounticon" />
         </router-link>
@@ -59,7 +55,7 @@ import Loginicon from "../assets/Loginicon.svg";
 const authStore = useAuthStore();
 const isPostModalOpen = ref(false);
 const isLoginModalOpen = ref(false);
-// 使用 computed 確保獲取最新值
+
 const userAvatar = computed(() => authStore.userAvatar);
 const toTop = () => {
   window.scrollTo(0, 0);
