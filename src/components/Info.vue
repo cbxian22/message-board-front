@@ -149,6 +149,8 @@ const handleUpdate = async () => {
       fileUrl: uploadedFileUrl || info.value.userAvatar,
     });
 
+    console.log("後端回應:", response.data);
+
     if (response.status === 200) {
       authStore.userName = name.value;
       authStore.userAvatar = uploadedFileUrl || info.value.userAvatar;
@@ -159,7 +161,7 @@ const handleUpdate = async () => {
       // 通知父組件刷新資料
       await nextTick(); // 確保 DOM 更新
       emitter.emit("refreshPost");
-      await nextTick();
+      await new Promise((resolve) => setTimeout(resolve, 1000)); // 等待後端更新
       await router.push(`/@${name.value}`);
       show.value = false;
     } else {
