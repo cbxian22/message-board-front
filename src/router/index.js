@@ -64,6 +64,7 @@ const router = createRouter({
         });
       });
     }
+
     // 從 Post 返回 Profile，恢復個人頁位置
     if (to.name === "Profile" && from.name === "Post") {
       const position = scrollStore.getScrollPosition();
@@ -71,14 +72,13 @@ const router = createRouter({
       return { top: position, behavior: "auto" };
     }
 
-    // 新導航（包括從首頁到 Profile 或 Post），滾動到頂部並重置
-    if (to.name === "Profile" || to.name === "Post") {
-      console.log(
-        "New navigation to Profile or Post, resetting scrollPosition to 0"
-      );
-      scrollStore.setScrollPosition(0);
-    }
-    console.log("New navigation, scrollPosition reset to 0");
+    // 新導航（包括從首頁到 Profile 或 Post），滾動到頂部，但不重置 scrollPosition
+    console.log(
+      "New navigation to:",
+      to.name,
+      "scrollPosition remains:",
+      scrollStore.getScrollPosition()
+    );
     return { top: 0, behavior: "smooth" };
   },
 });
