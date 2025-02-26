@@ -298,19 +298,26 @@ const closeModal = (event) => {
 const fetchComments = async () => {
   try {
     const userId = authStore.userId || localStorage.getItem("userId");
+    console.log(
+      "fetchComments - userId:",
+      userId,
+      "token:",
+      authStore.accessToken
+    ); // 添加日誌
     const response = await apiClient.get("/posts", {
-      params: { userId }, // 傳遞 userId 給後端
+      params: { userId },
       headers: authStore.accessToken
         ? { Authorization: `Bearer ${authStore.accessToken}` }
-        : {}, // 確保帶上 token
+        : {},
     });
+    console.log("fetchComments - 後端回應:", response.data); // 添加日誌查看回應
     if (response.status === 200 && Array.isArray(response.data)) {
       comments.value = response.data.map((comment) => ({
         id: comment.id,
         content: comment.content,
         timestamp: new Date(comment.created_at),
         file_url: comment.file_url,
-        visibility: comment.visibility, // 可選，保留用於調試
+        visibility: comment.visibility,
         name: comment.user_name,
         user_avatar: comment.user_avatar,
         likes: comment.likes || 0,
@@ -323,7 +330,10 @@ const fetchComments = async () => {
       alert("無法獲取貼文，數據格式不正確");
     }
   } catch (error) {
-    console.error("取得貼文錯誤:", error);
+    console.error(
+      "取得貼文錯誤:",
+      error.response ? error.response.data : error.message
+    );
     alert("貼文取得失敗，請檢查網絡或稍後再試");
   }
 };
