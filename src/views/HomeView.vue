@@ -47,16 +47,13 @@
 
 <script setup>
 import { ref, onMounted, onUnmounted, nextTick } from "vue";
-import { useScrollStore } from "@/stores/scrollStore";
 import { useSocketStore } from "../stores/socketStore";
-import { debounce } from "lodash";
 import { NSpin } from "naive-ui";
 
 import Navbar from "../components/Navbar.vue";
 import SinglePosts from "../components/SinglePosts.vue";
 import NavbarUp from "../components/NavbarUp.vue";
 
-const scrollStore = useScrollStore();
 const socketStore = useSocketStore();
 const isLoading = ref(true);
 

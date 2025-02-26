@@ -41,41 +41,10 @@ const router = createRouter({
       component: () => import("../views/NotFound.vue"),
     },
   ],
-  scrollBehavior(to, from, savedPosition) {
-    const scrollStore = useScrollStore();
-
-    if (to.name === "Home" && from.name === "Profile") {
-      const position = scrollStore.getScrollPosition();
-      console.log("Returning to Home from Profile, scrollPosition:", position);
-      return { top: position };
-    }
-
-    // if (to.name === "Profile" && from.name === "Post") {
-    //   const position = scrollStore.getScrollPosition();
-    //   console.log("Returning to Profile from Post, scrollPosition:", position);
-    //   return { top: position, behavior: "auto" };
-    // }
-
-    console.log(
-      "New navigation to:",
-      to.name,
-      "scrollPosition remains:",
-      scrollStore.getScrollPosition()
-    );
-
-    return { top: useScrollStore.scrollPosition };
-  },
 });
 
 router.beforeEach(async (to, from, next) => {
   const authStore = useAuthStore();
-  const scrollStore = useScrollStore();
-
-  if (from.name === "Home") {
-    const position = window.scrollY;
-    scrollStore.setScrollPosition(position);
-    console.log("Saving scroll position before leaving Home:", position);
-  }
 
   await nextTick();
   if ((to.name === "Login" || to.name === "Register") && authStore.isLoggedIn) {
