@@ -67,25 +67,19 @@ const saveScrollPosition = () => {
   console.log("Saved scroll position in HomeView:", position);
 };
 
-// 在路由跳轉前保存位置
-router.beforeEach((to, from, next) => {
-  if (from.name === "Home") {
-    saveScrollPosition();
-    console.log(
-      "Saving scroll position before leaving Home:",
-      scrollStore.getScrollPosition()
-    );
-  }
-  next();
-});
-
 onMounted(() => {
   window.addEventListener("scroll", saveScrollPosition);
+  // 恢復滾動位置
+  const savedPosition = scrollStore.getScrollPosition();
+  console.log("Restoring scroll position on mount:", savedPosition);
+  window.scrollTo({
+    top: savedPosition,
+    behavior: "auto",
+  });
 });
 
 onUnmounted(() => {
   window.removeEventListener("scroll", saveScrollPosition);
-  // 移除 saveScrollPosition()，因為已在 beforeEach 中保存
 });
 
 // 當 singleComment 加載完成時，更新 isLoading

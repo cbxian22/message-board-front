@@ -57,11 +57,7 @@ const router = createRouter({
     if (to.name === "Home" && from.name === "Profile") {
       const position = scrollStore.getScrollPosition();
       console.log("Returning to Home from Profile, scrollPosition:", position);
-      return new Promise((resolve) => {
-        nextTick().then(() => {
-          resolve({ top: position, behavior: "auto" });
-        });
-      });
+      return { top: position, behavior: "auto" };
     }
 
     if (to.name === "Profile" && from.name === "Post") {
@@ -101,23 +97,10 @@ const router = createRouter({
 //   }
 // });
 
-// // 如果已登入者訪問 Login 或 Register 頁面，重定向到首頁
-// router.beforeEach(async (to, from, next) => {
-//   const authStore = useAuthStore();
-//   await nextTick();
-
-//   // 如果已登入且正在訪問 Login 或 Register 頁面，重定向到首頁
-//   if ((to.name === "Login" || to.name === "Register") && authStore.isLoggedIn) {
-//     return next({ name: "Home" });
-//   }
-
-//   next(); // 其他情況正常導航
-// });
 router.beforeEach(async (to, from, next) => {
   const authStore = useAuthStore();
   const scrollStore = useScrollStore();
 
-  // 在離開 Home 前保存滾動位置
   if (from.name === "Home") {
     const position = window.scrollY || document.documentElement.scrollTop;
     scrollStore.setScrollPosition(position);
