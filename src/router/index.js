@@ -47,22 +47,14 @@ const router = createRouter({
     if (to.name === "Home" && from.name === "Profile") {
       const position = scrollStore.getScrollPosition();
       console.log("Returning to Home from Profile, scrollPosition:", position);
-
-      return { top: position || 0, behavior: "auto" };
+      return { top: position, behavior: "auto" }; // 使用 auto 以避免動畫干擾
     }
 
-    if (to.name === "Profile" && from.name === "Post") {
-      const position = scrollStore.getScrollPosition();
-      console.log("Returning to Profile from Post, scrollPosition:", position);
-      return { top: position, behavior: "auto" };
+    if (savedPosition) {
+      return savedPosition; // 瀏覽器後退/前進時使用保存的位置
     }
 
-    console.log(
-      "New navigation to:",
-      to.name,
-      "scrollPosition remains:",
-      scrollStore.getScrollPosition()
-    );
+    console.log("Navigating to:", to.name, "with scroll reset to top");
     return { top: 0, behavior: "smooth" };
   },
 });
@@ -73,14 +65,14 @@ router.beforeEach(async (to, from, next) => {
 
   if (from.name === "Home") {
     const position = window.scrollY || document.documentElement.scrollTop;
-    console.log("Saving scroll position before leaving Home:", position);
     scrollStore.setScrollPosition(position);
+    console.log("Saving scroll position before leaving Home:", position);
   }
 
+  await nextTick();
   if ((to.name === "Login" || to.name === "Register") && authStore.isLoggedIn) {
     return next({ name: "Home" });
   }
-
   next();
 });
 

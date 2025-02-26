@@ -46,10 +46,10 @@
 </template>
 
 <script setup>
-import { computed, ref, onMounted, onUnmounted, nextTick } from "vue";
+import { ref, onMounted, onUnmounted, nextTick } from "vue";
 import { useScrollStore } from "@/stores/scrollStore";
 import { useSocketStore } from "../stores/socketStore";
-import { useRouter } from "vue-router"; // 新增
+import { debounce } from "lodash";
 import { NSpin } from "naive-ui";
 
 import Navbar from "../components/Navbar.vue";
@@ -58,36 +58,43 @@ import NavbarUp from "../components/NavbarUp.vue";
 
 const scrollStore = useScrollStore();
 const socketStore = useSocketStore();
-const router = useRouter(); // 新增
 const isLoading = ref(true);
 
-const saveScrollPosition = () => {
+const saveScrollPosition = debounce(() => {
   const position = window.scrollY || document.documentElement.scrollTop;
   scrollStore.setScrollPosition(position);
-  console.log("Saved scroll position in HomeView:", position);
-};
+}, 100);
 
-onMounted(() => {
+onMounted(async () => {
   window.addEventListener("scroll", saveScrollPosition);
-
+  // 等待 DOM 渲染完成後恢復滾動位置
+  await nextTick();
   const savedPosition = scrollStore.getScrollPosition();
   console.log("Restoring scroll position on mount:", savedPosition);
 
-  nextTick(() => {
+  // 如果內容尚未加載完成，等待 handleLoaded 觸發後再滾動
+  if (!isLoading.value) {
     window.scrollTo({
       top: savedPosition,
       behavior: "auto",
     });
-  });
+  }
 });
 
 onUnmounted(() => {
+  // 移除滾動事件監聽器，避免記憶體洩漏
   window.removeEventListener("scroll", saveScrollPosition);
 });
 
 // 當 singleComment 加載完成時，更新 isLoading
 const handleLoaded = () => {
   isLoading.value = false;
+  const savedPosition = scrollStore.getScrollPosition();
+  console.log("Content loaded, restoring scroll position:", savedPosition);
+  window.scrollTo({
+    top: savedPosition,
+    behavior: "auto",
+  });
 };
 
 // 計算是否有新留言
