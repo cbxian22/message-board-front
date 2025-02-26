@@ -62,6 +62,7 @@ const isLoading = ref(true);
 const saveScrollPosition = () => {
   const position = window.scrollY || document.documentElement.scrollTop;
   scrollStore.setScrollPosition(position);
+  console.log("Saved scroll position in HomeView:", position);
 };
 
 onMounted(() => {
@@ -70,7 +71,11 @@ onMounted(() => {
 
 onUnmounted(() => {
   window.removeEventListener("scroll", saveScrollPosition);
-  saveScrollPosition(); // 離開前保存最後位置
+  saveScrollPosition();
+  console.log(
+    "Final scroll position on unmount:",
+    scrollStore.getScrollPosition()
+  );
 });
 
 // 當 singleComment 加載完成時，更新 isLoading
