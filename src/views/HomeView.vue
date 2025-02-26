@@ -98,7 +98,7 @@ const handleLoaded = () => {
 };
 
 // 計算是否有新留言
-const aru = computed(() => socketStore.messages.length > 0);
+// const aru = computed(() => socketStore.messages.length > 0);
 </script>
 
 <style scoped>
