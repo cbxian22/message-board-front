@@ -26,10 +26,10 @@
       </li>
 
       <li v-if="authStore.isLoggedIn">
+        <!-- <router-link :to="`/@${authStore.userName}`" class="nav-link"> -->
         <router-link
-          :to="`/@${authStore.userName}`"
+          :to="{ path: `/@${authStore.userName}`, query: { from: 'navbar' } }"
           class="nav-link"
-          :name="navbar"
         >
           <img class="user-img" :src="userAvatar" alt="Accounticon" />
         </router-link>
