@@ -157,6 +157,7 @@ const handleUpdate = async () => {
       localStorage.setItem("userName", authStore.userName);
       localStorage.setItem("userAvatar", authStore.userAvatar);
       loggedInUser.value = name.value;
+      console.log(name.value);
 
       await nextTick();
       emitter.emit("refreshPost");
