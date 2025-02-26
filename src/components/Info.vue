@@ -154,9 +154,10 @@ const handleUpdate = async () => {
       authStore.userAvatar = uploadedFileUrl || info.value.userAvatar;
       localStorage.setItem("userName", authStore.userName);
       localStorage.setItem("userAvatar", authStore.userAvatar);
-
-      await nextTick(); // 確保 DOM 更新
       loggedInUser.value = name.value;
+
+      // 通知父組件刷新資料
+      await nextTick(); // 確保 DOM 更新
       emitter.emit("refreshPost");
 
       await router.push(`/@${name.value}`);
