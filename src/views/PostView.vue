@@ -28,8 +28,6 @@ const emit = defineEmits(["update:modelValue"]);
 const socketStore = useSocketStore();
 const loadingBar = useLoadingBar();
 
-const userName = computed(() => authStore.userName || "未知用户");
-
 const content = ref("");
 const textarea = ref(null); // 取得 textarea DOM 節點
 const prevHeight = ref("auto"); // 儲存上一次高度

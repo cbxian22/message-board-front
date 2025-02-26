@@ -26,7 +26,6 @@
       </li>
 
       <li v-if="authStore.isLoggedIn">
-        <!-- <router-link :to="`/@${authStore.userName}`" class="nav-link"> -->
         <router-link
           :to="{ path: `/@${authStore.userName}`, query: { from: 'navbar' } }"
           class="nav-link"
@@ -75,7 +74,6 @@ const checkTokenAndOpenModal = () => {
 </script>
 
 <style scoped>
-/* 整體導航條 */
 .navbar {
   display: flex;
   justify-content: center;
@@ -86,23 +84,20 @@ const checkTokenAndOpenModal = () => {
   z-index: 1000;
 }
 
-/* 項目列表樣式 */
 .navbar ul {
   display: flex;
   justify-content: space-around;
   width: 60%;
 }
 
-/* 項目間距 */
 .navbar ul li {
-  /* display: flex; */
   list-style-type: none;
 }
 
 .nav-link {
-  display: flex; /* 讓 a 內的內容可以對齊 */
-  align-items: center; /* 垂直置中 */
-  justify-content: center; /* 水平置中（可選） */
+  display: flex;
+  align-items: center;
+  justify-content: center;
   padding: 10px 25px;
   margin: 5px 0;
 }
@@ -121,14 +116,14 @@ const checkTokenAndOpenModal = () => {
 }
 
 .dark-mode nav {
-  background: rgba(10, 10, 10, 0.6); /* 半透明黑色背景 */
-  backdrop-filter: blur(10px); /* 霧化效果 */
+  background: rgba(10, 10, 10, 0.6);
+  backdrop-filter: blur(10px);
   transition: background-color 0.3s ease, color 0.3s ease;
 }
 
 .light-mode nav {
-  background: rgba(255, 255, 255, 0.6); /* 半透明黑色背景 */
-  backdrop-filter: blur(10px); /* 霧化效果 */
+  background: rgba(255, 255, 255, 0.6);
+  backdrop-filter: blur(10px);
   transition: background-color 0.3s ease, color 0.3s ease;
 }
 </style>
