@@ -160,11 +160,11 @@ const handleUpdate = async () => {
       console.log("更新後的 authStore.userName:", authStore.userName); // 添加這行
 
       await nextTick();
-      emitter.emit("refreshPost");
+      // emitter.emit("refreshPost");
+      emitter.emit("refreshPost", { newUsername: name.value });
 
-      await router.push(`/@${name.value}`);
-      console.log("name.value:::::" + name.value);
-
+      // await router.push(`/@${name.value}`);
+      await router.replace(`/@${name.value}`);
       show.value = false;
     } else {
       alert("更新失敗");
