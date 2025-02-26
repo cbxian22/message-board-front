@@ -295,35 +295,34 @@ const closeModal = (event) => {
 };
 
 // 獲取主頁貼文
+
 const fetchComments = async () => {
   try {
     const userId = authStore.userId || localStorage.getItem("userId");
-    console.log(
-      "fetchComments - userId:",
-      userId,
-      "token:",
-      authStore.accessToken
-    ); // 添加日誌
+    const token = authStore.accessToken;
+    console.log("fetchComments - userId:", userId, "token:", token);
     const response = await apiClient.get("/posts", {
       params: { userId },
-      headers: authStore.accessToken
-        ? { Authorization: `Bearer ${authStore.accessToken}` }
-        : {},
+      headers: token ? { Authorization: `Bearer ${token}` } : {},
     });
-    console.log("fetchComments - 後端回應:", response.data); // 添加日誌查看回應
+    console.log("fetchComments - 後端回應數量:", response.data.length);
+    console.log("fetchComments - 後端回應:", response.data);
     if (response.status === 200 && Array.isArray(response.data)) {
-      comments.value = response.data.map((comment) => ({
-        id: comment.id,
-        content: comment.content,
-        timestamp: new Date(comment.created_at),
-        file_url: comment.file_url,
-        visibility: comment.visibility,
-        name: comment.user_name,
-        user_avatar: comment.user_avatar,
-        likes: comment.likes || 0,
-        userLiked: comment.user_liked || false,
-        replies: comment.replies || 0,
-      }));
+      comments.value = response.data.map((comment) => {
+        console.log("貼文:", comment.id, "visibility:", comment.visibility);
+        return {
+          id: comment.id,
+          content: comment.content,
+          timestamp: new Date(comment.created_at),
+          file_url: comment.file_url,
+          visibility: comment.visibility,
+          name: comment.user_name,
+          user_avatar: comment.user_avatar,
+          likes: comment.likes || 0,
+          userLiked: comment.user_liked || false,
+          replies: comment.replies || 0,
+        };
+      });
       emit("loaded");
     } else {
       console.error("數據格式不正確:", response.data);
