@@ -37,8 +37,12 @@
 
               <div v-if="authStore.isLoggedIn" class="border-login"></div>
 
-              <div v-if="authStore.isLoggedIn" class="nav-modal">
-                <span @click="handleLogout">登出</span>
+              <div
+                v-if="authStore.isLoggedIn"
+                class="nav-modal"
+                @click="logout"
+              >
+                登出
               </div>
             </div>
           </div>
@@ -91,8 +95,9 @@ onUnmounted(() => {
   document.removeEventListener("mousedown", closeModal);
 });
 
-const handleLogout = () => {
-  authStore.logout();
+const logout = async () => {
+  await authStore.logout();
+  isModalOpen.value = false;
   router.push("/login");
 };
 
