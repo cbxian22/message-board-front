@@ -65,6 +65,7 @@ const fetchUserData = async (username) => {
       userAvatar: userResponse.data.avatar_url,
       is_private: Boolean(userResponse.data.is_private),
     };
+    console.log("父組件 - userData.value:", userData.value); // 確認數據
 
     if (postsResponse.status === 200 && Array.isArray(postsResponse.data)) {
       userPosts.value = postsResponse.data.map((comment) => ({
