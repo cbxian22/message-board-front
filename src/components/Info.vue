@@ -87,7 +87,7 @@ watch(show, (newValue) => {
     intro.value = "";
     file.value = null;
     if (fileInputRef.value) fileInputRef.value.value = null;
-    info.is_private = false;
+    info.is_private = "";
   }
 });
 

@@ -57,7 +57,7 @@ const fetchUserData = async (username) => {
       router.replace("/not-found");
       return;
     }
-
+    console.log("原始 API 數據 - userResponse.data:", userResponse.data); // 檢查原始數據
     userData.value = {
       id: userResponse.data.id,
       name: userResponse.data.name,
