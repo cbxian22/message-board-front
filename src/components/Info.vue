@@ -62,21 +62,21 @@ watch(
     if (newData) {
       info.value = {
         ...newData,
-        is_private: Boolean(newData.is_private),
+        is_private: Boolean(newData.is_private), // 統一轉為布林值
       };
     }
   },
   { immediate: true }
 );
 
-watch(
-  () => props.userData,
-  (newData) => {
-    if (newData) {
-      info.value = newData;
-    }
-  }
-);
+// watch(
+//   () => props.userData,
+//   (newData) => {
+//     if (newData) {
+//       info.value = newData;
+//     }
+//   }
+// );
 
 // 當抽屜顯示時，預填入現有資料
 watch(show, (newValue) => {
