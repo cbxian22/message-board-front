@@ -1,6 +1,12 @@
 <script setup>
 import { ref, onMounted, onUnmounted, watch, nextTick } from "vue";
-import { NButton, NDrawerContent, NDrawer, useLoadingBar } from "naive-ui";
+import {
+  NSwitch,
+  NButton,
+  NDrawerContent,
+  NDrawer,
+  useLoadingBar,
+} from "naive-ui";
 import { useAuthStore } from "../stores/authStore";
 import { useThemeStore } from "../stores/themeStore";
 import { useRouter } from "vue-router";
@@ -27,6 +33,7 @@ const file = ref(null);
 const fileInputRef = ref(null);
 const tempAvatar = ref(null);
 const isLoginModalOpen = ref(false);
+const is_private = ref(false);
 
 // 監聽 authStore.userName 的變化並同步 loggedInUser
 watch(
@@ -39,15 +46,28 @@ watch(
 // 初始化檢查登入狀態，並監聽 authStore 變化
 onMounted(() => {
   updateWidth();
-  window.addEventListener("resize", updateWidth);
-  if (props.userData) {
-    info.value = props.userData;
-  }
+  // window.addEventListener("resize", updateWidth);
+  // if (props.userData) {
+  //   info.value = props.userData;
+  // }
 });
 
 onUnmounted(() => {
   window.removeEventListener("resize", updateWidth);
 });
+
+watch(
+  () => props.userData,
+  (newData) => {
+    if (newData) {
+      info.value = {
+        ...newData,
+        is_private: Boolean(newData.is_private),
+      };
+    }
+  },
+  { immediate: true }
+);
 
 watch(
   () => props.userData,
@@ -64,6 +84,7 @@ watch(show, (newValue) => {
     name.value = info.value.name || "";
     intro.value = info.value.intro || "";
     tempAvatar.value = info.value.userAvatar;
+    is_private.value = info.value.is_private;
   } else {
     tempAvatar.value = null;
     name.value = "";
@@ -128,7 +149,8 @@ const handleUpdate = async () => {
   if (
     name.value === info.value.name &&
     intro.value === info.value.intro &&
-    tempAvatar.value === info.value.userAvatar
+    tempAvatar.value === info.value.userAvatar &&
+    is_private.value === info.value.is_private
   ) {
     show.value = false;
     return;
@@ -157,6 +179,14 @@ const handleUpdate = async () => {
       localStorage.setItem("userName", authStore.userName);
       localStorage.setItem("userAvatar", authStore.userAvatar);
       loggedInUser.value = name.value;
+
+      info.value = {
+        ...info.value,
+        name: name.value,
+        intro: intro.value,
+        userAvatar: uploadedFileUrl || info.value.userAvatar,
+        is_private: is_private.value,
+      };
 
       await nextTick();
       emitter.emit("refreshPost", { newUsername: name.value });
@@ -265,9 +295,11 @@ const updateWidth = () => {
           <div class="form-box">
             <div class="form-mod">
               <label for="intro">變更隱私</label>
-              <span>公開</span>
-              <n-switch v-model:value="is_private" />
-              <span>私人</span>
+              <div class="toggle-container">
+                <span>公開</span>
+                <n-switch v-model:value="is_private" />
+                <span>私人</span>
+              </div>
             </div>
           </div>
 
@@ -279,6 +311,8 @@ const updateWidth = () => {
         </form>
       </n-drawer-content>
     </n-drawer>
+
+    <div v-show="is_private"></div>
   </div>
 
   <!-- 登入 Modal -->
@@ -405,5 +439,26 @@ const updateWidth = () => {
   height: 70px;
   border-radius: 50%;
   object-fit: cover;
+}
+
+/* 隱私切換樣式 */
+.privacy-toggle .toggle-container {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  margin-top: 10px;
+}
+
+.privacy-toggle span {
+  font-size: 14px;
+  color: rgb(243, 245, 247);
+}
+
+.light-mode .privacy-toggle span {
+  color: rgb(0, 0, 0);
+}
+
+.privacy-toggle .n-switch {
+  margin: 0 5px;
 }
 </style>
