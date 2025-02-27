@@ -159,7 +159,7 @@ const handleUpdate = async () => {
       name: name.value,
       intro: intro.value,
       fileUrl: uploadedFileUrl || info.value.userAvatar,
-      is_private: is_private.value,
+      isPrivate: is_private.value,
     });
 
     console.log("後端回應:", response.data);
