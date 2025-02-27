@@ -1,12 +1,6 @@
 <script setup>
 import { ref, onMounted, onUnmounted, watch, nextTick } from "vue";
-import {
-  NSwitch,
-  NButton,
-  NDrawerContent,
-  NDrawer,
-  useLoadingBar,
-} from "naive-ui";
+import { NButton, NDrawerContent, NDrawer, useLoadingBar } from "naive-ui";
 import { useAuthStore } from "../stores/authStore";
 import { useThemeStore } from "../stores/themeStore";
 import { useRouter } from "vue-router";
@@ -29,7 +23,6 @@ const rwdwidth = ref("100vw");
 const info = ref({});
 const name = ref("");
 const intro = ref("");
-const is_private = ref(false);
 const file = ref(null);
 const fileInputRef = ref(null);
 const tempAvatar = ref(null);
@@ -47,34 +40,22 @@ watch(
 onMounted(() => {
   updateWidth();
   window.addEventListener("resize", updateWidth);
-  // if (props.userData) {
-  //   info.value = props.userData;
-  // }
+  if (props.userData) {
+    info.value = props.userData;
+  }
 });
 
 onUnmounted(() => {
   window.removeEventListener("resize", updateWidth);
 });
 
-// watch(
-//   () => props.userData,
-//   (newData) => {
-//     if (newData) {
-//       info.value = newData;
-//     }
-//   }
-// );
 watch(
   () => props.userData,
   (newData) => {
     if (newData) {
-      info.value = {
-        ...newData,
-        is_private: Boolean(newData.is_private),
-      };
+      info.value = newData;
     }
-  },
-  { immediate: true }
+  }
 );
 
 // 當抽屜顯示時，預填入現有資料
@@ -83,7 +64,6 @@ watch(show, (newValue) => {
     name.value = info.value.name || "";
     intro.value = info.value.intro || "";
     tempAvatar.value = info.value.userAvatar;
-    is_private.value = info.value.is_private;
   } else {
     tempAvatar.value = null;
     name.value = "";
@@ -148,8 +128,7 @@ const handleUpdate = async () => {
   if (
     name.value === info.value.name &&
     intro.value === info.value.intro &&
-    tempAvatar.value === info.value.userAvatar &&
-    is_private.value === info.value.is_private
+    tempAvatar.value === info.value.userAvatar
   ) {
     show.value = false;
     return;
@@ -168,7 +147,6 @@ const handleUpdate = async () => {
       name: name.value,
       intro: intro.value,
       fileUrl: uploadedFileUrl || info.value.userAvatar,
-      is_private: is_private.value,
     });
 
     console.log("後端回應:", response.data);
@@ -179,14 +157,6 @@ const handleUpdate = async () => {
       localStorage.setItem("userName", authStore.userName);
       localStorage.setItem("userAvatar", authStore.userAvatar);
       loggedInUser.value = name.value;
-
-      info.value = {
-        ...info.value,
-        name: name.value,
-        intro: intro.value,
-        userAvatar: uploadedFileUrl || info.value.userAvatar,
-        is_private: is_private.value,
-      };
 
       await nextTick();
       emitter.emit("refreshPost", { newUsername: name.value });
@@ -309,8 +279,6 @@ const updateWidth = () => {
         </form>
       </n-drawer-content>
     </n-drawer>
-    <!--  -->
-    <div v-show="info.is_private">這是私人帳號，加入好友即可查看對方貼文。</div>
   </div>
 
   <!-- 登入 Modal -->
