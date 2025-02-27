@@ -41,38 +41,23 @@ watch(
 onMounted(() => {
   updateWidth();
   window.addEventListener("resize", updateWidth);
-  // if (props.userData) {
-  //   info.value = props.userData;
-  //   console.log("onMounted - info.value:", info.value); // 調試
-  // }
+  if (props.userData) {
+    info.value = props.userData;
+  }
 });
-watch(
-  () => props.userData,
-  (newData) => {
-    if (newData) {
-      info.value = {
-        ...newData,
-        is_private: Boolean(newData.is_private), // 確保轉換
-      };
-      console.log("watch - info.value:", info.value); // 調試
-    }
-  },
-  { immediate: true }
-);
 
 onUnmounted(() => {
   window.removeEventListener("resize", updateWidth);
 });
 
-// watch(
-//   () => props.userData,
-//   (newData) => {
-//     if (newData) {
-//       info.value = newData;
-//       console.log("onMounted - info.value:", info.value); // 調試
-//     }
-//   }
-// );
+watch(
+  () => props.userData,
+  (newData) => {
+    if (newData) {
+      info.value = newData;
+    }
+  }
+);
 
 // 當抽屜顯示時，預填入現有資料
 watch(show, (newValue) => {

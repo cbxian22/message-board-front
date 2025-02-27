@@ -57,7 +57,7 @@ const fetchUserData = async (username) => {
       router.replace("/not-found");
       return;
     }
-    console.log("原始 API 數據 - userResponse.data:", userResponse.data); // 檢查原始數據
+
     userData.value = {
       id: userResponse.data.id,
       name: userResponse.data.name,
@@ -65,7 +65,6 @@ const fetchUserData = async (username) => {
       userAvatar: userResponse.data.avatar_url,
       is_private: Boolean(userResponse.data.is_private),
     };
-    console.log("父組件 - userData.value:", userData.value); // 確認數據
 
     if (postsResponse.status === 200 && Array.isArray(postsResponse.data)) {
       userPosts.value = postsResponse.data.map((comment) => ({
