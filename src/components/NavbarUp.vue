@@ -40,7 +40,7 @@
               <div
                 v-if="authStore.isLoggedIn"
                 class="nav-modal"
-                @click.prevent="logout"
+                @click="authStore.logout()"
               >
                 <router-link to="/login">登出</router-link>
               </div>
@@ -94,11 +94,6 @@ onMounted(() => {
 onUnmounted(() => {
   document.removeEventListener("mousedown", closeModal);
 });
-
-const logout = () => {
-  authStore.logout();
-  router.push("/login");
-};
 
 // 變更主題並儲存
 const toggleTheme = (value) => {
