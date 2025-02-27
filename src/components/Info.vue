@@ -65,12 +65,14 @@ watch(show, (newValue) => {
     name.value = info.value.name || "";
     intro.value = info.value.intro || "";
     tempAvatar.value = info.value.userAvatar;
+    is_private.value = info.value.is_private;
   } else {
     tempAvatar.value = null;
     name.value = "";
     intro.value = "";
     file.value = null;
     if (fileInputRef.value) fileInputRef.value.value = null;
+    info.is_private = false;
   }
 });
 
@@ -129,7 +131,8 @@ const handleUpdate = async () => {
   if (
     name.value === info.value.name &&
     intro.value === info.value.intro &&
-    tempAvatar.value === info.value.userAvatar
+    tempAvatar.value === info.value.userAvatar &&
+    is_private.value === info.value.is_private
   ) {
     show.value = false;
     return;
@@ -148,6 +151,7 @@ const handleUpdate = async () => {
       name: name.value,
       intro: intro.value,
       fileUrl: uploadedFileUrl || info.value.userAvatar,
+      is_private: is_private.value,
     });
 
     console.log("後端回應:", response.data);
