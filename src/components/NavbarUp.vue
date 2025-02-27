@@ -37,12 +37,8 @@
 
               <div v-if="authStore.isLoggedIn" class="border-login"></div>
 
-              <div
-                v-if="authStore.isLoggedIn"
-                class="nav-modal"
-                @click="logout"
-              >
-                <span>登出</span>
+              <div class="nav-modal" @click="logout">
+                <div class="logout">登出</div>
               </div>
             </div>
           </div>
@@ -124,7 +120,7 @@ const toggleTheme = (value) => {
   z-index: 1000;
 }
 
-.navbar-up div {
+.navbar-up > div {
   display: flex;
   align-items: center;
 }
@@ -171,13 +167,20 @@ const toggleTheme = (value) => {
 }
 .nav-modal {
   margin: 5px 0;
+  cursor: pointer;
 }
+
 .nav-modal:hover {
   background: rgba(128, 128, 128, 0.15);
   border-radius: 10px;
   transition: background-color 0.3s ease, color 0.3s ease;
 }
 
+.nav-modal .logout {
+  padding: 5px 10px;
+  width: 200px;
+  color: red;
+}
 .n-collapse-item {
   flex-direction: column;
   align-items: self-start;
