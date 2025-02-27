@@ -43,6 +43,7 @@ onMounted(() => {
   window.addEventListener("resize", updateWidth);
   if (props.userData) {
     info.value = props.userData;
+    console.log("onMounted - info.value:", info.value); // 調試
   }
 });
 
@@ -55,6 +56,7 @@ watch(
   (newData) => {
     if (newData) {
       info.value = newData;
+      console.log("onMounted - info.value:", info.value); // 調試
     }
   }
 );

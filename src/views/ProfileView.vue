@@ -63,7 +63,7 @@ const fetchUserData = async (username) => {
       name: userResponse.data.name,
       intro: userResponse.data.intro,
       userAvatar: userResponse.data.avatar_url,
-      is_private: userResponse.data.is_private,
+      is_private: Boolean(userResponse.data.is_private),
     };
 
     if (postsResponse.status === 200 && Array.isArray(postsResponse.data)) {
