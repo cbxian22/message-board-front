@@ -270,6 +270,10 @@ const updateWidth = () => {
         </form>
       </n-drawer-content>
     </n-drawer>
+    <!--  -->
+    <div v-show="info.value.is_private">
+      這是私人帳號，加入好友即可查看對方貼文。
+    </div>
   </div>
 
   <!-- 登入 Modal -->
