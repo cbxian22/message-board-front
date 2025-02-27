@@ -46,10 +46,7 @@ watch(
 // 初始化檢查登入狀態，並監聽 authStore 變化
 onMounted(() => {
   updateWidth();
-  // window.addEventListener("resize", updateWidth);
-  // if (props.userData) {
-  //   info.value = props.userData;
-  // }
+  window.addEventListener("resize", updateWidth);
 });
 
 onUnmounted(() => {
@@ -64,19 +61,11 @@ watch(
         ...newData,
         is_private: Boolean(newData.is_private), // 統一轉為布林值
       };
+      console.log("Updated info.value:", info.value); // 調試
     }
   },
   { immediate: true }
 );
-
-// watch(
-//   () => props.userData,
-//   (newData) => {
-//     if (newData) {
-//       info.value = newData;
-//     }
-//   }
-// );
 
 // 當抽屜顯示時，預填入現有資料
 watch(show, (newValue) => {
@@ -85,6 +74,7 @@ watch(show, (newValue) => {
     intro.value = info.value.intro || "";
     tempAvatar.value = info.value.userAvatar;
     is_private.value = info.value.is_private;
+    console.log("Drawer opened - is_private:", is_private.value); // 調試
   } else {
     tempAvatar.value = null;
     name.value = "";

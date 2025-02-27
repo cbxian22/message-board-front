@@ -30,6 +30,7 @@ onMounted(async () => {
   // 監聽刷新事件
   emitter.on("refreshPost", (data) => {
     const usernameToFetch = data?.newUsername || props.username;
+    console.log("Refreshing with username:", usernameToFetch);
     fetchUserData(usernameToFetch);
   });
 });
