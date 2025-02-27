@@ -42,7 +42,7 @@
                 class="nav-modal"
                 @click="logout"
               >
-                登出
+                <span>登出</span>
               </div>
             </div>
           </div>
