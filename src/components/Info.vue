@@ -169,6 +169,7 @@ const handleUpdate = async () => {
       name: name.value,
       intro: intro.value,
       fileUrl: uploadedFileUrl || info.value.userAvatar,
+      is_private: is_private.value,
     });
 
     console.log("後端回應:", response.data);
@@ -312,7 +313,7 @@ const updateWidth = () => {
       </n-drawer-content>
     </n-drawer>
 
-    <div v-show="is_private"></div>
+    <div v-show="info.is_private">這是私人帳號，加入好友即可查看對方貼文。</div>
   </div>
 
   <!-- 登入 Modal -->
