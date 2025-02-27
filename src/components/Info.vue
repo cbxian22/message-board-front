@@ -1,6 +1,12 @@
 <script setup>
 import { ref, onMounted, onUnmounted, watch, nextTick } from "vue";
-import { NButton, NDrawerContent, NDrawer, useLoadingBar } from "naive-ui";
+import {
+  NSwitch,
+  NButton,
+  NDrawerContent,
+  NDrawer,
+  useLoadingBar,
+} from "naive-ui";
 import { useAuthStore } from "../stores/authStore";
 import { useThemeStore } from "../stores/themeStore";
 import { useRouter } from "vue-router";
@@ -41,22 +47,34 @@ watch(
 onMounted(() => {
   updateWidth();
   window.addEventListener("resize", updateWidth);
-  if (props.userData) {
-    info.value = props.userData;
-  }
+  // if (props.userData) {
+  //   info.value = props.userData;
+  // }
 });
 
 onUnmounted(() => {
   window.removeEventListener("resize", updateWidth);
 });
 
+// watch(
+//   () => props.userData,
+//   (newData) => {
+//     if (newData) {
+//       info.value = newData;
+//     }
+//   }
+// );
 watch(
   () => props.userData,
   (newData) => {
     if (newData) {
-      info.value = newData;
+      info.value = {
+        ...newData,
+        is_private: Boolean(newData.is_private),
+      };
     }
-  }
+  },
+  { immediate: true }
 );
 
 // 當抽屜顯示時，預填入現有資料
@@ -72,7 +90,6 @@ watch(show, (newValue) => {
     intro.value = "";
     file.value = null;
     if (fileInputRef.value) fileInputRef.value.value = null;
-    info.is_private = "";
   }
 });
 
@@ -162,6 +179,14 @@ const handleUpdate = async () => {
       localStorage.setItem("userName", authStore.userName);
       localStorage.setItem("userAvatar", authStore.userAvatar);
       loggedInUser.value = name.value;
+
+      info.value = {
+        ...info.value,
+        name: name.value,
+        intro: intro.value,
+        userAvatar: uploadedFileUrl || info.value.userAvatar,
+        is_private: is_private.value,
+      };
 
       await nextTick();
       emitter.emit("refreshPost", { newUsername: name.value });
@@ -264,6 +289,15 @@ const updateWidth = () => {
             <div class="form-mod">
               <label for="intro">個人介紹</label>
               <textarea v-model="intro" id="intro"></textarea>
+            </div>
+          </div>
+
+          <div class="form-box">
+            <div class="form-mod">
+              <label for="intro">變更隱私</label>
+              <span>公開</span>
+              <n-switch v-model:value="is_private" />
+              <span>私人</span>
             </div>
           </div>
 
