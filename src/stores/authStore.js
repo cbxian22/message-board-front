@@ -170,6 +170,53 @@ export const useAuthStore = defineStore("auth", {
         "role",
       ].forEach((key) => localStorage.removeItem(key));
     },
+    async logoutAll() {
+      const accessToken = this.accessToken;
+      if (!accessToken) {
+        console.warn("No access token found, cannot logout all devices.");
+        return;
+      }
+
+      try {
+        const response = await fetch(
+          "https://message-board-server-7yot.onrender.com/api/auth/logout-all",
+          {
+            method: "POST",
+            headers: {
+              "Content-Type": "application/json",
+              Authorization: `Bearer ${accessToken}`,
+            },
+          }
+        );
+
+        if (!response.ok) {
+          console.error("Logout all request failed:", await response.json());
+        } else {
+          console.log("Successfully logged out from all devices.");
+        }
+      } catch (error) {
+        console.error("Error during logout all:", error);
+      }
+
+      // 清空本地狀態和存儲（與 logout 相同）
+      Object.assign(this, {
+        isLoggedIn: false,
+        userId: null,
+        userName: "",
+        userAvatar: "",
+        role: "",
+        accessToken: null,
+        refreshToken: null,
+      });
+      [
+        "accessToken",
+        "refreshToken",
+        "userId",
+        "userName",
+        "userAvatar",
+        "role",
+      ].forEach((key) => localStorage.removeItem(key));
+    },
     async checkLoginStatus() {
       const accessToken = localStorage.getItem("accessToken");
       if (!accessToken) {

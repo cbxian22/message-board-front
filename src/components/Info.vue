@@ -460,20 +460,19 @@ const handleDelete = async () => {
 
   try {
     const response = await apiClient.delete("/users/profile");
-    if (response.status === 200) {
-      authStore.logout();
-      show.value = false;
-      message.success("已刪除成功！");
-      window.location.href = "/";
-    } else {
+    if (response.status !== 200) {
       throw new Error("刪除失敗");
     }
+    message.success("已刪除成功！");
   } catch (error) {
     console.error("刪除失敗:", error);
-    message.success("刪除失敗！");
+    message.error("刪除失敗！");
     loadingBar.error();
   } finally {
+    await authStore.logout();
+    show.value = false;
     loadingBar.finish();
+    window.location.href = "/";
   }
 };
 </script>
