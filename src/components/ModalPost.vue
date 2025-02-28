@@ -172,6 +172,7 @@ const handleMessage = async () => {
       message.success("貼文成功！");
       emit("update:modelValue", false);
       emitter.emit("addPost");
+      emitter.emit("refreshPost");
     } else {
       message.error("貼文失敗！");
       loadingBar.error();

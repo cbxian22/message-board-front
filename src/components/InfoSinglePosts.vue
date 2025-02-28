@@ -157,10 +157,7 @@ const handleDelete = async (postId) => {
     const response = await apiClient.delete(`/posts/${postId}/${userId}`);
     message.success("刪除貼文成功！");
     console.log(response);
-    emitter.on("refreshPost", () => {
-      emitter.emit("fetchUserData");
-    });
-    message.success("刪除貼文成功！");
+    emitter.emit("refreshPost");
   } catch {
     message.error("刪除失敗！");
   }
