@@ -36,7 +36,8 @@ const fileInputRef = ref(null);
 const tempAvatar = ref(null);
 const isLoginModalOpen = ref(false);
 const is_private = ref(false);
-const friendRequestSent = ref(false); // 新增：追蹤是否已發送好友請求
+const friendRequestSent = ref(false);
+const isAlreadyFriend = ref(false);
 
 // 監聽 authStore.userName 的變化並同步 loggedInUser
 watch(
@@ -45,16 +46,6 @@ watch(
     loggedInUser.value = newName;
   }
 );
-
-// 初始化檢查登入狀態，並監聽 authStore 變化
-onMounted(() => {
-  updateWidth();
-  window.addEventListener("resize", updateWidth);
-});
-
-onUnmounted(() => {
-  window.removeEventListener("resize", updateWidth);
-});
 
 watch(
   () => props.userData,
@@ -77,9 +68,33 @@ watch(show, (newValue) => {
     intro.value = info.value.intro || "";
     tempAvatar.value = info.value.userAvatar;
     is_private.value = info.value.is_private;
-    console.log("Drawer opened - is_private:", is_private.value); // 調試
   }
 });
+
+// 檢查好友狀態
+const checkFriendRequestStatus = async () => {
+  if (!authStore.accessToken || !info.value.id) return;
+
+  try {
+    const response = await apiClient.get(`/friends/status/${info.value.id}`);
+    const status = response.data.status;
+
+    if (status === "pending") {
+      friendRequestSent.value = true;
+      isAlreadyFriend.value = false;
+    } else if (status === "accepted") {
+      friendRequestSent.value = false;
+      isAlreadyFriend.value = true;
+    } else {
+      friendRequestSent.value = false;
+      isAlreadyFriend.value = false;
+    }
+  } catch (error) {
+    console.error("檢查好友狀態失敗:", error);
+    friendRequestSent.value = false;
+    isAlreadyFriend.value = false;
+  }
+};
 
 // 發送好友請求
 const sendFriendRequest = async () => {
@@ -95,28 +110,64 @@ const sendFriendRequest = async () => {
   }
   loadingBar.start();
   try {
-    const response = await apiClient.post(
-      "/friends/request",
-      { friendId }
-      // {
-      //   headers: {
-      //     Authorization: `Bearer ${authStore.accessToken}`,
-      //   },
-      // }
-    );
+    const response = await apiClient.post("/friends/request", { friendId });
 
     if (response.status === 201) {
       friendRequestSent.value = true;
+      isAlreadyFriend.value = false;
       message.success("好友請求已發送！");
+    } else if (response.status === 200) {
+      friendRequestSent.value = false;
+      isAlreadyFriend.value = false;
+      message.success("已取消好友請求！");
     }
   } catch (error) {
-    console.error("發送好友請求失敗:", error);
+    console.error("操作失敗:", error);
     if (error.response?.status === 401) {
       message.error("登入已過期，請重新登入！");
       authStore.logout();
       isLoginModalOpen.value = true;
+    } else if (error.response?.status === 400) {
+      message.error("已存在好友關係，無法操作！");
+      friendRequestSent.value = false;
+      isAlreadyFriend.value = true;
+    } else if (error.response?.status === 404) {
+      message.error("用戶不存在！");
     } else {
-      message.error("發送好友請求失敗，請稍後再試！");
+      message.error("操作失敗，請稍後再試！");
+    }
+    loadingBar.error();
+  } finally {
+    loadingBar.finish();
+  }
+};
+
+// 解除好友
+const deleteFriend = async () => {
+  if (!authStore.accessToken) {
+    isLoginModalOpen.value = true;
+    return;
+  }
+
+  const friendId = info.value.id;
+  loadingBar.start();
+  try {
+    const response = await apiClient.delete(`/friends/${friendId}`);
+    if (response.status === 200) {
+      isAlreadyFriend.value = false;
+      friendRequestSent.value = false;
+      message.success("已解除好友！");
+    }
+  } catch (error) {
+    console.error("解除好友失敗:", error);
+    if (error.response?.status === 404) {
+      message.error("好友關係不存在！");
+    } else if (error.response?.status === 401) {
+      message.error("登入已過期，請重新登入！");
+      authStore.logout();
+      isLoginModalOpen.value = true;
+    } else {
+      message.error("解除好友失敗，請稍後再試！");
     }
     loadingBar.error();
   } finally {
@@ -128,16 +179,27 @@ const sendFriendRequest = async () => {
 const checkTokenAndOpenModal = () => {
   if (!authStore.accessToken) {
     isLoginModalOpen.value = true;
-  } else if (!friendRequestSent.value) {
+  } else {
     sendFriendRequest();
   }
 };
 
-// const checkTokenAndOpenModal = () => {
-//   if (!authStore.accessToken) {
-//     isLoginModalOpen.value = true;
-//   }
-// };
+// 初始化檢查登入狀態，並監聽 authStore 變化
+onMounted(() => {
+  updateWidth();
+  window.addEventListener("resize", updateWidth);
+});
+
+onUnmounted(() => {
+  window.removeEventListener("resize", updateWidth);
+});
+
+watch(
+  () => info.value.id,
+  () => {
+    checkFriendRequestStatus();
+  }
+);
 
 // 觸發檔案輸入
 const triggerFileInput = () => {
@@ -321,15 +383,12 @@ const handleDelete = async () => {
       <n-button @click="show = true"> 編輯個人檔案 </n-button>
     </div>
 
-    <!-- 加入好友按鈕 -->
-    <div
-      class="set-btn"
-      v-if="loggedInUser !== info.name"
-      @click="checkTokenAndOpenModal"
-    >
-      <n-button>{{
-        friendRequestSent ? "已發送好友請求" : "加入好友"
-      }}</n-button>
+    <!-- 好友按鈕 -->
+    <div class="set-btn" v-if="loggedInUser !== info.name">
+      <n-button v-if="isAlreadyFriend" @click="deleteFriend">解除好友</n-button>
+      <n-button v-else @click="checkTokenAndOpenModal">
+        {{ friendRequestSent ? "取消好友請求" : "加入好友" }}
+      </n-button>
     </div>
 
     <!-- 抽屜視窗 -->
