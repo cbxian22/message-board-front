@@ -321,14 +321,14 @@ const fetchComments = async () => {
       emit("loaded");
     } else {
       console.error("數據格式不正確:", response.data);
-      messageStore.showError("數據格式不正確");
+      message.showError("數據格式不正確");
     }
   } catch (error) {
     console.error(
       "取得貼文錯誤:",
       error.response ? error.response.data : error.message
     );
-    messageStore.showError("貼文取得失敗，請檢查網絡或稍後再試");
+    message.showError("貼文取得失敗，請檢查網絡或稍後再試");
   }
 };
 
@@ -356,11 +356,11 @@ const fetchSingleComment = async (postId) => {
         replies: comment.replies || 0,
       };
     } else {
-      messageStore.showError("無法獲取單一貼文，數據格式不正確");
+      message.showError("無法獲取單一貼文，數據格式不正確");
     }
   } catch (error) {
     console.error("取得單一貼文錯誤:", error);
-    messageStore.showError("單一貼文取得失敗，請檢查網絡或稍後再試");
+    message.showError("單一貼文取得失敗，請檢查網絡或稍後再試");
   }
 };
 
