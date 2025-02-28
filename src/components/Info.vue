@@ -114,7 +114,7 @@ const checkFriendRequestStatus = async () => {
   }
 };
 
-// 發送好友請求
+// 發送好友請求//
 const sendFriendRequest = async () => {
   if (!authStore.accessToken) {
     isLoginModalOpen.value = true;
