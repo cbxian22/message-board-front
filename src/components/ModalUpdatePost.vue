@@ -187,7 +187,7 @@ const handleMessage = async () => {
   loadingBar.start();
 
   try {
-    const uploadedFileUrl = await uploadFile(); // 獨立處理圖片上傳
+    const uploadedFileUrl = await uploadFile();
     const response = await apiClient.put(
       `/posts/${props.comment.id}/${authStore.userId}`,
       {

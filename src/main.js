@@ -12,13 +12,11 @@ export const emitter = mitt();
 
 const app = createApp(App);
 
-// 初始化 Pinia 並掛載到 Vue 應用
 const pinia = createPinia();
 app.use(pinia);
 
-// 檢查登入狀態
 const authStore = useAuthStore();
-authStore.checkLoginStatus(); // 在應用啟動時檢查登入狀態
+authStore.checkLoginStatus();
 
 app.use(router);
 

@@ -239,6 +239,7 @@ import { usePostStore } from "../stores/usePostStore";
 import { useDateStore } from "../stores/dateStore";
 import { useRouter } from "vue-router";
 import apiClient from "../stores/axiosConfig";
+import { emitter } from "../main";
 
 import UpdatePostView from "./ModalUpdatePost.vue";
 
@@ -447,26 +448,27 @@ const handleReply = async (postId) => {
   router.push({ name: "CommentView", params: { postId } });
 };
 
-onMounted(() => {
+onMounted(async () => {
   fetchComments();
   document.addEventListener("mousedown", closeModal);
-
+  emitter.on("addPost", fetchComments);
   // 圖片加載處理
-  setTimeout(() => {
-    commentImages.value.forEach((img) => {
-      if (img) {
-        img.onload = () => {
-          if (img.naturalHeight > img.naturalWidth) {
-            img.classList.add("tall-img");
-          }
-        };
-      }
-    });
-  }, 0);
+  // setTimeout(() => {
+  //   commentImages.value.forEach((img) => {
+  //     if (img) {
+  //       img.onload = () => {
+  //         if (img.naturalHeight > img.naturalWidth) {
+  //           img.classList.add("tall-img");
+  //         }
+  //       };
+  //     }
+  //   });
+  // }, 0);
 });
 
 onUnmounted(() => {
   document.removeEventListener("mousedown", closeModal);
+  emitter.off("addPost", fetchComments);
 });
 </script>
 
