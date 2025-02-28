@@ -72,7 +72,7 @@ watch(show, (newValue) => {
   }
 });
 
-// 檢查好友狀態//
+// 檢查好友狀態
 const checkFriendRequestStatus = async () => {
   if (!authStore.accessToken || !info.value.id) return;
 
