@@ -227,18 +227,22 @@ const handleDelete = async () => {
     return;
   }
 
+  loadingBar.start();
+
   try {
+    authStore.logout();
     const response = await apiClient.delete("/users/profile");
     show.value = false;
     console.log("刪除使用者成功:", response.data.message);
     alert("使用者已成功刪除");
-    authStore.logout();
     window.location.href = "/";
   } catch (error) {
     const errorMessage =
       error.response?.data?.message || error.message || "未知錯誤";
     console.error("刪除失敗:", errorMessage);
     alert("刪除失敗: " + errorMessage);
+  } finally {
+    loadingBar.finish();
   }
 };
 </script>
