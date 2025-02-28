@@ -63,7 +63,6 @@ watch(
   { immediate: true }
 );
 
-// 當抽屜顯示時，預填入現有資料
 watch(show, (newValue) => {
   if (newValue) {
     name.value = info.value.name || "";
