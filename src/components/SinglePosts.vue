@@ -233,11 +233,10 @@ onMounted(() => {
 
 <script setup>
 import { ref, defineEmits, onMounted, onUnmounted } from "vue";
-import { NBadge } from "naive-ui";
+import { NBadge, useMessage } from "naive-ui";
 import { useAuthStore } from "../stores/authStore";
 import { usePostStore } from "../stores/usePostStore";
 import { useDateStore } from "../stores/dateStore";
-import { useMessageStore } from "../stores/messageStore";
 import { useRouter } from "vue-router";
 import apiClient from "../stores/axiosConfig";
 
@@ -256,7 +255,7 @@ const emit = defineEmits();
 const postStore = usePostStore();
 const authStore = useAuthStore();
 const dateStore = useDateStore();
-const messageStore = useMessageStore();
+const message = useMessage();
 
 const comments = ref([]);
 const commentImages = ref([]);
@@ -395,11 +394,11 @@ const handleUpdate = async (postId) => {
 // 按讚
 const handlelike = async (id) => {
   if (!authStore.userId || !authStore.accessToken) {
-    messageStore.showError("請先登入！");
-    messageStore.showInfo("請先登入！");
-    messageStore.showWarning("請先登入！");
-    messageStore.showSuccess("請先登入！");
-    messageStore.showLoading("請先登入！");
+    message.showError("請先登入！");
+    message.showInfo("請先登入！");
+    message.showWarning("請先登入！");
+    message.showSuccess("請先登入！");
+    message.showLoading("請先登入！");
     return;
   }
   if (isLikeProcessing.value) {
