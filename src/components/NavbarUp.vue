@@ -37,7 +37,11 @@
 
               <div v-if="authStore.isLoggedIn" class="border-login"></div>
 
-              <div class="nav-modal" @click="logout">
+              <div
+                v-if="authStore.isLoggedIn"
+                class="nav-modal"
+                @click="logout"
+              >
                 <div class="logout">登出</div>
               </div>
             </div>
