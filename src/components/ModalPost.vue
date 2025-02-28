@@ -171,7 +171,7 @@ const handleMessage = async () => {
       fileUrl.value = null;
       message.success("貼文成功！");
       emit("update:modelValue", false);
-      emitter.emit("refreshPost");
+      emitter.emit("addPost");
     } else {
       message.error("貼文失敗！");
       loadingBar.error();
