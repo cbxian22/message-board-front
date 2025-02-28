@@ -1,17 +1,24 @@
 <template>
   <n-config-provider :theme="theme">
     <n-loading-bar-provider>
-      <div :class="themeClass" class="app-container">
-        <n-global-style />
-        <router-view />
-      </div>
+      <n-message-provider>
+        <div :class="themeClass" class="app-container">
+          <n-global-style />
+          <router-view />
+        </div>
+      </n-message-provider>
     </n-loading-bar-provider>
   </n-config-provider>
 </template>
 
 <script setup>
 import { useThemeStore } from "./stores/themeStore";
-import { NConfigProvider, NGlobalStyle, NLoadingBarProvider } from "naive-ui";
+import {
+  NConfigProvider,
+  NGlobalStyle,
+  NLoadingBarProvider,
+  NMessageProvider,
+} from "naive-ui";
 import { computed, onMounted } from "vue";
 
 const themeStore = useThemeStore();
