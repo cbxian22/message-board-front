@@ -185,6 +185,7 @@ const handleUpdate = async () => {
       emitter.emit("refreshPost", { newUsername: name.value });
       await router.push(`/@${name.value}`);
       show.value = false;
+      message.success("更新成功！");
     } else {
       message.error("更新失敗！");
       loadingBar.error();
