@@ -202,6 +202,7 @@ const handleMessage = async () => {
       fileUrl.value = null;
       message.success("貼文更新成功！");
       emit("update:modelValue", false);
+      emitter.emit("refreshPost");
     } else {
       message.error("貼文更新失敗！");
       loadingBar.error();

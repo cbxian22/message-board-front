@@ -452,12 +452,12 @@ const handleReply = async (postId) => {
 onMounted(async () => {
   fetchComments();
   document.addEventListener("mousedown", closeModal);
-  emitter.on("addPost", fetchComments);
+  emitter.on("refreshPost", fetchComments);
 });
 
 onUnmounted(() => {
   document.removeEventListener("mousedown", closeModal);
-  emitter.off("addPost", fetchComments);
+  emitter.off("refreshPost", fetchComments);
 });
 </script>
 
