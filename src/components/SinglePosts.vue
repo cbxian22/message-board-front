@@ -458,8 +458,8 @@ onMounted(async () => {
 
 onUnmounted(() => {
   document.removeEventListener("mousedown", closeModal);
-  emitter.on("addPost", fetchComments);
-  emitter.on("updatePost", fetchComments);
+  emitter.off("addPost", fetchComments);
+  emitter.off("updatePost", fetchComments);
 });
 </script>
 

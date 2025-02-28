@@ -26,6 +26,7 @@ onMounted(async () => {
   if (props.username) {
     await fetchUserData(props.username);
   }
+
   // 監聽刷新事件
   emitter.on("refreshPost", (data) => {
     const usernameToFetch = data?.newUsername || props.username;

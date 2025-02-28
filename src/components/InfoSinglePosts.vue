@@ -107,8 +107,8 @@ const closeModal = (event) => {
 
 onMounted(() => {
   document.addEventListener("mousedown", closeModal);
-  emitter.on("addPost", fetchComments);
-  emitter.on("updatePost", fetchComments);
+  emitter.on("addPost", fetchSingleComment);
+  emitter.on("updatePost", fetchSingleComment);
   emitter.on("refreshPost", () => {
     emitter.emit("fetchUserData");
   });
@@ -116,8 +116,8 @@ onMounted(() => {
 
 onUnmounted(() => {
   document.removeEventListener("mousedown", closeModal);
-  emitter.on("addPost", fetchComments);
-  emitter.on("updatePost", fetchComments);
+  emitter.off("addPost", fetchSingleComment);
+  emitter.off("updatePost", fetchSingleComment);
   emitter.off("refreshPost", () => {});
 });
 
