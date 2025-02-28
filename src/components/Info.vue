@@ -321,24 +321,13 @@ const handleDelete = async () => {
       <n-button @click="show = true"> 編輯個人檔案 </n-button>
     </div>
 
-    <!-- 切換 -->
-    <div
-      class="set-btn"
-      v-if="loggedInUser !== info.name"
-      @click="checkTokenAndOpenModal"
-    >
-      <n-button> 加入好友 </n-button>
-    </div>
-
     <!-- 加入好友按鈕 -->
     <div
       class="set-btn"
       v-if="loggedInUser !== info.name"
       @click="checkTokenAndOpenModal"
     >
-      <n-button>{{
-        friendRequestSent ? "已發送好友請求" : "加入好友"
-      }}</n-button>
+      <n-button>{{ friendRequestSent ? "取消好友請求" : "加入好友" }}</n-button>
     </div>
 
     <!-- 抽屜視窗 -->
