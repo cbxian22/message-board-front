@@ -107,14 +107,14 @@ const closeModal = (event) => {
 
 onMounted(() => {
   document.addEventListener("mousedown", closeModal);
-  // emitter.on("refreshPost", () => {
-  //   emitter.emit("fetchUserData");
-  // });
+  emitter.on("refreshPost", () => {
+    emitter.emit("fetchUserData");
+  });
 });
 
 onUnmounted(() => {
   document.removeEventListener("mousedown", closeModal);
-  // emitter.off("refreshPost", () => {});
+  emitter.off("refreshPost", () => {});
 });
 
 // 獲取單一貼文
@@ -157,7 +157,7 @@ const handleDelete = async (postId) => {
     const response = await apiClient.delete(`/posts/${postId}/${userId}`);
     message.success("刪除貼文成功！");
     console.log(response);
-    emitter.emit("refreshPost");
+    message.success("刪除貼文成功！");
   } catch {
     message.error("刪除失敗！");
   }

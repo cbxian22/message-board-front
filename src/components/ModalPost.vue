@@ -76,7 +76,6 @@ import { useSocketStore } from "../stores/socketStore";
 import { useAuthStore } from "../stores/authStore";
 import apiClient from "../stores/axiosConfig"; // 引入 apiClient
 import Modal from "./Modal.vue";
-import { emitter } from "../main";
 
 import Noteicon from "../assets/Noteicon.svg";
 import Closeicon from "../assets/Closeicon.svg";
@@ -169,21 +168,9 @@ const handleMessage = async () => {
       content.value = "";
       file.value = null;
       fileUrl.value = null;
-      message.success("貼文成功！");
       emit("update:modelValue", false);
-      emitter.emit("refreshPost", {
-        newPost: {
-          id: response.data.id,
-          content: response.data.content,
-          timestamp: new Date(response.data.created_at),
-          file_url: response.data.file_url,
-          name: authStore.userName,
-          user_avatar: authStore.userAvatar,
-          likes: 0,
-          userLiked: false,
-          replies: 0,
-        },
-      });
+
+      message.success("貼文成功！");
     } else {
       message.error("貼文失敗！");
       loadingBar.error();
