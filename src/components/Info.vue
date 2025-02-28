@@ -6,6 +6,7 @@ import {
   NDrawerContent,
   NDrawer,
   useLoadingBar,
+  useMessage,
 } from "naive-ui";
 import { useAuthStore } from "../stores/authStore";
 import { useThemeStore } from "../stores/themeStore";
@@ -22,6 +23,7 @@ const themeStore = useThemeStore();
 const loadingBar = useLoadingBar();
 const router = useRouter();
 const authStore = useAuthStore();
+const message = useMessage();
 
 const loggedInUser = ref(authStore.userName);
 const show = ref(false);
@@ -131,7 +133,7 @@ const uploadFile = async () => {
 // 提交更新
 const handleUpdate = async () => {
   if (info.value.name !== authStore.userName) {
-    alert("您只能編輯自己的資料！");
+    message.error("您只能編輯自己的資料！");
     show.value = false;
     return;
   }
@@ -147,7 +149,7 @@ const handleUpdate = async () => {
   }
 
   if (!authStore.userId || !authStore.accessToken) {
-    alert("請先登入！");
+    message.error("請先登入！");
     isLoginModalOpen.value = true;
     return;
   }
@@ -184,17 +186,17 @@ const handleUpdate = async () => {
       await router.push(`/@${name.value}`);
       show.value = false;
     } else {
-      alert("更新失敗");
+      message.error("更新失敗！");
       loadingBar.error();
     }
   } catch (error) {
     console.error("更新錯誤:", error);
     if (error.response?.status === 401) {
-      alert("登入已過期，請重新登入");
+      message.error("登入已過期，請重新登入！");
       authStore.logout();
       isLoginModalOpen.value = true;
     } else {
-      alert("更新失敗，請稍後再試");
+      message.error("更新失敗，請稍後再試！");
     }
     loadingBar.error();
   } finally {
@@ -216,13 +218,13 @@ const updateWidth = () => {
 
 const handleDelete = async () => {
   if (info.value.name !== authStore.userName) {
-    alert("您只能刪除自己的資料！");
+    message.error("您只能刪除自己的資料！");
     show.value = false;
     return;
   }
 
   if (!authStore.userId || !authStore.accessToken) {
-    alert("請先登入！");
+    message.error("請先登入！");
     isLoginModalOpen.value = true;
     return;
   }
@@ -232,16 +234,16 @@ const handleDelete = async () => {
   try {
     const response = await apiClient.delete("/users/profile");
     if (response.status === 200) {
-      authStore.logout(); // 刪除成功後再登出
+      authStore.logout();
       show.value = false;
-      alert("使用者已成功刪除");
+      message.success("已刪除成功！");
       window.location.href = "/";
     } else {
       throw new Error("刪除失敗");
     }
   } catch (error) {
     console.error("刪除失敗:", error);
-    alert("刪除失敗: " + (error.response?.data?.message || "未知錯誤"));
+    message.success("刪除失敗！");
     loadingBar.error();
   } finally {
     loadingBar.finish();

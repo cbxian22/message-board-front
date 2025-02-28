@@ -67,12 +67,13 @@
 </template>
 
 <script setup>
-import { NSpin } from "naive-ui";
+import { NSpin, useMessage } from "naive-ui";
 import { ref } from "vue";
 import { useRouter } from "vue-router";
 import apiClient from "../stores/axiosConfig";
 
 const router = useRouter();
+const message = useMessage();
 
 const role = "user";
 const name = ref("");
@@ -93,11 +94,12 @@ const handleRegister = async () => {
     if (response.data.success) {
       router.push("/login");
     } else {
-      alert(response.data.message || "註冊失敗！");
+      message.error("註冊失敗！");
+      console.log("註冊失敗！:", response.data.message);
     }
   } catch (error) {
     console.error("註冊時發生錯誤:", error);
-    alert("註冊失敗，請稍後再試！");
+    message.error("註冊失敗，請稍後再試！");
   } finally {
     isTouched.value = false;
   }

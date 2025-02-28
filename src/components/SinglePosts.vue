@@ -360,31 +360,31 @@ const fetchSingleComment = async (postId) => {
     }
   } catch (error) {
     console.error("取得單一貼文錯誤:", error);
-    message.error("單一貼文取得失敗，請檢查網絡或稍後再試");
+    message.error("單一貼文取得失敗，請檢查網絡或稍後再試！");
   }
 };
 
 // 刪除貼文
 const handleDelete = async (postId) => {
   if (!authStore.accessToken) {
-    alert("請先登入！");
+    message.error("請先登入！");
     return;
   }
   try {
     const userId = authStore.userId;
     const message = await postStore.deletePost(postId, userId);
-    console.log("刪除貼文成功:", message);
+    message.Success("刪除貼文成功");
     await fetchComments(); // 重新獲取貼文
   } catch (error) {
     console.error("刪除失敗:", error.message);
-    alert("刪除失敗: " + error.message);
+    message.error("刪除失敗");
   }
 };
 
 // 修改貼文
 const handleUpdate = async (postId) => {
   if (!authStore.accessToken) {
-    alert("請先登入！");
+    message.error("請先登入！");
     return;
   }
   isOpenModal.value = true;
@@ -395,10 +395,6 @@ const handleUpdate = async (postId) => {
 const handlelike = async (id) => {
   if (!authStore.userId || !authStore.accessToken) {
     message.error("請先登入！");
-    message.info("請先登入！");
-    message.warning("請先登入！");
-    message.success("請先登入！");
-    message.loading("請先登入！");
     return;
   }
   if (isLikeProcessing.value) {
@@ -444,7 +440,7 @@ const handlelike = async (id) => {
 // 新增回覆
 const handleReply = async (postId) => {
   if (!authStore.accessToken) {
-    alert("請先登入！");
+    message.error("請先登入！");
     return;
   }
   await fetchSingleComment(postId);

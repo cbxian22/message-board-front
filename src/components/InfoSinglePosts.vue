@@ -1,6 +1,6 @@
 <script setup>
 import { ref, onMounted, onUnmounted, watch } from "vue";
-import { NBadge } from "naive-ui";
+import { NBadge, useMessage } from "naive-ui";
 import { useAuthStore } from "../stores/authStore";
 import { usePostStore } from "../stores/usePostStore";
 import { useDateStore } from "../stores/dateStore";
@@ -26,6 +26,7 @@ const router = useRouter();
 const postStore = usePostStore();
 const authStore = useAuthStore();
 const dateStore = useDateStore();
+const message = useMessage();
 
 const loggedInUser = ref(authStore.userName);
 const username = ref(router.currentRoute.value.params.username);
@@ -137,18 +138,18 @@ const fetchSingleComment = async (postId) => {
         replies: comment.replies,
       };
     } else {
-      alert("無法獲取單一留言，數據格式不正確");
+      message.error("無法獲取單一留言，數據格式不正確！");
     }
   } catch (error) {
     console.error("取得單一留言錯誤:", error);
-    alert("單一留言取得失敗，請檢查網絡或稍後再試");
+    message.error("單一留言取得失敗，請檢查網絡或稍後再試！");
   }
 };
 
 // 刪除留言
 const handleDelete = async (postId) => {
   if (!authStore.accessToken) {
-    alert("請先登入！");
+    message.error("請先登入！");
     return;
   }
   try {
@@ -157,14 +158,14 @@ const handleDelete = async (postId) => {
     console.log(message);
     location.reload();
   } catch {
-    console.log(刪除失敗);
+    message.error("刪除失敗！");
   }
 };
 
 // 修改留言
 const handleUpdate = async (postId) => {
   if (!authStore.accessToken) {
-    alert("請先登入！");
+    message.error("請先登入！");
     return;
   }
   isOpenModal.value = true;
@@ -174,7 +175,7 @@ const handleUpdate = async (postId) => {
 // 新增回覆
 const handleReply = async (postId) => {
   if (!authStore.accessToken) {
-    alert("請先登入！");
+    message.error("請先登入！");
     return;
   }
   await fetchSingleComment(postId);
@@ -184,7 +185,7 @@ const handleReply = async (postId) => {
 // 按讚
 const handlelike = async (id) => {
   if (!authStore.userId || !authStore.accessToken) {
-    alert("請先登入！");
+    message.error("請先登入！");
     return;
   }
 
