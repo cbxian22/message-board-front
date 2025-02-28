@@ -76,6 +76,7 @@ import { useSocketStore } from "../stores/socketStore";
 import { useAuthStore } from "../stores/authStore";
 import apiClient from "../stores/axiosConfig"; // 引入 apiClient
 import Modal from "./Modal.vue";
+import { emitter } from "../main";
 
 import Noteicon from "../assets/Noteicon.svg";
 import Closeicon from "../assets/Closeicon.svg";
