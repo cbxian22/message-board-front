@@ -71,7 +71,7 @@
 
 <script setup>
 import { ref, nextTick, watch, computed } from "vue";
-import { NButton, useLoadingBar } from "naive-ui";
+import { NButton, useLoadingBar, useMessage } from "naive-ui";
 import { useSocketStore } from "../stores/socketStore";
 import { useAuthStore } from "../stores/authStore";
 import apiClient from "../stores/axiosConfig"; // 引入 apiClient
@@ -81,14 +81,15 @@ import Noteicon from "../assets/Noteicon.svg";
 import Closeicon from "../assets/Closeicon.svg";
 
 const authStore = useAuthStore();
+const message = useMessage();
+const socketStore = useSocketStore();
+const loadingBar = useLoadingBar();
+
+const emit = defineEmits(["update:modelValue"]);
 const props = defineProps({
   modelValue: Boolean,
   comment: Object,
 });
-
-const emit = defineEmits(["update:modelValue"]);
-const socketStore = useSocketStore();
-const loadingBar = useLoadingBar();
 
 const userName = computed(() => authStore.userName || "未知用户");
 const content = ref("");
@@ -179,7 +180,7 @@ const uploadFile = async () => {
 // 提交上傳資料庫
 const handleMessage = async () => {
   if (!authStore.userId || !authStore.accessToken) {
-    alert("請先登入！");
+    message.error("請先登入！");
     return;
   }
 
@@ -201,13 +202,14 @@ const handleMessage = async () => {
       fileUrl.value = null;
       emit("update:modelValue", false);
       location.reload();
+      message.success("貼文更新成功！");
     } else {
-      alert("留言提交失敗");
+      message.error("貼文更新失敗！");
       loadingBar.error();
     }
   } catch (error) {
-    console.error("留言提交錯誤:", error);
-    alert("留言提交失敗");
+    console.error("貼文更新錯誤:", error);
+    message.error("貼文更新失敗！");
   } finally {
     loadingBar.finish();
   }

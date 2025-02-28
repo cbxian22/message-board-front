@@ -374,7 +374,7 @@ const handleDelete = async (postId) => {
     const userId = authStore.userId;
     const message = await postStore.deletePost(postId, userId);
     message.success("刪除貼文成功");
-    await fetchComments(); // 重新獲取貼文
+    await fetchComments();
   } catch (error) {
     console.error("刪除失敗:", error.message);
     message.error("刪除失敗");
