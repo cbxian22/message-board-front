@@ -200,9 +200,9 @@ const handleMessage = async () => {
       content.value = "";
       file.value = null;
       fileUrl.value = null;
-      emit("update:modelValue", false);
-      // location.reload();
       message.success("貼文更新成功！");
+      emit("update:modelValue", false);
+      emitter.emit("updatePost");
     } else {
       message.error("貼文更新失敗！");
       loadingBar.error();

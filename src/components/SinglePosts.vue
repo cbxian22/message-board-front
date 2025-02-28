@@ -374,7 +374,7 @@ const handleDelete = async (postId) => {
   try {
     const userId = authStore.userId;
     const message = await postStore.deletePost(postId, userId);
-    message.success("刪除貼文成功");
+    message.success("刪除貼文成功！");
     await fetchComments();
   } catch (error) {
     console.error("刪除失敗:", error.message);
@@ -452,23 +452,13 @@ onMounted(async () => {
   fetchComments();
   document.addEventListener("mousedown", closeModal);
   emitter.on("addPost", fetchComments);
-  // 圖片加載處理
-  // setTimeout(() => {
-  //   commentImages.value.forEach((img) => {
-  //     if (img) {
-  //       img.onload = () => {
-  //         if (img.naturalHeight > img.naturalWidth) {
-  //           img.classList.add("tall-img");
-  //         }
-  //       };
-  //     }
-  //   });
-  // }, 0);
+  emitter.on("updatePost", fetchComments);
 });
 
 onUnmounted(() => {
   document.removeEventListener("mousedown", closeModal);
   emitter.off("addPost", fetchComments);
+  emitter.off("updatePost", fetchComments);
 });
 </script>
 
