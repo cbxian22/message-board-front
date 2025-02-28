@@ -376,7 +376,7 @@ const handleDelete = async (postId) => {
     const response = await apiClient.delete(`/posts/${postId}/${userId}`);
     message.success("刪除貼文成功！");
     console.log(response);
-    await fetchComments();
+    await fetchComments(); // 重新獲取貼文列表
   } catch (error) {
     console.error("刪除失敗:", error.message);
     message.error("刪除失敗");
@@ -452,14 +452,10 @@ const handleReply = async (postId) => {
 onMounted(async () => {
   fetchComments();
   document.addEventListener("mousedown", closeModal);
-  emitter.on("addPost", fetchComments);
-  emitter.on("updatePost", fetchComments);
 });
 
 onUnmounted(() => {
   document.removeEventListener("mousedown", closeModal);
-  emitter.off("addPost", fetchComments);
-  emitter.off("updatePost", fetchComments);
 });
 </script>
 
