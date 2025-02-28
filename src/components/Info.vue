@@ -327,7 +327,9 @@ const handleDelete = async () => {
       v-if="loggedInUser !== info.name"
       @click="checkTokenAndOpenModal"
     >
-      <n-button>{{ friendRequestSent ? "取消好友請求" : "加入好友" }}</n-button>
+      <n-button>{{
+        friendRequestSent ? "已發送好友請求" : "加入好友"
+      }}</n-button>
     </div>
 
     <!-- 抽屜視窗 -->
