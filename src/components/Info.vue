@@ -229,9 +229,27 @@ const handleDelete = async () => {
 
   try {
     const response = await apiClient.delete("/users/profile");
+    show.value = false;
     console.log("刪除使用者成功:", response.data.message);
     alert("使用者已成功刪除");
-    authStore.logout();
+    // 清空本地狀態和存儲
+    Object.assign(this, {
+      isLoggedIn: false,
+      userId: null,
+      userName: "",
+      userAvatar: "",
+      role: "",
+      accessToken: null,
+      refreshToken: null,
+    });
+    [
+      "accessToken",
+      "refreshToken",
+      "userId",
+      "userName",
+      "userAvatar",
+      "role",
+    ].forEach((key) => localStorage.removeItem(key));
     await router.push("/");
   } catch (error) {
     const errorMessage =
