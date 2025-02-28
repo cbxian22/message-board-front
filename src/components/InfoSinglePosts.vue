@@ -107,17 +107,13 @@ const closeModal = (event) => {
 
 onMounted(() => {
   document.addEventListener("mousedown", closeModal);
-  emitter.on("addPost", fetchComments);
-  emitter.on("updatePost", fetchComments);
   emitter.on("refreshPost", () => {
-    emitter.emit("fetchUserData"); // 通知父組件刷新
+    emitter.emit("fetchUserData");
   });
 });
 
 onUnmounted(() => {
   document.removeEventListener("mousedown", closeModal);
-  emitter.off("addPost", fetchComments);
-  emitter.off("updatePost", fetchComments);
   emitter.off("refreshPost", () => {});
 });
 

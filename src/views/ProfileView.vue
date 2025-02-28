@@ -1,5 +1,5 @@
 <script setup>
-import { ref, onMounted, watch } from "vue";
+import { ref, onMounted, watch, onUnmounted } from "vue";
 import { useRoute, useRouter } from "vue-router";
 import apiClient from "../stores/axiosConfig";
 import { emitter } from "../main";
@@ -26,13 +26,19 @@ onMounted(async () => {
   if (props.username) {
     await fetchUserData(props.username);
   }
-
+  emitter.on("addPost", fetchUserData);
+  emitter.on("updatePost", fetchUserData);
   // 監聽刷新事件
   emitter.on("refreshPost", (data) => {
     const usernameToFetch = data?.newUsername || props.username;
     console.log("Refreshing with username:", usernameToFetch);
     fetchUserData(usernameToFetch);
   });
+});
+
+onUnmounted(() => {
+  emitter.off("addPost", fetchComments);
+  emitter.off("updatePost", fetchComments);
 });
 
 watch(
