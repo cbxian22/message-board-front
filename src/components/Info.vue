@@ -232,25 +232,8 @@ const handleDelete = async () => {
     show.value = false;
     console.log("刪除使用者成功:", response.data.message);
     alert("使用者已成功刪除");
-    // 清空本地狀態和存儲
-    Object.assign(this, {
-      isLoggedIn: false,
-      userId: null,
-      userName: "",
-      userAvatar: "",
-      role: "",
-      accessToken: null,
-      refreshToken: null,
-    });
-    [
-      "accessToken",
-      "refreshToken",
-      "userId",
-      "userName",
-      "userAvatar",
-      "role",
-    ].forEach((key) => localStorage.removeItem(key));
-    await router.push("/");
+    authStore.logout();
+    window.location.href = "/";
   } catch (error) {
     const errorMessage =
       error.response?.data?.message || error.message || "未知錯誤";
