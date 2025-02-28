@@ -321,14 +321,14 @@ const fetchComments = async () => {
       emit("loaded");
     } else {
       console.error("數據格式不正確:", response.data);
-      message.showError("數據格式不正確");
+      message.error("數據格式不正確");
     }
   } catch (error) {
     console.error(
       "取得貼文錯誤:",
       error.response ? error.response.data : error.message
     );
-    message.showError("貼文取得失敗，請檢查網絡或稍後再試");
+    message.error("貼文取得失敗，請檢查網絡或稍後再試");
   }
 };
 
@@ -356,11 +356,11 @@ const fetchSingleComment = async (postId) => {
         replies: comment.replies || 0,
       };
     } else {
-      message.showError("無法獲取單一貼文，數據格式不正確");
+      message.error("無法獲取單一貼文，數據格式不正確");
     }
   } catch (error) {
     console.error("取得單一貼文錯誤:", error);
-    message.showError("單一貼文取得失敗，請檢查網絡或稍後再試");
+    message.error("單一貼文取得失敗，請檢查網絡或稍後再試");
   }
 };
 
@@ -394,11 +394,11 @@ const handleUpdate = async (postId) => {
 // 按讚
 const handlelike = async (id) => {
   if (!authStore.userId || !authStore.accessToken) {
-    message.showError("請先登入！");
-    message.showInfo("請先登入！");
-    message.showWarning("請先登入！");
-    message.showSuccess("請先登入！");
-    message.showLoading("請先登入！");
+    message.error("請先登入！");
+    message.info("請先登入！");
+    message.warning("請先登入！");
+    message.success("請先登入！");
+    message.loading("請先登入！");
     return;
   }
   if (isLikeProcessing.value) {
