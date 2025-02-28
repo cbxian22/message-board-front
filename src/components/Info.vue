@@ -230,17 +230,19 @@ const handleDelete = async () => {
   loadingBar.start();
 
   try {
-    authStore.logout();
     const response = await apiClient.delete("/users/profile");
-    show.value = false;
-    console.log("刪除使用者成功:", response.data.message);
-    alert("使用者已成功刪除");
-    window.location.href = "/";
+    if (response.status === 200) {
+      authStore.logout(); // 刪除成功後再登出
+      show.value = false;
+      alert("使用者已成功刪除");
+      window.location.href = "/";
+    } else {
+      throw new Error("刪除失敗");
+    }
   } catch (error) {
-    const errorMessage =
-      error.response?.data?.message || error.message || "未知錯誤";
-    console.error("刪除失敗:", errorMessage);
-    alert("刪除失敗: " + errorMessage);
+    console.error("刪除失敗:", error);
+    alert("刪除失敗: " + (error.response?.data?.message || "未知錯誤"));
+    loadingBar.error();
   } finally {
     loadingBar.finish();
   }

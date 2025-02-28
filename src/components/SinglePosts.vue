@@ -237,6 +237,7 @@ import { NBadge } from "naive-ui";
 import { useAuthStore } from "../stores/authStore";
 import { usePostStore } from "../stores/usePostStore";
 import { useDateStore } from "../stores/dateStore";
+import { useMessageStore } from "../stores/messageStore";
 import { useRouter } from "vue-router";
 import apiClient from "../stores/axiosConfig";
 
@@ -255,6 +256,7 @@ const emit = defineEmits();
 const postStore = usePostStore();
 const authStore = useAuthStore();
 const dateStore = useDateStore();
+const messageStore = useMessageStore();
 
 const comments = ref([]);
 const commentImages = ref([]);
@@ -299,20 +301,18 @@ const fetchComments = async () => {
   try {
     const userId = authStore.userId || localStorage.getItem("userId");
     const token = authStore.accessToken;
-    console.log("fetchComments - userId:", userId, "token:", token); // 調試用日誌
     const response = await apiClient.get("/posts", {
       params: { userId },
       headers: token ? { Authorization: `Bearer ${token}` } : {},
     });
-    console.log("fetchComments - 後端回應數量:", response.data.length); // 調試用日誌
-    console.log("fetchComments - 後端回應:", response.data); // 調試用日誌
+
     if (response.status === 200 && Array.isArray(response.data)) {
       comments.value = response.data.map((comment) => ({
         id: comment.id,
         content: comment.content,
         timestamp: new Date(comment.created_at),
         file_url: comment.file_url,
-        visibility: comment.visibility, // 保留用於調試
+        visibility: comment.visibility,
         name: comment.user_name,
         user_avatar: comment.user_avatar,
         likes: comment.likes || 0,
@@ -322,14 +322,14 @@ const fetchComments = async () => {
       emit("loaded");
     } else {
       console.error("數據格式不正確:", response.data);
-      alert("無法獲取貼文，數據格式不正確");
+      messageStore.showError("數據格式不正確");
     }
   } catch (error) {
     console.error(
       "取得貼文錯誤:",
       error.response ? error.response.data : error.message
     );
-    alert("貼文取得失敗，請檢查網絡或稍後再試");
+    messageStore.showError("貼文取得失敗，請檢查網絡或稍後再試");
   }
 };
 
@@ -357,11 +357,11 @@ const fetchSingleComment = async (postId) => {
         replies: comment.replies || 0,
       };
     } else {
-      alert("無法獲取單一貼文，數據格式不正確");
+      messageStore.showError("無法獲取單一貼文，數據格式不正確");
     }
   } catch (error) {
     console.error("取得單一貼文錯誤:", error);
-    alert("單一貼文取得失敗，請檢查網絡或稍後再試");
+    messageStore.showError("單一貼文取得失敗，請檢查網絡或稍後再試");
   }
 };
 
@@ -395,7 +395,11 @@ const handleUpdate = async (postId) => {
 // 按讚
 const handlelike = async (id) => {
   if (!authStore.userId || !authStore.accessToken) {
-    alert("請先登入！");
+    messageStore.showError("請先登入！");
+    messageStore.showInfo("請先登入！");
+    messageStore.showWarning("請先登入！");
+    messageStore.showSuccess("請先登入！");
+    messageStore.showLoading("請先登入！");
     return;
   }
   if (isLikeProcessing.value) {
