@@ -213,6 +213,33 @@ const updateWidth = () => {
     rwdwidth.value = "100vw";
   }
 };
+
+const handleDelete = async () => {
+  if (info.value.name !== authStore.userName) {
+    alert("您只能刪除自己的資料！");
+    show.value = false;
+    return;
+  }
+
+  if (!authStore.userId || !authStore.accessToken) {
+    alert("請先登入！");
+    isLoginModalOpen.value = true;
+    return;
+  }
+
+  try {
+    const response = await apiClient.delete("/users/profile");
+    console.log("刪除使用者成功:", response.data.message);
+    alert("使用者已成功刪除");
+    authStore.logout();
+    await router.push("/");
+  } catch (error) {
+    const errorMessage =
+      error.response?.data?.message || error.message || "未知錯誤";
+    console.error("刪除失敗:", errorMessage);
+    alert("刪除失敗: " + errorMessage);
+  }
+};
 </script>
 
 <template>
@@ -287,9 +314,12 @@ const updateWidth = () => {
             <div class="form-mod">
               <label for="intro">變更隱私</label>
               <div class="toggle-container">
-                <span>公開</span>
-                <n-switch v-model:value="is_private" />
-                <span>私人</span>
+                <div>
+                  <span>公開</span>
+                  <n-switch v-model:value="is_private" />
+                  <span>私人</span>
+                </div>
+                <button @click="handleDelete">刪除帳號</button>
               </div>
             </div>
           </div>
@@ -398,11 +428,11 @@ const updateWidth = () => {
 
 .form-inner .full {
   flex: 1;
-  /* margin-right: 50px; */
 }
 
 .form-box textarea,
-.form-box input {
+.form-box input,
+.form-box .toggle-container {
   border: none;
   outline: none;
   resize: none;
@@ -411,11 +441,31 @@ const updateWidth = () => {
   font-size: 14px;
   padding: 20px 0;
   color: rgb(243, 245, 247);
+  line-height: 1.5; /* 確保行高一致 */
+  height: 60px; /* 明確給 textarea 高度 */
 }
 
 .light-mode .form-box textarea,
-.light-mode .form-box input {
+.light-mode .form-box input,
+.light-mode .form-box .toggle-container {
   color: rgb(0, 0, 0) !important;
+}
+.form-box .toggle-container {
+  display: flex;
+  justify-content: space-between;
+  cursor: default;
+}
+
+.form-box .toggle-container .n-switch {
+  padding: 0 25px;
+}
+
+.toggle-container button {
+  color: red;
+  font-weight: 600;
+}
+.toggle-container button:hover {
+  text-decoration: underline;
 }
 
 .form-mod {
