@@ -1,5 +1,5 @@
 <script setup>
-import { ref, onMounted, onUnmounted, watch, nextTick } from "vue";
+import { ref, onMounted, onUnmounted, watch, nextTick, computed } from "vue";
 import {
   NSwitch,
   NButton,
@@ -130,20 +130,25 @@ const uploadFile = async () => {
   }
 };
 
+// 計算是否有變更
+const hasChanges = computed(() => {
+  return (
+    name.value !== info.value.name ||
+    intro.value !== info.value.intro ||
+    tempAvatar.value !== info.value.userAvatar ||
+    is_private.value !== info.value.is_private
+  );
+});
+
 // 提交更新
 const handleUpdate = async () => {
-  if (info.value.name !== authStore.userName) {
-    message.error("您只能編輯自己的資料！");
+  if (!hasChanges.value) {
     show.value = false;
     return;
   }
 
-  if (
-    name.value === info.value.name &&
-    intro.value === info.value.intro &&
-    tempAvatar.value === info.value.userAvatar &&
-    is_private.value === info.value.is_private
-  ) {
+  if (info.value.name !== authStore.userName) {
+    message.error("您只能編輯自己的資料！");
     show.value = false;
     return;
   }
@@ -336,7 +341,9 @@ const handleDelete = async () => {
 
           <div class="form-box">
             <div class="form-mod">
-              <n-button @click="handleUpdate">保存變更</n-button>
+              <n-button @click="handleUpdate">{{
+                hasChanges ? "保存變更" : "取消變更"
+              }}</n-button>
             </div>
           </div>
         </form>
