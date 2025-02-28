@@ -77,13 +77,14 @@ watch(show, (newValue) => {
     tempAvatar.value = info.value.userAvatar;
     is_private.value = info.value.is_private;
     console.log("Drawer opened - is_private:", is_private.value); // 調試
-  } else {
-    tempAvatar.value = null;
-    name.value = "";
-    intro.value = "";
-    file.value = null;
-    if (fileInputRef.value) fileInputRef.value.value = null;
   }
+  // else {
+  //   tempAvatar.value = null;
+  //   name.value = "";
+  //   intro.value = "";
+  //   file.value = null;
+  //   if (fileInputRef.value) fileInputRef.value.value = null;
+  // }
 });
 
 const checkTokenAndOpenModal = () => {
