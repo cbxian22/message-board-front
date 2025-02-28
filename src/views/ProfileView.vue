@@ -1,17 +1,15 @@
 <script setup>
-import { ref, onMounted, watch, onUnmounted } from "vue";
+import { ref, onMounted, watch } from "vue";
 import { useRoute, useRouter } from "vue-router";
 import apiClient from "../stores/axiosConfig";
-import { emitter } from "../main";
 import { useAuthStore } from "../stores/authStore";
+import { emitter } from "../main";
 
 import Info from "../components/Info.vue";
 import InfoSinglePosts from "../components/InfoSinglePosts.vue";
 import Navbar from "../components/Navbar.vue";
 import NavbarUp from "../components/NavbarUp.vue";
 import Backicon from "../assets/Backicon.svg";
-
-// const aru = computed(() => socketStore.messages.length > 0);
 
 const props = defineProps(["username"]);
 const router = useRouter();
@@ -22,23 +20,32 @@ const userData = ref(null);
 const userPosts = ref([]);
 
 // 組件掛載時載入資料
+// onMounted(async () => {
+//   if (props.username) {
+//     await fetchUserData(props.username);
+//   }
+//   emitter.on("addPost", fetchUserData);
+//   emitter.on("updatePost", fetchUserData);
+//   // 監聽刷新事件
+//   emitter.on("refreshPost", (data) => {
+//     const usernameToFetch = data?.newUsername || props.username;
+//     console.log("Refreshing with username:", usernameToFetch);
+//     fetchUserData(usernameToFetch);
+//   });
+// });
+// 組件掛載時載入資料
 onMounted(async () => {
   if (props.username) {
     await fetchUserData(props.username);
   }
-  emitter.on("addPost", fetchUserData);
-  emitter.on("updatePost", fetchUserData);
-  // 監聽刷新事件
+  // 監聽刷新事件，支援新增貼文和完整刷新
   emitter.on("refreshPost", (data) => {
-    const usernameToFetch = data?.newUsername || props.username;
-    console.log("Refreshing with username:", usernameToFetch);
-    fetchUserData(usernameToFetch);
+    if (data?.newPost) {
+      userPosts.value.unshift(data.newPost); // 插入新貼文
+    } else {
+      fetchUserData(props.username); // 完整刷新
+    }
   });
-});
-
-onUnmounted(() => {
-  emitter.off("addPost", fetchUserData);
-  emitter.off("updatePost", fetchUserData);
 });
 
 watch(

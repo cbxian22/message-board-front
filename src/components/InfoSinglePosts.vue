@@ -107,14 +107,14 @@ const closeModal = (event) => {
 
 onMounted(() => {
   document.addEventListener("mousedown", closeModal);
-  emitter.on("refreshPost", () => {
-    emitter.emit("fetchUserData");
-  });
+  // emitter.on("refreshPost", () => {
+  //   emitter.emit("fetchUserData");
+  // });
 });
 
 onUnmounted(() => {
   document.removeEventListener("mousedown", closeModal);
-  emitter.off("refreshPost", () => {});
+  // emitter.off("refreshPost", () => {});
 });
 
 // 獲取單一貼文

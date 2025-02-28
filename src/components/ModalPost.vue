@@ -171,7 +171,19 @@ const handleMessage = async () => {
       fileUrl.value = null;
       message.success("貼文成功！");
       emit("update:modelValue", false);
-      emitter.emit("addPost");
+      emitter.emit("refreshPost", {
+        newPost: {
+          id: response.data.id,
+          content: response.data.content,
+          timestamp: new Date(response.data.created_at),
+          file_url: response.data.file_url,
+          name: authStore.userName,
+          user_avatar: authStore.userAvatar,
+          likes: 0,
+          userLiked: false,
+          replies: 0,
+        },
+      });
     } else {
       message.error("貼文失敗！");
       loadingBar.error();
