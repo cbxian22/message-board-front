@@ -217,16 +217,6 @@ const handleMessage = async () => {
   }
 };
 
-// 處理 Modal 關閉的邏輯
-// const handleModalClose = (newValue) => {
-//   if (content.value.trim() || file.value) {
-//     if (!window.confirm("確認要關閉並清除內容嗎？")) return;
-//   }
-//   content.value = "";
-//   file.value = null;
-//   fileUrl.value = null;
-//   emit("update:modelValue", false);
-// };
 // 判斷是否有變更
 const hasChanges = computed(() => {
   if (!props.comment) {

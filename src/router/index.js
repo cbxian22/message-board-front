@@ -23,6 +23,11 @@ const router = createRouter({
       component: () => import("../views/Register.vue"),
     },
     {
+      path: "/chat",
+      name: "Chat",
+      component: () => import("../views/chat.vue"),
+    },
+    {
       path: "/@:username",
       name: "Profile",
       component: () => import("../views/ProfileView.vue"),
@@ -34,7 +39,6 @@ const router = createRouter({
       component: () => import("../views/PostView.vue"),
       props: true,
     },
-
     {
       path: "/:pathMatch(.*)*",
       name: "NotFound",

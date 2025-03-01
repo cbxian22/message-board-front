@@ -176,3 +176,157 @@ async function fetchFriends() {
   cursor: pointer;
 }
 </style> -->
+<template>
+  <div>
+    <ul>
+      <li
+        v-for="msg in messages"
+        :key="msg.id"
+        :class="{ unread: !msg.isRead }"
+      >
+        <span>{{ msg.content }}</span>
+        <img
+          v-if="msg.media && msg.media.type === 'image'"
+          :src="msg.media.data"
+          alt="圖片"
+          style="max-width: 200px"
+        />
+        <video
+          v-if="msg.media && msg.media.type === 'video'"
+          controls
+          :src="msg.media.data"
+          style="max-width: 200px"
+        ></video>
+        <span>{{ msg.isRead ? "已讀" : "未讀" }}</span>
+      </li>
+    </ul>
+    <input
+      v-model="newMessage"
+      @keyup.enter="sendMessage"
+      placeholder="輸入文字"
+    />
+    <input type="file" accept="image/*,video/*" @change="handleFileUpload" />
+    <button @click="sendMessage">發送</button>
+  </div>
+</template>
+
+<script>
+import { io } from "socket.io-client";
+import { openDB } from "idb";
+
+export default {
+  data() {
+    return {
+      socket: null,
+      messages: [],
+      newMessage: "",
+      selectedFile: null,
+      currentUserId: "1", // 假設當前用戶ID
+      friendId: "2", // 假設好友ID
+      db: null, // IndexedDB 實例
+    };
+  },
+  async mounted() {
+    // 初始化 IndexedDB
+    this.db = await openDB("chatDB", 1, {
+      upgrade(db) {
+        db.createObjectStore("messages", { keyPath: "id" });
+      },
+    });
+
+    // 載入本地歷史消息
+    await this.loadMessages();
+
+    // 連接到 WebSocket
+    this.socket = io("https://your-backend-domain.com", {
+      query: { userId: this.currentUserId },
+    });
+
+    this.socket.on("receiveMessage", async (message) => {
+      await this.saveMessage(message);
+      this.messages.push(message);
+      if (message.receiverId === this.currentUserId) {
+        this.markAsRead(message.id);
+      }
+    });
+
+    this.socket.on("messageSent", async (message) => {
+      await this.saveMessage(message);
+      this.messages.push(message);
+    });
+
+    this.socket.on("messageRead", ({ messageId }) => {
+      const msg = this.messages.find((m) => m.id === messageId);
+      if (msg) {
+        msg.isRead = true;
+        this.updateMessage(msg); // 更新本地儲存
+      }
+    });
+  },
+  methods: {
+    async sendMessage() {
+      if (this.newMessage.trim() || this.selectedFile) {
+        const message = {
+          senderId: this.currentUserId,
+          receiverId: this.friendId,
+          content: this.newMessage,
+          media: this.selectedFile
+            ? await this.processFile(this.selectedFile)
+            : null,
+        };
+        this.socket.emit("sendMessage", message);
+        this.newMessage = "";
+        this.selectedFile = null;
+      }
+    },
+    handleFileUpload(event) {
+      this.selectedFile = event.target.files[0];
+    },
+    async processFile(file) {
+      return new Promise((resolve) => {
+        const reader = new FileReader();
+        reader.onload = (e) => {
+          resolve({
+            type: file.type.startsWith("image") ? "image" : "video",
+            data: e.target.result, // Base64 格式
+          });
+        };
+        reader.readAsDataURL(file);
+      });
+    },
+    async saveMessage(message) {
+      const tx = this.db.transaction("messages", "readwrite");
+      await tx.store.put(message);
+      await tx.done;
+    },
+    async updateMessage(message) {
+      const tx = this.db.transaction("messages", "readwrite");
+      await tx.store.put(message);
+      await tx.done;
+    },
+    async loadMessages() {
+      const allMessages = await this.db.getAll("messages");
+      this.messages = allMessages.filter(
+        (msg) =>
+          (msg.senderId === this.currentUserId &&
+            msg.receiverId === this.friendId) ||
+          (msg.senderId === this.friendId &&
+            msg.receiverId === this.currentUserId)
+      );
+    },
+    markAsRead(messageId) {
+      this.socket.emit("markAsRead", messageId);
+    },
+  },
+  beforeUnmount() {
+    this.socket.disconnect();
+  },
+};
+</script>
+
+<style>
+.unread {
+  font-weight: bold;
+  color: red;
+}
+</style>
