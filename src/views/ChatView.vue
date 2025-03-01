@@ -176,6 +176,8 @@ async function fetchFriends() {
   cursor: pointer;
 }
 </style> -->
+<!-- chatView.vue -->
+<!-- chatView.vue -->
 <template>
   <div>
     <ul>
@@ -221,24 +223,21 @@ export default {
       messages: [],
       newMessage: "",
       selectedFile: null,
-      currentUserId: "1", // 假設當前用戶ID
-      friendId: "2", // 假設好友ID
-      db: null, // IndexedDB 實例
+      currentUserId: "1", // 測試用，可從登入狀態獲取
+      friendId: "2", // 測試用，可從好友列表選擇
+      db: null,
     };
   },
   async mounted() {
-    // 初始化 IndexedDB
     this.db = await openDB("chatDB", 1, {
       upgrade(db) {
         db.createObjectStore("messages", { keyPath: "id" });
       },
     });
-
-    // 載入本地歷史消息
     await this.loadMessages();
 
-    // 連接到 WebSocket
-    this.socket = io("https://your-backend-domain.com", {
+    // 更新為 Render 的 WebSocket 地址
+    this.socket = io("wss://message-board-server-7yot.onrender.com", {
       query: { userId: this.currentUserId },
     });
 
@@ -246,7 +245,7 @@ export default {
       await this.saveMessage(message);
       this.messages.push(message);
       if (message.receiverId === this.currentUserId) {
-        this.markAsRead(message.id);
+        this.markAsRead(message.id, message.senderId); // 傳入 senderId
       }
     });
 
@@ -259,7 +258,7 @@ export default {
       const msg = this.messages.find((m) => m.id === messageId);
       if (msg) {
         msg.isRead = true;
-        this.updateMessage(msg); // 更新本地儲存
+        this.updateMessage(msg);
       }
     });
   },
@@ -288,7 +287,7 @@ export default {
         reader.onload = (e) => {
           resolve({
             type: file.type.startsWith("image") ? "image" : "video",
-            data: e.target.result, // Base64 格式
+            data: e.target.result,
           });
         };
         reader.readAsDataURL(file);
@@ -314,8 +313,8 @@ export default {
             msg.receiverId === this.currentUserId)
       );
     },
-    markAsRead(messageId) {
-      this.socket.emit("markAsRead", messageId);
+    markAsRead(messageId, senderId) {
+      this.socket.emit("markAsRead", { messageId, senderId });
     },
   },
   beforeUnmount() {
