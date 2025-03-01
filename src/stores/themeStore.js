@@ -25,7 +25,7 @@ export const useThemeStore = defineStore("theme", () => {
 
   return {
     theme,
-    isDarkMode, // 用來控制開關狀態
+    isDarkMode,
     setDarkTheme,
     setLightTheme,
   };

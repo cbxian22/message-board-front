@@ -1,4 +1,4 @@
-*,
+/* *,
 body {
   margin: 0;
   padding: 0;
@@ -29,7 +29,7 @@ a {
   background: none !important;
 }
 
-/* HomeView, ProfileView, CommentView */
+
 
 .container {
   border: 0.5px solid #373737;
@@ -37,7 +37,7 @@ a {
   overflow: hidden;
 }
 
-/* singleComment , selfsingleComment */
+
 .info-modal .modal-overlay {
   position: absolute;
   top: 110%;
@@ -79,7 +79,7 @@ a {
   color: #000 !important;
 }
 
-/* HomeView, loginView --- loading style --- */
+
 .loading-container {
   width: 100vw;
   height: 100vh;
@@ -87,7 +87,7 @@ a {
   flex-direction: column;
   align-items: center;
   justify-content: center;
-  /* 水平置中 */
+
   position: fixed;
   top: 0vh;
   left: 0vw;
@@ -104,7 +104,7 @@ a {
   font-size: 20px;
 }
 
-/*  */
+
 
 .app-container,
 html ::root {
@@ -113,7 +113,7 @@ html ::root {
   transition: background-color 0.3s ease, color 0.3s ease;
 }
 
-/* 深色模式 */
+
 .dark-mode {
   --n-body-color: rgb(10, 10, 10);
   --n-text-color: rgb(243, 245, 247);
@@ -124,7 +124,7 @@ html ::root {
   transition: background-color 0.3s ease, color 0.3s ease;
 }
 
-/* 淺色模式 */
+
 .light-mode {
   --n-body-color: rgba(255, 255, 255, 0.5);
   --n-text-color: rgb(0, 0, 0);
@@ -139,7 +139,7 @@ html ::root {
   stroke: rgb(0, 0, 0);
 }
 
-/* 平板 RWD (寬度小於 768px) */
+
 @media (max-width: 768px) {
   .container-box {
     width: 85% !important;
@@ -158,7 +158,7 @@ html ::root {
   }
 }
 
-/* 手機 RWD (寬度小於 480px) */
+
 @media (max-width: 500px) {
   .container-box {
     width: 100% !important;
@@ -199,5 +199,241 @@ html ::root {
   .message-form-mi {
     flex: auto !important;
     max-height: none !important;
+  }
+} */
+
+/* 重置樣式 */
+*,
+body {
+  margin: 0;
+  padding: 0;
+  box-sizing: border-box;
+}
+
+button {
+  color: var(--n-text-color);
+  cursor: pointer;
+  border: none;
+  outline: none;
+  background: none;
+  /* 移除 !important，除非有樣式衝突 */
+}
+
+input {
+  color: var(--n-text-color);
+  outline: none;
+}
+
+img,
+span {
+  background: none;
+  /* 移除 !important，除非有樣式衝突 */
+}
+
+a {
+  color: var(--n-text-color);
+  text-decoration: none;
+  background: none;
+}
+
+/* 主題變量定義與通用樣式 */
+.app-container,
+html:root {
+  color: var(--n-text-color);
+  background-color: var(--n-body-color);
+  transition: background-color 0.3s ease, color 0.3s ease;
+}
+
+/* 深色模式 */
+.dark-mode {
+  --n-body-color: rgb(10, 10, 10);
+  --n-text-color: rgb(243, 245, 247);
+  --n-border-color: rgb(55, 55, 55);
+}
+
+.dark-mode .container {
+  background-color: rgb(24, 24, 24);
+  border: 0.5px solid var(--n-border-color);
+  transition: background-color 0.3s ease, color 0.3s ease;
+}
+
+/* 淺色模式 */
+.light-mode {
+  --n-body-color: rgb(255, 255, 255);
+  /* 改為不透明白色，避免半透效果 */
+  --n-text-color: rgb(0, 0, 0);
+  --n-border-color: rgb(200, 200, 200);
+}
+
+.light-mode .container {
+  background-color: rgb(255, 255, 255);
+  border: 0.5px solid var(--n-border-color);
+  transition: background-color 0.3s ease, color 0.3s ease;
+}
+
+/* 通用容器樣式 */
+.container {
+  border-radius: 30px;
+  overflow: hidden;
+}
+
+/* HomeView, ProfileView, CommentView 的單一評論彈出視窗 */
+.info-modal .modal-overlay {
+  position: absolute;
+  top: 110%;
+  right: 0%;
+  border: 0.5px solid var(--n-border-color);
+  border-radius: 10px;
+  z-index: 1000;
+  padding: 10px;
+}
+
+.info-modal .modal-content ul {
+  list-style-type: none;
+}
+
+.info-modal .modal-content li {
+  width: 150px;
+}
+
+.info-modal li:hover {
+  background-color: rgba(128, 128, 128, 0.15);
+  border-radius: 10px;
+  transition: background-color 0.3s ease, color 0.3s ease;
+}
+
+.info-modal .modal-link {
+  width: 100%;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 5px 10px;
+}
+
+/* 主題特定的圖標和徽章樣式 */
+.light-mode .icon {
+  filter: invert(1) grayscale(100%) contrast(100%) brightness(0);
+}
+
+.light-mode .n-badge .n-badge-sup {
+  color: #000 !important;
+}
+
+.light-mode .n-spin .n-base-loading__icon {
+  stroke: rgb(0, 0, 0);
+}
+
+/* Loading 樣式 */
+.loading-container {
+  width: 100vw;
+  height: 100vh;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  position: fixed;
+  top: 0;
+  left: 0;
+}
+
+.n-spin-b {
+  position: absolute;
+  top: calc(50% + 200px);
+  text-align: center;
+}
+
+.n-spin-b p:last-child {
+  margin-top: 8px;
+  font-size: 20px;
+}
+
+/* Naive UI 對話框按鈕樣式覆蓋 */
+.dark-mode .n-dialog .n-button {
+  color: var(--n-text-color);
+  border-color: var(--n-border-color);
+}
+
+.light-mode .n-dialog .n-button {
+  color: var(--n-text-color);
+  border-color: var(--n-border-color);
+}
+
+.dark-mode .n-dialog .n-button--primary,
+.dark-mode .n-dialog .n-button--default {
+  color: rgb(243, 245, 247) !important;
+  /* 統一深色模式下的按鈕文字顏色 */
+}
+
+.light-mode .n-dialog .n-button--primary,
+.light-mode .n-dialog .n-button--default {
+  color: rgb(0, 0, 0) !important;
+  /* 統一淺色模式下的按鈕文字顏色 */
+}
+
+/* 平板 RWD (寬度小於 768px) */
+@media (max-width: 768px) {
+  .container-box {
+    width: 85% !important;
+  }
+
+  .page-title {
+    font-size: 1.5rem;
+  }
+
+  .aru {
+    padding: 15px 0;
+  }
+
+  .message-container {
+    width: 85% !important;
+  }
+}
+
+/* 手機 RWD (寬度小於 500px) */
+@media (max-width: 500px) {
+  .container-box {
+    width: 100% !important;
+    padding: 0 5px;
+  }
+
+  .page-title {
+    font-size: 1.2rem;
+  }
+
+  .n-spin-b p:last-child {
+    font-size: 16px;
+  }
+
+  .aru {
+    padding: 10px 0;
+  }
+
+  .comment-content {
+    font-size: 14px;
+  }
+
+  .navbar ul {
+    display: flex;
+    justify-content: space-around;
+    width: 100% !important;
+  }
+
+  .navbar-up {
+    padding: 0 10px !important;
+  }
+
+  .message-container {
+    width: 95% !important;
+    height: 70vh !important;
+  }
+
+  .message-form-mi {
+    flex: auto !important;
+    max-height: none !important;
+  }
+
+  .n-dialog {
+    width: 90vw !important;
+    /* 確保對話框在手機上適應寬度 */
   }
 }

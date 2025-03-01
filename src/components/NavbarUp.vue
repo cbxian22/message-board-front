@@ -21,7 +21,6 @@
             <div class="modal-content" @click.stop>
               <n-collapse arrow-placement="right" class="nav-modal">
                 <n-collapse-item title="外觀">
-                  <!-- <n-config-provider :theme="theme"> -->
                   <div class="theme-switch-container">
                     <span>淺色</span>
                     <n-switch
@@ -31,7 +30,6 @@
                     />
                     <span>深色</span>
                   </div>
-                  <!-- </n-config-provider> -->
                 </n-collapse-item>
               </n-collapse>
 
@@ -58,7 +56,6 @@ import { useRouter } from "vue-router";
 import { useAuthStore } from "../stores/authStore";
 import { useThemeStore } from "../stores/themeStore";
 import { NSwitch, NCollapseItem, NCollapse } from "naive-ui";
-// NConfigProvider
 import Menuicon from "../assets/Menuicon.svg";
 import Sendicon from "../assets/Sendicon.svg";
 
@@ -67,26 +64,12 @@ const themeStore = useThemeStore();
 const authStore = useAuthStore();
 
 const isModalOpen = ref(false);
-// const modalButton = ref(null);
-// const isDarkMode = computed(() => themeStore.isDarkMode);
 
 const openModal = (event) => {
   event.stopPropagation();
   isModalOpen.value = !isModalOpen.value;
 };
 
-// const closeModal = (event) => {
-//   const modal = document.querySelector(".modal-content");
-
-//   if (
-//     modal &&
-//     (modal.contains(event.target) || modalButton.value.contains(event.target))
-//   ) {
-//     return;
-//   }
-
-//   isModalOpen.value = false;
-// };
 const closeModal = (event) => {
   const modal = document.querySelector(".modal-content");
   if (modal && modal.contains(event.target)) return;
