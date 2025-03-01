@@ -217,9 +217,18 @@ const handleMessage = async () => {
   }
 };
 
-// 處理 Modal 關閉的邏輯
+const hasChanges = computed(() => {
+  return (
+    content.value !== content.name ||
+    file.value !== file.intro ||
+    fileUrl.value !== fileUrl.userAvatar
+  );
+});
+
 const handleModalClose = (newValue) => {
-  if (content.value.trim() || file.value) {
+  if (!hasChanges.value) {
+    emit("update:modelValue", false);
+  } else {
     dialog.warning({
       content: "確認要關閉並取消更新內容嗎？",
       positiveText: "關閉",
@@ -231,10 +240,18 @@ const handleModalClose = (newValue) => {
         emit("update:modelValue", false);
       },
     });
-  } else {
-    emit("update:modelValue", false);
   }
 };
+// 處理 Modal 關閉的邏輯
+// const handleModalClose = (newValue) => {
+//   if (content.value.trim() || file.value) {
+//     if (!window.confirm("確認要關閉並清除內容嗎？")) return;
+//   }
+//   content.value = "";
+//   file.value = null;
+//   fileUrl.value = null;
+//   emit("update:modelValue", false);
+// };
 
 // 監聽 Modal 開啟，恢復高度
 watch(content, () => {
