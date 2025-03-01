@@ -484,6 +484,16 @@ const handledeleteFriend = () => {
     content: "你确定要解除好友嗎？解除後需重新加入才瀏覽看私人帳號！",
     positiveText: "确定",
     negativeText: "取消",
+    positiveButtonProps: {
+      style: {
+        color: --n - text - color,
+      },
+    },
+    negativeButtonProps: {
+      style: {
+        color: --n - text - color,
+      },
+    },
     onPositiveClick: () => {
       deleteFriend();
     },
