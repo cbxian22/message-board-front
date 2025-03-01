@@ -448,7 +448,6 @@ const updateWidth = () => {
 const accountDelete = async () => {
   if (info.value.name !== authStore.userName) {
     message.error("您只能刪除自己的資料！");
-    show.value = false;
     return;
   }
 
@@ -496,6 +495,7 @@ const handleDeleteAccountConfirm = () => {
     negativeText: "取消",
     onPositiveClick: () => {
       accountDelete();
+      show.value = false;
     },
   });
 };
