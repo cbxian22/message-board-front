@@ -81,7 +81,7 @@ import Noteicon from "../assets/Noteicon.svg";
 import Closeicon from "../assets/Closeicon.svg";
 
 const authStore = useAuthStore();
-const message = useMessage();
+const message = useMessag();
 const dialog = useDialog();
 const socketStore = useSocketStore();
 const loadingBar = useLoadingBar();
