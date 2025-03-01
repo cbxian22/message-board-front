@@ -178,6 +178,8 @@ async function fetchFriends() {
 </style> -->
 <!-- chatView.vue -->
 <!-- chatView.vue -->
+
+<!-- chatView.vue -->
 <template>
   <div>
     <ul>
@@ -223,8 +225,8 @@ export default {
       messages: [],
       newMessage: "",
       selectedFile: null,
-      currentUserId: "2",
-      friendId: "4",
+      currentUserId: null, // 初始為 null，稍後從 API 獲取
+      friendId: null, // 初始為 null，測試時手動設置
       db: null,
     };
   },
@@ -236,25 +238,58 @@ export default {
     });
     await this.loadMessages();
 
-    // 更新為 Render 的 WebSocket 地址
+    // 從後端獲取當前用戶 ID
+    try {
+      const response = await fetch(
+        "https://message-board-server-7yot.onrender.com/api/auth/me",
+        {
+          headers: { Authorization: `Bearer ${localStorage.getItem("token")}` },
+        }
+      );
+      const data = await response.json();
+      if (data.userId) {
+        this.currentUserId = data.userId.toString(); // 確保是字符串
+        console.log("當前用戶 ID:", this.currentUserId);
+      } else {
+        throw new Error("無效的用戶資料");
+      }
+    } catch (err) {
+      console.error("獲取用戶 ID 失敗", err);
+      this.currentUserId = "2"; // 預設值，測試用
+    }
+
+    // 測試用，手動設置 friendId，實際應從好友列表選擇
+    this.friendId = this.currentUserId === "2" ? "4" : "2";
+
     this.socket = io("wss://message-board-server-7yot.onrender.com", {
       query: { userId: this.currentUserId },
     });
 
+    this.socket.on("connect", () => {
+      console.log("WebSocket 連接成功");
+    });
+
+    this.socket.on("connect_error", (err) => {
+      console.log("WebSocket 連接錯誤:", err);
+    });
+
     this.socket.on("receiveMessage", async (message) => {
+      console.log("收到消息:", message);
       await this.saveMessage(message);
       this.messages.push(message);
       if (message.receiverId === this.currentUserId) {
-        this.markAsRead(message.id, message.senderId); // 傳入 senderId
+        this.markAsRead(message.id, message.senderId);
       }
     });
 
     this.socket.on("messageSent", async (message) => {
+      console.log("消息已發送:", message);
       await this.saveMessage(message);
       this.messages.push(message);
     });
 
     this.socket.on("messageRead", ({ messageId }) => {
+      console.log("消息已讀:", messageId);
       const msg = this.messages.find((m) => m.id === messageId);
       if (msg) {
         msg.isRead = true;
@@ -273,6 +308,7 @@ export default {
             ? await this.processFile(this.selectedFile)
             : null,
         };
+        console.log("發送消息:", message);
         this.socket.emit("sendMessage", message);
         this.newMessage = "";
         this.selectedFile = null;
@@ -314,6 +350,7 @@ export default {
       );
     },
     markAsRead(messageId, senderId) {
+      console.log("標記已讀:", { messageId, senderId });
       this.socket.emit("markAsRead", { messageId, senderId });
     },
   },
