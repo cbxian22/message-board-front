@@ -362,145 +362,66 @@ export default {
 }
 </style> -->
 <template>
-  <div class="chat-container">
-    <h2>{{ friend.name }} 的聊天室</h2>
-    <ul class="message-list">
-      <li
-        v-for="msg in messages"
-        :key="msg.id"
-        :class="{ unread: !msg.isRead }"
-      >
-        <span>{{ msg.content }}</span>
-        <img
-          v-if="msg.media && msg.media.type === 'image'"
-          :src="msg.media.data"
-          alt="圖片"
-          class="chat-media"
-        />
-        <video
-          v-if="msg.media && msg.media.type === 'video'"
-          controls
-          :src="msg.media.data"
-          class="chat-media"
-        ></video>
-        <span>{{ msg.isRead ? "已讀" : "未讀" }}</span>
-      </li>
-    </ul>
+  <div>
+    <!-- 訊息顯示區 -->
+    <div v-for="message in messages" :key="message.id">
+      <p>
+        <strong>{{ message.senderName }}:</strong> {{ message.content }}
+      </p>
+    </div>
 
-    <input
+    <!-- 發送訊息區 -->
+    <textarea
       v-model="newMessage"
-      @keyup.enter="sendMessage"
-      placeholder="輸入文字"
-    />
-    <input type="file" accept="image/*,video/*" @change="handleFileUpload" />
-    <button @click="sendMessage">發送</button>
+      placeholder="Type your message..."
+    ></textarea>
+    <button @click="sendMessage">Send</button>
   </div>
 </template>
 
 <script>
+import axios from "axios";
 import { io } from "socket.io-client";
-import { openDB } from "idb";
-import apiClient from "../stores/axiosConfig"; // 你的 axios 設定
 
 export default {
   data() {
     return {
-      socket: null,
-      messages: [],
+      friendId: null, // 存儲接收者的 ID
       newMessage: "",
-      selectedFile: null,
-      currentUser: null,
-      friend: null,
-      db: null,
+      messages: [],
+      socket: null,
+      currentUserId: null, // 假設有個方法可以獲取當前登入的用戶 ID
     };
   },
-  async mounted() {
-    await this.initDB();
-    await this.getCurrentUser();
+  created() {
+    // 確保從路由參數取得 friendId
+    this.friendId = this.$route.params.id;
+    if (!this.friendId) {
+      console.error("接收者 ID (friendId) 未設定！");
+      return;
+    }
 
-    const friendId = this.$route.params.id; // 直接從路由抓取好友ID
-    await this.getFriendInfo(friendId);
-
-    await this.loadMessages(friendId);
-
-    this.setupWebSocket();
+    this.initializeSocket();
+    this.fetchMessages();
   },
   methods: {
-    async initDB() {
-      this.db = await openDB("chatDB", 1, {
-        upgrade(db) {
-          if (!db.objectStoreNames.contains("messages")) {
-            db.createObjectStore("messages", { keyPath: "id" });
-          }
-        },
-      });
-    },
-    async getCurrentUser() {
-      const res = await apiClient.get("/auth/me");
-      this.currentUser = res.data;
-    },
-    async getFriendInfo(friendId) {
-      try {
-        const res = await apiClient.get(`/friends/${friendId}`);
-        this.friend = res.data;
-      } catch (err) {
-        console.error("獲取好友資料失敗:", err.response?.data?.message);
-        this.friend = { id: friendId, name: "未知用戶" }; // 避免報錯
-      }
-    },
-    async loadMessages(friendId) {
-      const allMessages = await this.db.getAll("messages");
-      this.messages = allMessages.filter(
-        (msg) =>
-          (msg.senderId == this.currentUser.id && msg.receiverId == friendId) ||
-          (msg.senderId == friendId && msg.receiverId == this.currentUser.id)
-      );
-    },
-    setupWebSocket() {
-      this.socket = io("wss://message-board-server-7yot.onrender.com", {
-        query: { userId: this.currentUser.id },
+    // 初始化 WebSocket
+    initializeSocket() {
+      this.socket = io("https://message-board-server-7yot.onrender.com"); // 更改為你的 WebSocket 伺服器網址
+
+      this.socket.on("connect", () => {
+        console.log("WebSocket 已連線");
       });
 
-      this.socket.on("connect", () => console.log("WebSocket 已連線"));
-      this.socket.on("connect_error", (err) =>
-        console.error("WebSocket 錯誤:", err)
-      );
-
-      this.socket.on("receiveMessage", async (message) => {
-        if (this.isCurrentChat(message)) {
-          this.messages.push(message);
-          await this.saveMessage(message);
-          if (message.receiverId == this.currentUser.id) {
-            this.markAsRead(message.id);
-          }
-        }
-      });
-
-      this.socket.on("messageSent", async (message) => {
-        if (this.isCurrentChat(message)) {
-          this.messages.push(message);
-          await this.saveMessage(message);
-        }
-      });
-
-      this.socket.on("messageRead", ({ messageId }) => {
-        const msg = this.messages.find((m) => m.id === messageId);
-        if (msg) {
-          msg.isRead = true;
-          this.updateMessage(msg);
-        }
+      this.socket.on("messageReceived", (message) => {
+        console.log("接收到訊息:", message);
+        this.messages.push(message); // 接收到訊息後更新列表
       });
     },
-    isCurrentChat(message) {
-      return (
-        (message.senderId == this.currentUser.id &&
-          message.receiverId == this.friend.id) ||
-        (message.senderId == this.friend.id &&
-          message.receiverId == this.currentUser.id)
-      );
-    },
+
+    // 發送訊息
     async sendMessage() {
-      if (this.newMessage.trim() || this.selectedFile) {
+      if (this.newMessage.trim()) {
         // 確保 receiverId 是有效的
         if (!this.friendId) {
           console.error("接收者 ID (friendId) 未設定！");
@@ -509,76 +430,35 @@ export default {
 
         const message = {
           senderId: this.currentUserId,
-          receiverId: this.friendId, // 這裡確保使用的是 friendId
+          receiverId: this.friendId,
           content: this.newMessage,
-          media: this.selectedFile
-            ? await this.processFile(this.selectedFile)
-            : null,
+          media: null, // 如果有媒體，這裡可以處理
         };
+
         console.log("發送消息:", message);
 
-        // 發送訊息
+        // 發送訊息到後端，並通過 WebSocket 發送
         this.socket.emit("sendMessage", message);
+        this.messages.push(message); // 立即將訊息加入畫面
 
         // 清空輸入框
         this.newMessage = "";
-        this.selectedFile = null;
       }
     },
-    async saveMessage(message) {
-      const tx = this.db.transaction("messages", "readwrite");
-      await tx.store.put(message);
+
+    // 從 API 獲取訊息
+    async fetchMessages() {
+      try {
+        const response = await axios.get(`/api/messages/${this.friendId}`);
+        this.messages = response.data;
+      } catch (error) {
+        console.error("獲取訊息失敗:", error);
+      }
     },
-    async updateMessage(message) {
-      const tx = this.db.transaction("messages", "readwrite");
-      await tx.store.put(message);
-    },
-    handleFileUpload(event) {
-      this.selectedFile = event.target.files[0];
-    },
-    processFile(file) {
-      return new Promise((resolve) => {
-        const reader = new FileReader();
-        reader.onload = (e) => {
-          resolve({
-            type: file.type.startsWith("image") ? "image" : "video",
-            data: e.target.result,
-          });
-        };
-        reader.readAsDataURL(file);
-      });
-    },
-    markAsRead(messageId) {
-      this.socket.emit("markAsRead", {
-        messageId,
-        senderId: this.friend.id,
-      });
-    },
-  },
-  beforeUnmount() {
-    if (this.socket) this.socket.disconnect();
   },
 };
 </script>
 
 <style scoped>
-.chat-container {
-  padding: 20px;
-}
-.message-list {
-  list-style: none;
-  padding: 0;
-}
-.message-list li {
-  margin: 8px 0;
-}
-.chat-media {
-  max-width: 200px;
-  display: block;
-  margin: 5px 0;
-}
-.unread {
-  font-weight: bold;
-  color: red;
-}
+/* 可以加入樣式 */
 </style>
