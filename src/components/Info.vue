@@ -481,12 +481,11 @@ const handleDelete = async () => {
 // 直接定義方法
 const handledeleteFriend = () => {
   dialog.warning({
-    title: "關閉",
     content: "你确定要解除好友嗎？解除後需重新加入才瀏覽看私人帳號！",
     positiveText: "确定",
     negativeText: "取消",
     onPositiveClick: () => {
-      deleteFriend;
+      deleteFriend();
     },
   });
 };
