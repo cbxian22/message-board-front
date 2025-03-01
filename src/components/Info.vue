@@ -17,7 +17,7 @@ import { emitter } from "../main";
 import Login from "./ModalLogin.vue";
 
 const props = defineProps({
-  userData: Object, // 從父組件接收用戶資料
+  userData: Object,
 });
 
 const themeStore = useThemeStore();
