@@ -395,18 +395,18 @@ export const useAuthStore = defineStore("auth", {
           const data = await response.json();
           if (!response.ok || !data.success) {
             console.error("登出請求失敗:", data.message);
-            // 即使後端失敗，仍繼續清空本地資料，但記錄問題
-          } else {
-            console.log("後端登出成功:", data.message);
+            return; // 不清空本地資料，讓用戶可以重試
           }
+          console.log("後端登出成功:", data.message);
         } catch (error) {
           console.error("登出請求錯誤:", error);
+          return; // 不清空本地資料
         }
       } else {
         console.warn("無 refreshToken 可發送，僅清空本地資料");
       }
 
-      // 清空本地狀態和存儲
+      // 僅在成功登出後清空本地資料
       Object.assign(this, {
         isLoggedIn: false,
         userId: null,
@@ -424,7 +424,6 @@ export const useAuthStore = defineStore("auth", {
         "userAvatar",
         "role",
       ].forEach((key) => localStorage.removeItem(key));
-
       console.log("本地資料已清空");
     },
     async logoutAll() {
