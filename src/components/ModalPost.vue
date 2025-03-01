@@ -71,7 +71,7 @@
 
 <script setup>
 import { ref, nextTick, watch, computed } from "vue";
-import { NButton, useLoadingBar, useMessage } from "naive-ui";
+import { NButton, useLoadingBar, useMessag, useDialog } from "naive-ui";
 import { useSocketStore } from "../stores/socketStore";
 import { useAuthStore } from "../stores/authStore";
 import apiClient from "../stores/axiosConfig"; // 引入 apiClient
@@ -82,6 +82,7 @@ import Closeicon from "../assets/Closeicon.svg";
 
 const authStore = useAuthStore();
 const message = useMessage();
+const dialog = useDialog();
 const socketStore = useSocketStore();
 const loadingBar = useLoadingBar();
 
@@ -186,13 +187,31 @@ const handleMessage = async () => {
 // 處理 Modal 關閉的邏輯
 const handleModalClose = (newValue) => {
   if (content.value.trim() || file.value) {
-    if (!window.confirm("確認要關閉並清除內容嗎？")) return;
+    dialog.warning({
+      content: "確認要關閉並清除內容嗎？",
+      positiveText: "關閉",
+      negativeText: "取消",
+      onPositiveClick: () => {
+        content.value = "";
+        file.value = null;
+        fileUrl.value = null;
+        emit("update:modelValue", false);
+      },
+    });
+  } else {
+    emit("update:modelValue", false);
   }
-  content.value = "";
-  file.value = null;
-  fileUrl.value = null;
-  emit("update:modelValue", false);
 };
+
+// const handleModalClose = (newValue) => {
+//   if (content.value.trim() || file.value) {
+//     if (!window.confirm("確認要關閉並清除內容嗎？")) return;
+//   }
+//   content.value = "";
+//   file.value = null;
+//   fileUrl.value = null;
+//   emit("update:modelValue", false);
+// };
 
 // 監聽 Modal 開啟，恢復高度
 watch(content, () => {

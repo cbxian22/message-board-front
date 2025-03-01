@@ -489,7 +489,6 @@ const handleDeleteFriendConfirm = () => {
 };
 
 const handleDeleteAccountConfirm = () => {
-  show.value = true;
   dialog.warning({
     content: "貼文及回覆及其資料將全部刪除！",
     positiveText: "刪除帳號",
