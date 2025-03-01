@@ -180,6 +180,7 @@ async function fetchFriends() {
 <!-- chatView.vue -->
 
 <!-- chatView.vue -->
+<!-- chatView.vue -->
 <template>
   <div>
     <ul>
@@ -217,6 +218,7 @@ async function fetchFriends() {
 <script>
 import { io } from "socket.io-client";
 import { openDB } from "idb";
+import apiClient from "../stores/axiosConfig"; // 調整為你的實際路徑
 
 export default {
   data() {
@@ -225,8 +227,8 @@ export default {
       messages: [],
       newMessage: "",
       selectedFile: null,
-      currentUserId: null, // 初始為 null，稍後從 API 獲取
-      friendId: null, // 初始為 null，測試時手動設置
+      currentUserId: null,
+      friendId: null,
       db: null,
     };
   },
@@ -238,23 +240,16 @@ export default {
     });
     await this.loadMessages();
 
-    // 從後端獲取當前用戶 ID
+    // 使用 apiClient 獲取當前用戶 ID
     try {
-      const response = await fetch(
-        "https://message-board-server-7yot.onrender.com/api/auth/me",
-        {
-          headers: { Authorization: `Bearer ${localStorage.getItem("token")}` },
-        }
-      );
-      const data = await response.json();
-      if (data.userId) {
-        this.currentUserId = data.userId.toString(); // 確保是字符串
-        console.log("當前用戶 ID:", this.currentUserId);
-      } else {
-        throw new Error("無效的用戶資料");
-      }
+      const response = await apiClient.get("/auth/me");
+      this.currentUserId = response.data.id.toString(); // 後端返回的是 id
+      console.log("當前用戶 ID:", this.currentUserId);
     } catch (err) {
-      console.error("獲取用戶 ID 失敗", err);
+      console.error(
+        "獲取用戶 ID 失敗:",
+        err.response?.data?.message || err.message
+      );
       this.currentUserId = "2"; // 預設值，測試用
     }
 
