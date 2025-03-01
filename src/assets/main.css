@@ -210,8 +210,8 @@ body {
   margin: 0;
   padding: 0;
   box-sizing: border-box;
-  background-color: var(--n-body-color);
-  color: var(--n-text-color);
+  background-color: var(--n-body-color) !important;
+  color: var(--n-text-color) !important;
   transition: background-color 0.3s ease, color 0.3s ease;
 }
 
