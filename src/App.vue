@@ -1,6 +1,6 @@
 <template>
-  <div :class="themeClass" class="app-container">
-    <n-config-provider :theme="theme">
+  <n-config-provider :theme="theme">
+    <div :class="themeClass" class="app-container">
       <n-loading-bar-provider>
         <n-message-provider>
           <n-dialog-provider>
@@ -9,8 +9,8 @@
           </n-dialog-provider>
         </n-message-provider>
       </n-loading-bar-provider>
-    </n-config-provider>
-  </div>
+    </div>
+  </n-config-provider>
 </template>
 
 <script setup>
