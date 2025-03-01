@@ -711,7 +711,11 @@ const handleDelete = async () => {
 .friend-request-actions {
   display: flex;
   gap: 10px;
-  width: 100%;
+  justify-content: center; /* 靠左對齊 */
+  flex-wrap: nowrap; /* 禁止換行，預設值，但這裡明確指定 */
+}
+.friend-request-actions .n-button {
+  flex: 1;
 }
 
 .form-mod {
