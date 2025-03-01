@@ -203,16 +203,6 @@ const handleModalClose = (newValue) => {
   }
 };
 
-// const handleModalClose = (newValue) => {
-//   if (content.value.trim() || file.value) {
-//     if (!window.confirm("確認要關閉並清除內容嗎？")) return;
-//   }
-//   content.value = "";
-//   file.value = null;
-//   fileUrl.value = null;
-//   emit("update:modelValue", false);
-// };
-
 // 監聽 Modal 開啟，恢復高度
 watch(content, () => {
   nextTick(() => {
