@@ -67,11 +67,13 @@ watch(
 watch(
   () => props.userData,
   (newData) => {
+    console.log("props.userData 更新:", newData); // 檢查傳入的值
     if (newData) {
       info.value = {
         ...newData,
         is_private: Boolean(newData.is_private),
       };
+      console.log("info.value 更新:", info.value); // 檢查更新後的值
       name.value = info.value.name || "";
       intro.value = info.value.intro || "";
       tempAvatar.value = info.value.userAvatar;
