@@ -381,7 +381,7 @@ export const useAuthStore = defineStore("auth", {
       const refreshToken = this.refreshToken;
 
       if (refreshToken) {
-        console.log("發送登出請求，refreshToken:", refreshToken); // 添加日誌
+        console.log("發送登出請求，refreshToken:", refreshToken);
         try {
           const response = await fetch(
             "https://message-board-server-7yot.onrender.com/api/auth/logout",
@@ -395,6 +395,7 @@ export const useAuthStore = defineStore("auth", {
           const data = await response.json();
           if (!response.ok || !data.success) {
             console.error("登出請求失敗:", data.message);
+            // 即使後端失敗，仍繼續清空本地資料，但記錄問題
           } else {
             console.log("後端登出成功:", data.message);
           }
