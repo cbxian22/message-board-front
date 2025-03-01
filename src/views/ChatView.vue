@@ -181,7 +181,7 @@ async function fetchFriends() {
 
 <!-- chatView.vue -->
 <!-- chatView.vue -->
-<!-- <template>
+<template>
   <div>
     <ul>
       <li
@@ -360,105 +360,4 @@ export default {
   font-weight: bold;
   color: red;
 }
-</style> -->
-<template>
-  <div>
-    <!-- 訊息顯示區 -->
-    <div v-for="message in messages" :key="message.id">
-      <p>
-        <strong>{{ message.senderName }}:</strong> {{ message.content }}
-      </p>
-    </div>
-
-    <!-- 發送訊息區 -->
-    <textarea
-      v-model="newMessage"
-      placeholder="Type your message..."
-    ></textarea>
-    <button @click="sendMessage">Send</button>
-  </div>
-</template>
-
-<script>
-import axios from "axios";
-import { io } from "socket.io-client";
-
-export default {
-  data() {
-    return {
-      friendId: null, // 存儲接收者的 ID
-      newMessage: "",
-      messages: [],
-      socket: null,
-      currentUserId: null, // 假設有個方法可以獲取當前登入的用戶 ID
-    };
-  },
-  created() {
-    // 確保從路由參數取得 friendId
-    this.friendId = this.$route.params.id;
-    if (!this.friendId) {
-      console.error("接收者 ID (friendId) 未設定！");
-      return;
-    }
-
-    this.initializeSocket();
-    this.fetchMessages();
-  },
-  methods: {
-    // 初始化 WebSocket
-    initializeSocket() {
-      this.socket = io("https://message-board-server-7yot.onrender.com"); // 更改為你的 WebSocket 伺服器網址
-
-      this.socket.on("connect", () => {
-        console.log("WebSocket 已連線");
-      });
-
-      this.socket.on("messageReceived", (message) => {
-        console.log("接收到訊息:", message);
-        this.messages.push(message); // 接收到訊息後更新列表
-      });
-    },
-
-    // 發送訊息
-    async sendMessage() {
-      if (this.newMessage.trim()) {
-        // 確保 receiverId 是有效的
-        if (!this.friendId) {
-          console.error("接收者 ID (friendId) 未設定！");
-          return;
-        }
-
-        const message = {
-          senderId: this.currentUserId,
-          receiverId: this.friendId,
-          content: this.newMessage,
-          media: null, // 如果有媒體，這裡可以處理
-        };
-
-        console.log("發送消息:", message);
-
-        // 發送訊息到後端，並通過 WebSocket 發送
-        this.socket.emit("sendMessage", message);
-        this.messages.push(message); // 立即將訊息加入畫面
-
-        // 清空輸入框
-        this.newMessage = "";
-      }
-    },
-
-    // 從 API 獲取訊息
-    async fetchMessages() {
-      try {
-        const response = await axios.get(`/api/messages/${this.friendId}`);
-        this.messages = response.data;
-      } catch (error) {
-        console.error("獲取訊息失敗:", error);
-      }
-    },
-  },
-};
-</script>
-
-<style scoped>
-/* 可以加入樣式 */
 </style>
