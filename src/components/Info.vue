@@ -480,9 +480,8 @@ const handleDelete = async () => {
 
 const handledeleteFriendConfirm = () => {
   dialog.warning({
-    content:
-      "解除好友後需要再次加入好友才可以瀏覽私人帳號，你确定要解除好友嗎？",
-    positiveText: "确定",
+    content: "需要再次加入好友才可以瀏覽私人帳號！",
+    positiveText: "解除好友",
     negativeText: "取消",
     onPositiveClick: () => {
       deleteFriend();
