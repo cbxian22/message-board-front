@@ -2,10 +2,12 @@
   <n-config-provider :theme="theme">
     <n-loading-bar-provider>
       <n-message-provider>
-        <div :class="themeClass" class="app-container">
-          <n-global-style />
-          <router-view />
-        </div>
+        <n-dialog-provider>
+          <div :class="themeClass" class="app-container">
+            <n-global-style />
+            <router-view />
+          </div>
+        </n-dialog-provider>
       </n-message-provider>
     </n-loading-bar-provider>
   </n-config-provider>
@@ -18,6 +20,7 @@ import {
   NGlobalStyle,
   NLoadingBarProvider,
   NMessageProvider,
+  NDialogProvider,
 } from "naive-ui";
 import { computed, onMounted } from "vue";
 
