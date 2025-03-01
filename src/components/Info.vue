@@ -445,7 +445,7 @@ const updateWidth = () => {
   }
 };
 
-const handleDelete = async () => {
+const accountDelete = async () => {
   if (info.value.name !== authStore.userName) {
     message.error("您只能刪除自己的資料！");
     show.value = false;
@@ -478,13 +478,24 @@ const handleDelete = async () => {
   }
 };
 
-const handledeleteFriendConfirm = () => {
+const handleDeleteFriendConfirm = () => {
   dialog.warning({
     content: "需要再次加入好友才可以瀏覽私人帳號！",
     positiveText: "解除好友",
     negativeText: "取消",
     onPositiveClick: () => {
       deleteFriend();
+    },
+  });
+};
+
+const handleDeleteAccountConfirm = () => {
+  dialog.warning({
+    content: "貼文及回覆及其資料將全部刪除！",
+    positiveText: "刪除帳號",
+    negativeText: "取消",
+    onPositiveClick: () => {
+      accountDelete();
     },
   });
 };
@@ -508,7 +519,7 @@ const handledeleteFriendConfirm = () => {
     </div>
 
     <div class="set-btn" v-if="loggedInUser !== info.name">
-      <n-button v-if="isAlreadyFriend" @click="handledeleteFriendConfirm"
+      <n-button v-if="isAlreadyFriend" @click="handleDeleteFriendConfirm"
         >解除好友</n-button
       >
       <div v-else-if="isPendingReceived" class="friend-request-actions">
@@ -571,7 +582,7 @@ const handledeleteFriendConfirm = () => {
                   <n-switch v-model:value="is_private" />
                   <span>私人</span>
                 </div>
-                <button @click="handleDelete">刪除帳號</button>
+                <button @click="handleDeleteAccountConfirm">刪除帳號</button>
               </div>
             </div>
           </div>
