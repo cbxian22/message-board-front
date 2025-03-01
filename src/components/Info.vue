@@ -51,47 +51,15 @@ watch(
   }
 );
 
-// watch(
-//   () => props.userData,
-//   (newData) => {
-//     if (newData) {
-//       info.value = {
-//         ...newData,
-//         is_private: Boolean(newData.is_private),
-//       };
-//       console.log("Updated info.value:", info.value);
-//     }
-//   },
-//   { immediate: true }
-// );
 watch(
   () => props.userData,
   (newData) => {
-    console.log("props.userData 更新:", newData); // 檢查傳入的值
     if (newData) {
       info.value = {
         ...newData,
         is_private: Boolean(newData.is_private),
       };
-      console.log("info.value 更新:", info.value); // 檢查更新後的值
-      name.value = info.value.name || "";
-      intro.value = info.value.intro || "";
-      tempAvatar.value = info.value.userAvatar;
-      is_private.value = info.value.is_private;
-
-      // 根據 friendStatus 設置好友相關狀態
-      if (newData.friendStatus && authStore.isLoggedIn) {
-        const { status, isSender } = newData.friendStatus;
-        friendRequestSent.value = status === "pending" && isSender;
-        isPendingReceived.value = status === "pending" && !isSender;
-        isAlreadyFriend.value = status === "accepted";
-        pendingRequestId.value = null; // 初始設為 null，因為 /friends/status 未提供 requestId
-      } else {
-        friendRequestSent.value = false;
-        isPendingReceived.value = false;
-        isAlreadyFriend.value = false;
-        pendingRequestId.value = null;
-      }
+      console.log("Updated info.value:", info.value);
     }
   },
   { immediate: true }
@@ -107,45 +75,46 @@ watch(show, (newValue) => {
 });
 
 // 檢查好友狀態
-// const checkFriendRequestStatus = async () => {
-//   if (!authStore.accessToken || !info.value.id) return;
+const checkFriendRequestStatus = async () => {
+  if (!authStore.accessToken || !info.value.id) return;
 
-//   try {
-//     const response = await apiClient.get(`/friends/status/${info.value.id}`);
-//     const { status, isSender } = response.data;
+  try {
+    const response = await apiClient.get(`/friends/status/${info.value.id}`);
+    const { status, isSender } = response.data;
 
-//     if (status === "pending" && isSender) {
-//       friendRequestSent.value = true;
-//       isPendingReceived.value = false;
-//       isAlreadyFriend.value = false;
-//       pendingRequestId.value = null; // 發送者不需要 requestId
-//     } else if (status === "pending" && !isSender) {
-//       friendRequestSent.value = false;
-//       isPendingReceived.value = true;
-//       isAlreadyFriend.value = false;
-//       const pendingResponse = await apiClient.get(
-//         `/friends/pending/${info.value.id}`
-//       );
-//       pendingRequestId.value = pendingResponse.data.requestId;
-//     } else if (status === "accepted") {
-//       friendRequestSent.value = false;
-//       isPendingReceived.value = false;
-//       isAlreadyFriend.value = true;
-//       pendingRequestId.value = null;
-//     } else {
-//       friendRequestSent.value = false;
-//       isPendingReceived.value = false;
-//       isAlreadyFriend.value = false;
-//       pendingRequestId.value = null;
-//     }
-//   } catch (error) {
-//     console.error("檢查好友狀態失敗:", error);
-//     friendRequestSent.value = false;
-//     isPendingReceived.value = false;
-//     isAlreadyFriend.value = false;
-//     pendingRequestId.value = null;
-//   }
-// };
+    if (status === "pending" && isSender) {
+      friendRequestSent.value = true;
+      isPendingReceived.value = false;
+      isAlreadyFriend.value = false;
+      pendingRequestId.value = null; // 發送者不需要 requestId
+    } else if (status === "pending" && !isSender) {
+      friendRequestSent.value = false;
+      isPendingReceived.value = true;
+      isAlreadyFriend.value = false;
+      // 獲取 requestId
+      const pendingResponse = await apiClient.get(
+        `/friends/pending/${info.value.id}`
+      );
+      pendingRequestId.value = pendingResponse.data.requestId;
+    } else if (status === "accepted") {
+      friendRequestSent.value = false;
+      isPendingReceived.value = false;
+      isAlreadyFriend.value = true;
+      pendingRequestId.value = null;
+    } else {
+      friendRequestSent.value = false;
+      isPendingReceived.value = false;
+      isAlreadyFriend.value = false;
+      pendingRequestId.value = null;
+    }
+  } catch (error) {
+    console.error("檢查好友狀態失敗:", error);
+    friendRequestSent.value = false;
+    isPendingReceived.value = false;
+    isAlreadyFriend.value = false;
+    pendingRequestId.value = null;
+  }
+};
 
 // 發送好友請求//
 const sendFriendRequest = async () => {
@@ -170,14 +139,12 @@ const sendFriendRequest = async () => {
       isAlreadyFriend.value = false;
       pendingRequestId.value = null;
       message.success("好友請求已發送！");
-      emitter.emit("refreshPost", { newUsername: props.userData.name });
     } else if (response.status === 200) {
       friendRequestSent.value = false;
       isPendingReceived.value = false;
       isAlreadyFriend.value = false;
       pendingRequestId.value = null;
       message.success("已取消好友請求！");
-      emitter.emit("refreshPost", { newUsername: props.userData.name });
     }
   } catch (error) {
     console.error("操作失敗:", error);
@@ -200,37 +167,16 @@ const sendFriendRequest = async () => {
   }
 };
 
-// 獲取待處理請求的 requestId
-const fetchPendingRequestId = async () => {
-  if (!authStore.accessToken || !info.value.id) return null;
-
-  try {
-    const response = await apiClient.get(`/friends/pending/${info.value.id}`);
-    return response.data.requestId;
-  } catch (error) {
-    console.error("獲取 pending requestId 失敗:", error);
-    return null;
-  }
-};
-
-// 接受好友請求
+// 接受好友請求（需要知道 requestId）
 const acceptFriendRequest = async () => {
   if (!authStore.accessToken) {
     isLoginModalOpen.value = true;
     return;
   }
 
-  // if (!pendingRequestId.value) {
-  //   message.error("無待接受的好友請求！");
-  //   return;
-  // }
-  // 如果 pendingRequestId 不存在，動態獲取
   if (!pendingRequestId.value) {
-    pendingRequestId.value = await fetchPendingRequestId();
-    if (!pendingRequestId.value) {
-      message.error("無待接受的好友請求！");
-      return;
-    }
+    message.error("無待接受的好友請求！");
+    return;
   }
 
   loadingBar.start();
@@ -244,7 +190,6 @@ const acceptFriendRequest = async () => {
       isAlreadyFriend.value = true;
       pendingRequestId.value = null;
       message.success("已接受好友請求！");
-      emitter.emit("refreshPost", { newUsername: props.userData.name });
     }
   } catch (error) {
     console.error("接受好友請求失敗:", error);
@@ -272,18 +217,9 @@ const rejectFriendRequest = async () => {
     return;
   }
 
-  // if (!pendingRequestId.value) {
-  //   message.error("無待拒絕的好友請求！");
-  //   return;
-  // }
-
-  // 如果 pendingRequestId 不存在，動態獲取
   if (!pendingRequestId.value) {
-    pendingRequestId.value = await fetchPendingRequestId();
-    if (!pendingRequestId.value) {
-      message.error("無待拒絕的好友請求！");
-      return;
-    }
+    message.error("無待拒絕的好友請求！");
+    return;
   }
 
   loadingBar.start();
@@ -297,7 +233,6 @@ const rejectFriendRequest = async () => {
       isAlreadyFriend.value = false;
       pendingRequestId.value = null;
       message.success("已拒絕好友請求！");
-      emitter.emit("refreshPost", { newUsername: props.userData.name });
     }
   } catch (error) {
     console.error("拒絕好友請求失敗:", error);
@@ -335,7 +270,6 @@ const deleteFriend = async () => {
       isPendingReceived.value = false;
       pendingRequestId.value = null;
       message.success("已解除好友！");
-      emitter.emit("refreshPost", { newUsername: props.userData.name });
     }
   } catch (error) {
     console.error("解除好友失敗:", error);
@@ -367,19 +301,19 @@ const checkTokenAndOpenModal = () => {
 onMounted(() => {
   updateWidth();
   window.addEventListener("resize", updateWidth);
-  // checkFriendRequestStatus();
+  checkFriendRequestStatus();
 });
 
 onUnmounted(() => {
   window.removeEventListener("resize", updateWidth);
 });
 
-// watch(
-//   () => info.value.id,
-//   () => {
-//     checkFriendRequestStatus();
-//   }
-// );
+watch(
+  () => info.value.id,
+  () => {
+    checkFriendRequestStatus();
+  }
+);
 
 // 觸發檔案輸入
 const triggerFileInput = () => {
@@ -574,19 +508,7 @@ const handledeleteFriend = () => {
       <n-button @click="show = true"> 編輯個人檔案 </n-button>
     </div>
 
-    <!-- <div class="set-btn" v-if="loggedInUser !== info.name">
-      <n-button v-if="isAlreadyFriend" @click="handledeleteFriend"
-        >解除好友</n-button
-      >
-      <div v-else-if="isPendingReceived" class="friend-request-actions">
-        <n-button @click="acceptFriendRequest">確認好友請求</n-button>
-        <n-button @click="rejectFriendRequest">拒絕好友請求</n-button>
-      </div>
-      <n-button v-else @click="checkTokenAndOpenModal">
-        {{ friendRequestSent ? "取消好友請求" : "加入好友" }}
-      </n-button>
-    </div> -->
-    <div class="set-btn" v-if="loggedInUser !== info.name && info.id">
+    <div class="set-btn" v-if="loggedInUser !== info.name">
       <n-button v-if="isAlreadyFriend" @click="handledeleteFriend"
         >解除好友</n-button
       >

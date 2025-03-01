@@ -53,23 +53,11 @@ const fetchUserData = async (username) => {
         params: { userId: localStorage.getItem("userId") },
       }),
     ]);
-    console.log("用戶資料:", userResponse.data);
-    console.log("貼文資料:", postsResponse.data);
+
     if (userResponse.data.message === "使用者不存在") {
       router.replace("/not-found");
       return;
     }
-
-    const friendStatusResponse = authStore.isLoggedIn
-      ? await apiClient
-          .get(`/friends/status/${userResponse.data.id}`)
-          .catch((err) => {
-            console.error("獲取好友狀態失敗:", err);
-            return { data: null };
-          })
-      : { data: null };
-
-    console.log("好友狀態:", friendStatusResponse.data);
 
     userData.value = {
       id: userResponse.data.id,
@@ -77,15 +65,7 @@ const fetchUserData = async (username) => {
       intro: userResponse.data.intro,
       userAvatar: userResponse.data.avatar_url,
       is_private: Boolean(userResponse.data.is_private),
-      friendStatus: friendStatusResponse.data // 直接使用後端返回的格式
-        ? {
-            status: friendStatusResponse.data.status,
-            isSender: friendStatusResponse.data.isSender,
-          }
-        : null,
     };
-
-    console.log("userData 更新後:", userData.value);
 
     if (postsResponse.status === 200 && Array.isArray(postsResponse.data)) {
       userPosts.value = postsResponse.data.map((comment) => ({
