@@ -94,7 +94,6 @@ const handleLoaded = () => {
   display: flex;
   flex-direction: column;
   justify-self: center;
-  margin: 100px 0;
 }
 
 .aru {
