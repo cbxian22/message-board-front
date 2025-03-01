@@ -11,6 +11,11 @@
             <img :src="Sendicon" alt="Sendicon" />
           </router-link>
         </li>
+        <li v-if="authStore.isLoggedIn">
+          <router-link to="/list" class="nav-link">
+            <img :src="Sendicon" alt="Sendicon" />
+          </router-link>
+        </li>
 
         <li>
           <button ref="modalButton" @click="openModal" class="nav-link">
