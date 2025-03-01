@@ -223,8 +223,8 @@ export default {
       messages: [],
       newMessage: "",
       selectedFile: null,
-      currentUserId: "4",
-      friendId: "2",
+      currentUserId: "2",
+      friendId: "4",
       db: null,
     };
   },
