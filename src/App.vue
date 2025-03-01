@@ -1,16 +1,16 @@
 <template>
-  <n-config-provider :theme="theme">
-    <n-loading-bar-provider>
-      <n-message-provider>
-        <n-dialog-provider>
-          <div :class="themeClass" class="app-container">
+  <div :class="themeClass" class="app-container">
+    <n-config-provider :theme="theme">
+      <n-loading-bar-provider>
+        <n-message-provider>
+          <n-dialog-provider>
             <n-global-style />
             <router-view />
-          </div>
-        </n-dialog-provider>
-      </n-message-provider>
-    </n-loading-bar-provider>
-  </n-config-provider>
+          </n-dialog-provider>
+        </n-message-provider>
+      </n-loading-bar-provider>
+    </n-config-provider>
+  </div>
 </template>
 
 <script setup>
