@@ -362,148 +362,219 @@ export default {
 }
 </style> -->
 <template>
-  <div class="chat-room">
-    <div class="header">
-      <img :src="friend.avatar_url" class="avatar" />
-      <div class="friend-info">
-        <div class="name">{{ friend.name }}</div>
-      </div>
-    </div>
-    <div class="chat-content">
-      <div
-        v-for="message in messages"
-        :key="message.id"
-        :class="['message', message.sender === 'me' ? 'me' : 'friend']"
+  <div class="chat-container">
+    <h2>{{ friend.name }} 的聊天室</h2>
+    <ul class="message-list">
+      <li
+        v-for="msg in messages"
+        :key="msg.id"
+        :class="{ unread: !msg.isRead }"
       >
-        {{ message.content }}
-      </div>
-    </div>
-    <div class="chat-input">
-      <input
-        type="text"
-        v-model="newMessage"
-        placeholder="輸入訊息..."
-        @keydown.enter="sendMessage"
-      />
-      <button @click="sendMessage">發送</button>
-    </div>
+        <span>{{ msg.content }}</span>
+        <img
+          v-if="msg.media && msg.media.type === 'image'"
+          :src="msg.media.data"
+          alt="圖片"
+          class="chat-media"
+        />
+        <video
+          v-if="msg.media && msg.media.type === 'video'"
+          controls
+          :src="msg.media.data"
+          class="chat-media"
+        ></video>
+        <span>{{ msg.isRead ? "已讀" : "未讀" }}</span>
+      </li>
+    </ul>
+
+    <input
+      v-model="newMessage"
+      @keyup.enter="sendMessage"
+      placeholder="輸入文字"
+    />
+    <input type="file" accept="image/*,video/*" @change="handleFileUpload" />
+    <button @click="sendMessage">發送</button>
   </div>
 </template>
 
-<script setup>
-import { ref, onMounted } from "vue";
-import { useRoute } from "vue-router";
+<script>
+import { io } from "socket.io-client";
+import { openDB } from "idb";
+import apiClient from "../stores/axiosConfig"; // 你的 axios 設定
 
-const route = useRoute();
+export default {
+  data() {
+    return {
+      socket: null,
+      messages: [],
+      newMessage: "",
+      selectedFile: null,
+      currentUser: null,
+      friend: null,
+      db: null,
+    };
+  },
+  async mounted() {
+    await this.initDB();
+    await this.getCurrentUser();
 
-const friend = ref({
-  id: route.params.id,
-  name: route.query.name,
-  avatar_url: route.query.avatar,
-});
+    const friendId = this.$route.params.id; // 直接從路由抓取好友ID
+    await this.getFriendInfo(friendId);
 
-const messages = ref([]);
-const newMessage = ref("");
+    await this.loadMessages(friendId);
 
-// 模擬從 IndexedDB 拿聊天紀錄（這裡你之後可以改成真的用 IndexedDB）
-onMounted(async () => {
-  const storedMessages = JSON.parse(localStorage.getItem(getChatKey())) || [];
-  messages.value = storedMessages;
-});
+    this.setupWebSocket();
+  },
+  methods: {
+    async initDB() {
+      this.db = await openDB("chatDB", 1, {
+        upgrade(db) {
+          if (!db.objectStoreNames.contains("messages")) {
+            db.createObjectStore("messages", { keyPath: "id" });
+          }
+        },
+      });
+    },
+    async getCurrentUser() {
+      const res = await apiClient.get("/auth/me");
+      this.currentUser = res.data;
+    },
+    async getFriendInfo(friendId) {
+      try {
+        const res = await apiClient.get(`/friends/${friendId}`);
+        this.friend = res.data;
+      } catch (err) {
+        console.error("獲取好友資料失敗:", err.response?.data?.message);
+        this.friend = { id: friendId, name: "未知用戶" }; // 避免報錯
+      }
+    },
+    async loadMessages(friendId) {
+      const allMessages = await this.db.getAll("messages");
+      this.messages = allMessages.filter(
+        (msg) =>
+          (msg.senderId == this.currentUser.id && msg.receiverId == friendId) ||
+          (msg.senderId == friendId && msg.receiverId == this.currentUser.id)
+      );
+    },
+    setupWebSocket() {
+      this.socket = io("wss://message-board-server-7yot.onrender.com", {
+        query: { userId: this.currentUser.id },
+      });
 
-// 發送訊息
-function sendMessage() {
-  if (!newMessage.value.trim()) return;
+      this.socket.on("connect", () => console.log("WebSocket 已連線"));
+      this.socket.on("connect_error", (err) =>
+        console.error("WebSocket 錯誤:", err)
+      );
 
-  const message = {
-    id: Date.now(),
-    sender: "me",
-    content: newMessage.value,
-  };
-  messages.value.push(message);
-  saveMessages();
-  newMessage.value = "";
-}
+      this.socket.on("receiveMessage", async (message) => {
+        if (this.isCurrentChat(message)) {
+          this.messages.push(message);
+          await this.saveMessage(message);
+          if (message.receiverId == this.currentUser.id) {
+            this.markAsRead(message.id);
+          }
+        }
+      });
 
-// 存入 IndexedDB（這裡示意用 localStorage，你之後改成 IndexedDB）
-function saveMessages() {
-  localStorage.setItem(getChatKey(), JSON.stringify(messages.value));
-}
+      this.socket.on("messageSent", async (message) => {
+        if (this.isCurrentChat(message)) {
+          this.messages.push(message);
+          await this.saveMessage(message);
+        }
+      });
 
-// 取得這個聊天室的存檔 key
-function getChatKey() {
-  return `chat_with_${friend.value.id}`;
-}
+      this.socket.on("messageRead", ({ messageId }) => {
+        const msg = this.messages.find((m) => m.id === messageId);
+        if (msg) {
+          msg.isRead = true;
+          this.updateMessage(msg);
+        }
+      });
+    },
+    isCurrentChat(message) {
+      return (
+        (message.senderId == this.currentUser.id &&
+          message.receiverId == this.friend.id) ||
+        (message.senderId == this.friend.id &&
+          message.receiverId == this.currentUser.id)
+      );
+    },
+    async sendMessage() {
+      if (this.newMessage.trim() || this.selectedFile) {
+        const message = {
+          id: Date.now(),
+          senderId: this.currentUser.id,
+          receiverId: this.friend.id,
+          content: this.newMessage,
+          media: this.selectedFile
+            ? await this.processFile(this.selectedFile)
+            : null,
+          isRead: false,
+          createdAt: new Date(),
+        };
+
+        this.socket.emit("sendMessage", message);
+        this.messages.push(message);
+        await this.saveMessage(message);
+
+        this.newMessage = "";
+        this.selectedFile = null;
+      }
+    },
+    async saveMessage(message) {
+      const tx = this.db.transaction("messages", "readwrite");
+      await tx.store.put(message);
+    },
+    async updateMessage(message) {
+      const tx = this.db.transaction("messages", "readwrite");
+      await tx.store.put(message);
+    },
+    handleFileUpload(event) {
+      this.selectedFile = event.target.files[0];
+    },
+    processFile(file) {
+      return new Promise((resolve) => {
+        const reader = new FileReader();
+        reader.onload = (e) => {
+          resolve({
+            type: file.type.startsWith("image") ? "image" : "video",
+            data: e.target.result,
+          });
+        };
+        reader.readAsDataURL(file);
+      });
+    },
+    markAsRead(messageId) {
+      this.socket.emit("markAsRead", {
+        messageId,
+        senderId: this.friend.id,
+      });
+    },
+  },
+  beforeUnmount() {
+    if (this.socket) this.socket.disconnect();
+  },
+};
 </script>
 
 <style scoped>
-.chat-room {
-  display: flex;
-  flex-direction: column;
-  height: 100vh;
+.chat-container {
+  padding: 20px;
 }
-.header {
-  display: flex;
-  align-items: center;
-  gap: 12px;
-  padding: 12px;
-  background-color: #f0f0f0;
-  border-bottom: 1px solid #ddd;
+.message-list {
+  list-style: none;
+  padding: 0;
 }
-.avatar {
-  width: 50px;
-  height: 50px;
-  border-radius: 50%;
-  object-fit: cover;
+.message-list li {
+  margin: 8px 0;
 }
-.friend-info {
-  display: flex;
-  flex-direction: column;
+.chat-media {
+  max-width: 200px;
+  display: block;
+  margin: 5px 0;
 }
-.name {
+.unread {
   font-weight: bold;
-}
-.chat-content {
-  flex: 1;
-  overflow-y: auto;
-  padding: 12px;
-  background-color: #fafafa;
-}
-.message {
-  padding: 8px 12px;
-  margin: 4px 0;
-  border-radius: 16px;
-  max-width: 60%;
-  word-wrap: break-word;
-}
-.me {
-  align-self: flex-end;
-  background-color: #dcf8c6;
-}
-.friend {
-  align-self: flex-start;
-  background-color: #fff;
-  border: 1px solid #ddd;
-}
-.chat-input {
-  display: flex;
-  gap: 8px;
-  padding: 12px;
-  background-color: #f0f0f0;
-  border-top: 1px solid #ddd;
-}
-.chat-input input {
-  flex: 1;
-  padding: 8px;
-  border: 1px solid #ccc;
-  border-radius: 4px;
-}
-.chat-input button {
-  padding: 8px 16px;
-  background-color: #007bff;
-  color: white;
-  border: none;
-  border-radius: 4px;
-  cursor: pointer;
+  color: red;
 }
 </style>
