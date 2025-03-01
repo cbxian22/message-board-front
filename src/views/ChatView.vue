@@ -223,8 +223,8 @@ export default {
       messages: [],
       newMessage: "",
       selectedFile: null,
-      currentUserId: "1", // 測試用，可從登入狀態獲取
-      friendId: "2", // 測試用，可從好友列表選擇
+      currentUserId: "4",
+      friendId: "2",
       db: null,
     };
   },
