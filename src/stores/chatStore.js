@@ -1,77 +1,61 @@
 import { defineStore } from "pinia";
-import {
-  saveMessage,
-  getMessages,
-  deleteMessage,
-  searchMessages,
-} from "@/services/indexedDB";
+import { openDB } from "idb";
 
-export const useChatStore = defineStore("chat", {
+export const useChatStore = defineStore("chatStore", {
   state: () => ({
-    messages: [],
-    activeChatId: null,
-    ws: null,
-    userId: null,
+    db: null,
   }),
-
   actions: {
-    connectWebSocket(userId) {
-      if (this.ws) return;
-
-      this.userId = userId;
-      this.ws = new WebSocket(
-        `wss://message-board-server-7yot.onrender.com?userId=${userId}`
-      );
-
-      this.ws.onopen = () => console.log("✅ WebSocket 已連接");
-
-      this.ws.onmessage = async (event) => {
-        const data = JSON.parse(event.data);
-        if (
-          data.type === "NEW_MESSAGE" &&
-          data.message.chatId === this.activeChatId
-        ) {
-          this.messages.push(data.message);
-          await saveMessage(data.message);
-        }
-      };
-
-      this.ws.onclose = () => {
-        console.log("❌ WebSocket 連線關閉");
-        this.ws = null;
-      };
+    async initDB() {
+      this.db = await openDB("chatDB", 1, {
+        upgrade(db) {
+          if (!db.objectStoreNames.contains("messages")) {
+            db.createObjectStore("messages", { keyPath: "id" });
+          }
+        },
+      });
     },
-
-    async setActiveChat(chatId) {
-      this.activeChatId = chatId;
-      this.messages = await getMessages(chatId);
+    async loadMessages(userId, friendId) {
+      const chatId = this.getChatId(userId, friendId);
+      const allMessages = await this.db.getAll("messages");
+      return allMessages.filter((msg) => msg.chatId === chatId);
     },
-
-    async sendMessage(content) {
-      if (!this.activeChatId || !this.ws) return;
-
-      const newMessage = {
-        chatId: this.activeChatId,
-        senderId: this.userId,
+    getChatId(userId, friendId) {
+      return [userId, friendId].sort().join("-");
+    },
+    async createMessage(currentUser, friendId, content, file) {
+      let media = null;
+      if (file) {
+        media = await this.processFile(file);
+      }
+      const message = {
+        id: `${currentUser.id}-${friendId}-${Date.now()}`,
+        chatId: this.getChatId(currentUser.id, friendId),
+        senderId: currentUser.id,
+        receiverId: friendId,
         content,
-        timestamp: Date.now(),
+        media,
+        isRead: false,
+        createdAt: new Date(),
       };
-
-      this.ws.send(
-        JSON.stringify({ type: "NEW_MESSAGE", message: newMessage })
-      );
-      this.messages.push(newMessage);
-      await saveMessage(newMessage);
+      await this.saveMessage(message);
+      return message;
     },
-
-    async removeMessage(messageId) {
-      await deleteMessage(messageId);
-      this.messages = this.messages.filter((msg) => msg.id !== messageId);
+    async saveMessage(message) {
+      const tx = this.db.transaction("messages", "readwrite");
+      await tx.store.put(message);
     },
-
-    async searchChat(keyword) {
-      if (!this.activeChatId) return [];
-      return await searchMessages(this.activeChatId, keyword);
+    async processFile(file) {
+      return new Promise((resolve) => {
+        const reader = new FileReader();
+        reader.onload = () => {
+          resolve({
+            type: file.type.startsWith("image") ? "image" : "video",
+            data: reader.result,
+          });
+        };
+        reader.readAsDataURL(file);
+      });
     },
   },
 });

@@ -361,9 +361,9 @@ export default {
   color: red;
 }
 </style> -->
-
 <template>
   <div>
+    <h2>{{ friend.name }}</h2>
     <ul>
       <li
         v-for="msg in messages"
@@ -374,14 +374,13 @@ export default {
         <img
           v-if="msg.media?.type === 'image'"
           :src="msg.media.data"
-          alt="圖片"
-          style="max-width: 200px"
+          style="max-width: 150px"
         />
         <video
           v-if="msg.media?.type === 'video'"
           controls
           :src="msg.media.data"
-          style="max-width: 200px"
+          style="max-width: 150px"
         ></video>
         <span>{{ msg.isRead ? "已讀" : "未讀" }}</span>
       </li>
@@ -389,101 +388,48 @@ export default {
     <input
       v-model="newMessage"
       @keyup.enter="sendMessage"
-      placeholder="輸入文字"
+      placeholder="輸入訊息"
     />
-    <input type="file" accept="image/*,video/*" @change="handleFileUpload" />
+    <input type="file" @change="handleFileUpload" />
     <button @click="sendMessage">發送</button>
   </div>
 </template>
 
 <script setup>
 import { ref, onMounted, onUnmounted } from "vue";
-import { openDB } from "idb";
-import { io } from "socket.io-client";
+import { useRoute } from "vue-router";
+import { useChatStore } from "../stores/chatStore";
 import apiClient from "../stores/axiosConfig";
+import { io } from "socket.io-client";
 
+const route = useRoute();
+const chatStore = useChatStore();
+const friend = ref({});
 const messages = ref([]);
 const newMessage = ref("");
 const selectedFile = ref(null);
 const socket = ref(null);
 let currentUser = {};
-let friendId = "4"; // 這個可以從路由或其他地方取
-
-let db = null;
-
-async function initDB() {
-  db = await openDB("chatDB", 1, {
-    upgrade(db) {
-      if (!db.objectStoreNames.contains("messages")) {
-        db.createObjectStore("messages", { keyPath: "id" });
-      }
-    },
-  });
-}
-
-async function loadMessages() {
-  const allMessages = await db.getAll("messages");
-  const chatId = generateChatId(currentUser.id, friendId);
-  messages.value = allMessages.filter((msg) => msg.chatId === chatId);
-}
-
-async function handleFileUpload(e) {
-  selectedFile.value = e.target.files[0];
-}
-
-async function processFile(file) {
-  const reader = new FileReader();
-  return new Promise((resolve) => {
-    reader.onload = () =>
-      resolve({
-        type: file.type.startsWith("image") ? "image" : "video",
-        data: reader.result,
-      });
-    reader.readAsDataURL(file);
-  });
-}
-
-async function sendMessage() {
-  const message = {
-    id: `${currentUser.id}-${friendId}-${Date.now()}`,
-    chatId: generateChatId(currentUser.id, friendId),
-    senderId: currentUser.id,
-    receiverId: friendId,
-    content: newMessage.value,
-    media: selectedFile.value ? await processFile(selectedFile.value) : null,
-    isRead: false,
-    createdAt: new Date(),
-  };
-
-  socket.value.emit("sendMessage", message);
-  await saveMessage(message);
-  messages.value.push(message);
-  newMessage.value = "";
-  selectedFile.value = null;
-}
-
-async function saveMessage(message) {
-  const tx = db.transaction("messages", "readwrite");
-  await tx.store.put(message);
-}
-
-function generateChatId(userId1, userId2) {
-  return [userId1, userId2].sort().join("-");
-}
 
 onMounted(async () => {
-  await initDB();
-  const { data } = await apiClient.get("/auth/me");
-  currentUser = data;
-  await loadMessages();
+  const friendId = route.params.id;
+
+  const { data: me } = await apiClient.get("/auth/me");
+  currentUser = me;
+
+  const { data: friendData } = await apiClient.get(`/users/${friendId}`);
+  friend.value = friendData;
+
+  await chatStore.initDB();
+  messages.value = await chatStore.loadMessages(currentUser.id, friendId);
 
   socket.value = io("wss://message-board-server-7yot.onrender.com", {
     query: { userId: currentUser.id },
   });
 
   socket.value.on("receiveMessage", async (message) => {
-    await saveMessage(message);
-    if (message.chatId === generateChatId(currentUser.id, friendId)) {
+    await chatStore.saveMessage(message);
+    if (message.chatId === chatStore.getChatId(currentUser.id, friendId)) {
       messages.value.push(message);
       socket.value.emit("markAsRead", {
         messageId: message.id,
@@ -496,7 +442,7 @@ onMounted(async () => {
     const msg = messages.value.find((m) => m.id === messageId);
     if (msg) {
       msg.isRead = true;
-      saveMessage(msg);
+      chatStore.saveMessage(msg);
     }
   });
 });
@@ -504,9 +450,27 @@ onMounted(async () => {
 onUnmounted(() => {
   socket.value.disconnect();
 });
+
+async function handleFileUpload(event) {
+  selectedFile.value = event.target.files[0];
+}
+
+async function sendMessage() {
+  const friendId = route.params.id;
+  const message = await chatStore.createMessage(
+    currentUser,
+    friendId,
+    newMessage.value,
+    selectedFile.value
+  );
+  socket.value.emit("sendMessage", message);
+  messages.value.push(message);
+  newMessage.value = "";
+  selectedFile.value = null;
+}
 </script>
 
-<style>
+<style scoped>
 .unread {
   color: red;
 }
