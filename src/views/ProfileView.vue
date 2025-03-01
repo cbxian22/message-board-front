@@ -59,12 +59,25 @@ const fetchUserData = async (username) => {
       return;
     }
 
+    // 如果已登入，獲取好友狀態，使用用戶 ID
+    const friendStatusResponse = authStore.isLoggedIn
+      ? await apiClient
+          .get(`/friends/status/${userResponse.data.id}`)
+          .catch(() => ({ data: null }))
+      : { data: null };
+
     userData.value = {
       id: userResponse.data.id,
       name: userResponse.data.name,
       intro: userResponse.data.intro,
       userAvatar: userResponse.data.avatar_url,
       is_private: Boolean(userResponse.data.is_private),
+      friendStatus: friendStatusResponse.data // 直接使用後端返回的格式
+        ? {
+            status: friendStatusResponse.data.status,
+            isSender: friendStatusResponse.data.isSender,
+          }
+        : null,
     };
 
     if (postsResponse.status === 200 && Array.isArray(postsResponse.data)) {

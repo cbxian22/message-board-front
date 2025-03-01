@@ -88,7 +88,6 @@ const handleLoaded = () => {
 </script>
 
 <style scoped>
-/* 安插 singleComment 容器 */
 .container-box {
   width: 650px;
   display: flex;

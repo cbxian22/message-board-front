@@ -24,24 +24,8 @@ import {
 } from "naive-ui";
 import { computed } from "vue";
 
-// const themeStore = useThemeStore();
-// const theme = computed(() => themeStore.theme);
-
-// // 根據主題變更 class
-// const themeClass = computed(() =>
-//   themeStore.isDarkMode ? "dark-mode" : "light-mode"
-// );
-
-// // 確保應用啟動時讀取 localStorage
-// onMounted(() => {
-//   const savedTheme = localStorage.getItem("theme");
-//   if (savedTheme === "dark") {
-//     themeStore.setDarkTheme();
-//   } else {
-//     themeStore.setLightTheme();
-//   }
-// });
 const themeStore = useThemeStore();
+
 const theme = computed(() => themeStore.theme);
 const themeClass = computed(() =>
   themeStore.isDarkMode ? "dark-mode" : "light-mode"
