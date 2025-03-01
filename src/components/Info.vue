@@ -7,6 +7,7 @@ import {
   NDrawer,
   useLoadingBar,
   useMessage,
+  useDialog,
 } from "naive-ui";
 import { useAuthStore } from "../stores/authStore";
 import { useThemeStore } from "../stores/themeStore";
@@ -24,6 +25,7 @@ const loadingBar = useLoadingBar();
 const router = useRouter();
 const authStore = useAuthStore();
 const message = useMessage();
+const dialog = useDialog();
 
 const loggedInUser = ref(authStore.userName);
 const show = ref(false);
@@ -475,6 +477,20 @@ const handleDelete = async () => {
     window.location.href = "/";
   }
 };
+
+// 直接定義方法
+const handledeleteFriend = () => {
+  dialog.success({
+    title: "關閉",
+    content: "你确定要解除好友嗎？解除後需重新加入才瀏覽看私人帳號！",
+    positiveText: "确定",
+    negativeText: "取消",
+    onPositiveClick: () => {
+      deleteFriend();
+      message.success("已成功解除好友！");
+    },
+  });
+};
 </script>
 
 <template>
@@ -495,7 +511,9 @@ const handleDelete = async () => {
     </div>
 
     <div class="set-btn" v-if="loggedInUser !== info.name">
-      <n-button v-if="isAlreadyFriend" @click="deleteFriend">解除好友</n-button>
+      <n-button v-if="isAlreadyFriend" @click="handledeleteFriend"
+        >解除好友</n-button
+      >
       <div v-else-if="isPendingReceived" class="friend-request-actions">
         <n-button @click="acceptFriendRequest">確認好友請求</n-button>
         <n-button @click="rejectFriendRequest">拒絕好友請求</n-button>
