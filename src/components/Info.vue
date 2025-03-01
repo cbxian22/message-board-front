@@ -7,7 +7,7 @@ import {
   NDrawer,
   useLoadingBar,
   useMessage,
-  useDialog,
+  // useDialog,
 } from "naive-ui";
 import { useAuthStore } from "../stores/authStore";
 import { useThemeStore } from "../stores/themeStore";
@@ -25,7 +25,7 @@ const loadingBar = useLoadingBar();
 const router = useRouter();
 const authStore = useAuthStore();
 const message = useMessage();
-const dialog = useDialog();
+// const dialog = useDialog();
 
 const loggedInUser = ref(authStore.userName);
 const show = ref(false);
