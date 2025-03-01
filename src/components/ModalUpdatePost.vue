@@ -217,31 +217,6 @@ const handleMessage = async () => {
   }
 };
 
-const hasChanges = computed(() => {
-  return (
-    content.value !== content.name ||
-    file.value !== file.intro ||
-    fileUrl.value !== fileUrl.userAvatar
-  );
-});
-
-const handleModalClose = (newValue) => {
-  if (!hasChanges.value) {
-    emit("update:modelValue", false);
-  } else {
-    dialog.warning({
-      content: "確認要關閉並取消更新內容嗎？",
-      positiveText: "關閉",
-      negativeText: "取消",
-      onPositiveClick: () => {
-        content.value = "";
-        file.value = null;
-        fileUrl.value = null;
-        emit("update:modelValue", false);
-      },
-    });
-  }
-};
 // 處理 Modal 關閉的邏輯
 // const handleModalClose = (newValue) => {
 //   if (content.value.trim() || file.value) {
@@ -252,6 +227,44 @@ const handleModalClose = (newValue) => {
 //   fileUrl.value = null;
 //   emit("update:modelValue", false);
 // };
+// 判斷是否有變更
+const hasChanges = computed(() => {
+  if (!props.comment) {
+    // 如果沒有初始貼文（新建模式），只要有內容或檔案就算有變更
+    return content.value.trim() || file.value;
+  }
+  // 編輯模式：比較當前值與初始值
+  const isContentChanged = content.value !== (props.comment.content || "");
+  const isFileUrlChanged = fileUrl.value !== (props.comment.file_url || null);
+  const isFileAdded = !!file.value; // 是否有新上傳的檔案
+  return isContentChanged || isFileUrlChanged || isFileAdded;
+});
+
+// 處理 Modal 關閉邏輯
+const handleModalClose = (newValue) => {
+  if (!hasChanges.value) {
+    // 無變更，直接關閉
+    emit("update:modelValue", false);
+  } else {
+    // 有變更，顯示確認對話框
+    dialog.warning({
+      content: "確認要關閉並取消更新內容嗎？",
+      positiveText: "關閉",
+      negativeText: "取消",
+      onPositiveClick: () => {
+        // 點"關閉"：清除內容並關閉 Modal
+        content.value = "";
+        file.value = null;
+        fileUrl.value = null;
+        emit("update:modelValue", false);
+      },
+      onNegativeClick: () => {
+        // 點"取消"：保留內容但關閉 Modal
+        emit("update:modelValue", false);
+      },
+    });
+  }
+};
 
 // 監聽 Modal 開啟，恢復高度
 watch(content, () => {
