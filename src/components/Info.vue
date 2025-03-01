@@ -495,7 +495,6 @@ const handleDeleteAccountConfirm = () => {
     negativeText: "取消",
     onPositiveClick: () => {
       accountDelete();
-      show.value = false;
     },
   });
 };
