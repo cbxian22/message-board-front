@@ -203,11 +203,16 @@ html ::root {
 } */
 
 /* 重置樣式 */
+/* 重置樣式 */
 *,
 body {
   margin: 0;
   padding: 0;
   box-sizing: border-box;
+  background-color: var(--n-body-color);
+  /* 將背景應用到 body */
+  color: var(--n-text-color);
+  transition: background-color 0.3s ease, color 0.3s ease;
 }
 
 button {
@@ -216,7 +221,6 @@ button {
   border: none;
   outline: none;
   background: none;
-  /* 移除 !important，除非有樣式衝突 */
 }
 
 input {
@@ -227,7 +231,6 @@ input {
 img,
 span {
   background: none;
-  /* 移除 !important，除非有樣式衝突 */
 }
 
 a {
@@ -237,10 +240,7 @@ a {
 }
 
 /* 主題變量定義與通用樣式 */
-.app-container,
-html:root {
-  color: var(--n-text-color);
-  background-color: var(--n-body-color);
+.app-container {
   transition: background-color 0.3s ease, color 0.3s ease;
 }
 
@@ -260,7 +260,6 @@ html:root {
 /* 淺色模式 */
 .light-mode {
   --n-body-color: rgb(255, 255, 255);
-  /* 改為不透明白色，避免半透效果 */
   --n-text-color: rgb(0, 0, 0);
   --n-border-color: rgb(200, 200, 200);
 }
@@ -336,17 +335,6 @@ html:root {
   left: 0;
 }
 
-.n-spin-b {
-  position: absolute;
-  top: calc(50% + 200px);
-  text-align: center;
-}
-
-.n-spin-b p:last-child {
-  margin-top: 8px;
-  font-size: 20px;
-}
-
 /* Naive UI 對話框按鈕樣式覆蓋 */
 .dark-mode .n-dialog .n-button {
   color: var(--n-text-color);
@@ -361,13 +349,11 @@ html:root {
 .dark-mode .n-dialog .n-button--primary,
 .dark-mode .n-dialog .n-button--default {
   color: rgb(243, 245, 247) !important;
-  /* 統一深色模式下的按鈕文字顏色 */
 }
 
 .light-mode .n-dialog .n-button--primary,
 .light-mode .n-dialog .n-button--default {
   color: rgb(0, 0, 0) !important;
-  /* 統一淺色模式下的按鈕文字顏色 */
 }
 
 /* 平板 RWD (寬度小於 768px) */
@@ -434,6 +420,5 @@ html:root {
 
   .n-dialog {
     width: 90vw !important;
-    /* 確保對話框在手機上適應寬度 */
   }
 }
