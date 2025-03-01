@@ -4,7 +4,6 @@ import { ref } from "vue";
 import { darkTheme, lightTheme } from "naive-ui";
 
 export const useThemeStore = defineStore("theme", () => {
-  // 讀取 localStorage，預設為 'dark'
   const savedTheme = localStorage.getItem("theme") || "dark";
   const isDarkMode = ref(savedTheme === "dark");
   const theme = ref(isDarkMode.value ? darkTheme : lightTheme);

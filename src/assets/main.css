@@ -204,13 +204,13 @@ html ::root {
 
 /* 重置樣式 */
 /* 重置樣式 */
+/* 重置樣式 */
 *,
 body {
   margin: 0;
   padding: 0;
   box-sizing: border-box;
   background-color: var(--n-body-color);
-  /* 將背景應用到 body */
   color: var(--n-text-color);
   transition: background-color 0.3s ease, color 0.3s ease;
 }
@@ -241,6 +241,8 @@ a {
 
 /* 主題變量定義與通用樣式 */
 .app-container {
+  min-height: 100vh;
+  /* 確保填滿視窗 */
   transition: background-color 0.3s ease, color 0.3s ease;
 }
 
@@ -333,6 +335,18 @@ a {
   position: fixed;
   top: 0;
   left: 0;
+}
+
+.n-spin-b {
+  position: absolute;
+  top: 50%;
+  transform: translateY(-50%);
+  text-align: center;
+}
+
+.n-spin-b p:last-child {
+  margin-top: 8px;
+  font-size: 20px;
 }
 
 /* Naive UI 對話框按鈕樣式覆蓋 */
