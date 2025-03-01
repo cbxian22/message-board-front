@@ -362,116 +362,148 @@ export default {
 }
 </style> -->
 <template>
-  <div>
-    <h2>{{ friend.name }}</h2>
-    <ul>
-      <li
-        v-for="msg in messages"
-        :key="msg.id"
-        :class="{ unread: !msg.isRead }"
+  <div class="chat-room">
+    <div class="header">
+      <img :src="friend.avatar_url" class="avatar" />
+      <div class="friend-info">
+        <div class="name">{{ friend.name }}</div>
+      </div>
+    </div>
+    <div class="chat-content">
+      <div
+        v-for="message in messages"
+        :key="message.id"
+        :class="['message', message.sender === 'me' ? 'me' : 'friend']"
       >
-        <span>{{ msg.content }}</span>
-        <img
-          v-if="msg.media?.type === 'image'"
-          :src="msg.media.data"
-          style="max-width: 150px"
-        />
-        <video
-          v-if="msg.media?.type === 'video'"
-          controls
-          :src="msg.media.data"
-          style="max-width: 150px"
-        ></video>
-        <span>{{ msg.isRead ? "已讀" : "未讀" }}</span>
-      </li>
-    </ul>
-    <input
-      v-model="newMessage"
-      @keyup.enter="sendMessage"
-      placeholder="輸入訊息"
-    />
-    <input type="file" @change="handleFileUpload" />
-    <button @click="sendMessage">發送</button>
+        {{ message.content }}
+      </div>
+    </div>
+    <div class="chat-input">
+      <input
+        type="text"
+        v-model="newMessage"
+        placeholder="輸入訊息..."
+        @keydown.enter="sendMessage"
+      />
+      <button @click="sendMessage">發送</button>
+    </div>
   </div>
 </template>
 
 <script setup>
-import { ref, onMounted, onUnmounted } from "vue";
+import { ref, onMounted } from "vue";
 import { useRoute } from "vue-router";
-import { useChatStore } from "../stores/chatStore";
-import apiClient from "../stores/axiosConfig";
-import { io } from "socket.io-client";
 
 const route = useRoute();
-const chatStore = useChatStore();
-const friend = ref({});
+
+const friend = ref({
+  id: route.params.id,
+  name: route.query.name,
+  avatar_url: route.query.avatar,
+});
+
 const messages = ref([]);
 const newMessage = ref("");
-const selectedFile = ref(null);
-const socket = ref(null);
-let currentUser = {};
 
+// 模擬從 IndexedDB 拿聊天紀錄（這裡你之後可以改成真的用 IndexedDB）
 onMounted(async () => {
-  const friendId = route.params.id;
-
-  const { data: me } = await apiClient.get("/auth/me");
-  currentUser = me;
-
-  const { data: friendData } = await apiClient.get(`/users/${friendId}`);
-  friend.value = friendData;
-
-  await chatStore.initDB();
-  messages.value = await chatStore.loadMessages(currentUser.id, friendId);
-
-  socket.value = io("wss://message-board-server-7yot.onrender.com", {
-    query: { userId: currentUser.id },
-  });
-
-  socket.value.on("receiveMessage", async (message) => {
-    await chatStore.saveMessage(message);
-    if (message.chatId === chatStore.getChatId(currentUser.id, friendId)) {
-      messages.value.push(message);
-      socket.value.emit("markAsRead", {
-        messageId: message.id,
-        senderId: message.senderId,
-      });
-    }
-  });
-
-  socket.value.on("messageRead", ({ messageId }) => {
-    const msg = messages.value.find((m) => m.id === messageId);
-    if (msg) {
-      msg.isRead = true;
-      chatStore.saveMessage(msg);
-    }
-  });
+  const storedMessages = JSON.parse(localStorage.getItem(getChatKey())) || [];
+  messages.value = storedMessages;
 });
 
-onUnmounted(() => {
-  socket.value.disconnect();
-});
+// 發送訊息
+function sendMessage() {
+  if (!newMessage.value.trim()) return;
 
-async function handleFileUpload(event) {
-  selectedFile.value = event.target.files[0];
+  const message = {
+    id: Date.now(),
+    sender: "me",
+    content: newMessage.value,
+  };
+  messages.value.push(message);
+  saveMessages();
+  newMessage.value = "";
 }
 
-async function sendMessage() {
-  const friendId = route.params.id;
-  const message = await chatStore.createMessage(
-    currentUser,
-    friendId,
-    newMessage.value,
-    selectedFile.value
-  );
-  socket.value.emit("sendMessage", message);
-  messages.value.push(message);
-  newMessage.value = "";
-  selectedFile.value = null;
+// 存入 IndexedDB（這裡示意用 localStorage，你之後改成 IndexedDB）
+function saveMessages() {
+  localStorage.setItem(getChatKey(), JSON.stringify(messages.value));
+}
+
+// 取得這個聊天室的存檔 key
+function getChatKey() {
+  return `chat_with_${friend.value.id}`;
 }
 </script>
 
 <style scoped>
-.unread {
-  color: red;
+.chat-room {
+  display: flex;
+  flex-direction: column;
+  height: 100vh;
+}
+.header {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  padding: 12px;
+  background-color: #f0f0f0;
+  border-bottom: 1px solid #ddd;
+}
+.avatar {
+  width: 50px;
+  height: 50px;
+  border-radius: 50%;
+  object-fit: cover;
+}
+.friend-info {
+  display: flex;
+  flex-direction: column;
+}
+.name {
+  font-weight: bold;
+}
+.chat-content {
+  flex: 1;
+  overflow-y: auto;
+  padding: 12px;
+  background-color: #fafafa;
+}
+.message {
+  padding: 8px 12px;
+  margin: 4px 0;
+  border-radius: 16px;
+  max-width: 60%;
+  word-wrap: break-word;
+}
+.me {
+  align-self: flex-end;
+  background-color: #dcf8c6;
+}
+.friend {
+  align-self: flex-start;
+  background-color: #fff;
+  border: 1px solid #ddd;
+}
+.chat-input {
+  display: flex;
+  gap: 8px;
+  padding: 12px;
+  background-color: #f0f0f0;
+  border-top: 1px solid #ddd;
+}
+.chat-input input {
+  flex: 1;
+  padding: 8px;
+  border: 1px solid #ccc;
+  border-radius: 4px;
+}
+.chat-input button {
+  padding: 8px 16px;
+  background-color: #007bff;
+  color: white;
+  border: none;
+  border-radius: 4px;
+  cursor: pointer;
 }
 </style>
