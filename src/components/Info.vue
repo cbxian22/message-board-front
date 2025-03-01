@@ -485,7 +485,7 @@ const handledeleteFriend = () => {
     positiveText: "确定",
     negativeText: "取消",
     onPositiveClick: () => {
-      deleteFriend();
+      deleteFriend;
     },
   });
 };
