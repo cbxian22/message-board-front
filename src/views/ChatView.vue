@@ -501,22 +501,26 @@ export default {
     },
     async sendMessage() {
       if (this.newMessage.trim() || this.selectedFile) {
+        // 確保 receiverId 是有效的
+        if (!this.friendId) {
+          console.error("接收者 ID (friendId) 未設定！");
+          return;
+        }
+
         const message = {
-          id: Date.now(),
-          senderId: this.currentUser.id,
-          receiverId: this.friend.id,
+          senderId: this.currentUserId,
+          receiverId: this.friendId, // 這裡確保使用的是 friendId
           content: this.newMessage,
           media: this.selectedFile
             ? await this.processFile(this.selectedFile)
             : null,
-          isRead: false,
-          createdAt: new Date(),
         };
+        console.log("發送消息:", message);
 
+        // 發送訊息
         this.socket.emit("sendMessage", message);
-        this.messages.push(message);
-        await this.saveMessage(message);
 
+        // 清空輸入框
         this.newMessage = "";
         this.selectedFile = null;
       }
