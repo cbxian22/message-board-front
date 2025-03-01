@@ -88,11 +88,13 @@ const handleLoaded = () => {
 </script>
 
 <style scoped>
+/* 安插 singleComment 容器 */
 .container-box {
-  width: 100%;
-  max-width: 650px;
-  margin: 100px auto;
-  background-color: var(--n-body-color);
+  width: 650px;
+  display: flex;
+  flex-direction: column;
+  justify-self: center;
+  margin: 100px 0;
 }
 
 .aru {
