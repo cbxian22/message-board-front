@@ -7,7 +7,7 @@ import {
   NDrawer,
   useLoadingBar,
   useMessage,
-  // useDialog,
+  useDialog,
 } from "naive-ui";
 import { useAuthStore } from "../stores/authStore";
 import { useThemeStore } from "../stores/themeStore";
@@ -25,7 +25,7 @@ const loadingBar = useLoadingBar();
 const router = useRouter();
 const authStore = useAuthStore();
 const message = useMessage();
-// const dialog = useDialog();
+const dialog = useDialog();
 
 const loggedInUser = ref(authStore.userName);
 const show = ref(false);
@@ -480,14 +480,13 @@ const handleDelete = async () => {
 
 // 直接定義方法
 const handledeleteFriend = () => {
-  dialog.success({
+  dialog.warning({
     title: "關閉",
     content: "你确定要解除好友嗎？解除後需重新加入才瀏覽看私人帳號！",
     positiveText: "确定",
     negativeText: "取消",
     onPositiveClick: () => {
-      deleteFriend();
-      message.success("已成功解除好友！");
+      deleteFriend;
     },
   });
 };
