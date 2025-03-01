@@ -71,7 +71,7 @@
 
 <script setup>
 import { ref, nextTick, watch, computed } from "vue";
-import { NButton, useLoadingBar, useMessag, useDialog } from "naive-ui";
+import { NButton, useLoadingBar, useMessage, useDialog } from "naive-ui";
 import { useSocketStore } from "../stores/socketStore";
 import { useAuthStore } from "../stores/authStore";
 import apiClient from "../stores/axiosConfig"; // 引入 apiClient
@@ -81,7 +81,7 @@ import Noteicon from "../assets/Noteicon.svg";
 import Closeicon from "../assets/Closeicon.svg";
 
 const authStore = useAuthStore();
-const message = useMessag();
+const message = useMessage();
 const dialog = useDialog();
 const socketStore = useSocketStore();
 const loadingBar = useLoadingBar();
