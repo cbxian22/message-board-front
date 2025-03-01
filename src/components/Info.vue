@@ -716,6 +716,7 @@ const handleDelete = async () => {
 }
 .friend-request-actions .n-button {
   flex: 1;
+  width: 100%;
 }
 
 .form-mod {
