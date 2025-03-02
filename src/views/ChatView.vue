@@ -1,15 +1,32 @@
-<!-- chatView.vue
+<!-- chatView.vue -->
 <template>
   <div>
     <ul>
-      <li v-for="msg in messages" :key="msg.id" :class="{ unread: !msg.isRead }">
+      <li v-for="msg in messages" :key="msg.id">
         <span>{{ msg.content }}</span>
-        <img v-if="msg.media && msg.media.type === 'image'" :src="msg.media.data" alt="圖片" style="max-width: 200px" />
-        <video v-if="msg.media && msg.media.type === 'video'" controls :src="msg.media.data" style="max-width: 200px"></video>
-        <span>{{ msg.isRead ? "已讀" : "未讀" }}</span>
+        <img
+          v-if="msg.media && msg.media.type === 'image'"
+          :src="msg.media.data"
+          alt="圖片"
+          style="max-width: 200px"
+        />
+        <video
+          v-if="msg.media && msg.media.type === 'video'"
+          controls
+          :src="msg.media.data"
+          style="max-width: 200px"
+        ></video>
+        <!-- 僅在自己發送的消息上顯示已讀/未讀 -->
+        <span v-if="msg.senderId === currentUserId">{{
+          msg.isRead ? "已讀" : "未讀"
+        }}</span>
       </li>
     </ul>
-    <input v-model="newMessage" @keyup.enter="sendMessage" placeholder="輸入文字" />
+    <input
+      v-model="newMessage"
+      @keyup.enter="sendMessage"
+      placeholder="輸入文字"
+    />
     <input type="file" accept="image/*,video/*" @change="handleFileUpload" />
     <button @click="sendMessage">發送</button>
   </div>
@@ -18,7 +35,7 @@
 <script>
 import { io } from "socket.io-client";
 import { openDB } from "idb";
-import apiClient from "../path/to/apiClient"; // 調整為你的實際路徑
+import apiClient from "../stores/axiosConfig"; // 調整路徑
 
 export default {
   data() {
@@ -40,18 +57,19 @@ export default {
     });
     await this.loadMessages();
 
-    // 使用 apiClient 獲取當前用戶 ID
     try {
       const response = await apiClient.get("/auth/me");
-      this.currentUserId = response.data.id.toString(); // 後端返回的是 id
+      this.currentUserId = response.data.id.toString();
       console.log("當前用戶 ID:", this.currentUserId);
     } catch (err) {
-      console.error("獲取用戶 ID 失敗:", err.response?.data?.message || err.message);
-      this.currentUserId = "2"; // 預設值，測試用
+      console.error(
+        "獲取用戶 ID 失敗:",
+        err.response?.data?.message || err.message
+      );
+      this.currentUserId = "2"; // 預設值
     }
 
-    // 測試用，手動設置 friendId，實際應從好友列表選擇
-    this.friendId = this.currentUserId === "2" ? "4" : "2";
+    this.friendId = this.currentUserId === "2" ? "4" : "2"; // 測試用
 
     this.socket = io("wss://message-board-server-7yot.onrender.com", {
       query: { userId: this.currentUserId },
@@ -83,9 +101,19 @@ export default {
     this.socket.on("messageRead", ({ messageId }) => {
       console.log("消息已讀:", messageId);
       const msg = this.messages.find((m) => m.id === messageId);
-      if (msg) {
+      if (msg && msg.senderId === this.currentUserId) {
         msg.isRead = true;
         this.updateMessage(msg);
+      }
+    });
+
+    this.socket.on("offlineMessages", async (messages) => {
+      console.log("收到離線消息:", messages);
+      for (const message of messages) {
+        await this.saveMessage(message);
+        if (!this.messages.some((m) => m.id === message.id)) {
+          this.messages.push(message);
+        }
       }
     });
   },
@@ -96,7 +124,9 @@ export default {
           senderId: this.currentUserId,
           receiverId: this.friendId,
           content: this.newMessage,
-          media: this.selectedFile ? await this.processFile(this.selectedFile) : null,
+          media: this.selectedFile
+            ? await this.processFile(this.selectedFile)
+            : null,
         };
         console.log("發送消息:", message);
         this.socket.emit("sendMessage", message);
@@ -133,8 +163,10 @@ export default {
       const allMessages = await this.db.getAll("messages");
       this.messages = allMessages.filter(
         (msg) =>
-          (msg.senderId === this.currentUserId && msg.receiverId === this.friendId) ||
-          (msg.senderId === this.friendId && msg.receiverId === this.currentUserId)
+          (msg.senderId === this.currentUserId &&
+            msg.receiverId === this.friendId) ||
+          (msg.senderId === this.friendId &&
+            msg.receiverId === this.currentUserId)
       );
     },
     markAsRead(messageId, senderId) {
@@ -153,9 +185,9 @@ export default {
   font-weight: bold;
   color: red;
 }
-</style> -->
+</style>
 <!-- chatView.vue -->
-<template>
+<!-- <template>
   <div>
     <ul>
       <li
@@ -354,4 +386,4 @@ export default {
   font-weight: bold;
   color: red;
 }
-</style>
+</style> -->
