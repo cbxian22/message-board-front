@@ -635,6 +635,7 @@ export default {
 </style> -->
 
 <!-- chatView.vue -->
+<!-- chatView.vue -->
 <template>
   <div>
     <ul>
@@ -737,9 +738,11 @@ export default {
       console.log("收到消息已讀通知:", messageId);
       let msg = this.messages.find((m) => m.id === messageId);
       if (msg) {
-        this.$set(msg, "isRead", true);
+        msg.isRead = true; // 直接修改屬性
         await this.updateMessage(msg);
         console.log("更新現有消息已讀狀態:", msg);
+        // 確保 UI 更新
+        this.messages = [...this.messages];
       } else {
         console.log(
           `消息 ${messageId} 未在當前 messages 中，嘗試從 IndexedDB 載入`
