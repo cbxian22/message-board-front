@@ -418,6 +418,7 @@ export default {
 </style> -->
 
 <!-- chatView.vue  version 3-->
+<!-- chatView.vue -->
 <template>
   <div>
     <ul>
@@ -532,6 +533,8 @@ export default {
           await this.saveMessage(missingMsg);
           this.addOrUpdateMessage(missingMsg);
           console.log("從 IndexedDB 載入並更新消息:", missingMsg);
+        } else {
+          console.log(`消息 ${messageId} 在 IndexedDB 中也未找到`);
         }
       }
     });
