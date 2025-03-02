@@ -291,7 +291,7 @@ export default {
       console.log("收到消息:", message);
       await this.saveMessage(message);
       this.addOrUpdateMessage(message);
-      if (message.receiverId === this.currentUserId) {
+      if (message.receiverId === this.currentUserId && !message.isRead) {
         this.markAsRead(message.id, message.senderId, message.receiverId);
       }
     });
@@ -310,8 +310,7 @@ export default {
         await this.updateMessage(msg);
         console.log("更新消息已讀狀態:", msg);
       } else {
-        console.log(`消息 ${messageId} 未找到，可能不在當前對話中`);
-        // 如果消息不在當前對話中，從 IndexedDB 重新載入
+        console.log(`消息 ${messageId} 未找到，嘗試從 IndexedDB 載入`);
         const allMessages = await this.db.getAll("messages");
         const missingMsg = allMessages.find((m) => m.id === messageId);
         if (missingMsg) {
