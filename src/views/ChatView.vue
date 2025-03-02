@@ -306,9 +306,20 @@ export default {
       console.log("收到消息已讀通知:", messageId);
       const msg = this.messages.find((m) => m.id === messageId);
       if (msg) {
-        msg.isRead = true;
+        this.$set(msg, "isRead", true); // 確保 Vue 響應性
         await this.updateMessage(msg);
         console.log("更新消息已讀狀態:", msg);
+      } else {
+        console.log(`消息 ${messageId} 未找到，可能不在當前對話中`);
+        // 如果消息不在當前對話中，從 IndexedDB 重新載入
+        const allMessages = await this.db.getAll("messages");
+        const missingMsg = allMessages.find((m) => m.id === messageId);
+        if (missingMsg) {
+          missingMsg.isRead = true;
+          await this.saveMessage(missingMsg);
+          this.addOrUpdateMessage(missingMsg);
+          console.log("從 IndexedDB 載入並更新消息:", missingMsg);
+        }
       }
     });
 
