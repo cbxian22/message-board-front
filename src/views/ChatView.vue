@@ -83,6 +83,7 @@ export default {
 
     this.socket.on("receiveMessage", async (message) => {
       console.log("收到消息:", message);
+      message.createdAt = message.createdAt.toString(); // 轉為字符串
       await this.saveMessage(message);
       this.addOrUpdateMessage(message);
       if (message.receiverId === this.currentUserId) {
@@ -92,6 +93,7 @@ export default {
 
     this.socket.on("messageSent", async (message) => {
       console.log("消息已發送:", message);
+      message.createdAt = message.createdAt.toString(); // 轉為字符串
       await this.saveMessage(message);
       this.addOrUpdateMessage(message);
     });
@@ -108,8 +110,12 @@ export default {
     this.socket.on("offlineMessages", async (messages) => {
       console.log("收到離線消息:", messages);
       for (const message of messages) {
+        message.createdAt = message.createdAt.toString(); // 轉為字符串
         await this.saveMessage(message);
         this.addOrUpdateMessage(message);
+        if (message.receiverId === this.currentUserId) {
+          this.markAsRead(message.id, message.senderId); // 離線消息上線後標記已讀
+        }
       }
     });
   },
@@ -147,12 +153,12 @@ export default {
     },
     async saveMessage(message) {
       const tx = this.db.transaction("messages", "readwrite");
-      await tx.store.put(message);
+      await tx.store.put({ ...message }); // 複製物件避免不可序列化問題
       await tx.done;
     },
     async updateMessage(message) {
       const tx = this.db.transaction("messages", "readwrite");
-      await tx.store.put(message);
+      await tx.store.put({ ...message }); // 複製物件避免不可序列化問題
       await tx.done;
     },
     async loadMessages() {
@@ -170,7 +176,7 @@ export default {
       if (existingMsg) {
         Object.assign(existingMsg, message); // 更新現有消息
       } else {
-        this.messages.push(message); // 添加新消息
+        this.messages.push({ ...message }); // 添加新消息，複製以避免引用問題
       }
     },
     markAsRead(messageId, senderId) {
