@@ -54,7 +54,7 @@ export default {
       },
     });
 
-    // 先載入歷史消息
+    // 先載入歷史消息並更新 messages
     await this.loadMessages();
 
     try {
@@ -70,6 +70,7 @@ export default {
     }
 
     this.friendId = this.currentUserId === "2" ? "4" : "2"; // 測試用
+    await this.loadMessages(); // 在設置 friendId 後再次載入，確保過濾正確
 
     this.socket = io("wss://message-board-server-7yot.onrender.com", {
       query: { userId: this.currentUserId },
@@ -172,13 +173,15 @@ export default {
     async loadMessages() {
       const allMessages = await this.db.getAll("messages");
       console.log("從 IndexedDB 載入消息:", allMessages);
-      this.messages = allMessages.filter(
+      const filteredMessages = allMessages.filter(
         (msg) =>
           (msg.senderId === this.currentUserId &&
             msg.receiverId === this.friendId) ||
           (msg.senderId === this.friendId &&
             msg.receiverId === this.currentUserId)
       );
+      this.messages = [...filteredMessages]; // 直接賦值觸發響應式更新
+      console.log("更新後的 messages 陣列:", this.messages);
     },
     addOrUpdateMessage(message) {
       const existingMsg = this.messages.find((m) => m.id === message.id);
