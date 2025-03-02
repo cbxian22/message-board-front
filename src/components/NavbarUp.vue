@@ -7,13 +7,11 @@
     <div>
       <ul>
         <li v-if="authStore.isLoggedIn">
-          <router-link to="/chat" class="nav-link">
+          <router-link to="/chatlist" class="nav-link">
             <img :src="Sendicon" alt="Sendicon" />
           </router-link>
         </li>
-        <li v-if="authStore.isLoggedIn">
-          <router-link to="/chatlist" class="nav-link"> chatlist </router-link>
-        </li>
+
         <li v-if="authStore.isLoggedIn">
           <router-link to="/friendslist" class="nav-link">
             Friendslist
