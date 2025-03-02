@@ -192,7 +192,7 @@ export default {
 <script>
 import { io } from "socket.io-client";
 import { openDB } from "idb";
-import apiClient from "../path/to/apiClient"; // 調整路徑
+import apiClient from "../stores/axiosConfig"; // 調整路徑
 
 export default {
   data() {
