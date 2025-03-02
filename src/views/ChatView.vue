@@ -203,6 +203,7 @@ export default {
 </style> -->
 
 <!-- chatView.vue  version 2 -->
+<!-- chatView.vue -->
 <template>
   <div>
     <ul>
@@ -291,7 +292,7 @@ export default {
       await this.saveMessage(message);
       this.addOrUpdateMessage(message);
       if (message.receiverId === this.currentUserId) {
-        this.markAsRead(message.id, message.senderId);
+        this.markAsRead(message.id, message.senderId, message.receiverId);
       }
     });
 
@@ -317,7 +318,7 @@ export default {
         await this.saveMessage(message);
         this.addOrUpdateMessage(message);
         if (message.receiverId === this.currentUserId && !message.isRead) {
-          this.markAsRead(message.id, message.senderId);
+          this.markAsRead(message.id, message.senderId, message.receiverId);
         }
       }
     });
@@ -388,9 +389,9 @@ export default {
         this.messages.push({ ...message });
       }
     },
-    markAsRead(messageId, senderId) {
-      console.log("標記已讀:", { messageId, senderId });
-      this.socket.emit("markAsRead", { messageId, senderId });
+    markAsRead(messageId, senderId, receiverId) {
+      console.log("標記已讀:", { messageId, senderId, receiverId });
+      this.socket.emit("markAsRead", { messageId, senderId, receiverId });
     },
   },
   beforeUnmount() {
