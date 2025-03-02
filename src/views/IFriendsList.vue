@@ -40,7 +40,7 @@ const fetchFriends = async () => {
 
 // 跳轉到聊天頁面
 const goToChat = (friendId) => {
-  router.push({ name: "ChatView", params: { friendId } });
+  router.push({ name: "Chat", params: { friendId } });
 };
 
 // 頁面掛載時執行
