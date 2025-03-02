@@ -506,6 +506,7 @@ onBeforeUnmount(() => {
 
 <script setup>
 import { ref, onMounted, onBeforeUnmount } from "vue";
+import { useRouter } from "vue-router"; // 引入 useRouter
 import { io } from "socket.io-client";
 import { openDB } from "idb";
 import apiClient from "../stores/axiosConfig";
@@ -513,6 +514,8 @@ import apiClient from "../stores/axiosConfig";
 const props = defineProps({
   friendId: String, // 從路由參數接收 friendId
 });
+
+const router = useRouter(); // 使用路由器進行跳轉
 
 // 定義響應式變數
 const socket = ref(null);
@@ -617,106 +620,46 @@ const fetchFriendName = async () => {
   }
 };
 
-// 頁面掛載時執行
-onMounted(async () => {
-  db.value = await openDB("chatDB", 1, {
-    upgrade(db) {
-      db.createObjectStore("messages", { keyPath: "id" });
-    },
-  });
-
+// 獲取當前用戶 ID
+const fetchCurrentUser = async () => {
   try {
     const response = await apiClient.get("/auth/me");
     currentUserId.value = response.data.id.toString();
     console.log("當前用戶 ID:", currentUserId.value);
-  } catch (err) {
-    console.error(
-      "獲取用戶 ID 失敗:",
-      err.response?.data?.message || err.message
-    );
-    currentUserId.value = "2"; // 預設值
-  }
+    // 只有在成功獲取用戶 ID 後才繼續後續初始化
+    await fetchFriendName();
+    await loadMessages();
 
-  await fetchFriendName();
-  await loadMessages();
+    socket.value = io("wss://message-board-server-7yot.onrender.com", {
+      query: { userId: currentUserId.value },
+    });
 
-  socket.value = io("wss://message-board-server-7yot.onrender.com", {
-    query: { userId: currentUserId.value },
-  });
+    socket.value.on("connect", () => {
+      console.log("WebSocket 連接成功");
+    });
 
-  socket.value.on("connect", () => {
-    console.log("WebSocket 連接成功");
-  });
+    socket.value.on("connect_error", (err) => {
+      console.log("WebSocket 連接錯誤:", err);
+    });
 
-  socket.value.on("connect_error", (err) => {
-    console.log("WebSocket 連接錯誤:", err);
-  });
-
-  socket.value.on("receiveMessage", async (message) => {
-    console.log("收到消息:", message);
-    await saveMessage(message);
-    if (
-      (message.senderId === props.friendId &&
-        message.receiverId === currentUserId.value) ||
-      (message.receiverId === props.friendId &&
-        message.senderId === currentUserId.value)
-    ) {
-      addOrUpdateMessage(message);
-    }
-    if (message.receiverId === currentUserId.value && !message.isRead) {
-      markAsRead(message.id, message.senderId, message.receiverId);
-    }
-  });
-
-  socket.value.on("messageSent", async (message) => {
-    console.log("消息已發送:", message);
-    await saveMessage(message);
-    if (
-      (message.senderId === currentUserId.value &&
-        message.receiverId === props.friendId) ||
-      (message.receiverId === currentUserId.value &&
-        message.senderId === props.friendId)
-    ) {
-      addOrUpdateMessage(message);
-    }
-  });
-
-  socket.value.on("messageRead", async ({ messageId }) => {
-    console.log("收到消息已讀通知:", messageId);
-    let msg = messages.value.find((m) => m.id === messageId);
-    if (msg) {
-      msg.isRead = true;
-      await updateMessage(msg);
-      console.log("更新現有消息已讀狀態:", msg);
-      messages.value = [...messages.value];
-    } else {
-      console.log(
-        `消息 ${messageId} 未在當前 messages 中，嘗試從 IndexedDB 載入`
-      );
-      const allMessages = await db.value.getAll("messages");
-      const missingMsg = allMessages.find((m) => m.id === messageId);
-      if (missingMsg) {
-        missingMsg.isRead = true;
-        await saveMessage(missingMsg);
-        if (
-          (missingMsg.senderId === currentUserId.value &&
-            missingMsg.receiverId === props.friendId) ||
-          (missingMsg.receiverId === currentUserId.value &&
-            missingMsg.senderId === props.friendId)
-        ) {
-          addOrUpdateMessage(missingMsg);
-          console.log("從 IndexedDB 載入並更新消息:", missingMsg);
-          messages.value = [...messages.value];
-        }
-      } else {
-        console.log(`消息 ${messageId} 在 IndexedDB 中也未找到`);
+    socket.value.on("receiveMessage", async (message) => {
+      console.log("收到消息:", message);
+      await saveMessage(message);
+      if (
+        (message.senderId === props.friendId &&
+          message.receiverId === currentUserId.value) ||
+        (message.receiverId === props.friendId &&
+          message.senderId === currentUserId.value)
+      ) {
+        addOrUpdateMessage(message);
       }
-    }
-  });
+      if (message.receiverId === currentUserId.value && !message.isRead) {
+        markAsRead(message.id, message.senderId, message.receiverId);
+      }
+    });
 
-  socket.value.on("syncMessages", async (messagesData) => {
-    console.log("收到短期同步消息:", messagesData);
-    for (const message of messagesData) {
+    socket.value.on("messageSent", async (message) => {
+      console.log("消息已發送:", message);
       await saveMessage(message);
       if (
         (message.senderId === currentUserId.value &&
@@ -726,16 +669,83 @@ onMounted(async () => {
       ) {
         addOrUpdateMessage(message);
       }
-      if (message.receiverId === currentUserId.value && !message.isRead) {
-        markAsRead(message.id, message.senderId, message.receiverId);
+    });
+
+    socket.value.on("messageRead", async ({ messageId }) => {
+      console.log("收到消息已讀通知:", messageId);
+      let msg = messages.value.find((m) => m.id === messageId);
+      if (msg) {
+        msg.isRead = true;
+        await updateMessage(msg);
+        console.log("更新現有消息已讀狀態:", msg);
+        messages.value = [...messages.value];
+      } else {
+        console.log(
+          `消息 ${messageId} 未在當前 messages 中，嘗試從 IndexedDB 載入`
+        );
+        const allMessages = await db.value.getAll("messages");
+        const missingMsg = allMessages.find((m) => m.id === messageId);
+        if (missingMsg) {
+          missingMsg.isRead = true;
+          await saveMessage(missingMsg);
+          if (
+            (missingMsg.senderId === currentUserId.value &&
+              missingMsg.receiverId === props.friendId) ||
+            (missingMsg.receiverId === currentUserId.value &&
+              missingMsg.senderId === props.friendId)
+          ) {
+            addOrUpdateMessage(missingMsg);
+            console.log("從 IndexedDB 載入並更新消息:", missingMsg);
+            messages.value = [...messages.value];
+          }
+        } else {
+          console.log(`消息 ${messageId} 在 IndexedDB 中也未找到`);
+        }
       }
-    }
+    });
+
+    socket.value.on("syncMessages", async (messagesData) => {
+      console.log("收到短期同步消息:", messagesData);
+      for (const message of messagesData) {
+        await saveMessage(message);
+        if (
+          (message.senderId === currentUserId.value &&
+            message.receiverId === props.friendId) ||
+          (message.receiverId === currentUserId.value &&
+            message.senderId === props.friendId)
+        ) {
+          addOrUpdateMessage(message);
+        }
+        if (message.receiverId === currentUserId.value && !message.isRead) {
+          markAsRead(message.id, message.senderId, message.receiverId);
+        }
+      }
+    });
+  } catch (err) {
+    console.error(
+      "獲取用戶 ID 失敗:",
+      err.response?.data?.message || err.message
+    );
+    router.push("/login"); // 跳轉至登入頁面
+  }
+};
+
+// 頁面掛載時執行
+onMounted(async () => {
+  db.value = await openDB("chatDB", 1, {
+    upgrade(db) {
+      db.createObjectStore("messages", { keyPath: "id" });
+    },
   });
+
+  await fetchCurrentUser(); // 將所有初始化邏輯移至 fetchCurrentUser 內
 });
 
 // 頁面卸載前斷開 WebSocket
 onBeforeUnmount(() => {
-  socket.value.disconnect();
+  if (socket.value) {
+    socket.value.disconnect();
+  }
 });
 </script>
 

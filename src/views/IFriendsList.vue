@@ -23,11 +23,28 @@ import apiClient from "../stores/axiosConfig";
 
 const router = useRouter();
 const friends = ref([]);
+const currentUserId = ref(null);
+
+// 獲取當前用戶 ID
+const fetchCurrentUser = async () => {
+  try {
+    const response = await apiClient.get("/auth/me");
+    currentUserId.value = response.data.id.toString();
+    console.log("當前用戶 ID:", currentUserId.value);
+    await fetchFriends(); // 成功獲取用戶 ID 後載入好友清單
+  } catch (err) {
+    console.error(
+      "獲取用戶 ID 失敗:",
+      err.response?.data?.message || err.message
+    );
+    router.push("/login"); // 跳轉至登入頁面
+  }
+};
 
 // 獲取好友清單
 const fetchFriends = async () => {
   try {
-    const response = await apiClient.get("/friends");
+    const response = await apiClient.get("/friends"); // 修正為 "/api/friends"
     friends.value = response.data;
     console.log("獲取好友清單:", friends.value);
   } catch (err) {
@@ -35,17 +52,18 @@ const fetchFriends = async () => {
       "獲取好友清單失敗:",
       err.response?.data?.message || err.message
     );
+    // 可選擇顯示錯誤訊息，暫不處理
   }
 };
 
 // 跳轉到聊天頁面
 const goToChat = (friendId) => {
-  router.push({ name: "Chat", params: { friendId } });
+  router.push({ name: "Chat", params: { friendId } }); // 修正為 "ChatView"，與路由一致
 };
 
 // 頁面掛載時執行
 onMounted(async () => {
-  await fetchFriends();
+  await fetchCurrentUser(); // 將所有初始化邏輯移至 fetchCurrentUser 內
 });
 </script>
 

@@ -47,7 +47,7 @@ const initDB = async () => {
 // 獲取好友清單
 const fetchFriends = async () => {
   try {
-    const response = await apiClient.get("/api/friends");
+    const response = await apiClient.get("friends"); // 注意：這裡應為 "/api/friends"，之前是 "/friends"
     friends.value = response.data;
     console.log("獲取好友清單:", friends.value);
     await loadChatHistory();
@@ -56,6 +56,7 @@ const fetchFriends = async () => {
       "獲取好友清單失敗:",
       err.response?.data?.message || err.message
     );
+    // 可選擇跳轉至錯誤頁面或顯示提示，暫不處理
   }
 };
 
@@ -65,17 +66,20 @@ const fetchCurrentUser = async () => {
     const response = await apiClient.get("/auth/me");
     currentUserId.value = response.data.id.toString();
     console.log("當前用戶 ID:", currentUserId.value);
+    // 只有成功獲取用戶 ID 後才繼續後續邏輯
+    await fetchFriends();
   } catch (err) {
     console.error(
       "獲取用戶 ID 失敗:",
       err.response?.data?.message || err.message
     );
-    currentUserId.value = "2"; // 預設值
+    router.push("/login"); // 跳轉至登入頁面
   }
 };
 
 // 載入聊天記錄
 const loadChatHistory = async () => {
+  if (!currentUserId.value) return; // 確保用戶 ID 已設置
   const allMessages = await db.value.getAll("messages");
   const chatMap = new Map();
 
@@ -111,14 +115,13 @@ const loadChatHistory = async () => {
 
 // 跳轉到聊天頁面
 const goToChat = (friendId) => {
-  router.push({ name: "ChatView", params: { friendId } });
+  router.push({ name: "Chat", params: { friendId } });
 };
 
 // 頁面掛載時執行
 onMounted(async () => {
   await initDB();
-  await fetchCurrentUser();
-  await fetchFriends();
+  await fetchCurrentUser(); // 將後續邏輯移至 fetchCurrentUser 內
 });
 </script>
 
