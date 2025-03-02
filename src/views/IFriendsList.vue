@@ -27,7 +27,7 @@ const friends = ref([]);
 // 獲取好友清單
 const fetchFriends = async () => {
   try {
-    const response = await apiClient.get("/api/friends");
+    const response = await apiClient.get("/friends");
     friends.value = response.data;
     console.log("獲取好友清單:", friends.value);
   } catch (err) {
