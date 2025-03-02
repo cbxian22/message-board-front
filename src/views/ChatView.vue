@@ -16,7 +16,6 @@
           :src="msg.media.data"
           style="max-width: 200px"
         ></video>
-
         <span v-if="msg.senderId === currentUserId && msg.isRead">已讀</span>
       </li>
     </ul>
@@ -33,7 +32,7 @@
 <script>
 import { io } from "socket.io-client";
 import { openDB } from "idb";
-import apiClient from "../stores/axiosConfig"; // 調整路徑
+import apiClient from "../stores/axiosConfig";
 
 export default {
   data() {
@@ -54,7 +53,6 @@ export default {
       },
     });
 
-    // 先載入歷史消息並更新 messages
     await this.loadMessages();
 
     try {
@@ -70,7 +68,7 @@ export default {
     }
 
     this.friendId = this.currentUserId === "2" ? "4" : "2"; // 測試用
-    await this.loadMessages(); // 在設置 friendId 後再次載入，確保過濾正確
+    await this.loadMessages(); // 確保過濾正確
 
     this.socket = io("wss://message-board-server-7yot.onrender.com", {
       query: { userId: this.currentUserId },
@@ -86,7 +84,6 @@ export default {
 
     this.socket.on("receiveMessage", async (message) => {
       console.log("收到消息:", message);
-      message.createdAt = message.createdAt.toString(); // 確保可序列化
       await this.saveMessage(message);
       this.addOrUpdateMessage(message);
       if (message.receiverId === this.currentUserId) {
@@ -96,7 +93,6 @@ export default {
 
     this.socket.on("messageSent", async (message) => {
       console.log("消息已發送:", message);
-      message.createdAt = message.createdAt.toString(); // 確保可序列化
       await this.saveMessage(message);
       this.addOrUpdateMessage(message);
     });
@@ -111,14 +107,13 @@ export default {
       }
     });
 
-    this.socket.on("offlineMessages", async (messages) => {
-      console.log("收到離線消息:", messages);
+    this.socket.on("syncMessages", async (messages) => {
+      console.log("收到短期同步消息:", messages);
       for (const message of messages) {
-        message.createdAt = message.createdAt.toString(); // 確保可序列化
         await this.saveMessage(message);
         this.addOrUpdateMessage(message);
         if (message.receiverId === this.currentUserId) {
-          this.markAsRead(message.id, message.senderId); // 處理離線消息的已讀
+          this.markAsRead(message.id, message.senderId);
         }
       }
     });
@@ -157,14 +152,13 @@ export default {
     },
     async saveMessage(message) {
       const tx = this.db.transaction("messages", "readwrite");
-      await tx.store.put({ ...message }); // 複製物件避免不可序列化問題
+      await tx.store.put({ ...message });
       await tx.done;
     },
     async updateMessage(message) {
       const tx = this.db.transaction("messages", "readwrite");
-      await tx.store.put({ ...message }); // 複製物件避免不可序列化問題
+      await tx.store.put({ ...message });
       await tx.done;
-      // 更新 messages 陣列
       const msg = this.messages.find((m) => m.id === message.id);
       if (msg) {
         Object.assign(msg, message);
@@ -173,22 +167,21 @@ export default {
     async loadMessages() {
       const allMessages = await this.db.getAll("messages");
       console.log("從 IndexedDB 載入消息:", allMessages);
-      const filteredMessages = allMessages.filter(
+      this.messages = allMessages.filter(
         (msg) =>
           (msg.senderId === this.currentUserId &&
             msg.receiverId === this.friendId) ||
           (msg.senderId === this.friendId &&
             msg.receiverId === this.currentUserId)
       );
-      this.messages = [...filteredMessages]; // 直接賦值觸發響應式更新
       console.log("更新後的 messages 陣列:", this.messages);
     },
     addOrUpdateMessage(message) {
       const existingMsg = this.messages.find((m) => m.id === message.id);
       if (existingMsg) {
-        Object.assign(existingMsg, message); // 更新現有消息
+        Object.assign(existingMsg, message);
       } else {
-        this.messages.push({ ...message }); // 添加新消息
+        this.messages.push({ ...message });
       }
     },
     markAsRead(messageId, senderId) {
@@ -308,12 +301,12 @@ export default {
       this.addOrUpdateMessage(message);
     });
 
-    this.socket.on("messageRead", ({ messageId }) => {
+    this.socket.on("messageRead", async ({ messageId }) => {
       console.log("消息已讀:", messageId);
       const msg = this.messages.find((m) => m.id === messageId);
       if (msg && msg.senderId === this.currentUserId) {
         msg.isRead = true;
-        this.updateMessage(msg);
+        await this.updateMessage(msg); // 更新 IndexedDB 和 messages
         console.log("更新發送者已讀狀態:", msg);
       }
     });
@@ -323,7 +316,8 @@ export default {
       for (const message of messages) {
         await this.saveMessage(message);
         this.addOrUpdateMessage(message);
-        if (message.receiverId === this.currentUserId) {
+        // 如果消息已讀且是自己的，確保本地同步
+        if (message.receiverId === this.currentUserId && message.isRead) {
           this.markAsRead(message.id, message.senderId);
         }
       }
