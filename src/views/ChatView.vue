@@ -16,10 +16,8 @@
           :src="msg.media.data"
           style="max-width: 200px"
         ></video>
-        <!-- 僅在自己發送的消息上顯示已讀/未讀 -->
-        <span v-if="msg.senderId === currentUserId">{{
-          msg.isRead ? "已讀" : "未讀"
-        }}</span>
+        <!-- 僅在自己發送且已讀時顯示「已讀」 -->
+        <span v-if="msg.senderId === currentUserId && msg.isRead">已讀</span>
       </li>
     </ul>
     <input
@@ -86,7 +84,7 @@ export default {
     this.socket.on("receiveMessage", async (message) => {
       console.log("收到消息:", message);
       await this.saveMessage(message);
-      this.messages.push(message);
+      this.addOrUpdateMessage(message);
       if (message.receiverId === this.currentUserId) {
         this.markAsRead(message.id, message.senderId);
       }
@@ -95,7 +93,7 @@ export default {
     this.socket.on("messageSent", async (message) => {
       console.log("消息已發送:", message);
       await this.saveMessage(message);
-      this.messages.push(message);
+      this.addOrUpdateMessage(message);
     });
 
     this.socket.on("messageRead", ({ messageId }) => {
@@ -111,9 +109,7 @@ export default {
       console.log("收到離線消息:", messages);
       for (const message of messages) {
         await this.saveMessage(message);
-        if (!this.messages.some((m) => m.id === message.id)) {
-          this.messages.push(message);
-        }
+        this.addOrUpdateMessage(message);
       }
     });
   },
@@ -168,6 +164,14 @@ export default {
           (msg.senderId === this.friendId &&
             msg.receiverId === this.currentUserId)
       );
+    },
+    addOrUpdateMessage(message) {
+      const existingMsg = this.messages.find((m) => m.id === message.id);
+      if (existingMsg) {
+        Object.assign(existingMsg, message); // 更新現有消息
+      } else {
+        this.messages.push(message); // 添加新消息
+      }
     },
     markAsRead(messageId, senderId) {
       console.log("標記已讀:", { messageId, senderId });
