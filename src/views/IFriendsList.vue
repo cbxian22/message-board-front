@@ -1,20 +1,17 @@
+<!-- Friends.vue -->
 <template>
-  <div class="friends-list">
-    <h2>好友列表</h2>
-    <div v-if="friends.length === 0">目前沒有好友</div>
-    <div v-else>
-      <div
-        v-for="friend in friends"
-        :key="friend.id"
-        class="friend-item"
-        @click="goToChat(friend)"
-      >
-        <img :src="friend.avatar_url" class="avatar" />
-        <div class="friend-info">
-          <div class="name">{{ friend.name }}</div>
-          <div class="account">@{{ friend.account }}</div>
+  <div class="friends-container">
+    <h2>我的好友</h2>
+    <div class="friend-list">
+      <div v-for="friend in friends" :key="friend.id" class="friend-item">
+        <img :src="friend.avatar_url" :alt="friend.name" class="avatar" />
+        <span class="friend-name">{{ friend.name }}</span>
+        <div class="actions">
+          <button @click="goToChat(friend.id)" class="chat-button">聊天</button>
+          <button class="remove-button">解除好友</button>
         </div>
       </div>
+      <p v-if="friends.length === 0">暫無好友</p>
     </div>
   </div>
 </template>
@@ -24,65 +21,118 @@ import { ref, onMounted } from "vue";
 import { useRouter } from "vue-router";
 import apiClient from "../stores/axiosConfig";
 
-const friends = ref([]);
 const router = useRouter();
+const friends = ref([]);
 
-onMounted(async () => {
+// 獲取好友清單
+const fetchFriends = async () => {
   try {
-    const { data } = await apiClient.get("/friends");
-    friends.value = data.map((f) => ({
-      id: f.friend_id,
-      name: f.friend_name,
-      account: f.friend_account,
-      avatar_url: f.friend_avatar_url,
-    }));
-  } catch (error) {
-    console.error("取得好友列表失敗", error);
+    const response = await apiClient.get("/api/friends");
+    friends.value = response.data;
+    console.log("獲取好友清單:", friends.value);
+  } catch (err) {
+    console.error(
+      "獲取好友清單失敗:",
+      err.response?.data?.message || err.message
+    );
   }
-});
+};
 
-function goToChat(friend) {
-  router.push({
-    path: `/chat/${friend.id}`,
-    query: {
-      name: friend.name,
-      avatar: friend.avatar_url,
-    },
-  });
-}
+// 跳轉到聊天頁面
+const goToChat = (friendId) => {
+  router.push({ name: "ChatView", params: { friendId } });
+};
+
+// 頁面掛載時執行
+onMounted(async () => {
+  await fetchFriends();
+});
 </script>
 
 <style scoped>
-.friends-list {
-  padding: 16px;
+.friends-container {
+  max-width: 600px;
+  margin: 0 auto;
+  padding: 20px;
+  background-color: #f5f5f5;
+  min-height: 100vh;
 }
+
+h2 {
+  font-size: 20px;
+  color: #333;
+  margin: 20px 0 10px;
+}
+
+.friend-list {
+  background-color: #ffffff;
+  border-radius: 10px;
+  padding: 15px;
+  box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1);
+}
+
 .friend-item {
   display: flex;
   align-items: center;
-  gap: 12px;
-  padding: 12px;
-  border-bottom: 1px solid #eee;
+  padding: 10px;
+  border-bottom: 1px solid #e0e0e0;
+}
+
+.friend-item:last-child {
+  border-bottom: none;
+}
+
+.avatar {
+  width: 40px;
+  height: 40px;
+  border-radius: 50%;
+  margin-right: 10px;
+  object-fit: cover;
+}
+
+.friend-name {
+  flex: 1;
+  font-size: 16px;
+  color: #333;
+}
+
+.actions {
+  display: flex;
+  gap: 10px;
+}
+
+.chat-button {
+  padding: 5px 10px;
+  background-color: #007bff;
+  color: #ffffff;
+  border: none;
+  border-radius: 5px;
   cursor: pointer;
   transition: background-color 0.2s;
 }
-.friend-item:hover {
-  background-color: #f5f5f5;
+
+.chat-button:hover {
+  background-color: #0056b3;
 }
-.avatar {
-  width: 50px;
-  height: 50px;
-  border-radius: 50%;
-  object-fit: cover;
+
+.remove-button {
+  padding: 5px 10px;
+  background-color: #dc3545;
+  color: #ffffff;
+  border: none;
+  border-radius: 5px;
+  cursor: pointer;
+  transition: background-color 0.2s;
 }
-.friend-info {
-  display: flex;
-  flex-direction: column;
+
+.remove-button:hover {
+  background-color: #c82333;
 }
-.name {
-  font-weight: bold;
-}
-.account {
-  font-size: 14px;
-  color: #888;
+
+p {
+  color: #666;
+  font-style: italic;
+  text-align: center;
+  margin: 15px 0;
 }
 </style>

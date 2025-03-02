@@ -12,8 +12,11 @@
           </router-link>
         </li>
         <li v-if="authStore.isLoggedIn">
-          <router-link to="/list" class="nav-link">
-            <img :src="Sendicon" alt="Sendicon" />
+          <router-link to="/chatlist" class="nav-link"> chatlist </router-link>
+        </li>
+        <li v-if="authStore.isLoggedIn">
+          <router-link to="/friendslist" class="nav-link">
+            Friendslist
           </router-link>
         </li>
 

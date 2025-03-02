@@ -23,14 +23,20 @@ const router = createRouter({
       component: () => import("../views/RegisterView.vue"),
     },
     {
-      path: "/chat",
+      path: "/chat/:friendId",
       name: "Chat",
       component: () => import("../views/ChatView.vue"),
+      props: true,
     },
     {
-      path: "/list",
-      name: "List",
+      path: "/friendslist",
+      name: "Friendslist",
       component: () => import("../views/IFriendsList.vue"),
+    },
+    {
+      path: "/chatlist",
+      name: "Chatlist",
+      component: () => import("../views/Chatlist.vue"),
     },
     {
       path: "/@:username",
