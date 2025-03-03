@@ -73,6 +73,11 @@ import Menuicon from "../assets/Menuicon.svg";
 import Sendicon from "../assets/Sendicon.svg";
 import Boardxian from "/Boardxian.svg";
 
+defineProps({
+  activeItem: String, // 從父組件接收
+});
+
+const emit = defineEmits(["update-active"]); // 定義事件
 const router = useRouter();
 const themeStore = useThemeStore();
 const authStore = useAuthStore();
@@ -80,7 +85,7 @@ const isModalOpen = ref(false);
 const activeItem = ref();
 
 const setActive = (item) => {
-  activeItem.value = item;
+  emit("update-active", item); // 通知父組件更新
 };
 
 const openModal = (event) => {

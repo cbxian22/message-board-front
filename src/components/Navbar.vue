@@ -77,18 +77,24 @@ import Searchicon from "../assets/Searchicon.svg";
 import Addicon from "../assets/Addicon.svg";
 import Loginicon from "../assets/Loginicon.svg";
 
+defineProps({
+  activeItem: String, // 從父組件接收
+});
+
+const emit = defineEmits(["update-active"]); // 定義事件
+
 const authStore = useAuthStore();
 const isPostModalOpen = ref(false);
 const isLoginModalOpen = ref(false);
 const activeItem = ref("home");
 
+const setActive = (item) => {
+  emit("update-active", item); // 通知父組件更新
+};
+
 const userAvatar = computed(() => authStore.userAvatar);
 const toTop = () => {
   window.scrollTo(0, 0);
-};
-
-const setActive = (item) => {
-  activeItem.value = item;
 };
 
 const checkTokenAndOpenModal = () => {

@@ -8,7 +8,7 @@
   </div>
 
   <div v-show="!isLoading"> -->
-  <NavbarUp />
+  <NavbarUp :active-item="activeItem" @update-active="updateActive" />
   <div class="container-box">
     <div class="container">
       <!--  -->
@@ -41,7 +41,7 @@
       <SinglePosts @loaded="handleLoaded" />
     </div>
   </div>
-  <Navbar />
+  <Navbar :active-item="activeItem" @update-active="updateActive" />
   <!-- </div> -->
 </template>
 
@@ -57,7 +57,14 @@ import NavbarUp from "../components/NavbarUp.vue";
 
 const socketStore = useSocketStore();
 const scrollStore = useScrollStore();
+
+// 預設下方導航欄的 home 高亮
 const isLoading = ref(true);
+const activeItem = ref("home");
+
+const updateActive = (item) => {
+  activeItem.value = item; // 更新共享狀態
+};
 
 // 監聽滾動，記錄滾動位置
 const saveScrollPosition = () => {
