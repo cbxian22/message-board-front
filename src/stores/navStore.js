@@ -41,24 +41,11 @@ export const useNavStore = defineStore("nav", () => {
       case "/friendslist":
         activeItem.value = "profile";
         break;
-      case `/@${authStore.userName}`:
+      case `/@${authStore.userName}, query: { from: 'navbar' }`:
         activeItem.value = "profile";
         break;
       default:
-        // 處理動態路由 /@[username]
-        if (path.startsWith("/@")) {
-          if (currentUsername === authStore.userName) {
-            // 如果是自己的頁面，高亮 "profile"
-            activeItem.value = "profile";
-          } else {
-            // 如果是別人的頁面，取消高亮
-            activeItem.value = undefined;
-          }
-        } else {
-          // 其他未匹配的路由，取消高亮
-          activeItem.value = undefined;
-        }
-        break;
+        activeItem.value = undefined; // 如果路由不匹配任何導航項，清除高亮
     }
   };
 
