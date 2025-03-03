@@ -1,5 +1,5 @@
 <template>
-  <!-- <div v-show="isLoading" class="loading-container">
+  <div v-show="isLoading" class="loading-container">
     <n-spin size="large" stroke="#FFF" />
     <div class="n-spin-b">
       <p>produced by</p>
@@ -7,22 +7,22 @@
     </div>
   </div>
 
-  <div v-show="!isLoading"> -->
-  <NavbarUp />
-  <div class="container-box">
-    <div class="container">
-      <!--  -->
-      <div v-if="aru" class="aru">
-        <h1>最新留言</h1>
-        <div
-          v-for="(message, index) in socketStore.messages"
-          :key="index"
-          class="comment"
-        >
-          <!-- <h3 class="comment-title">{{ message.data.title }}</h3> -->
-          <p class="comment-content">{{ message.data.content }}</p>
+  <div v-show="!isLoading">
+    <NavbarUp />
+    <div class="container-box">
+      <div class="container">
+        <!--  -->
+        <div v-if="aru" class="aru">
+          <h1>最新留言</h1>
+          <div
+            v-for="(message, index) in socketStore.messages"
+            :key="index"
+            class="comment"
+          >
+            <!-- <h3 class="comment-title">{{ message.data.title }}</h3> -->
+            <p class="comment-content">{{ message.data.content }}</p>
 
-          <!-- <div class="comment-meta">
+            <!-- <div class="comment-meta">
               <span class="comment-author">貼文者: {{ comment.name }}</span>
               <span class="comment-time"
                 >貼文時間: {{ formatDate(comment.timestamp) }}</span
@@ -34,15 +34,15 @@
             <button @click="goToCommentPage(comment.id)" class="view-button">
               查看及回覆
             </button> -->
-          <!--  -->
+            <!--  -->
+          </div>
         </div>
+        <!-- <singleComment /> -->
+        <SinglePosts @loaded="handleLoaded" />
       </div>
-      <!-- <singleComment /> -->
-      <SinglePosts @loaded="handleLoaded" />
     </div>
+    <Navbar />
   </div>
-  <Navbar />
-  <!-- </div> -->
 </template>
 
 <script setup>
