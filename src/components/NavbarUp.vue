@@ -9,24 +9,28 @@
 
     <div>
       <ul>
-        <li v-if="authStore.isLoggedIn">
-          <router-link to="/chatlist" class="nav-link">
-            <img :src="Sendicon" alt="Sendicon" />
+        <li v-if="authStore.isLoggedIn" @click="setActive('chatlist')">
+          <router-link
+            to="/chatlist"
+            class="nav-link"
+            :class="{ active: activeItem === 'chatlist' }"
+          >
+            <img class="icon" :src="Sendicon" alt="Sendicon" />
           </router-link>
         </li>
 
-        <li v-if="authStore.isLoggedIn">
+        <!-- <li v-if="authStore.isLoggedIn">
           <router-link to="/friendslist" class="nav-link">
             Friendslist
           </router-link>
-        </li>
+        </li> -->
 
         <li>
           <button ref="modalButton" @click="openModal" class="nav-link">
-            <img :src="Menuicon" alt="Menuicon" />
+            <img class="icon" :src="Menuicon" alt="Menuicon" />
           </button>
 
-          <div v-show="isModalOpen" class="modal-overlay">
+          <div v-show="isModalOpen" class="modal-overlay" @click="closeModal">
             <div class="modal-content" @click.stop>
               <n-collapse arrow-placement="right" class="nav-modal">
                 <n-collapse-item title="外觀">
@@ -60,7 +64,7 @@
 </template>
 
 <script setup>
-import { ref, computed, onMounted, onUnmounted } from "vue";
+import { ref, onMounted, onUnmounted } from "vue";
 import { useRouter } from "vue-router";
 import { useAuthStore } from "../stores/authStore";
 import { useThemeStore } from "../stores/themeStore";
@@ -72,8 +76,12 @@ import Boardxian from "/Boardxian.svg";
 const router = useRouter();
 const themeStore = useThemeStore();
 const authStore = useAuthStore();
-
 const isModalOpen = ref(false);
+const activeItem = ref();
+
+const setActive = (item) => {
+  activeItem.value = item;
+};
 
 const openModal = (event) => {
   event.stopPropagation();
@@ -81,17 +89,22 @@ const openModal = (event) => {
 };
 
 const closeModal = (event) => {
-  const modal = document.querySelector(".modal-content");
-  if (modal && modal.contains(event.target)) return;
-  isModalOpen.value = false;
+  const modalContent = document.querySelector(".modal-content");
+  if (
+    isModalOpen.value &&
+    modalContent &&
+    !modalContent.contains(event.target)
+  ) {
+    isModalOpen.value = false;
+  }
 };
 
 onMounted(() => {
-  document.addEventListener("mousedown", closeModal);
+  document.addEventListener("click", closeModal);
 });
 
 onUnmounted(() => {
-  document.removeEventListener("mousedown", closeModal);
+  document.removeEventListener("click", closeModal);
 });
 
 const logout = async () => {
@@ -113,14 +126,18 @@ const toggleTheme = (value) => {
 <style scoped>
 /* 整體導航條 */
 .navbar-up {
+  padding: 0 30px;
   display: flex;
   justify-content: space-between;
-  padding: 0 30px;
   width: 100%;
   position: fixed;
   top: 0;
   left: 0;
   z-index: 1000;
+}
+
+.navbar-up > div:last-child {
+  padding-right: 15px;
 }
 
 .navbar-up > div {
@@ -136,7 +153,11 @@ const toggleTheme = (value) => {
 /* 項目間距 */
 .navbar-up ul li {
   display: flex;
-  position: relative; /* 確保彈出視窗相對於按鈕定位 */
+}
+
+.navbar-up ul li:last-child {
+  position: relative;
+  margin-left: 10%;
 }
 
 .nav-link {
@@ -145,7 +166,8 @@ const toggleTheme = (value) => {
   margin: 5px 0;
 }
 
-.nav-link:hover {
+.nav-link:hover,
+.nav-link.active {
   background: rgba(128, 128, 128, 0.15) !important;
   border-radius: 10px;
   transition: background-color 0.3s ease, color 0.3s ease;
@@ -154,11 +176,9 @@ const toggleTheme = (value) => {
 .modal-overlay {
   position: absolute;
   top: 100%;
-  right: 115%;
-  width: 100%;
+  right: 0;
   display: flex;
   justify-content: center;
-  z-index: 2000;
 }
 
 .modal-content {
@@ -224,9 +244,9 @@ const toggleTheme = (value) => {
 }
 
 /* 淺色下更改引入 icon 顏色 */
-.light-mode img {
+/* .light-mode img {
   filter: invert(1) grayscale(100%) contrast(100%) brightness(0);
-}
+} */
 
 .dark-mode nav {
   background: rgba(10, 10, 10, 0.6);

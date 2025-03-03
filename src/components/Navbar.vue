@@ -1,34 +1,56 @@
 <template>
   <nav class="navbar">
     <ul>
-      <li @click="toTop()">
-        <router-link to="/" class="nav-link">
+      <li
+        @click="
+          toTop();
+          setActive('home');
+        "
+      >
+        <router-link
+          to="/"
+          class="nav-link"
+          :class="{ active: activeItem === 'home' }"
+        >
           <img class="icon" :src="Homeicon" alt="Homeicon" />
         </router-link>
       </li>
 
-      <li>
-        <router-link to="/" class="nav-link">
+      <li @click="setActive('search')">
+        <router-link
+          to="/"
+          class="nav-link"
+          :class="{ active: activeItem === 'search' }"
+        >
           <img class="icon" :src="Searchicon" alt="Searchicon" />
         </router-link>
       </li>
 
       <li>
-        <button @click="checkTokenAndOpenModal" class="nav-link">
+        <button
+          @click="checkTokenAndOpenModal"
+          class="nav-link"
+          :class="{ active: activeItem === 'add' }"
+        >
           <img class="icon" :src="Addicon" alt="Addicon" />
         </button>
       </li>
 
-      <li v-if="!authStore.isLoggedIn">
-        <router-link to="/login" class="nav-link">
+      <li v-if="!authStore.isLoggedIn" @click="setActive('login')">
+        <router-link
+          to="/login"
+          class="nav-link"
+          :class="{ active: activeItem === 'login' }"
+        >
           <img class="icon" :src="Loginicon" alt="Loginicon" />
         </router-link>
       </li>
 
-      <li v-if="authStore.isLoggedIn">
+      <li v-if="authStore.isLoggedIn" @click="setActive('login')">
         <router-link
           :to="{ path: `/@${authStore.userName}`, query: { from: 'navbar' } }"
           class="nav-link"
+          :class="{ active: activeItem === 'profile' }"
         >
           <img class="user-img" :src="userAvatar" alt="Accounticon" />
         </router-link>
@@ -58,10 +80,15 @@ import Loginicon from "../assets/Loginicon.svg";
 const authStore = useAuthStore();
 const isPostModalOpen = ref(false);
 const isLoginModalOpen = ref(false);
+const activeItem = ref("home");
 
 const userAvatar = computed(() => authStore.userAvatar);
 const toTop = () => {
   window.scrollTo(0, 0);
+};
+
+const setActive = (item) => {
+  activeItem.value = item;
 };
 
 const checkTokenAndOpenModal = () => {
@@ -69,6 +96,7 @@ const checkTokenAndOpenModal = () => {
     isLoginModalOpen.value = true;
   } else {
     isPostModalOpen.value = true;
+    setActive("add"); // 點擊時設為活躍
   }
 };
 </script>
@@ -102,7 +130,8 @@ const checkTokenAndOpenModal = () => {
   margin: 5px 0;
 }
 
-.nav-link:hover {
+.nav-link:hover,
+.nav-link.active {
   background-color: rgba(128, 128, 128, 0.15) !important;
   border-radius: 10px;
   transition: background-color 0.3s ease, color 0.3s ease;

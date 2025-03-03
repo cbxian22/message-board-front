@@ -146,12 +146,19 @@ html ::root {
 
 
 @media (max-width: 768px) {
-  .container-box {
-    width: 85% !important;
+
+  /* 讓 navbarup 內的元素左右內縮 */
+  .navbar-up {
+    padding: 0 25px !important;
   }
 
-  .page-title {
-    font-size: 1.5rem;
+  /* 讓最後一個 div 再往左，為了 hover 10px */
+  .navbar-up>div:last-child {
+    padding-right: 10px !important;
+  }
+
+  .container-box {
+    width: 85% !important;
   }
 
   .aru {
@@ -171,18 +178,35 @@ html ::root {
     width: 30px;
     cursor: pointer;
   }
+
+  .navbar-up .nav-link {
+    padding: 10px 10px !important;
+  }
+
+  .navbar .nav-link {
+    padding: 10px 15px !important;
+  }
 }
 
 
 @media (max-width: 500px) {
+
+  /* 讓 navbarup 內的元素左右內縮 */
+  .navbar-up {
+    padding: 0 15px !important;
+  }
+
+  /* 讓最後一個 div 再往左，為了 hover 10px */
+  .navbar-up>div:last-child {
+    padding-right: 10px !important;
+  }
+
+
   .container-box {
     width: 100% !important;
     padding: 0 5px;
   }
 
-  .page-title {
-    font-size: 1.2rem;
-  }
 
   .n-spin-b p:last-child {
     font-size: 16px;
@@ -202,9 +226,6 @@ html ::root {
     width: 100% !important;
   }
 
-  .navbar-up {
-    padding: 0 10px !important;
-  }
 
   .message-container {
     width: 95% !important;
