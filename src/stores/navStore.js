@@ -14,9 +14,9 @@ import { defineStore } from "pinia";
 import { ref } from "vue";
 import { useRoute } from "vue-router";
 import { useAuthStore } from "../stores/authStore";
-const authStore = useAuthStore();
 
 export const useNavStore = defineStore("nav", () => {
+  const authStore = useAuthStore();
   const route = useRoute();
   const activeItem = ref("home"); // 預設 home
 
