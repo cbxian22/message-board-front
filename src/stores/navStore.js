@@ -27,6 +27,7 @@ export const useNavStore = defineStore("nav", () => {
   // 監聽路由變化並更新 activeItem
   const syncWithRoute = () => {
     const path = route.path;
+    const currentUsername = route.params.username;
     switch (path) {
       case "/":
         activeItem.value = "home";
@@ -44,7 +45,20 @@ export const useNavStore = defineStore("nav", () => {
         activeItem.value = "profile";
         break;
       default:
-        activeItem.value = undefined; // 如果路由不匹配任何導航項，清除高亮
+        // 處理動態路由 /@[username]
+        if (path.startsWith("/@")) {
+          if (currentUsername === authStore.userName) {
+            // 如果是自己的頁面，高亮 "profile"
+            activeItem.value = "profile";
+          } else {
+            // 如果是別人的頁面，取消高亮
+            activeItem.value = undefined;
+          }
+        } else {
+          // 其他未匹配的路由，取消高亮
+          activeItem.value = undefined;
+        }
+        break;
     }
   };
 
