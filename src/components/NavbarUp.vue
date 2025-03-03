@@ -64,8 +64,8 @@
 </template>
 
 <script setup>
-import { ref, onMounted, onUnmounted } from "vue";
-import { useRouter } from "vue-router";
+import { ref, onMounted, onUnmounted, watch } from "vue";
+import { useRouter, useRoute } from "vue-router";
 import { useAuthStore } from "../stores/authStore";
 import { useThemeStore } from "../stores/themeStore";
 import { useNavStore } from "../stores/navStore";
@@ -75,6 +75,7 @@ import Sendicon from "../assets/Sendicon.svg";
 import Boardxian from "/Boardxian.svg";
 
 const router = useRouter();
+const route = useRoute();
 const themeStore = useThemeStore();
 const authStore = useAuthStore();
 const isModalOpen = ref(false);
@@ -83,6 +84,14 @@ const navStore = useNavStore();
 const setActive = (item) => {
   navStore.setActive(item);
 };
+
+// 監聽路由變化，同步高亮
+watch(
+  () => route.path,
+  () => {
+    navStore.syncWithRoute();
+  }
+);
 
 const openModal = (event) => {
   event.stopPropagation();

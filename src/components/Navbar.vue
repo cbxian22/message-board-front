@@ -66,9 +66,10 @@
 </template>
 
 <script setup>
-import { ref, computed } from "vue";
+import { ref, computed, watch } from "vue";
 import { useAuthStore } from "../stores/authStore";
 import { useNavStore } from "../stores/navStore";
+import { useRoute } from "vue-router";
 
 import PostView from "./ModalPost.vue";
 import Login from "./ModalLogin.vue";
@@ -82,10 +83,19 @@ const authStore = useAuthStore();
 const isPostModalOpen = ref(false);
 const isLoginModalOpen = ref(false);
 const navStore = useNavStore();
+const route = useRoute();
 
 const setActive = (item) => {
   navStore.setActive(item);
 };
+
+// 監聽路由變化，同步高亮
+watch(
+  () => route.path,
+  () => {
+    navStore.syncWithRoute();
+  }
+);
 
 const userAvatar = computed(() => authStore.userAvatar);
 const toTop = () => {
