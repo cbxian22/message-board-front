@@ -13,7 +13,7 @@
           <router-link
             to="/chatlist"
             class="nav-link"
-            :class="{ active: activeItem === 'chatlist' }"
+            :class="{ active: navStore.activeItem === 'chatlist' }"
           >
             <img class="icon" :src="Sendicon" alt="Sendicon" />
           </router-link>
@@ -68,24 +68,20 @@ import { ref, onMounted, onUnmounted } from "vue";
 import { useRouter } from "vue-router";
 import { useAuthStore } from "../stores/authStore";
 import { useThemeStore } from "../stores/themeStore";
+import { useNavStore } from "../stores/navStore";
 import { NSwitch, NCollapseItem, NCollapse } from "naive-ui";
 import Menuicon from "../assets/Menuicon.svg";
 import Sendicon from "../assets/Sendicon.svg";
 import Boardxian from "/Boardxian.svg";
 
-defineProps({
-  activeItem: String, // 從父組件接收
-});
-
-const emit = defineEmits(["update-active"]); // 定義事件
 const router = useRouter();
 const themeStore = useThemeStore();
 const authStore = useAuthStore();
 const isModalOpen = ref(false);
-const activeItem = ref();
+const navStore = useNavStore();
 
 const setActive = (item) => {
-  emit("update-active", item); // 通知父組件更新
+  navStore.setActive(item);
 };
 
 const openModal = (event) => {

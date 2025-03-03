@@ -10,7 +10,7 @@
         <router-link
           to="/"
           class="nav-link"
-          :class="{ active: activeItem === 'home' }"
+          :class="{ active: navStore.activeItem === 'home' }"
         >
           <img class="icon" :src="Homeicon" alt="Homeicon" />
         </router-link>
@@ -20,7 +20,7 @@
         <router-link
           to="/"
           class="nav-link"
-          :class="{ active: activeItem === 'search' }"
+          :class="{ active: navStore.activeItem === 'search' }"
         >
           <img class="icon" :src="Searchicon" alt="Searchicon" />
         </router-link>
@@ -30,7 +30,7 @@
         <button
           @click="checkTokenAndOpenModal"
           class="nav-link"
-          :class="{ active: activeItem === 'add' }"
+          :class="{ active: navStore.activeItem === 'add' }"
         >
           <img class="icon" :src="Addicon" alt="Addicon" />
         </button>
@@ -40,7 +40,7 @@
         <router-link
           to="/login"
           class="nav-link"
-          :class="{ active: activeItem === 'login' }"
+          :class="{ active: navStore.activeItem === 'login' }"
         >
           <img class="icon" :src="Loginicon" alt="Loginicon" />
         </router-link>
@@ -50,7 +50,7 @@
         <router-link
           :to="{ path: `/@${authStore.userName}`, query: { from: 'navbar' } }"
           class="nav-link"
-          :class="{ active: activeItem === 'profile' }"
+          :class="{ active: navStore.activeItem === 'profile' }"
         >
           <img class="user-img" :src="userAvatar" alt="Accounticon" />
         </router-link>
@@ -68,6 +68,7 @@
 <script setup>
 import { ref, computed } from "vue";
 import { useAuthStore } from "../stores/authStore";
+import { useNavStore } from "../stores/navStore";
 
 import PostView from "./ModalPost.vue";
 import Login from "./ModalLogin.vue";
@@ -77,19 +78,13 @@ import Searchicon from "../assets/Searchicon.svg";
 import Addicon from "../assets/Addicon.svg";
 import Loginicon from "../assets/Loginicon.svg";
 
-defineProps({
-  activeItem: String, // 從父組件接收
-});
-
-const emit = defineEmits(["update-active"]); // 定義事件
-
 const authStore = useAuthStore();
 const isPostModalOpen = ref(false);
 const isLoginModalOpen = ref(false);
-const activeItem = ref("home");
+const navStore = useNavStore();
 
 const setActive = (item) => {
-  emit("update-active", item); // 通知父組件更新
+  navStore.setActive(item);
 };
 
 const userAvatar = computed(() => authStore.userAvatar);
