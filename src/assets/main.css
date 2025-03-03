@@ -104,6 +104,11 @@ a {
   font-size: 20px;
 }
 
+.boardxian-logo {
+  display: none;
+  max-width: 100%;
+  height: auto;
+}
 
 
 .app-container,
@@ -155,6 +160,10 @@ html ::root {
 
   .message-container {
     width: 85% !important;
+  }
+
+  .boardxian-text {
+    display: none;
   }
 }
 

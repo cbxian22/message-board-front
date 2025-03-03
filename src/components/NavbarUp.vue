@@ -1,7 +1,12 @@
 <template>
   <nav class="navbar-up">
     <div>
-      <h1><a href="/">Boardxian</a></h1>
+      <h1 class="boardxian-text"><a href="/">Boardxian</a></h1>
+      <img
+        src="public/Boardxian.svg"
+        alt="Boardxian Logo"
+        class="boardxian-logo"
+      />
     </div>
 
     <div>
