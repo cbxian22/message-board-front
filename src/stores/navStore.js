@@ -13,6 +13,8 @@
 import { defineStore } from "pinia";
 import { ref } from "vue";
 import { useRoute } from "vue-router";
+import { useAuthStore } from "../stores/authStore";
+const authStore = useAuthStore();
 
 export const useNavStore = defineStore("nav", () => {
   const route = useRoute();
@@ -38,7 +40,7 @@ export const useNavStore = defineStore("nav", () => {
       case "/friendslist":
         activeItem.value = "profile";
         break;
-      case `/@${route.params.username}`:
+      case `/@${authStore.userName}`:
         activeItem.value = "profile";
         break;
       default:
