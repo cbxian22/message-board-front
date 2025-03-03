@@ -2,11 +2,7 @@
   <nav class="navbar-up">
     <div>
       <h1 class="boardxian-text"><a href="/">Boardxian</a></h1>
-      <img
-        src="public/Boardxian.svg"
-        alt="Boardxian Logo"
-        class="boardxian-logo"
-      />
+      <img :src="Boardxian" alt="Boardxian Logo" class="boardxian-logo" />
     </div>
 
     <div>
@@ -69,6 +65,7 @@ import { useThemeStore } from "../stores/themeStore";
 import { NSwitch, NCollapseItem, NCollapse } from "naive-ui";
 import Menuicon from "../assets/Menuicon.svg";
 import Sendicon from "../assets/Sendicon.svg";
+import Boardxian from "/Boardxian.svg";
 
 const router = useRouter();
 const themeStore = useThemeStore();
