@@ -517,6 +517,10 @@ const handleDeleteAccountConfirm = () => {
       <n-button @click="show = true"> 編輯個人檔案 </n-button>
     </div>
 
+    <div class="set-btn" v-if="loggedInUser === info.name">
+      <n-button @click="show = true"> 編輯個人檔案 </n-button>
+    </div>
+
     <div class="set-btn" v-if="loggedInUser !== info.name">
       <n-button v-if="isAlreadyFriend" @click="handleDeleteFriendConfirm"
         >解除好友</n-button

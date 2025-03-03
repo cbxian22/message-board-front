@@ -58,9 +58,7 @@ import NavbarUp from "../components/NavbarUp.vue";
 const socketStore = useSocketStore();
 const scrollStore = useScrollStore();
 
-// 預設下方導航欄的 home 高亮
 const isLoading = ref(true);
-const activeItem = ref("home");
 
 // 監聽滾動，記錄滾動位置
 const saveScrollPosition = () => {
