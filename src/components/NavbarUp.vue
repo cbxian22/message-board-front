@@ -1,8 +1,10 @@
 <template>
   <nav class="navbar-up">
     <div>
-      <h1 class="boardxian-text"><a href="/">Boardxian</a></h1>
-      <img :src="Boardxian" alt="Boardxian Logo" class="boardxian-logo" />
+      <a href="/">
+        <h1 class="boardxian-text">Boardxian</h1>
+        <img :src="Boardxian" alt="Boardxian Logo" class="boardxian-logo" />
+      </a>
     </div>
 
     <div>
