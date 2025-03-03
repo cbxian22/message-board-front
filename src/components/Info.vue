@@ -517,17 +517,14 @@ const handleDeleteAccountConfirm = () => {
     </div>
 
     <!-- 切換 -->
-    <!-- <div class="set-btn" v-if="loggedInUser === info.name"> -->
-    <div class="set-btn">
+    <div class="set-btn" v-if="loggedInUser === info.name">
       <div class="friend-request-actions">
         <n-button @click="show = true"> 編輯個人檔案 </n-button>
         <n-button @click="toFriendsList"> 好友 </n-button>
       </div>
     </div>
 
-    <!-- <div class="set-btn" v-if="loggedInUser === info.name"></div> -->
-
-    <!-- <div class="set-btn" v-if="loggedInUser !== info.name">
+    <div class="set-btn" v-if="loggedInUser !== info.name">
       <n-button v-if="isAlreadyFriend" @click="handleDeleteFriendConfirm"
         >解除好友</n-button
       >
@@ -538,7 +535,7 @@ const handleDeleteAccountConfirm = () => {
       <n-button v-else @click="checkTokenAndOpenModal">
         {{ friendRequestSent ? "取消好友請求" : "加入好友" }}
       </n-button>
-    </div> -->
+    </div>
 
     <!-- 抽屜視窗 -->
     <n-drawer v-model:show="show" :width="rwdwidth">
