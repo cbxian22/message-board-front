@@ -1,17 +1,5 @@
-// import { defineStore } from "pinia";
-// import { ref } from "vue";
-
-// export const useNavStore = defineStore("nav", () => {
-//   const activeItem = ref("home"); // 預設 home
-
-//   const setActive = (item) => {
-//     activeItem.value = item;
-//   };
-
-//   return { activeItem, setActive };
-// });
 import { defineStore } from "pinia";
-import { ref } from "vue";
+import { ref, watch } from "vue";
 import { useRoute } from "vue-router";
 import { useAuthStore } from "../stores/authStore";
 
@@ -24,10 +12,12 @@ export const useNavStore = defineStore("nav", () => {
     activeItem.value = item;
   };
 
-  // 監聽路由變化並更新 activeItem
   const syncWithRoute = () => {
     const path = route.path;
-    const currentUsername = route.params.username;
+    const currentUsername = route.params.username; // 動態路由中的 username
+
+    console.log("Syncing with route:", path, "Username:", currentUsername); // 除錯用
+
     switch (path) {
       case "/":
         activeItem.value = "home";
@@ -41,17 +31,30 @@ export const useNavStore = defineStore("nav", () => {
       case "/friendslist":
         activeItem.value = "profile";
         break;
-      case `/@${authStore.userName}, query: { from: 'navbar' }`:
-        activeItem.value = "profile";
-        break;
       default:
-        activeItem.value = undefined; // 如果路由不匹配任何導航項，清除高亮
+        if (path.startsWith("/@")) {
+          if (currentUsername && currentUsername === authStore.userName) {
+            activeItem.value = "profile"; // 自己的頁面
+          } else {
+            activeItem.value = undefined; // 他人的頁面或其他動態路由
+          }
+        } else {
+          activeItem.value = undefined; // 未匹配的路由
+        }
+        break;
     }
   };
 
   // 初始同步
   syncWithRoute();
 
-  // 返回狀態和方法
+  // 監聽路由變化
+  watch(
+    () => route.path,
+    () => {
+      syncWithRoute();
+    }
+  );
+
   return { activeItem, setActive, syncWithRoute };
 });

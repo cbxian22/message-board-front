@@ -83,15 +83,8 @@ const navStore = useNavStore();
 
 const setActive = (item) => {
   navStore.setActive(item);
+  navStore.syncWithRoute(); // 點擊後立即同步路由狀態
 };
-
-// 監聽路由變化，同步高亮
-watch(
-  () => route.path,
-  () => {
-    navStore.syncWithRoute();
-  }
-);
 
 const openModal = (event) => {
   event.stopPropagation();
