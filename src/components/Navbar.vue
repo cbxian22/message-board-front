@@ -46,7 +46,7 @@
         </router-link>
       </li>
 
-      <li v-if="authStore.isLoggedIn" @click="setActive('login')">
+      <li v-if="authStore.isLoggedIn" @click="setActive('profile')">
         <router-link
           :to="{ path: `/@${authStore.userName}`, query: { from: 'navbar' } }"
           class="nav-link"
