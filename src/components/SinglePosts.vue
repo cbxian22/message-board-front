@@ -481,7 +481,7 @@ onUnmounted(() => {
   transition: background-color 0.3s ease, color 0.3s ease;
 }
 </style> -->
-<!-- 
+
 <script setup>
 import { ref, defineEmits, onMounted, onUnmounted } from "vue";
 import { NBadge, useMessage, NImage } from "naive-ui";
@@ -1073,4 +1073,4 @@ onUnmounted(() => {
   background: rgb(255, 255, 255);
   transition: background-color 0.3s ease, color 0.3s ease;
 }
-</style> -->
+</style>
