@@ -809,7 +809,6 @@ onUnmounted(() => {
             v-if="isImage(comment.file_url)"
             :src="comment.file_url"
             alt="comment media"
-            width="75%"
             lazy
             :preview-disabled="false"
             @preview="handleImagePreview"
@@ -982,7 +981,7 @@ onUnmounted(() => {
 .comment-file {
   width: 100%;
   display: flex;
-  justify-content: flex-start; /* 改為左對齊 */
+  justify-content: flex-start;
   overflow: hidden;
 }
 
