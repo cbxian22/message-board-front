@@ -482,7 +482,7 @@ onUnmounted(() => {
 }
 </style> -->
 <script setup>
-import { ref, defineEmits, onMounted, onUnmounted, watch } from "vue";
+import { ref, defineEmits, onMounted, onUnmounted } from "vue";
 import { NBadge, useMessage, NImage } from "naive-ui";
 import { useAuthStore } from "../stores/authStore";
 import { usePostStore } from "../stores/usePostStore";
@@ -514,7 +514,6 @@ const buttonRefs = ref({});
 const isOpenModal = ref(false);
 const isLikeProcessing = ref(false);
 const selectedComment = ref(null);
-const loadedVideos = ref({});
 
 // 檔案類型檢查
 const isImage = (url) => {
@@ -525,12 +524,6 @@ const isImage = (url) => {
 const isVideo = (url) => {
   const videoExtensions = [".mp4", ".webm", ".ogg", ".mov"];
   return videoExtensions.some((ext) => url.toLowerCase().endsWith(ext));
-};
-
-// Intersection Observer 配置（僅作為備用）
-const intersectionObserverOptions = {
-  rootMargin: "0px",
-  threshold: 0.1,
 };
 
 // 打開 Modal 並禁用背景滾動
@@ -718,12 +711,11 @@ const handleReply = async (postId) => {
   router.push({ name: "CommentView", params: { postId } });
 };
 
-// 圖片點擊時禁用背景滾動
-const handleImageClick = () => {
+// 圖片預覽控制背景滾動
+const handleImagePreview = () => {
   document.body.style.overflow = "hidden";
 };
 
-// 圖片預覽關閉時恢復滾動
 const handleImagePreviewClose = () => {
   document.body.style.overflow = "auto";
 };
@@ -737,23 +729,6 @@ onUnmounted(() => {
   document.removeEventListener("mousedown", closeModal);
   document.body.style.overflow = "auto";
 });
-
-// 移除 IntersectionObserver，改為直接載入影片
-watch(
-  comments,
-  () => {
-    const videos = document.querySelectorAll(".comment-video");
-    videos.forEach((video) => {
-      const commentId = comments.value.find((c) =>
-        video.src.includes(c.file_url)
-      )?.id;
-      if (commentId && !loadedVideos.value[commentId]) {
-        video.load(); // 直接載入
-      }
-    });
-  },
-  { deep: true }
-);
 </script>
 
 <template>
@@ -836,31 +811,26 @@ watch(
             width="75%"
             lazy
             :preview-disabled="false"
-            @click="handleImageClick"
+            @preview="handleImagePreview"
             @preview-close="handleImagePreviewClose"
           >
             <template #placeholder>
               <div class="media-placeholder">Loading Image...</div>
             </template>
           </n-image>
-          <div
-            v-else-if="isVideo(comment.file_url)"
-            class="video-wrapper"
-            :class="{ loaded: loadedVideos[comment.id] }"
-          >
+          <div v-else-if="isVideo(comment.file_url)" class="video-wrapper">
             <video
               :src="comment.file_url"
               controls
               class="comment-video"
               preload="auto"
-              :data-comment-id="comment.id"
-              @canplay="loadedVideos[comment.id] = true"
-              @loadeddata="loadedVideos[comment.id] = true"
-              @error="console.error('Video load error:', comment.file_url)"
+              @error="
+                (e) => {
+                  console.error('Video load error:', comment.file_url, e);
+                  message.error('影片載入失敗，請檢查格式或網絡');
+                }
+              "
             />
-            <div v-if="!loadedVideos[comment.id]" class="media-placeholder">
-              Loading Video...
-            </div>
           </div>
         </span>
       </div>
@@ -1009,33 +979,28 @@ watch(
 }
 
 .comment-file {
-  display: block;
-  max-width: 100%;
+  width: 100%;
+  display: flex;
+  justify-content: center;
   overflow: hidden;
-  position: relative;
 }
 
 .comment-file .n-image {
-  width: 75%;
-  max-width: 75%;
+  width: 75% !important;
+  max-width: 75% !important;
   height: auto;
   object-fit: contain;
-  display: block;
 }
 
 .video-wrapper {
-  position: relative;
-  display: block;
   width: 75%;
   max-width: 75%;
 }
 
 .comment-video {
-  width: 75%;
-  max-width: 75%;
+  width: 100%;
   height: auto;
   object-fit: contain;
-  display: block;
 }
 
 .media-placeholder {
@@ -1050,12 +1015,6 @@ watch(
   background-color: #0001;
   color: #707070;
   z-index: 1;
-  transition: opacity 0.3s ease;
-}
-
-.video-wrapper.loaded .media-placeholder {
-  opacity: 0;
-  pointer-events: none;
 }
 
 .tall-img,
