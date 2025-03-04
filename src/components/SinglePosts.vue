@@ -989,7 +989,7 @@ onUnmounted(() => {
   width: 75%;
   max-width: 75%;
   height: auto;
-  object-fit: contain;
+  object-fit: cover;
 }
 
 .n-image-preview-container .n-image-preview {
