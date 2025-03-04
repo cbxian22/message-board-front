@@ -991,6 +991,7 @@ onUnmounted(() => {
 .comment-image {
   width: 75%;
   max-width: 75%;
+  max-height: 200px;
 }
 
 .comment-image img {
