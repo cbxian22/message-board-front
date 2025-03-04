@@ -534,20 +534,22 @@ const intersectionObserverOptions = {
   threshold: 0.1,
 };
 
-// 打開 Modal
+// 打開 Modal 並禁用背景滾動
 const openModal = (event, commentId) => {
   event.stopPropagation();
   if (modalState.value[commentId]) {
     modalState.value[commentId] = false;
+    document.body.style.overflow = "auto"; // 恢復滾動
     return;
   }
   Object.keys(modalState.value).forEach((key) => {
     modalState.value[key] = false;
   });
   modalState.value[commentId] = true;
+  document.body.style.overflow = "hidden"; // 禁用滾動
 };
 
-// 關閉 Modal
+// 關閉 Modal 並恢復背景滾動
 const closeModal = (event) => {
   const clickedInsideModal = Object.keys(modalRefs.value).some((id) => {
     const modal = modalRefs.value[id];
@@ -560,6 +562,7 @@ const closeModal = (event) => {
     Object.keys(modalState.value).forEach((key) => {
       modalState.value[key] = false;
     });
+    document.body.style.overflow = "auto"; // 恢復滾動
   }
 };
 
@@ -735,7 +738,7 @@ onMounted(async () => {
       }
     });
   }, intersectionObserverOptions);
-  // 初始檢查所有影片
+
   setTimeout(() => {
     const videos = document.querySelectorAll(".comment-video");
     videos.forEach((video) => {
@@ -753,6 +756,7 @@ onMounted(async () => {
 onUnmounted(() => {
   document.removeEventListener("mousedown", closeModal);
   if (observer) observer.disconnect();
+  document.body.style.overflow = "auto"; // 確保卸載時恢復滾動
 });
 
 watch(
@@ -850,7 +854,7 @@ watch(
             v-if="isImage(comment.file_url)"
             :src="comment.file_url"
             alt="comment media"
-            width="300"
+            width="100%"
             lazy
             :intersection-observer-options="intersectionObserverOptions"
           >
@@ -871,6 +875,7 @@ watch(
               :data-comment-id="comment.id"
               @canplay="loadedVideos[comment.id] = true"
               @loadeddata="loadedVideos[comment.id] = true"
+              @error="console.error('Video load error:', comment.file_url)"
             />
             <div v-if="!loadedVideos[comment.id]" class="media-placeholder">
               Loading Video...
