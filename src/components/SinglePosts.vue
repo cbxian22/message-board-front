@@ -813,6 +813,7 @@ onUnmounted(() => {
             :preview-disabled="false"
             @preview="handleImagePreview"
             @preview-close="handleImagePreviewClose"
+            class="comment-image"
           >
             <template #placeholder>
               <div class="media-placeholder">Loading Image...</div>
@@ -978,6 +979,8 @@ onUnmounted(() => {
   position: relative;
 }
 
+/* url 圖片影片 */
+
 .comment-file {
   width: 100%;
   display: flex;
@@ -985,17 +988,29 @@ onUnmounted(() => {
   overflow: hidden;
 }
 
-.comment-file .n-image {
+.comment-image {
   width: 75%;
   max-width: 75%;
 }
 
-.comment-file .n-image img {
+.comment-image img {
   width: 100%;
   height: auto;
   object-fit: cover;
 }
 
+.video-wrapper {
+  width: 75%;
+  max-width: 75%;
+}
+
+.comment-video {
+  width: 100%;
+  height: auto;
+  object-fit: contain;
+}
+
+/* 確保預覽圖片行為一致 */
 .n-image-preview-container .n-image-preview {
   user-select: none;
   -webkit-user-select: none;
