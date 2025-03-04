@@ -481,7 +481,6 @@ onUnmounted(() => {
   transition: background-color 0.3s ease, color 0.3s ease;
 }
 </style> -->
-
 <script setup>
 import { ref, defineEmits, onMounted, onUnmounted, watch } from "vue";
 import { NBadge, useMessage, NImage } from "naive-ui";
@@ -528,7 +527,7 @@ const isVideo = (url) => {
   return videoExtensions.some((ext) => url.toLowerCase().endsWith(ext));
 };
 
-// Intersection Observer 配置
+// Intersection Observer 配置（僅作為備用）
 const intersectionObserverOptions = {
   rootMargin: "0px",
   threshold: 0.1,
@@ -539,14 +538,14 @@ const openModal = (event, commentId) => {
   event.stopPropagation();
   if (modalState.value[commentId]) {
     modalState.value[commentId] = false;
-    document.body.style.overflow = "auto"; // 恢復滾動
+    document.body.style.overflow = "auto";
     return;
   }
   Object.keys(modalState.value).forEach((key) => {
     modalState.value[key] = false;
   });
   modalState.value[commentId] = true;
-  document.body.style.overflow = "hidden"; // 禁用滾動
+  document.body.style.overflow = "hidden";
 };
 
 // 關閉 Modal 並恢復背景滾動
@@ -562,7 +561,7 @@ const closeModal = (event) => {
     Object.keys(modalState.value).forEach((key) => {
       modalState.value[key] = false;
     });
-    document.body.style.overflow = "auto"; // 恢復滾動
+    document.body.style.overflow = "auto";
   }
 };
 
@@ -719,46 +718,27 @@ const handleReply = async (postId) => {
   router.push({ name: "CommentView", params: { postId } });
 };
 
-let observer;
+// 圖片點擊時禁用背景滾動
+const handleImageClick = () => {
+  document.body.style.overflow = "hidden";
+};
+
+// 圖片預覽關閉時恢復滾動
+const handleImagePreviewClose = () => {
+  document.body.style.overflow = "auto";
+};
 
 onMounted(async () => {
   fetchComments();
   document.addEventListener("mousedown", closeModal);
-
-  observer = new IntersectionObserver((entries) => {
-    entries.forEach((entry) => {
-      if (entry.isIntersecting) {
-        const video = entry.target;
-        const commentId = video.dataset.commentId;
-        if (!loadedVideos.value[commentId]) {
-          video.load();
-          loadedVideos.value[commentId] = true;
-        }
-        observer.unobserve(video);
-      }
-    });
-  }, intersectionObserverOptions);
-
-  setTimeout(() => {
-    const videos = document.querySelectorAll(".comment-video");
-    videos.forEach((video) => {
-      const commentId = comments.value.find((c) =>
-        video.src.includes(c.file_url)
-      )?.id;
-      if (commentId && !video.dataset.commentId) {
-        video.dataset.commentId = commentId;
-        observer.observe(video);
-      }
-    });
-  }, 0);
 });
 
 onUnmounted(() => {
   document.removeEventListener("mousedown", closeModal);
-  if (observer) observer.disconnect();
-  document.body.style.overflow = "auto"; // 確保卸載時恢復滾動
+  document.body.style.overflow = "auto";
 });
 
+// 移除 IntersectionObserver，改為直接載入影片
 watch(
   comments,
   () => {
@@ -767,9 +747,8 @@ watch(
       const commentId = comments.value.find((c) =>
         video.src.includes(c.file_url)
       )?.id;
-      if (commentId && !video.dataset.commentId) {
-        video.dataset.commentId = commentId;
-        observer.observe(video);
+      if (commentId && !loadedVideos.value[commentId]) {
+        video.load(); // 直接載入
       }
     });
   },
@@ -854,9 +833,11 @@ watch(
             v-if="isImage(comment.file_url)"
             :src="comment.file_url"
             alt="comment media"
-            width="100%"
+            width="75%"
             lazy
-            :intersection-observer-options="intersectionObserverOptions"
+            :preview-disabled="false"
+            @click="handleImageClick"
+            @preview-close="handleImagePreviewClose"
           >
             <template #placeholder>
               <div class="media-placeholder">Loading Image...</div>
@@ -1028,32 +1009,32 @@ watch(
 }
 
 .comment-file {
-  display: block; /* 改為 block 以適應手機 */
-  width: 100%;
+  display: block;
   max-width: 100%;
   overflow: hidden;
   position: relative;
 }
 
 .comment-file .n-image {
-  width: 100%; /* 確保圖片適應容器 */
-  max-width: 100%; /* 限制最大寬度 */
+  width: 75%;
+  max-width: 75%;
   height: auto;
-  object-fit: contain; /* 改為 contain 以避免裁切 */
+  object-fit: contain;
   display: block;
 }
 
 .video-wrapper {
   position: relative;
   display: block;
-  width: 100%;
+  width: 75%;
+  max-width: 75%;
 }
 
 .comment-video {
-  width: 100%; /* 適應手機螢幕 */
-  max-width: 100%;
+  width: 75%;
+  max-width: 75%;
   height: auto;
-  object-fit: contain; /* 避免裁切 */
+  object-fit: contain;
   display: block;
 }
 
@@ -1079,8 +1060,8 @@ watch(
 
 .tall-img,
 .tall-video {
-  width: 100%; /* 手機上確保寬度適應 */
-  max-height: 250px; /* 限制高度 */
+  width: 75%;
+  max-height: 250px;
 }
 
 .dark-mode .modal-overlay {
@@ -1091,22 +1072,5 @@ watch(
 .light-mode .modal-overlay {
   background: rgb(255, 255, 255);
   transition: background-color 0.3s ease, color 0.3s ease;
-}
-
-/* 手機適配 */
-@media (max-width: 768px) {
-  .comment-box {
-    padding: 15px; /* 手機上減小內邊距 */
-  }
-
-  .photo {
-    width: 40px;
-    height: 40px;
-  }
-
-  .comment-file .n-image,
-  .comment-video {
-    max-width: 100%; /* 確保手機上不超出 */
-  }
 }
 </style>
