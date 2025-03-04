@@ -985,9 +985,13 @@ onUnmounted(() => {
   overflow: hidden;
 }
 
-.comment-file .n-image img {
+.comment-file .n-image {
   width: 75%;
   max-width: 75%;
+}
+
+.comment-file .n-image img {
+  width: 100%;
   height: auto;
   object-fit: cover;
 }
