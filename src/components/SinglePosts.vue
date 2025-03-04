@@ -867,7 +867,7 @@ watch(
               :src="comment.file_url"
               controls
               class="comment-video"
-              preload="metadata"
+              preload="auto"
               :data-comment-id="comment.id"
               @canplay="loadedVideos[comment.id] = true"
               @loadeddata="loadedVideos[comment.id] = true"
@@ -1023,27 +1023,32 @@ watch(
 }
 
 .comment-file {
-  display: inline-block;
+  display: block; /* 改為 block 以適應手機 */
+  width: 100%;
   max-width: 100%;
   overflow: hidden;
   position: relative;
 }
 
 .comment-file .n-image {
-  max-width: 75%;
+  width: 100%; /* 確保圖片適應容器 */
+  max-width: 100%; /* 限制最大寬度 */
   height: auto;
-  object-fit: cover;
+  object-fit: contain; /* 改為 contain 以避免裁切 */
+  display: block;
 }
 
 .video-wrapper {
   position: relative;
-  display: inline-block;
+  display: block;
+  width: 100%;
 }
 
 .comment-video {
-  max-width: 75%;
+  width: 100%; /* 適應手機螢幕 */
+  max-width: 100%;
   height: auto;
-  object-fit: cover;
+  object-fit: contain; /* 避免裁切 */
   display: block;
 }
 
@@ -1069,8 +1074,8 @@ watch(
 
 .tall-img,
 .tall-video {
-  width: auto;
-  max-height: 250px;
+  width: 100%; /* 手機上確保寬度適應 */
+  max-height: 250px; /* 限制高度 */
 }
 
 .dark-mode .modal-overlay {
@@ -1081,5 +1086,22 @@ watch(
 .light-mode .modal-overlay {
   background: rgb(255, 255, 255);
   transition: background-color 0.3s ease, color 0.3s ease;
+}
+
+/* 手機適配 */
+@media (max-width: 768px) {
+  .comment-box {
+    padding: 15px; /* 手機上減小內邊距 */
+  }
+
+  .photo {
+    width: 40px;
+    height: 40px;
+  }
+
+  .comment-file .n-image,
+  .comment-video {
+    max-width: 100%; /* 確保手機上不超出 */
+  }
 }
 </style>
