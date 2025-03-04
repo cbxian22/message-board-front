@@ -985,7 +985,7 @@ onUnmounted(() => {
   overflow: hidden;
 }
 
-.comment-file .n-image {
+.comment-file .n-image img {
   width: 75%;
   max-width: 75%;
   height: auto;
