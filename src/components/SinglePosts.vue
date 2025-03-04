@@ -466,7 +466,9 @@ onUnmounted(() => {
     :class="['comment-box', { 'last-comment': index === comments.length - 1 }]"
   >
     <div class="photo-content">
-      <img :src="comment.user_avatar" alt="頭像" class="photo" />
+      <router-link :to="`/@${comment.name}`">
+        <img :src="comment.user_avatar" alt="頭像" class="photo" />
+      </router-link>
     </div>
 
     <div class="comment">
