@@ -1376,14 +1376,8 @@ onUnmounted(() => {
             width="75%"
             lazy
             :preview-disabled="true"
-            <!--
-            禁用
-            Naive
-            UI
-            預覽
-            --
+            @click="openImagePreview(comment.file_url)"
           >
-            @click="openImagePreview(comment.file_url)" >
             <template #placeholder>
               <div class="media-placeholder">Loading Image...</div>
             </template>
