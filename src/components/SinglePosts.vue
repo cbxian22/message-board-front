@@ -997,7 +997,7 @@ onUnmounted(() => {
   width: 100% !important;
 }
 
-.n-image-preview {
+.n-image-preview-container .n-image-preview {
   user-select: none;
   -webkit-user-select: none;
   pointer-events: all;
