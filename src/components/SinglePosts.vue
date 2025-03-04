@@ -992,10 +992,6 @@ onUnmounted(() => {
   object-fit: contain;
 }
 
-.comment-file .n-image img {
-  width: 100% !important;
-}
-
 .n-image-preview-container .n-image-preview {
   user-select: none;
   -webkit-user-select: none;
