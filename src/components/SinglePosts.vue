@@ -735,6 +735,19 @@ onMounted(async () => {
       }
     });
   }, intersectionObserverOptions);
+  // 初始檢查所有影片
+  setTimeout(() => {
+    const videos = document.querySelectorAll(".comment-video");
+    videos.forEach((video) => {
+      const commentId = comments.value.find((c) =>
+        video.src.includes(c.file_url)
+      )?.id;
+      if (commentId && !video.dataset.commentId) {
+        video.dataset.commentId = commentId;
+        observer.observe(video);
+      }
+    });
+  }, 0);
 });
 
 onUnmounted(() => {
@@ -854,8 +867,9 @@ watch(
               :src="comment.file_url"
               controls
               class="comment-video"
-              preload="none"
+              preload="metadata"
               :data-comment-id="comment.id"
+              @canplay="loadedVideos[comment.id] = true"
               @loadeddata="loadedVideos[comment.id] = true"
             />
             <div v-if="!loadedVideos[comment.id]" class="media-placeholder">
