@@ -987,8 +987,8 @@ onUnmounted(() => {
 }
 
 .comment-file .n-image {
-  width: 75% !important;
-  max-width: 75% !important;
+  width: 75%;
+  max-width: 75%;
   height: auto;
   object-fit: contain;
 }
