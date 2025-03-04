@@ -993,8 +993,8 @@ onUnmounted(() => {
 
 /* url 圖片影片 */
 .n-image {
-  width: 70%;
-  max-width: 70%;
+  width: 75%;
+  max-width: 75%;
 }
 
 :deep(.n-image img) {
@@ -1012,38 +1012,5 @@ onUnmounted(() => {
   width: 100%;
   height: auto;
   object-fit: contain;
-}
-
-/* 確保預覽圖片行為一致 */
-
-.video-wrapper {
-  width: 75%;
-  max-width: 75%;
-}
-
-.comment-video {
-  width: 100%;
-  height: auto;
-  object-fit: contain;
-}
-
-.media-placeholder {
-  position: absolute;
-  top: 0;
-  left: 0;
-  width: 100%;
-  height: 100%;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  background-color: #0001;
-  color: #707070;
-  z-index: 1;
-}
-
-.tall-img,
-.tall-video {
-  width: 75%;
-  max-height: 250px;
 }
 </style>
