@@ -993,7 +993,7 @@ onUnmounted(() => {
   object-fit: contain;
 }
 
-.n-image img {
+.comment-file .n-image img {
   width: 100% !important;
 }
 
@@ -1007,7 +1007,7 @@ onUnmounted(() => {
   transition: transform 0.3s var(--n-bezier);
 }
 
-.n-image-preview-toolbar {
+.n-image-preview-container .n-image-preview-toolbar {
   z-index: 1;
   position: absolute;
   left: 50%;
@@ -1023,7 +1023,7 @@ onUnmounted(() => {
   align-items: center;
 }
 
-.n-base-icon {
+.n-image-preview-container .n-base-icon {
   height: 1em;
   line-height: 1em;
   text-align: center;
