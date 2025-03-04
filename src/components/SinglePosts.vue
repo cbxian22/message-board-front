@@ -997,6 +997,42 @@ onUnmounted(() => {
   width: 100% !important;
 }
 
+.n-image-preview {
+  user-select: none;
+  -webkit-user-select: none;
+  pointer-events: all;
+  margin: auto;
+  max-height: calc(70vh - 32px);
+  max-width: calc(70vw - 32px);
+  transition: transform 0.3s var(--n-bezier);
+}
+
+.n-image-preview-toolbar {
+  z-index: 1;
+  position: absolute;
+  left: 50%;
+  top: 3px;
+  transform: translateX(-50%);
+  border-radius: var(--n-toolbar-border-radius);
+  height: 48px;
+  background: var(--n-toolbar-color);
+  box-shadow: var(--n-toolbar-box-shadow);
+  color: var(--n-toolbar-icon-color);
+  transition: color 0.3s var(--n-bezier);
+  display: flex;
+  align-items: center;
+}
+
+.n-base-icon {
+  height: 1em;
+  line-height: 1em;
+  text-align: center;
+  display: inline-block;
+  position: relative;
+  fill: currentColor;
+  transform: translateZ(0);
+}
+
 .video-wrapper {
   width: 75%;
   max-width: 75%;
