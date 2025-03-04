@@ -804,7 +804,7 @@ onUnmounted(() => {
 
       <div class="comment-content">
         <p>{{ comment.content }}</p>
-        <span v-if="comment.file_url" class="comment-file">
+        <span v-if="comment.file_url">
           <n-image
             v-if="isImage(comment.file_url)"
             :src="comment.file_url"
@@ -960,6 +960,11 @@ onUnmounted(() => {
   color: #707070;
 }
 
+/* 更多按鈕樣式 */
+.info-modal {
+  position: relative;
+}
+
 .info-link {
   display: flex;
   align-items: center;
@@ -967,6 +972,17 @@ onUnmounted(() => {
   padding: 5px 10px;
 }
 
+.dark-mode .modal-overlay {
+  background: rgb(24, 24, 24);
+  transition: background-color 0.3s ease, color 0.3s ease;
+}
+
+.light-mode .modal-overlay {
+  background: rgb(255, 255, 255);
+  transition: background-color 0.3s ease, color 0.3s ease;
+}
+
+/* 內容 文字 及 url */
 .comment-content {
   margin-bottom: 10px;
 }
@@ -975,28 +991,16 @@ onUnmounted(() => {
   margin-bottom: 10px;
 }
 
-.info-modal {
-  position: relative;
-}
-
 /* url 圖片影片 */
-
-.comment-file {
-  width: 100%;
-  display: flex;
-  justify-content: flex-start;
-  overflow: hidden;
+.n-image {
+  width: 70%;
+  max-width: 70%;
 }
 
-.comment-image {
-  width: 75% !important;
-  max-width: 75%;
-}
-
-.comment-image img {
-  width: 100%;
-  height: auto;
-  object-fit: cover;
+:deep(.n-image img) {
+  max-width: 100%;
+  object-fit: contain;
+  max-height: 350px;
 }
 
 .video-wrapper {
@@ -1011,41 +1015,6 @@ onUnmounted(() => {
 }
 
 /* 確保預覽圖片行為一致 */
-.n-image-preview-container .n-image-preview {
-  user-select: none;
-  -webkit-user-select: none;
-  pointer-events: all;
-  margin: auto;
-  max-height: calc(70vh - 32px);
-  max-width: calc(70vw - 32px);
-  transition: transform 0.3s var(--n-bezier);
-}
-
-.n-image-preview-container .n-image-preview-toolbar {
-  z-index: 1;
-  position: absolute;
-  left: 50%;
-  top: 3px;
-  transform: translateX(-50%);
-  border-radius: var(--n-toolbar-border-radius);
-  height: 48px;
-  background: var(--n-toolbar-color);
-  box-shadow: var(--n-toolbar-box-shadow);
-  color: var(--n-toolbar-icon-color);
-  transition: color 0.3s var(--n-bezier);
-  display: flex;
-  align-items: center;
-}
-
-.n-image-preview-container .n-base-icon {
-  height: 1em;
-  line-height: 1em;
-  text-align: center;
-  display: inline-block;
-  position: relative;
-  fill: currentColor;
-  transform: translateZ(0);
-}
 
 .video-wrapper {
   width: 75%;
@@ -1076,15 +1045,5 @@ onUnmounted(() => {
 .tall-video {
   width: 75%;
   max-height: 250px;
-}
-
-.dark-mode .modal-overlay {
-  background: rgb(24, 24, 24);
-  transition: background-color 0.3s ease, color 0.3s ease;
-}
-
-.light-mode .modal-overlay {
-  background: rgb(255, 255, 255);
-  transition: background-color 0.3s ease, color 0.3s ease;
 }
 </style>
