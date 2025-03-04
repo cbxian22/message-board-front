@@ -1566,6 +1566,10 @@ onUnmounted(() => {
   object-fit: contain;
 }
 
+.n-image img {
+  width: 100%;
+}
+
 .video-wrapper {
   width: 75%;
   max-width: 75%;
