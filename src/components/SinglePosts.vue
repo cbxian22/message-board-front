@@ -869,7 +869,7 @@ onUnmounted(() => {
       </div>
     </div>
   </div>
-  <UpdatePostView v-model="isOpenModal" ::post-id="selectedPostId" />
+  <UpdatePostView v-model="isOpenModal" :post-id="selectedPostId" />
 </template>
 
 <style scoped>
