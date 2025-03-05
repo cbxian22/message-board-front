@@ -512,7 +512,7 @@ const modalRefs = ref({});
 const buttonRefs = ref({});
 const isOpenModal = ref(false);
 const isLikeProcessing = ref(false);
-const selectedComment = ref(null);
+const selectedPostId = ref(null);
 
 // 檔案類型檢查
 const isImage = (url) => {
@@ -655,8 +655,19 @@ const handleUpdate = async (postId) => {
     message.error("請先登入！");
     return;
   }
+  selectedPostId.value = postId;
   isOpenModal.value = true;
-  // await fetchSingleComment(postId);
+};
+
+const handlePostUpdate = (updatedPost) => {
+  const index = comments.value.findIndex((c) => c.id === updatedPost.id);
+  if (index !== -1) {
+    comments.value[index] = {
+      ...comments.value[index],
+      content: updatedPost.content,
+      file_url: updatedPost.file_url,
+    };
+  }
 };
 
 // 按讚
@@ -717,10 +728,12 @@ const handleReply = async (postId) => {
 onMounted(async () => {
   fetchComments();
   document.addEventListener("mousedown", closeModal);
+  emitter.on("updatePost", handlePostUpdate); // 監聽更新事件
 });
 
 onUnmounted(() => {
   document.removeEventListener("mousedown", closeModal);
+  emitter.off("updatePost", handlePostUpdate); // 移除事件監聽
 });
 </script>
 
@@ -852,7 +865,7 @@ onUnmounted(() => {
       </div>
     </div>
   </div>
-  <UpdatePostView v-model="isOpenModal" :comment="selectedComment" />
+  <UpdatePostView v-model="isOpenModal" :comment="selectedPostId" />
 </template>
 
 <style scoped>

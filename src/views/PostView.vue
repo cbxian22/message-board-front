@@ -35,6 +35,7 @@ const file = ref(null);
 const fileUrl = ref(null);
 const fileInputRef = ref(null);
 const isOpenModal = ref(false);
+const selectedPostId = ref(null);
 
 const isSubmitDisabled = computed(() => !(content.value.trim() || file.value));
 
@@ -94,8 +95,19 @@ const handleUpdate = async (postId) => {
     message.error("請先登入！");
     return;
   }
+  selectedPostId.value = postId;
   isOpenModal.value = true;
-  // await fetchSingleComment(postId);
+};
+
+const handlePostUpdate = (updatedPost) => {
+  const index = comments.value.findIndex((c) => c.id === updatedPost.id);
+  if (index !== -1) {
+    comments.value[index] = {
+      ...comments.value[index],
+      content: updatedPost.content,
+      file_url: updatedPost.file_url,
+    };
+  }
 };
 
 const handleFileUpload = (event) => {
@@ -244,12 +256,13 @@ onMounted(() => {
   document.addEventListener("mousedown", closeModal);
   adjustTextareaHeight();
   console.log(route.params.id);
-
   fetchSingleComment(route.params.id); // 根據路由參數獲取資料
+  emitter.on("updatePost", handlePostUpdate); // 監聽更新事件
 });
 
 onUnmounted(() => {
   document.removeEventListener("mousedown", closeModal);
+  emitter.off("updatePost", handlePostUpdate); // 移除事件監聽
 });
 </script>
 
@@ -414,7 +427,7 @@ onUnmounted(() => {
     </div>
   </div>
   <div v-else>正在加載貼文...</div>
-  <UpdatePostView v-model="isOpenModal" :comment="selectedComment" />
+  <UpdatePostView v-model="isOpenModal" :comment="selectedPostId" />
   <Navbar />
 </template>
 
