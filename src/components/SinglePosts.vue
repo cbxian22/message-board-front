@@ -486,7 +486,6 @@ onUnmounted(() => {
 import { ref, defineEmits, onMounted, onUnmounted } from "vue";
 import { NBadge, useMessage, NImage } from "naive-ui";
 import { useAuthStore } from "../stores/authStore";
-import { usePostStore } from "../stores/usePostStore";
 import { useDateStore } from "../stores/dateStore";
 import { useRouter } from "vue-router";
 import apiClient from "../stores/axiosConfig";
@@ -503,7 +502,6 @@ import Flagicon from "../assets/Flagicon.svg";
 
 const router = useRouter();
 const emit = defineEmits();
-const postStore = usePostStore();
 const authStore = useAuthStore();
 const dateStore = useDateStore();
 const message = useMessage();
@@ -528,34 +526,67 @@ const isVideo = (url) => {
 };
 
 // 打開 Modal 並禁用背景滾動
+// const openModal = (event, commentId) => {
+//   event.stopPropagation();
+//   if (modalState.value[commentId]) {
+//     modalState.value[commentId] = false;
+//     document.body.style.overflow = "auto";
+//     return;
+//   }
+//   Object.keys(modalState.value).forEach((key) => {
+//     modalState.value[key] = false;
+//   });
+//   modalState.value[commentId] = true;
+//   document.body.style.overflow = "hidden";
+// };
 const openModal = (event, commentId) => {
   event.stopPropagation();
+
+  // 如果當前 Modal 已開啟，則關閉它
   if (modalState.value[commentId]) {
     modalState.value[commentId] = false;
-    document.body.style.overflow = "auto";
     return;
   }
+
+  // 先關閉所有其他留言的 Modal
   Object.keys(modalState.value).forEach((key) => {
     modalState.value[key] = false;
   });
+
+  // 只打開當前點擊的留言的 Modal
   modalState.value[commentId] = true;
-  document.body.style.overflow = "hidden";
 };
 
 // 關閉 Modal 並恢復背景滾動
+// const closeModal = (event) => {
+//   const clickedInsideModal = Object.keys(modalRefs.value).some((id) => {
+//     const modal = modalRefs.value[id];
+//     const button = buttonRefs.value[id];
+//     return (
+//       modal && (modal.contains(event.target) || button.contains(event.target))
+//     );
+//   });
+//   if (!clickedInsideModal) {
+//     Object.keys(modalState.value).forEach((key) => {
+//       modalState.value[key] = false;
+//     });
+//     document.body.style.overflow = "auto";
+//   }
+// };
 const closeModal = (event) => {
   const clickedInsideModal = Object.keys(modalRefs.value).some((id) => {
     const modal = modalRefs.value[id];
     const button = buttonRefs.value[id];
+
     return (
       modal && (modal.contains(event.target) || button.contains(event.target))
     );
   });
+
   if (!clickedInsideModal) {
     Object.keys(modalState.value).forEach((key) => {
       modalState.value[key] = false;
     });
-    document.body.style.overflow = "auto";
   }
 };
 
