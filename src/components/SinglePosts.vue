@@ -716,13 +716,9 @@ const handleReply = async (postId) => {
 };
 
 // 圖片預覽控制背景滾動
-const handleImagePreview = () => {
-  document.body.style.overflow = "hidden";
-};
-
-const handleImagePreviewClose = () => {
-  document.body.style.overflow = "auto";
-};
+// const handleImagePreview = () => {
+//   document.body.style.overflow = "hidden";
+// };
 
 onMounted(async () => {
   fetchComments();
@@ -814,7 +810,6 @@ onUnmounted(() => {
             alt="comment media"
             lazy
             :preview-disabled="false"
-            @preview="handleImagePreview"
             class="comment-image"
           >
             <template #placeholder>
