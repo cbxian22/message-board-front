@@ -713,8 +713,7 @@ const handleReply = async (postId) => {
   }
   await fetchSingleComment(postId);
   console.log(postId);
-
-  router.push({ name: "Post", params: { postId } });
+  router.push({ name: "Post", params: { id: postId } });
 };
 
 onMounted(async () => {
