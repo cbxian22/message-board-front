@@ -165,10 +165,6 @@ const toggleTheme = (value) => {
   z-index: 1000;
 }
 
-.navbar-up > div:last-child {
-  padding-right: 15px;
-}
-
 .navbar-up > div {
   display: flex;
   align-items: center;
