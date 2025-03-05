@@ -7,7 +7,7 @@ import { useDateStore } from "../stores/dateStore";
 import apiClient from "../stores/axiosConfig";
 import Navbar from "../components/Navbar.vue";
 import NavbarUp from "../components/NavbarUp.vue";
-import UpdatePostView from "./ModalUpdatePost.vue";
+import UpdatePostView from "../components/ModalUpdatePost.vue";
 
 import Backicon from "../assets/Backicon.svg";
 import Favoriteicon from "../assets/Favoriteicon.svg";
