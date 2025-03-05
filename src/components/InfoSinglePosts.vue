@@ -1,6 +1,6 @@
 <script setup>
 import { ref, onMounted, onUnmounted, watch } from "vue";
-import { NBadge, useMessage } from "naive-ui";
+import { NBadge, useMessage, NImage } from "naive-ui";
 import { useAuthStore } from "../stores/authStore";
 import { useDateStore } from "../stores/dateStore";
 import { useRouter } from "vue-router";
@@ -301,7 +301,7 @@ const handlelike = async (id) => {
         </div>
       </div>
 
-      <div class="comment-content">
+      <!-- <div class="comment-content">
         <p>{{ comment.content }}</p>
         <span v-if="comment.file_url" class="comment-file">
           <img
@@ -309,6 +309,38 @@ const handlelike = async (id) => {
             alt="comment.file_url"
             ref="commentImages"
           />
+        </span>
+      </div> -->
+
+      <div class="comment-content">
+        <p>{{ comment.content }}</p>
+        <span v-if="comment.file_url">
+          <n-image
+            v-if="isImage(comment.file_url)"
+            :src="comment.file_url"
+            alt="comment media"
+            lazy
+            :preview-disabled="false"
+            class="comment-image"
+          >
+            <template #placeholder>
+              <div class="media-placeholder">Loading Image...</div>
+            </template>
+          </n-image>
+          <div v-else-if="isVideo(comment.file_url)" class="video-wrapper">
+            <video
+              :src="comment.file_url"
+              controls
+              class="comment-video"
+              preload="auto"
+              @error="
+                (e) => {
+                  console.error('Video load error:', comment.file_url, e);
+                  message.error('影片載入失敗，請檢查格式或網絡');
+                }
+              "
+            />
+          </div>
         </span>
       </div>
 
@@ -437,13 +469,6 @@ const handlelike = async (id) => {
   color: #707070;
 }
 
-.info-link {
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  padding: 5px 10px;
-}
-
 .comment-content {
   margin-bottom: 10px;
 }
@@ -456,23 +481,11 @@ const handlelike = async (id) => {
   position: relative;
 }
 
-/* url 圖片 */
-
-.comment-file {
-  display: inline-block;
-  max-width: 100%;
-  overflow: hidden;
-}
-
-.comment-file img {
-  max-width: 75%;
-  height: auto;
-  object-fit: cover;
-}
-/* 直向 */
-.tall-img {
-  width: auto;
-  max-height: 250px;
+.info-link {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 5px 10px;
 }
 
 .dark-mode .modal-overlay {
@@ -483,5 +496,37 @@ const handlelike = async (id) => {
 .light-mode .modal-overlay {
   background: rgb(255, 255, 255);
   transition: background-color 0.3s ease, color 0.3s ease;
+}
+
+/* 內容 文字 及 url */
+.comment-content {
+  margin-bottom: 10px;
+}
+
+.comment-content p {
+  margin-bottom: 10px;
+}
+
+/* url 圖片影片 */
+.n-image {
+  width: 75%;
+  max-width: 75%;
+}
+
+:deep(.n-image img) {
+  max-width: 100%;
+  object-fit: contain;
+  max-height: 350px;
+}
+
+.video-wrapper {
+  width: 75%;
+  max-width: 75%;
+}
+
+.comment-video {
+  width: 100%;
+  height: auto;
+  object-fit: contain;
 }
 </style>

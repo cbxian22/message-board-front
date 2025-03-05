@@ -715,11 +715,6 @@ const handleReply = async (postId) => {
   router.push({ name: "CommentView", params: { postId } });
 };
 
-// 圖片預覽控制背景滾動
-// const handleImagePreview = () => {
-//   document.body.style.overflow = "hidden";
-// };
-
 onMounted(async () => {
   fetchComments();
   document.addEventListener("mousedown", closeModal);
@@ -727,7 +722,6 @@ onMounted(async () => {
 
 onUnmounted(() => {
   document.removeEventListener("mousedown", closeModal);
-  document.body.style.overflow = "auto";
 });
 </script>
 
