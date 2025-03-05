@@ -32,7 +32,6 @@ const isModalOpen = ref(false);
 const isLikeProcessing = ref(false);
 const textareaRef = ref(null);
 const content = ref("");
-const comments = ref([]);
 const file = ref(null);
 const fileUrl = ref(null);
 const fileInputRef = ref(null);
@@ -103,10 +102,9 @@ const handleUpdate = async (postId) => {
 
 // 處理貼文更新
 const handlePostUpdate = (updatedPost) => {
-  const index = comments.value.findIndex((c) => c.id === updatedPost.id);
-  if (index !== -1) {
-    comments.value[index] = {
-      ...comments.value[index],
+  if (post.value && post.value.id === updatedPost.id) {
+    post.value = {
+      ...post.value,
       content: updatedPost.content,
       file_url: updatedPost.file_url,
     };
