@@ -945,17 +945,9 @@ onUnmounted(() => {
   color: rgb(0, 0, 0);
 }
 </style>-->
-
 <script setup>
-import {
-  ref,
-  watch,
-  computed,
-  defineEmits,
-  onMounted,
-  onUnmounted,
-  defineProps,
-} from "vue";
+import { ref, watch, computed, defineEmits, onMounted, onUnmounted } from "vue";
+import { useRoute } from "vue-router"; // 引入 useRoute
 import { NBadge, useMessage, NImage, NButton, useLoadingBar } from "naive-ui";
 import { useAuthStore } from "../stores/authStore";
 import { useDateStore } from "../stores/dateStore";
@@ -970,20 +962,14 @@ import Flagicon from "../assets/Flagicon.svg";
 import Noteicon from "../assets/Noteicon.svg";
 import Closeicon from "../assets/Closeicon.svg";
 
-// 定義 props 來接收父組件傳入的單一貼文數據
-const props = defineProps({
-  post: {
-    type: Object,
-    required: true,
-  },
-});
-
+const route = useRoute();
 const emit = defineEmits(["updatePost", "deletePost", "likePost", "newReply"]);
 const authStore = useAuthStore();
 const dateStore = useDateStore();
 const message = useMessage();
 const loadingBar = useLoadingBar();
 
+const post = ref(null); // 本地狀態儲存貼文資料
 const isModalOpen = ref(false);
 const isLikeProcessing = ref(false);
 const textareaRef = ref(null);
@@ -994,12 +980,44 @@ const fileInputRef = ref(null);
 
 const isSubmitDisabled = computed(() => !(content.value.trim() || file.value));
 
+// 獲取單一貼文
+const fetchSingleComment = async (postId) => {
+  try {
+    const userId = authStore.userId || localStorage.getItem("userId");
+    const response = await apiClient.get(`/posts/${postId}`, {
+      params: { userId },
+      headers: authStore.accessToken
+        ? { Authorization: `Bearer ${authStore.accessToken}` }
+        : {},
+    });
+    if (response.status === 200) {
+      const comment = response.data;
+      post.value = {
+        id: comment.id,
+        content: comment.content,
+        name: comment.user_name,
+        timestamp: new Date(comment.created_at),
+        file_url: comment.file_url,
+        user_avatar: comment.user_avatar,
+        likes: comment.likes || 0,
+        userLiked: comment.user_liked || false,
+        replies: comment.replies || 0,
+      };
+    } else {
+      message.error("無法獲取單一貼文，數據格式不正確");
+    }
+  } catch (error) {
+    console.error("取得單一貼文錯誤:", error);
+    message.error("單一貼文取得失敗，請檢查網絡或稍後再試！");
+  }
+};
+
 // 動態調整高度
 const adjustTextareaHeight = () => {
   const textarea = textareaRef.value;
   if (textarea) {
-    textarea.style.height = "auto"; // 重置高度
-    textarea.style.height = `${Math.min(textarea.scrollHeight, 150)}px`; // 設置為內容高度，最大 150px
+    textarea.style.height = "auto";
+    textarea.style.height = `${Math.min(textarea.scrollHeight, 150)}px`;
   }
 };
 
@@ -1061,7 +1079,7 @@ const handleMessage = async () => {
     const response = await apiClient.post(`/posts/${authStore.userId}`, {
       content: content.value,
       fileUrl: uploadedFileUrl,
-      parentId: props.post.id, // 將回覆與父貼文關聯
+      parentId: post.value.id, // 將回覆與父貼文關聯
     });
     if (response.status === 201) {
       content.value = "";
@@ -1139,8 +1157,10 @@ const handlelike = async (id) => {
       emit("likePost", {
         id,
         likes: response.data.likesCount,
-        userLiked: !props.post.userLiked,
+        userLiked: !post.value.userLiked,
       });
+      post.value.likes = response.data.likesCount;
+      post.value.userLiked = !post.value.userLiked;
     }
   } catch (error) {
     console.error(
@@ -1155,6 +1175,7 @@ const handlelike = async (id) => {
 onMounted(() => {
   document.addEventListener("mousedown", closeModal);
   adjustTextareaHeight();
+  fetchSingleComment(route.params.id); // 根據路由參數獲取資料
 });
 
 onUnmounted(() => {
@@ -1163,12 +1184,12 @@ onUnmounted(() => {
 </script>
 
 <template>
-  <div class="container-box container" v-if="props.post">
+  <div class="container-box container" v-if="post">
     <div class="comment-box">
       <div class="photo-content">
-        <router-link :to="`/@${props.post.name}`">
+        <router-link :to="`/@${post.name}`">
           <img
-            :src="props.post.user_avatar || 'https://via.placeholder.com/50'"
+            :src="post.user_avatar || 'https://via.placeholder.com/50'"
             alt="頭像"
             class="photo"
           />
@@ -1178,11 +1199,11 @@ onUnmounted(() => {
       <div class="comment">
         <div class="info">
           <div class="info-span">
-            <router-link class="comment-author" :to="`/@${props.post.name}`">
-              {{ props.post.name }}
+            <router-link class="comment-author" :to="`/@${post.name}`">
+              {{ post.name }}
             </router-link>
             <span class="comment-time">
-              {{ dateStore.formatDate(props.post.timestamp) }}
+              {{ dateStore.formatDate(post.timestamp) }}
             </span>
           </div>
 
@@ -1195,13 +1216,12 @@ onUnmounted(() => {
                 <ul>
                   <li
                     v-if="
-                      authStore.isLoggedIn &&
-                      authStore.userName === props.post.name
+                      authStore.isLoggedIn && authStore.userName === post.name
                     "
                   >
                     <button
                       class="modal-link"
-                      @click="emit('updatePost', props.post.id)"
+                      @click="emit('updatePost', post.id)"
                     >
                       <img class="icon" :src="Editicon" alt="Edit icon" />
                       <span>編輯</span>
@@ -1209,19 +1229,15 @@ onUnmounted(() => {
                   </li>
                   <li
                     v-if="
-                      authStore.isLoggedIn &&
-                      authStore.userName === props.post.name
+                      authStore.isLoggedIn && authStore.userName === post.name
                     "
                   >
-                    <button
-                      class="modal-link"
-                      @click="handleDelete(props.post.id)"
-                    >
+                    <button class="modal-link" @click="handleDelete(post.id)">
                       <img class="icon" :src="Deleteicon" alt="Delete icon" />
                       <span>刪除</span>
                     </button>
                   </li>
-                  <li v-if="authStore.userName !== props.post.name">
+                  <li v-if="authStore.userName !== post.name">
                     <button class="modal-link">
                       <img class="icon" :src="Flagicon" alt="Flag icon" />
                       <span>檢舉</span>
@@ -1234,11 +1250,11 @@ onUnmounted(() => {
         </div>
 
         <div class="comment-content">
-          <p>{{ props.post.content }}</p>
-          <span v-if="props.post.file_url">
+          <p>{{ post.content }}</p>
+          <span v-if="post.file_url">
             <n-image
-              v-if="isImage(props.post.file_url)"
-              :src="props.post.file_url"
+              v-if="isImage(post.file_url)"
+              :src="post.file_url"
               alt="post media"
               lazy
               :preview-disabled="false"
@@ -1248,15 +1264,15 @@ onUnmounted(() => {
                 <div class="media-placeholder">Loading Image...</div>
               </template>
             </n-image>
-            <div v-else-if="isVideo(props.post.file_url)" class="video-wrapper">
+            <div v-else-if="isVideo(post.file_url)" class="video-wrapper">
               <video
-                :src="props.post.file_url"
+                :src="post.file_url"
                 controls
                 class="comment-video"
                 preload="auto"
                 @error="
                   (e) => {
-                    console.error('Video load error:', props.post.file_url, e);
+                    console.error('Video load error:', post.file_url, e);
                     message.error('影片載入失敗，請檢查格式或網絡');
                   }
                 "
@@ -1268,15 +1284,15 @@ onUnmounted(() => {
         <div class="reply">
           <ul>
             <li>
-              <div class="reply-count" @click="handlelike(props.post.id)">
+              <div class="reply-count" @click="handlelike(post.id)">
                 <button class="reply-link">
                   <img
-                    :class="{ icon: !props.post.userLiked }"
-                    :src="props.post.userLiked ? FavoriteRedicon : Favoriteicon"
+                    :class="{ icon: !post.userLiked }"
+                    :src="post.userLiked ? FavoriteRedicon : Favoriteicon"
                     alt="Like"
                   />
                 </button>
-                <n-badge :value="props.post.likes || 0" />
+                <n-badge :value="post.likes || 0" />
               </div>
             </li>
           </ul>
@@ -1329,6 +1345,7 @@ onUnmounted(() => {
       </div>
     </div>
   </div>
+  <div v-else>正在加載貼文...</div>
 </template>
 
 <style scoped>
