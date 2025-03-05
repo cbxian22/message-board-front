@@ -9,7 +9,7 @@
 
     <div>
       <ul>
-        <li v-if="authStore.isLoggedIn" @click="setActive('chatlist')">
+        <li v-if="shouldShowChatAndNotification" @click="setActive('chatlist')">
           <router-link
             to="/chatlist"
             class="nav-link"
@@ -19,7 +19,10 @@
           </router-link>
         </li>
 
-        <li v-if="authStore.isLoggedIn" @click="setActive('notification')">
+        <li
+          v-if="shouldShowChatAndNotification"
+          @click="setActive('notification')"
+        >
           <router-link to="/notification" class="nav-link">
             <img class="icon" :src="Favoriteicon" alt="Favoriteicon" />
           </router-link>
@@ -64,7 +67,7 @@
 </template>
 
 <script setup>
-import { ref, onMounted, onUnmounted } from "vue";
+import { ref, computed, onMounted, onUnmounted } from "vue";
 import { useRouter, useRoute } from "vue-router";
 import { useAuthStore } from "../stores/authStore";
 import { useThemeStore } from "../stores/themeStore";
@@ -83,10 +86,20 @@ const isModalOpen = ref(false);
 const navStore = useNavStore();
 
 const shouldShowMenuIcon = computed(() => {
-  if (!authStore.isLoggedIn) {
-    return true;
+  if (!authStore.isLoggedIn) return true; // 未登入的時候，Menuicon 一直顯示
+  if (route.name !== "Profile") return false; // 不是 profile 頁面就隱藏
+  return route.params.username === authStore.userName; // 只在自己的頁面顯示
+});
+
+const shouldShowChatAndNotification = computed(() => {
+  if (!authStore.isLoggedIn) return false; // 未登入時都不顯示
+  if (
+    route.name === "Profile" &&
+    route.params.username !== authStore.userName
+  ) {
+    return false; // 如果是別人的 Profile 頁面，不顯示
   }
-  return route.name === "Profile";
+  return true; // 其他頁面正常顯示
 });
 
 const setActive = (item) => {
