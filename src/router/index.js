@@ -23,6 +23,11 @@ const router = createRouter({
       component: () => import("../views/RegisterView.vue"),
     },
     {
+      path: "/post",
+      name: "Post",
+      component: () => import("../views/PostView.vue"),
+    },
+    {
       path: "/chat/:friendId",
       name: "Chat",
       component: () => import("../views/ChatView.vue"),
