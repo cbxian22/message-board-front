@@ -428,7 +428,7 @@ onUnmounted(() => {
     </div>
   </div>
   <div v-else>正在加載貼文...</div>
-  <UpdatePostView v-model="isOpenModal" :comment="selectedPostId" />
+  <UpdatePostView v-model="isOpenModal" :post-id="selectedPostId" />
   <Navbar />
 </template>
 
