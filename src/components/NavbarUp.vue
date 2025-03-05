@@ -97,11 +97,13 @@ const shouldShowMenuIcon = computed(() => {
 });
 
 const shouldShowChatAndNotification = computed(() => {
-  if (!authStore.isLoggedIn) return false; // 未登入時不顯示
+  if (!authStore.isLoggedIn) return false;
   if (
     route.name === "Profile" &&
     route.params.username === authStore.userName
   ) {
+    return false;
+  } else {
     return false;
   }
 });
