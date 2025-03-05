@@ -26,7 +26,7 @@
         </router-link>
       </li>
 
-      <li v-if="shouldShowMenuIcon">
+      <li>
         <button
           @click="checkTokenAndOpenModal"
           class="nav-link"
@@ -69,7 +69,6 @@
 import { ref, computed } from "vue";
 import { useAuthStore } from "../stores/authStore";
 import { useNavStore } from "../stores/navStore";
-import { useRoute } from "vue-router";
 
 import PostView from "./ModalPost.vue";
 import Login from "./ModalLogin.vue";
@@ -80,18 +79,10 @@ import Addicon from "../assets/Addicon.svg";
 import Loginicon from "../assets/Loginicon.svg";
 
 const authStore = useAuthStore();
-const route = useRoute();
 const navStore = useNavStore();
 
 const isPostModalOpen = ref(false);
 const isLoginModalOpen = ref(false);
-
-const shouldShowMenuIcon = computed(() => {
-  if (!authStore.isLoggedIn) {
-    return true;
-  }
-  return route.name === "Profile";
-});
 
 const setActive = (item) => {
   navStore.setActive(item);

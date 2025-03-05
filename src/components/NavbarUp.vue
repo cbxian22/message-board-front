@@ -19,13 +19,13 @@
           </router-link>
         </li>
 
-        <li v-if="authStore.isLoggedIn">
+        <li v-if="authStore.isLoggedIn" @click="setActive('notification')">
           <router-link to="/notification" class="nav-link">
             <img class="icon" :src="Favoriteicon" alt="Favoriteicon" />
           </router-link>
         </li>
 
-        <li>
+        <li v-if="shouldShowMenuIcon">
           <button ref="modalButton" @click="openModal" class="nav-link">
             <img class="icon" :src="Menuicon" alt="Menuicon" />
           </button>
@@ -65,7 +65,7 @@
 
 <script setup>
 import { ref, onMounted, onUnmounted } from "vue";
-import { useRouter } from "vue-router";
+import { useRouter, useRoute } from "vue-router";
 import { useAuthStore } from "../stores/authStore";
 import { useThemeStore } from "../stores/themeStore";
 import { useNavStore } from "../stores/navStore";
@@ -76,10 +76,18 @@ import Favoriteicon from "../assets/Favoriteicon.svg";
 import Boardxian from "/Boardxian.svg";
 
 const router = useRouter();
+const route = useRoute();
 const themeStore = useThemeStore();
 const authStore = useAuthStore();
 const isModalOpen = ref(false);
 const navStore = useNavStore();
+
+const shouldShowMenuIcon = computed(() => {
+  if (!authStore.isLoggedIn) {
+    return true;
+  }
+  return route.name === "Profile";
+});
 
 const setActive = (item) => {
   navStore.setActive(item);
