@@ -506,13 +506,60 @@ const authStore = useAuthStore();
 const dateStore = useDateStore();
 const message = useMessage();
 
-const comments = ref([]);
+// const comments = ref([]);
 const modalState = ref({});
 const modalRefs = ref({});
 const buttonRefs = ref({});
 const isOpenModal = ref(false);
 const isLikeProcessing = ref(false);
 const selectedComment = ref(null);
+
+const comments = [
+  {
+    id: 1,
+    name: "xian", // 留言者名稱
+    timestamp: new Date().toISOString(), // 留言時間
+    content: "這是一則測試留言。",
+    file_url:
+      "https://storage.googleapis.com/message_board_storage/IMG_0197.jpeg", // 可以放圖片或影片
+    userLiked: true, // 當前使用者是否已經按讚
+    likes: 5, // 總按讚數
+    replies: 2, // 回覆數量
+  },
+  {
+    id: 2,
+    name: "andy",
+    timestamp: new Date().toISOString(),
+    content: "這是另一則留言，帶一張圖片。",
+    file_url:
+      "https://storage.googleapis.com/message_board_storage/1000005954.jpg",
+    userLiked: false,
+    likes: 3,
+    replies: 1,
+  },
+  {
+    id: 3,
+    name: "boxian",
+    timestamp: new Date().toISOString(),
+    content: "這是帶影片的留言。",
+    file_url:
+      "https://storage.googleapis.com/message_board_storage/1000003286.jpg",
+    userLiked: false,
+    likes: 0,
+    replies: 0,
+  },
+  {
+    id: 4,
+    name: "xian",
+    timestamp: new Date().toISOString(),
+    content: "這是一則純文字留言。",
+    file_url:
+      "https://storage.googleapis.com/message_board_storage/_20250301_222936.JPG", // 無附件
+    userLiked: true,
+    likes: 7,
+    replies: 4,
+  },
+];
 
 // 檔案類型檢查
 const isImage = (url) => {
@@ -712,7 +759,7 @@ const handleReply = async (postId) => {
     return;
   }
   await fetchSingleComment(postId);
-  router.push({ name: "CommentView", params: { postId } });
+  router.push({ name: "Post", params: { postId } });
 };
 
 onMounted(async () => {

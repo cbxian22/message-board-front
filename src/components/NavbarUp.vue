@@ -82,8 +82,9 @@ const router = useRouter();
 const route = useRoute();
 const themeStore = useThemeStore();
 const authStore = useAuthStore();
-const isModalOpen = ref(false);
 const navStore = useNavStore();
+
+const isModalOpen = ref(false);
 
 const shouldShowMenuIcon = computed(() => {
   if (!authStore.isLoggedIn) return true;
