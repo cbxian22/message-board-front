@@ -660,6 +660,7 @@ const handleUpdate = async (postId) => {
   isOpenModal.value = true;
 };
 
+// 處理貼文更新
 const handlePostUpdate = (updatedPost) => {
   const index = comments.value.findIndex((c) => c.id === updatedPost.id);
   if (index !== -1) {
@@ -668,6 +669,8 @@ const handlePostUpdate = (updatedPost) => {
       content: updatedPost.content,
       file_url: updatedPost.file_url,
     };
+    isOpenModal.value = false; // 關閉 Modal
+    selectedPostId.value = null; // 清空選中貼文
   }
 };
 
@@ -866,7 +869,7 @@ onUnmounted(() => {
       </div>
     </div>
   </div>
-  <UpdatePostView v-model="isOpenModal" :comment="selectedPostId" />
+  <UpdatePostView v-model="isOpenModal" ::post-id="selectedPostId" />
 </template>
 
 <style scoped>

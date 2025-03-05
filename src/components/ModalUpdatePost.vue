@@ -531,7 +531,7 @@ const props = defineProps({
   modelValue: Boolean,
   postId: {
     type: [String, Number],
-    required: true, // 假設 postId 是必須的，通過父組件傳入
+    required: true, // postId 是必須的
   },
 });
 
@@ -655,16 +655,17 @@ const handleMessage = async () => {
     );
 
     if (response.status === 200) {
-      content.value = "";
-      file.value = null;
-      fileUrl.value = null;
-      message.success("貼文更新成功！");
-      emit("update:modelValue", false); // 關閉模態
-      emitter.emit("updatePost", {
+      const updatedPost = {
         id: props.postId,
         content: content.value,
         file_url: uploadedFileUrl,
-      }); // 通知父組件
+      };
+      emitter.emit("updatePost", updatedPost); // 通知父組件
+      message.success("貼文更新成功！");
+      content.value = "";
+      file.value = null;
+      fileUrl.value = null;
+      emit("update:modelValue", false); // 關閉模態
     } else {
       message.error("貼文更新失敗！");
       loadingBar.error();
@@ -726,6 +727,16 @@ onMounted(() => {
     fetchSingleComment(props.postId);
   }
 });
+
+// 監聽 postId 變化
+watch(
+  () => props.postId,
+  (newPostId) => {
+    if (newPostId) {
+      fetchSingleComment(newPostId);
+    }
+  }
+);
 </script>
 
 <style scoped>
