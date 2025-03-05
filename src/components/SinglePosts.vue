@@ -526,19 +526,6 @@ const isVideo = (url) => {
 };
 
 // 打開 Modal 並禁用背景滾動
-// const openModal = (event, commentId) => {
-//   event.stopPropagation();
-//   if (modalState.value[commentId]) {
-//     modalState.value[commentId] = false;
-//     document.body.style.overflow = "auto";
-//     return;
-//   }
-//   Object.keys(modalState.value).forEach((key) => {
-//     modalState.value[key] = false;
-//   });
-//   modalState.value[commentId] = true;
-//   document.body.style.overflow = "hidden";
-// };
 const openModal = (event, commentId) => {
   event.stopPropagation();
 
@@ -558,21 +545,6 @@ const openModal = (event, commentId) => {
 };
 
 // 關閉 Modal 並恢復背景滾動
-// const closeModal = (event) => {
-//   const clickedInsideModal = Object.keys(modalRefs.value).some((id) => {
-//     const modal = modalRefs.value[id];
-//     const button = buttonRefs.value[id];
-//     return (
-//       modal && (modal.contains(event.target) || button.contains(event.target))
-//     );
-//   });
-//   if (!clickedInsideModal) {
-//     Object.keys(modalState.value).forEach((key) => {
-//       modalState.value[key] = false;
-//     });
-//     document.body.style.overflow = "auto";
-//   }
-// };
 const closeModal = (event) => {
   const clickedInsideModal = Object.keys(modalRefs.value).some((id) => {
     const modal = modalRefs.value[id];
@@ -843,7 +815,6 @@ onUnmounted(() => {
             lazy
             :preview-disabled="false"
             @preview="handleImagePreview"
-            @preview-close="handleImagePreviewClose"
             class="comment-image"
           >
             <template #placeholder>

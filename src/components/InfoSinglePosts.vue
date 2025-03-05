@@ -2,7 +2,6 @@
 import { ref, onMounted, onUnmounted, watch } from "vue";
 import { NBadge, useMessage } from "naive-ui";
 import { useAuthStore } from "../stores/authStore";
-import { usePostStore } from "../stores/usePostStore";
 import { useDateStore } from "../stores/dateStore";
 import { useRouter } from "vue-router";
 import apiClient from "../stores/axiosConfig"; // 引入 apiClient
@@ -23,7 +22,6 @@ const props = defineProps({
 });
 
 const router = useRouter();
-const postStore = usePostStore();
 const authStore = useAuthStore();
 const dateStore = useDateStore();
 const message = useMessage();
@@ -38,6 +36,17 @@ const buttonRefs = ref({});
 const isOpenModal = ref(false);
 const isLikeProcessing = ref(false); // 用於追踪點讚狀態
 const selectedComment = ref(null); // 用於儲存當前選中的單一留言
+
+// 檔案類型檢查
+const isImage = (url) => {
+  const imageExtensions = [".jpg", ".jpeg", ".png", ".gif", ".bmp", ".webp"];
+  return imageExtensions.some((ext) => url.toLowerCase().endsWith(ext));
+};
+
+const isVideo = (url) => {
+  const videoExtensions = [".mp4", ".webm", ".ogg", ".mov"];
+  return videoExtensions.some((ext) => url.toLowerCase().endsWith(ext));
+};
 
 watch(
   () => props.posts,
