@@ -307,10 +307,7 @@ onUnmounted(() => {
                       authStore.isLoggedIn && authStore.userName === post.name
                     "
                   >
-                    <button
-                      class="modal-link"
-                      @click="handleUpdate(comment.id)"
-                    >
+                    <button class="modal-link" @click="handleUpdate(post.id)">
                       <img class="icon" :src="Editicon" alt="Edit icon" />
                       <span>編輯</span>
                     </button>
