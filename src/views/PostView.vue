@@ -1163,7 +1163,7 @@ onUnmounted(() => {
 </script>
 
 <template>
-  <div class="container-box container">
+  <div class="container-box container" v-if="props.post">
     <div class="comment-box">
       <div class="photo-content">
         <router-link :to="`/@${props.post.name}`">
