@@ -259,6 +259,8 @@ const handlelike = async (id) => {
 onMounted(() => {
   document.addEventListener("mousedown", closeModal);
   adjustTextareaHeight();
+  console.log(route.params.id);
+  fetchSingleComment(route.params.id); // 根據路由參數獲取資料
   emitter.on("updatePost", handlePostUpdate); // 監聽更新事件
 });
 
