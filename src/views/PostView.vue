@@ -32,6 +32,7 @@ const isModalOpen = ref(false);
 const isLikeProcessing = ref(false);
 const textareaRef = ref(null);
 const content = ref("");
+const comments = ref([]);
 const file = ref(null);
 const fileUrl = ref(null);
 const fileInputRef = ref(null);
