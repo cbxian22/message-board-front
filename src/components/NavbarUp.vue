@@ -19,11 +19,11 @@
           </router-link>
         </li>
 
-        <!-- <li v-if="authStore.isLoggedIn">
-          <router-link to="/friendslist" class="nav-link">
-            Friendslist
+        <li v-if="authStore.isLoggedIn">
+          <router-link to="/notification" class="nav-link">
+            <img class="icon" :src="Favoriteicon" alt="Favoriteicon" />
           </router-link>
-        </li> -->
+        </li>
 
         <li>
           <button ref="modalButton" @click="openModal" class="nav-link">
@@ -72,6 +72,7 @@ import { useNavStore } from "../stores/navStore";
 import { NSwitch, NCollapseItem, NCollapse } from "naive-ui";
 import Menuicon from "../assets/Menuicon.svg";
 import Sendicon from "../assets/Sendicon.svg";
+import Favoriteicon from "../assets/Favoriteicon.svg";
 import Boardxian from "/Boardxian.svg";
 
 const router = useRouter();
