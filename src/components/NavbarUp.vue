@@ -103,9 +103,8 @@ const shouldShowChatAndNotification = computed(() => {
     route.params.username === authStore.userName
   ) {
     return false;
-  } else {
-    return false;
   }
+  return true;
 });
 
 const setActive = (item) => {
