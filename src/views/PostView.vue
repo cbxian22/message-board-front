@@ -5,6 +5,7 @@ import { NBadge, useMessage, NImage, NButton, useLoadingBar } from "naive-ui";
 import { useAuthStore } from "../stores/authStore";
 import { useDateStore } from "../stores/dateStore";
 import apiClient from "../stores/axiosConfig";
+import { emitter } from "../main";
 import Navbar from "../components/Navbar.vue";
 import NavbarUp from "../components/NavbarUp.vue";
 import UpdatePostView from "../components/ModalUpdatePost.vue";

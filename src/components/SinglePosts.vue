@@ -489,6 +489,7 @@ import { useAuthStore } from "../stores/authStore";
 import { useDateStore } from "../stores/dateStore";
 import { useRouter } from "vue-router";
 import apiClient from "../stores/axiosConfig";
+import { emitter } from "../main";
 
 import UpdatePostView from "./ModalUpdatePost.vue";
 
