@@ -97,15 +97,15 @@ const file = ref(null);
 const fileUrl = ref(null);
 const fileInputRef = ref(null);
 
-// 檢查是否啟用提交按鈕
+// 貼文＿檢查是否啟用提交按鈕
 const isSubmitDisabled = computed(() => !(content.value.trim() || file.value));
 
-// 獲取 <input type="file">
+// 貼文＿獲取 <input type="file">
 const triggerFileInput = () => {
   fileInputRef.value?.click();
 };
 
-// 檢查檔案上傳處理，並顯示預覽
+// 貼文＿檢查檔案上傳處理，並顯示預覽
 const handleFileUpload = (event) => {
   const selectedFile = event.target.files[0];
   if (selectedFile) {
@@ -121,13 +121,13 @@ const handleFileUpload = (event) => {
   }
 };
 
-// 取消檔案預覽，重設檔案選擇
+// 貼文＿取消檔案預覽，重設檔案選擇
 const cancelFilePreview = () => {
   fileUrl.value = null;
   file.value = null;
 };
 
-// 獨立處理圖片上傳
+// 貼文＿獨立處理圖片上傳
 const uploadFile = async () => {
   if (!file.value) return null;
 
@@ -149,7 +149,7 @@ const uploadFile = async () => {
   }
 };
 
-// 提交上傳資料庫
+// 貼文＿提交上傳資料庫
 const handleMessage = async () => {
   if (!authStore.userId || !authStore.accessToken) {
     message.error("請先登入！");
@@ -184,7 +184,7 @@ const handleMessage = async () => {
   }
 };
 
-// 處理 Modal 關閉的邏輯
+// 處理 Modal
 const handleModalClose = (newValue) => {
   if (content.value.trim() || file.value) {
     dialog.warning({

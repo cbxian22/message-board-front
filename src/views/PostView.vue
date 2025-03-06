@@ -39,22 +39,34 @@ const fileInputRef = ref(null);
 const isOpenModal = ref(false);
 const selectedPostId = ref(null);
 
-const isSubmitDisabled = computed(() => !(content.value.trim() || file.value));
+// 貼文＿打開 Modal
+const openModal = (event) => {
+  event.stopPropagation();
+  isModalOpen.value = !isModalOpen.value;
+};
 
-// const post = {
-//   name: "alice",
-//   content: "這是測試貼文的內容",
-//   file_url:
-//     "https://storage.googleapis.com/message_board_storage/1000003286.jpg",
-//   timestamp: "2025-03-06T10:00:00Z",
-//   user_avatar:
-//     "https://storage.googleapis.com/message_board_storage/IMG_7103.jpeg",
-//   dateStore: {
-//     formatDate: "2025-03-06 10:00:00",
-//   },
-// };
+// 貼文＿關閉 Modal
+const closeModal = (event) => {
+  const modalContent = event.target.closest(".modal-content");
+  const infoLink = event.target.closest(".info-link");
+  if (!modalContent && !infoLink) {
+    isModalOpen.value = false;
+  }
+};
 
-// 獲取單一貼文
+// 貼文＿檔案類型檢查
+const isImage = (url) => {
+  const imageExtensions = [".jpg", ".jpeg", ".png", ".gif", ".bmp", ".webp"];
+  return imageExtensions.some((ext) => url.toLowerCase().endsWith(ext));
+};
+
+// 貼文＿檔案類型檢查
+const isVideo = (url) => {
+  const videoExtensions = [".mp4", ".webm", ".ogg", ".mov"];
+  return videoExtensions.some((ext) => url.toLowerCase().endsWith(ext));
+};
+
+// 貼文＿獲取單一
 const fetchSingleComment = async (postId) => {
   try {
     const userId = authStore.userId || localStorage.getItem("userId");
@@ -86,135 +98,7 @@ const fetchSingleComment = async (postId) => {
   }
 };
 
-// 動態調整高度
-const adjustTextareaHeight = () => {
-  const textarea = textareaRef.value;
-  if (textarea) {
-    textarea.style.height = "auto";
-    textarea.style.height = `${Math.min(textarea.scrollHeight, 150)}px`;
-  }
-};
-
-// 獲取 <input type="file">
-const triggerFileInput = () => {
-  fileInputRef.value?.click();
-};
-
-// 修改貼文
-const handleUpdate = async (postId) => {
-  if (!authStore.accessToken) {
-    message.error("請先登入！");
-    return;
-  }
-  selectedPostId.value = postId;
-  isOpenModal.value = true;
-};
-
-// 處理貼文更新
-const handlePostUpdate = (updatedPost) => {
-  if (post.value && post.value.id === updatedPost.id) {
-    post.value = {
-      ...post.value,
-      content: updatedPost.content,
-      file_url: updatedPost.file_url,
-    };
-    isOpenModal.value = false; // 關閉 Modal
-    selectedPostId.value = null; // 清空選中貼文
-  }
-};
-
-const handleFileUpload = (event) => {
-  const selectedFile = event.target.files[0];
-  if (selectedFile) {
-    console.log("檔案已選擇:", selectedFile.name);
-    if (selectedFile.type.startsWith("image/")) {
-      const reader = new FileReader();
-      reader.onload = (e) => {
-        fileUrl.value = e.target.result;
-      };
-      reader.readAsDataURL(selectedFile);
-    }
-    file.value = selectedFile;
-  }
-};
-
-const cancelFilePreview = () => {
-  fileUrl.value = null;
-  file.value = null;
-};
-
-const uploadFile = async () => {
-  if (!file.value) return null;
-  try {
-    console.log("開始上傳檔案...");
-    const { data } = await apiClient.get("/upload", {
-      params: { filename: file.value.name, contentType: file.value.type },
-    });
-    await apiClient.put(data.uploadUrl, file.value, {
-      headers: { "Content-Type": file.value.type },
-    });
-    console.log("檔案上傳成功:", data.fileUrl);
-    return data.fileUrl;
-  } catch (error) {
-    console.error("檔案上傳失敗:", error);
-    return null;
-  }
-};
-
-const handleMessage = async () => {
-  if (!authStore.userId || !authStore.accessToken) {
-    message.error("請先登入！");
-    return;
-  }
-  loadingBar.start();
-  try {
-    const uploadedFileUrl = await uploadFile();
-    const response = await apiClient.post(`/posts/${authStore.userId}`, {
-      content: content.value,
-      fileUrl: uploadedFileUrl,
-      parentId: post.value.id, // 將回覆與父貼文關聯
-    });
-    if (response.status === 201) {
-      content.value = "";
-      file.value = null;
-      fileUrl.value = null;
-      message.success("回覆成功！");
-      emit("newReply", response.data); // 通知父組件有新回覆
-    } else {
-      message.error("回覆失敗！");
-      loadingBar.error();
-    }
-  } catch (error) {
-    console.error("回覆錯誤:", error);
-    message.error("回覆失敗！");
-  } finally {
-    loadingBar.finish();
-  }
-};
-
-const isImage = (url) => {
-  const imageExtensions = [".jpg", ".jpeg", ".png", ".gif", ".bmp", ".webp"];
-  return imageExtensions.some((ext) => url.toLowerCase().endsWith(ext));
-};
-
-const isVideo = (url) => {
-  const videoExtensions = [".mp4", ".webm", ".ogg", ".mov"];
-  return videoExtensions.some((ext) => url.toLowerCase().endsWith(ext));
-};
-
-const openModal = (event) => {
-  event.stopPropagation();
-  isModalOpen.value = !isModalOpen.value;
-};
-
-const closeModal = (event) => {
-  const modalContent = event.target.closest(".modal-content");
-  const infoLink = event.target.closest(".info-link");
-  if (!modalContent && !infoLink) {
-    isModalOpen.value = false;
-  }
-};
-
+// 貼文＿刪除
 const handleDelete = async (postId) => {
   if (!authStore.accessToken) {
     message.error("請先登入！");
@@ -231,6 +115,30 @@ const handleDelete = async (postId) => {
   }
 };
 
+// 貼文＿修改
+const handleUpdate = async (postId) => {
+  if (!authStore.accessToken) {
+    message.error("請先登入！");
+    return;
+  }
+  selectedPostId.value = postId;
+  isOpenModal.value = true;
+};
+
+// 貼文＿處理更新
+const handlePostUpdate = (updatedPost) => {
+  if (post.value && post.value.id === updatedPost.id) {
+    post.value = {
+      ...post.value,
+      content: updatedPost.content,
+      file_url: updatedPost.file_url,
+    };
+    isOpenModal.value = false; // 關閉 Modal
+    selectedPostId.value = null; // 清空選中貼文
+  }
+};
+
+// 貼文＿按讚
 const handlelike = async (id) => {
   if (!authStore.userId || !authStore.accessToken) {
     message.error("請先登入！");
@@ -265,6 +173,98 @@ const handlelike = async (id) => {
   }
 };
 
+// ===== 因為不用 Modal Reply 所以部分功能雷同，直接寫入此檔案 ===== //
+
+// 回覆＿檢查是否啟用提交按鈕
+const isSubmitDisabled = computed(() => !(content.value.trim() || file.value));
+
+// 回覆＿獲取 <input type="file">
+const triggerFileInput = () => {
+  fileInputRef.value?.click();
+};
+
+// 回覆＿檢查檔案上傳處理，並顯示預覽
+const handleFileUpload = (event) => {
+  const selectedFile = event.target.files[0];
+  if (selectedFile) {
+    console.log("檔案已選擇:", selectedFile.name);
+    if (selectedFile.type.startsWith("image/")) {
+      const reader = new FileReader();
+      reader.onload = (e) => {
+        fileUrl.value = e.target.result;
+      };
+      reader.readAsDataURL(selectedFile);
+    }
+    file.value = selectedFile;
+  }
+};
+
+// 回覆＿取消檔案預覽，重設檔案選擇
+const cancelFilePreview = () => {
+  fileUrl.value = null;
+  file.value = null;
+};
+
+// 回覆＿獨立處理圖片上傳
+const uploadFile = async () => {
+  if (!file.value) return null;
+  try {
+    console.log("開始上傳檔案...");
+    const { data } = await apiClient.get("/upload", {
+      params: { filename: file.value.name, contentType: file.value.type },
+    });
+    await apiClient.put(data.uploadUrl, file.value, {
+      headers: { "Content-Type": file.value.type },
+    });
+    console.log("檔案上傳成功:", data.fileUrl);
+    return data.fileUrl;
+  } catch (error) {
+    console.error("檔案上傳失敗:", error);
+    return null;
+  }
+};
+
+// 回覆＿提交上傳資料庫
+const handleMessage = async () => {
+  if (!authStore.userId || !authStore.accessToken) {
+    message.error("請先登入！");
+    return;
+  }
+  loadingBar.start();
+  try {
+    const uploadedFileUrl = await uploadFile();
+    const response = await apiClient.post(`/posts/${authStore.userId}`, {
+      content: content.value,
+      fileUrl: uploadedFileUrl,
+      parentId: post.value.id, // 將回覆與父貼文關聯
+    });
+    if (response.status === 201) {
+      content.value = "";
+      file.value = null;
+      fileUrl.value = null;
+      message.success("回覆成功！");
+      emit("newReply", response.data); // 通知父組件有新回覆
+    } else {
+      message.error("回覆失敗！");
+      loadingBar.error();
+    }
+  } catch (error) {
+    console.error("回覆錯誤:", error);
+    message.error("回覆失敗！");
+  } finally {
+    loadingBar.finish();
+  }
+};
+
+// 動態調整高度
+const adjustTextareaHeight = () => {
+  const textarea = textareaRef.value;
+  if (textarea) {
+    textarea.style.height = "auto";
+    textarea.style.height = `${Math.min(textarea.scrollHeight, 150)}px`;
+  }
+};
+
 onMounted(() => {
   document.addEventListener("mousedown", closeModal);
   adjustTextareaHeight();
@@ -278,7 +278,7 @@ onUnmounted(() => {
   emitter.off("updatePost", handlePostUpdate); // 移除事件監聽
 });
 
-// 監聽內容變化
+// 監聽內容，調整高度
 watch(content, () => {
   adjustTextareaHeight();
 });

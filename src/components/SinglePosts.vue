@@ -515,18 +515,7 @@ const isOpenModal = ref(false);
 const isLikeProcessing = ref(false);
 const selectedPostId = ref(null);
 
-// 檔案類型檢查
-const isImage = (url) => {
-  const imageExtensions = [".jpg", ".jpeg", ".png", ".gif", ".bmp", ".webp"];
-  return imageExtensions.some((ext) => url.toLowerCase().endsWith(ext));
-};
-
-const isVideo = (url) => {
-  const videoExtensions = [".mp4", ".webm", ".ogg", ".mov"];
-  return videoExtensions.some((ext) => url.toLowerCase().endsWith(ext));
-};
-
-// 打開 Modal 並禁用背景滾動
+// 貼文＿打開 Modal
 const openModal = (event, commentId) => {
   event.stopPropagation();
 
@@ -545,7 +534,7 @@ const openModal = (event, commentId) => {
   modalState.value[commentId] = true;
 };
 
-// 關閉 Modal 並恢復背景滾動
+// 貼文＿關閉 Modal
 const closeModal = (event) => {
   const clickedInsideModal = Object.keys(modalRefs.value).some((id) => {
     const modal = modalRefs.value[id];
@@ -563,7 +552,19 @@ const closeModal = (event) => {
   }
 };
 
-// 獲取主頁貼文
+// 貼文＿檔案類型檢查
+const isImage = (url) => {
+  const imageExtensions = [".jpg", ".jpeg", ".png", ".gif", ".bmp", ".webp"];
+  return imageExtensions.some((ext) => url.toLowerCase().endsWith(ext));
+};
+
+// 貼文＿檔案類型檢查
+const isVideo = (url) => {
+  const videoExtensions = [".mp4", ".webm", ".ogg", ".mov"];
+  return videoExtensions.some((ext) => url.toLowerCase().endsWith(ext));
+};
+
+// 貼文＿獲取
 const fetchComments = async () => {
   try {
     const userId = authStore.userId || localStorage.getItem("userId");
@@ -600,7 +601,7 @@ const fetchComments = async () => {
   }
 };
 
-// 刪除貼文
+// 貼文＿刪除
 const handleDelete = async (postId) => {
   if (!authStore.accessToken) {
     message.error("請先登入！");
@@ -618,7 +619,7 @@ const handleDelete = async (postId) => {
   }
 };
 
-// 修改貼文
+// 貼文＿修改
 const handleUpdate = async (postId) => {
   if (!authStore.accessToken) {
     message.error("請先登入！");
@@ -628,7 +629,7 @@ const handleUpdate = async (postId) => {
   isOpenModal.value = true;
 };
 
-// 處理貼文更新
+// 貼文＿處理更新
 const handlePostUpdate = (updatedPost) => {
   const index = comments.value.findIndex((c) => c.id === updatedPost.id);
   if (index !== -1) {
@@ -642,7 +643,7 @@ const handlePostUpdate = (updatedPost) => {
   }
 };
 
-// 按讚
+// 貼文＿按讚
 const handlelike = async (id) => {
   if (!authStore.userId || !authStore.accessToken) {
     message.error("請先登入！");
@@ -688,7 +689,7 @@ const handlelike = async (id) => {
   }
 };
 
-// 新增回覆
+// 貼文＿導向＿回覆
 const handleReply = async (postId) => {
   router.push({ name: "Post", params: { id: postId } });
 };

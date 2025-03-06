@@ -38,86 +38,7 @@ const isOpenModal = ref(false);
 const isLikeProcessing = ref(false);
 const selectedReplyId = ref(null);
 
-// const replies = [
-//   {
-//     id: 1,
-//     name: "xian",
-//     user_avatar:
-//       "https://storage.googleapis.com/message_board_storage/1000003286.jpg",
-//     content: "有人知道這是哪裡嗎？",
-//     timestamp: new Date("2025-02-22T19:06:51.000Z"),
-//     file_url:
-//       "https://storage.googleapis.com/message_board_storage/1000003286.jpg",
-//     likes: 5,
-//     userLiked: false,
-//     replies: 2,
-//   },
-//   {
-//     id: 2,
-//     name: "jane",
-//     user_avatar:
-//       "https://storage.googleapis.com/message_board_storage/1000006562.jpg",
-//     content: "這看起來像是巴黎鐵塔！",
-//     timestamp: new Date("2025-02-22T20:15:30.000Z"),
-//     file_url:
-//       "https://storage.googleapis.com/message_board_storage/IMG_7103.jpeg",
-//     likes: 3,
-//     userLiked: true,
-//     replies: 1,
-//   },
-//   {
-//     id: 3,
-//     name: "bob",
-//     user_avatar:
-//       "https://storage.googleapis.com/message_board_storage/20250221_123341575.JPG",
-//     content: "應該是東京塔吧！",
-//     timestamp: new Date("2025-02-22T21:30:00.000Z"),
-//     file_url:
-//       "https://storage.googleapis.com/message_board_storage/IMG_0197.jpeg",
-//     likes: 10,
-//     userLiked: false,
-//     replies: 5,
-//   },
-//   {
-//     id: 4,
-//     name: "alice",
-//     user_avatar:
-//       "https://storage.googleapis.com/message_board_storage/DSC06831.jpeg",
-//     content: "我覺得是上海的東方明珠！",
-//     timestamp: new Date("2025-02-22T22:45:15.000Z"),
-//     file_url: null,
-//     likes: 8,
-//     userLiked: true,
-//     replies: 3,
-//   },
-//   {
-//     id: 5,
-//     name: "tom",
-//     user_avatar:
-//       "https://storage.googleapis.com/message_board_storage/IMG_2122.JPG",
-//     content: "那是自由女神像吧！",
-//     timestamp: new Date("2025-02-22T23:50:10.000Z"),
-//     file_url:
-//       "https://storage.googleapis.com/message_board_storage/IMG_2067.jpeg",
-//     likes: 2,
-//     userLiked: false,
-//     replies: 0,
-//   },
-// ];
-
-// 檔案類型檢查
-
-const isImage = (url) => {
-  const imageExtensions = [".jpg", ".jpeg", ".png", ".gif", ".bmp", ".webp"];
-  return imageExtensions.some((ext) => url.toLowerCase().endsWith(ext));
-};
-
-const isVideo = (url) => {
-  const videoExtensions = [".mp4", ".webm", ".ogg", ".mov"];
-  return videoExtensions.some((ext) => url.toLowerCase().endsWith(ext));
-};
-
-// 打開 Modal 並禁用背景滾動
+// 回覆＿打開 Modal
 const openModal = (event, replyId) => {
   event.stopPropagation();
 
@@ -136,7 +57,7 @@ const openModal = (event, replyId) => {
   modalState.value[replyId] = true;
 };
 
-// 關閉 Modal 並恢復背景滾動
+// 回覆＿關閉 Modal
 const closeModal = (event) => {
   const clickedInsideModal = Object.keys(modalRefs.value).some((id) => {
     const modal = modalRefs.value[id];
@@ -154,7 +75,19 @@ const closeModal = (event) => {
   }
 };
 
-// 獲取單一貼文所有回覆
+// 回覆＿檔案類型檢查
+const isImage = (url) => {
+  const imageExtensions = [".jpg", ".jpeg", ".png", ".gif", ".bmp", ".webp"];
+  return imageExtensions.some((ext) => url.toLowerCase().endsWith(ext));
+};
+
+// 回覆＿檔案類型檢查
+const isVideo = (url) => {
+  const videoExtensions = [".mp4", ".webm", ".ogg", ".mov"];
+  return videoExtensions.some((ext) => url.toLowerCase().endsWith(ext));
+};
+
+// 回覆＿獲取
 const fetchReplies = async (postId) => {
   try {
     const userId = authStore.userId || localStorage.getItem("userId");
@@ -190,7 +123,7 @@ const fetchReplies = async (postId) => {
   }
 };
 
-// 刪除回覆
+// 回覆＿刪除
 const handleDelete = async (replayId) => {
   if (!authStore.accessToken) {
     message.error("請先登入！");
@@ -208,7 +141,7 @@ const handleDelete = async (replayId) => {
   }
 };
 
-// 修改貼文
+// 回覆＿修改
 const handleUpdate = async (replayId) => {
   if (!authStore.accessToken) {
     message.error("請先登入！");
@@ -218,7 +151,7 @@ const handleUpdate = async (replayId) => {
   isOpenModal.value = true;
 };
 
-// 處理貼文更新
+// 回覆＿處理更新
 const handleReplyUpdate = (updatedReply) => {
   const index = replies.value.findIndex((c) => c.id === updatedReply.id);
   if (index !== -1) {
@@ -232,7 +165,7 @@ const handleReplyUpdate = (updatedReply) => {
   }
 };
 
-// 按讚
+// 回覆＿按讚
 const handlelike = async (id) => {
   if (!authStore.userId || !authStore.accessToken) {
     message.error("請先登入！");
