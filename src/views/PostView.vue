@@ -38,6 +38,7 @@ const fileUrl = ref(null);
 const fileInputRef = ref(null);
 const isOpenModal = ref(false);
 const selectedPostId = ref(null);
+const postId = route.params.id;
 
 // 貼文＿打開 Modal
 const openModal = (event) => {
@@ -271,8 +272,7 @@ const adjustTextareaHeight = () => {
 onMounted(() => {
   document.addEventListener("mousedown", closeModal);
   adjustTextareaHeight();
-  console.log(route.params.id);
-  fetchSingleComment(route.params.id); // 根據路由參數獲取資料
+  fetchSingleComment(postId); // 根據路由參數獲取資料
   emitter.on("updatePost", handlePostUpdate); // 監聽更新事件
 });
 
