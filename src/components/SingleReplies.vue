@@ -159,7 +159,7 @@ const fetchReplies = async (postId) => {
   try {
     const userId = authStore.userId || localStorage.getItem("userId");
     const token = authStore.accessToken;
-    const response = await apiClient.get("/replies", {
+    const response = await apiClient.get(`/replies/${postId}`, {
       params: { userId },
       headers: token ? { Authorization: `Bearer ${token}` } : {},
     });
