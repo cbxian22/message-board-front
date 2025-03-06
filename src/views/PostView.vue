@@ -8,6 +8,7 @@ import apiClient from "../stores/axiosConfig";
 import { emitter } from "../main";
 import Navbar from "../components/Navbar.vue";
 import NavbarUp from "../components/NavbarUp.vue";
+import SingleReplies from "../components/SingleReplies.vue";
 import UpdatePostView from "../components/ModalUpdatePost.vue";
 
 import Backicon from "../assets/Backicon.svg";
@@ -27,7 +28,7 @@ const dateStore = useDateStore();
 const message = useMessage();
 const loadingBar = useLoadingBar();
 
-const post = ref(null); // 本地狀態儲存貼文資料
+const post = ref(null);
 const isModalOpen = ref(false);
 const isLikeProcessing = ref(false);
 const textareaRef = ref(null);
@@ -39,6 +40,19 @@ const isOpenModal = ref(false);
 const selectedPostId = ref(null);
 
 const isSubmitDisabled = computed(() => !(content.value.trim() || file.value));
+
+// const post = {
+//   name: "alice",
+//   content: "這是測試貼文的內容",
+//   file_url:
+//     "https://storage.googleapis.com/message_board_storage/1000003286.jpg",
+//   timestamp: "2025-03-06T10:00:00Z",
+//   user_avatar:
+//     "https://storage.googleapis.com/message_board_storage/IMG_7103.jpeg",
+//   dateStore: {
+//     formatDate: "2025-03-06 10:00:00",
+//   },
+// };
 
 // 獲取單一貼文
 const fetchSingleComment = async (postId) => {
@@ -365,7 +379,7 @@ onUnmounted(() => {
           </span>
         </div>
 
-        <div class="reply">
+        <div class="reply-section">
           <ul>
             <li>
               <div class="reply-count" @click="handlelike(post.id)">
@@ -428,8 +442,10 @@ onUnmounted(() => {
         </div>
       </div>
     </div>
+    <SingleReplies :post-id="1" />
   </div>
   <div v-else>正在加載貼文...</div>
+
   <UpdatePostView v-model="isOpenModal" :post-id="selectedPostId" />
   <Navbar />
 </template>
@@ -466,13 +482,13 @@ onUnmounted(() => {
   object-fit: cover;
 }
 
-.reply {
+.reply-section {
   display: flex;
   margin-left: -10px;
   align-items: center;
 }
 
-.reply ul {
+.reply-section ul {
   display: flex;
   flex-direction: row;
   list-style-type: none;
