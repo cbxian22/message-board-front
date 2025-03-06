@@ -272,18 +272,23 @@ const adjustTextareaHeight = () => {
 onMounted(() => {
   document.addEventListener("mousedown", closeModal);
   adjustTextareaHeight();
-  fetchSingleComment(postId); // 根據路由參數獲取資料
-  emitter.on("updatePost", handlePostUpdate); // 監聽更新事件
+  fetchSingleComment(postId.value);
+  emitter.on("updatePost", handlePostUpdate);
 });
 
 onUnmounted(() => {
   document.removeEventListener("mousedown", closeModal);
-  emitter.off("updatePost", handlePostUpdate); // 移除事件監聽
+  emitter.off("updatePost", handlePostUpdate);
 });
 
 // 監聽內容，調整高度
 watch(content, () => {
   adjustTextareaHeight();
+  () => route.params.id,
+    (newId) => {
+      postId.value = newId;
+      fetchSingleComment(newId); // 重新獲取貼文資料
+    };
 });
 </script>
 
