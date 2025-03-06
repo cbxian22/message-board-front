@@ -129,14 +129,12 @@ const handleUpdate = async (postId) => {
 // 貼文＿處理更新
 const handlePostUpdate = (updatedPost) => {
   if (post.value && post.value.id === updatedPost.id) {
-    // post.value = {
-    //   ...post.value,
-    //   content: updatedPost.content,
-    //   file_url: updatedPost.file_url,
-    // };
-    post.value = { ...post.value, ...updatedPost };
-    isOpenModal.value = false; // 關閉 Modal
-    // selectedPostId.value = null; // 清空選中貼文
+    post.value = {
+      ...post.value,
+      content: updatedPost.content,
+      file_url: updatedPost.file_url,
+    };
+    isOpenModal.value = false;
   }
 };
 
