@@ -38,7 +38,7 @@ const fileUrl = ref(null);
 const fileInputRef = ref(null);
 const isOpenModal = ref(false);
 // const selectedPostId = ref(null);
-const postId = ref(route.params.id);
+const postId = route.params.id;
 
 // 貼文＿打開 Modal
 const openModal = (event) => {
@@ -129,11 +129,12 @@ const handleUpdate = async (postId) => {
 // 貼文＿處理更新
 const handlePostUpdate = (updatedPost) => {
   if (post.value && post.value.id === updatedPost.id) {
-    post.value = {
-      ...post.value,
-      content: updatedPost.content,
-      file_url: updatedPost.file_url,
-    };
+    // post.value = {
+    //   ...post.value,
+    //   content: updatedPost.content,
+    //   file_url: updatedPost.file_url,
+    // };
+    post.value = { ...post.value, ...updatedPost };
     isOpenModal.value = false; // 關閉 Modal
     // selectedPostId.value = null; // 清空選中貼文
   }
@@ -272,7 +273,7 @@ const adjustTextareaHeight = () => {
 onMounted(() => {
   document.addEventListener("mousedown", closeModal);
   adjustTextareaHeight();
-  fetchSingleComment(postId.value);
+  fetchSingleComment(postId);
   emitter.on("updatePost", handlePostUpdate);
 });
 
@@ -284,11 +285,6 @@ onUnmounted(() => {
 // 監聽內容，調整高度
 watch(content, () => {
   adjustTextareaHeight();
-  () => route.params.id,
-    (newId) => {
-      postId.value = newId;
-      fetchSingleComment(newId); // 重新獲取貼文資料
-    };
 });
 </script>
 
