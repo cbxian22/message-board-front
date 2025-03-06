@@ -550,8 +550,6 @@ const closeModal = (event) => {
       modalState.value[key] = false;
     });
   }
-
-  selectedPostId.value = null;
 };
 
 // 貼文＿檔案類型檢查
@@ -640,8 +638,8 @@ const handlePostUpdate = (updatedPost) => {
       content: updatedPost.content,
       file_url: updatedPost.file_url,
     };
-    isOpenModal.value = false;
-    selectedPostId.value = null;
+    isOpenModal.value = false; // 關閉 Modal
+    selectedPostId.value = null; // 清空選中貼文
   }
 };
 
