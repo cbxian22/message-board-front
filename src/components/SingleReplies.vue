@@ -1,5 +1,5 @@
 <script setup>
-import { ref, defineEmits, onMounted, onUnmounted } from "vue";
+import { ref, watch, defineEmits, onMounted, onUnmounted } from "vue";
 import { NBadge, useMessage, NImage } from "naive-ui";
 import { useAuthStore } from "../stores/authStore";
 import { useDateStore } from "../stores/dateStore";
@@ -279,7 +279,9 @@ const handlelike = async (id) => {
 };
 
 onMounted(async () => {
-  fetchReplies();
+  if (props.postId) {
+    fetchReplies(props.postId);
+  }
   document.addEventListener("mousedown", closeModal);
   emitter.on("updateReply", handleReplyUpdate); // 監聽更新事件
 });
@@ -288,6 +290,15 @@ onUnmounted(() => {
   document.removeEventListener("mousedown", closeModal);
   emitter.off("updateReply", handleReplyUpdate); // 移除事件監聽
 });
+
+watch(
+  () => props.postId,
+  (newPostId) => {
+    if (newPostId) {
+      fetchReplies(newPostId);
+    }
+  }
+);
 </script>
 
 <template>
