@@ -442,7 +442,7 @@ onUnmounted(() => {
         </div>
       </div>
     </div>
-    <SingleReplies :post-id="1" />
+    <SingleReplies :post-id="selectedPostId" />
   </div>
   <div v-else>正在加載貼文...</div>
 
