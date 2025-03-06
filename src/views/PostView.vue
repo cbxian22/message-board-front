@@ -273,6 +273,7 @@ onMounted(() => {
   document.addEventListener("mousedown", closeModal);
   adjustTextareaHeight();
   emitter.on("updatePost", handlePostUpdate);
+  fetchSingleComment(postId);
 });
 
 onUnmounted(() => {
