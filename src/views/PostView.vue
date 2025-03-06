@@ -117,17 +117,18 @@ const handleDelete = async (postId) => {
 };
 
 // 貼文＿修改
-const handleUpdate = async (postId) => {
+const handleUpdate = async () => {
   if (!authStore.accessToken) {
     message.error("請先登入！");
     return;
   }
-  // selectedPostId.value = postId;
   isOpenModal.value = true;
 };
 
 // 貼文＿處理更新
 const handlePostUpdate = (updatedPost) => {
+  console.log(updatedPost);
+
   if (post.value && post.value.id === updatedPost.id) {
     post.value = {
       ...post.value,
@@ -323,7 +324,7 @@ watch(content, () => {
                       authStore.isLoggedIn && authStore.userName === post.name
                     "
                   >
-                    <button class="modal-link" @click="handleUpdate(post.id)">
+                    <button class="modal-link" @click="handleUpdate()">
                       <img class="icon" :src="Editicon" alt="Edit icon" />
                       <span>編輯</span>
                     </button>
