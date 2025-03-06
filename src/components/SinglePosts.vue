@@ -620,12 +620,12 @@ const handleDelete = async (postId) => {
 };
 
 // 貼文＿修改
-const handleUpdate = async (postId) => {
+const handleUpdate = async () => {
   if (!authStore.accessToken) {
     message.error("請先登入！");
     return;
   }
-  selectedPostId.value = postId;
+  // selectedPostId.value = postId;
   isOpenModal.value = true;
 };
 
@@ -639,7 +639,7 @@ const handlePostUpdate = (updatedPost) => {
       file_url: updatedPost.file_url,
     };
     isOpenModal.value = false; // 關閉 Modal
-    selectedPostId.value = null; // 清空選中貼文
+    // selectedPostId.value = null; // 清空選中貼文
   }
 };
 
@@ -749,7 +749,7 @@ onUnmounted(() => {
                     authStore.isLoggedIn && authStore.userName === comment.name
                   "
                 >
-                  <button class="modal-link" @click="handleUpdate(comment.id)">
+                  <button class="modal-link" @click="handleUpdate">
                     <img class="icon" :src="Editicon" alt="Editicon" />
                     <span>編輯</span>
                   </button>
