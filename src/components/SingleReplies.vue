@@ -3,7 +3,7 @@ import { ref, watch, defineEmits, onMounted, onUnmounted } from "vue";
 import { NBadge, useMessage, NImage } from "naive-ui";
 import { useAuthStore } from "../stores/authStore";
 import { useDateStore } from "../stores/dateStore";
-import { useRouter } from "vue-router";
+import { useRoute } from "vue-router";
 import apiClient from "../stores/axiosConfig";
 import { emitter } from "../main";
 
@@ -16,7 +16,7 @@ import Editicon from "../assets/Editicon.svg";
 import Deleteicon from "../assets/Deleteicon.svg";
 import Flagicon from "../assets/Flagicon.svg";
 
-const router = useRouter();
+const route = useRoute();
 const emit = defineEmits();
 const authStore = useAuthStore();
 const dateStore = useDateStore();
@@ -279,10 +279,8 @@ const handlelike = async (id) => {
 };
 
 onMounted(async () => {
-  if (props.postId) {
-    fetchReplies(props.postId);
-  }
   document.addEventListener("mousedown", closeModal);
+  fetchReplies(route.params.id);
   emitter.on("updateReply", handleReplyUpdate); // 監聽更新事件
 });
 
@@ -290,15 +288,6 @@ onUnmounted(() => {
   document.removeEventListener("mousedown", closeModal);
   emitter.off("updateReply", handleReplyUpdate); // 移除事件監聽
 });
-
-watch(
-  () => props.postId,
-  (newPostId) => {
-    if (newPostId) {
-      fetchReplies(newPostId);
-    }
-  }
-);
 </script>
 
 <template>
