@@ -37,7 +37,7 @@ const file = ref(null);
 const fileUrl = ref(null);
 const fileInputRef = ref(null);
 const isOpenModal = ref(false);
-const selectedPostId = ref(null);
+// const selectedPostId = ref(null);
 const postId = route.params.id;
 
 // 貼文＿打開 Modal
@@ -122,7 +122,7 @@ const handleUpdate = async (postId) => {
     message.error("請先登入！");
     return;
   }
-  selectedPostId.value = postId;
+  // selectedPostId.value = postId;
   isOpenModal.value = true;
 };
 
@@ -135,7 +135,7 @@ const handlePostUpdate = (updatedPost) => {
       file_url: updatedPost.file_url,
     };
     isOpenModal.value = false; // 關閉 Modal
-    selectedPostId.value = null; // 清空選中貼文
+    // selectedPostId.value = null; // 清空選中貼文
   }
 };
 
@@ -174,7 +174,7 @@ const handlelike = async (id) => {
   }
 };
 
-// ===== 因為不用 Modal Reply 所以部分功能雷同，直接寫入此檔案 ===== //
+//  因為不用 Modal Reply 且部分功能雷同，直接寫入此檔案
 
 // 回覆＿檢查是否啟用提交按鈕
 const isSubmitDisabled = computed(() => !(content.value.trim() || file.value));
@@ -449,11 +449,11 @@ watch(content, () => {
         </div>
       </div>
     </div>
-    <SingleReplies :post-id="selectedPostId" />
+    <SingleReplies :post-id="postId" />
   </div>
   <div v-else>正在加載貼文...</div>
 
-  <UpdatePostView v-model="isOpenModal" :post-id="selectedPostId" />
+  <UpdatePostView v-model="isOpenModal" :post-id="postId" />
   <Navbar />
 </template>
 

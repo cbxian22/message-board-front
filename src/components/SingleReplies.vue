@@ -35,7 +35,7 @@ const replies = ref([]);
 const modalState = ref({});
 const modalRefs = ref({});
 const buttonRefs = ref({});
-const isOpenModal = ref(false);
+const isEditing = ref(false);
 const isLikeProcessing = ref(false);
 const selectedReplyId = ref(null);
 const postId = route.params.id;
@@ -150,22 +150,23 @@ const handleUpdate = async (replayId) => {
     return;
   }
   selectedReplyId.value = replayId;
-  isOpenModal.value = true;
+  // isOpenModal.value = true;
+  isEditing.value = true;
 };
 
 // 回覆＿處理更新
-const handleReplyUpdate = (updatedReply) => {
-  const index = replies.value.findIndex((c) => c.id === updatedReply.id);
-  if (index !== -1) {
-    replies.value[index] = {
-      ...replies.value[index],
-      content: updatedReply.content,
-      file_url: updatedReply.file_url,
-    };
-    isOpenModal.value = false;
-    selectedReplyId.value = null;
-  }
-};
+// const handleReplyUpdate = (updatedReply) => {
+//   const index = replies.value.findIndex((c) => c.id === updatedReply.id);
+//   if (index !== -1) {
+//     replies.value[index] = {
+//       ...replies.value[index],
+//       content: updatedReply.content,
+//       file_url: updatedReply.file_url,
+//     };
+//     isOpenModal.value = false;
+//     selectedReplyId.value = null;
+//   }
+// };
 
 // 回覆＿按讚
 const handlelike = async (id) => {
@@ -213,15 +214,65 @@ const handlelike = async (id) => {
   }
 };
 
+//  因為不用 Modal Update Reply 且部分功能雷同，直接寫入此檔案
+
+// 回覆＿提交更新
+const handleMessage = async (replayId) => {
+  if (!authStore.userId || !authStore.accessToken) {
+    message.error("請先登入！");
+    return;
+  }
+
+  if (!props.postId) {
+    message.error("無效的貼文 ID！");
+    return;
+  }
+
+  loadingBar.start();
+
+  try {
+    const uploadedFileUrl = await uploadFile();
+    const response = await apiClient.put(
+      `/posts/${props.postId}/${authStore.userId}`,
+      {
+        content: content.value,
+        fileUrl: uploadedFileUrl,
+      }
+    );
+
+    if (response.status === 200) {
+      const updatedPost = {
+        id: props.postId,
+        content: content.value,
+        file_url: uploadedFileUrl,
+      };
+      emitter.emit("updatePost", updatedPost); // 通知父組件
+      message.success("貼文更新成功！");
+      content.value = "";
+      file.value = null;
+      fileUrl.value = null;
+      emit("update:modelValue", false); // 關閉模態
+    } else {
+      message.error("貼文更新失敗！");
+      loadingBar.error();
+    }
+  } catch (error) {
+    console.error("貼文更新錯誤:", error);
+    message.error("貼文更新失敗！");
+  } finally {
+    loadingBar.finish();
+  }
+};
+
 onMounted(async () => {
   document.addEventListener("mousedown", closeModal);
   fetchReplies(postId);
-  emitter.on("updateReply", handleReplyUpdate); // 監聽更新事件
+  // emitter.on("updateReply", handleReplyUpdate); // 監聽更新事件
 });
 
 onUnmounted(() => {
   document.removeEventListener("mousedown", closeModal);
-  emitter.off("updateReply", handleReplyUpdate); // 移除事件監聽
+  // emitter.off("updateReply", handleReplyUpdate); // 移除事件監聽
 });
 </script>
 
@@ -331,6 +382,19 @@ onUnmounted(() => {
         <ul>
           <li>
             <div class="reply-count" @click="handlelike(reply.id)">
+              <button class="reply-link">
+                <img
+                  :class="{ icon: !reply.userLiked }"
+                  :src="reply.userLiked ? FavoriteRedicon : Favoriteicon"
+                  alt="Like"
+                />
+              </button>
+              <n-badge :value="reply.likes || 0" />
+            </div>
+          </li>
+          <!-- 當 isEditing = true 出現-->
+          <li v-if="isEditing">
+            <div class="reply-count" @click="">
               <button class="reply-link">
                 <img
                   :class="{ icon: !reply.userLiked }"
