@@ -550,6 +550,8 @@ const closeModal = (event) => {
       modalState.value[key] = false;
     });
   }
+
+  selectedPostId.value = null;
 };
 
 // 貼文＿檔案類型檢查
@@ -620,12 +622,12 @@ const handleDelete = async (postId) => {
 };
 
 // 貼文＿修改
-const handleUpdate = async () => {
+const handleUpdate = async (postId) => {
   if (!authStore.accessToken) {
     message.error("請先登入！");
     return;
   }
-  // selectedPostId.value = postId;
+  selectedPostId.value = postId;
   isOpenModal.value = true;
 };
 
@@ -638,8 +640,8 @@ const handlePostUpdate = (updatedPost) => {
       content: updatedPost.content,
       file_url: updatedPost.file_url,
     };
-    isOpenModal.value = false; // 關閉 Modal
-    // selectedPostId.value = null; // 清空選中貼文
+    isOpenModal.value = false;
+    selectedPostId.value = null;
   }
 };
 
@@ -749,7 +751,7 @@ onUnmounted(() => {
                     authStore.isLoggedIn && authStore.userName === comment.name
                   "
                 >
-                  <button class="modal-link" @click="handleUpdate()">
+                  <button class="modal-link" @click="handleUpdate(comment.id)">
                     <img class="icon" :src="Editicon" alt="Editicon" />
                     <span>編輯</span>
                   </button>
