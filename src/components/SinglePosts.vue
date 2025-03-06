@@ -722,10 +722,6 @@ const handlelike = async (id) => {
 
 // 新增回覆
 const handleReply = async (postId) => {
-  if (!authStore.accessToken) {
-    message.error("請先登入！");
-    return;
-  }
   router.push({ name: "Post", params: { id: postId } });
 };
 
