@@ -38,7 +38,7 @@ const fileUrl = ref(null);
 const fileInputRef = ref(null);
 const isOpenModal = ref(false);
 const selectedPostId = ref(null);
-const postId = route.params.id;
+// const postId = route.params.id;
 
 // 貼文＿打開 Modal
 const openModal = (event) => {
@@ -273,7 +273,7 @@ onMounted(() => {
   document.addEventListener("mousedown", closeModal);
   adjustTextareaHeight();
   emitter.on("updatePost", handlePostUpdate);
-  fetchSingleComment(postId);
+  fetchSingleComment(route.params.id);
 });
 
 onUnmounted(() => {
@@ -324,7 +324,7 @@ watch(content, () => {
                       authStore.isLoggedIn && authStore.userName === post.name
                     "
                   >
-                    <button class="modal-link" @click="handleUpdate(postId)">
+                    <button class="modal-link" @click="handleUpdate(post.id)">
                       <img class="icon" :src="Editicon" alt="Edit icon" />
                       <span>編輯</span>
                     </button>
