@@ -600,38 +600,6 @@ const fetchComments = async () => {
   }
 };
 
-// 獲取單一貼文
-// const fetchSingleComment = async (postId) => {
-//   try {
-//     const userId = authStore.userId || localStorage.getItem("userId");
-//     const response = await apiClient.get(`/posts/${postId}`, {
-//       params: { userId },
-//       headers: authStore.accessToken
-//         ? { Authorization: `Bearer ${authStore.accessToken}` }
-//         : {},
-//     });
-//     if (response.status === 200) {
-//       const comment = response.data;
-//       selectedComment.value = {
-//         id: comment.id,
-//         content: comment.content,
-//         name: comment.user_name,
-//         timestamp: new Date(comment.created_at),
-//         file_url: comment.file_url,
-//         user_avatar: comment.user_avatar,
-//         likes: comment.likes || 0,
-//         userLiked: comment.user_liked || false,
-//         replies: comment.replies || 0,
-//       };
-//     } else {
-//       message.error("無法獲取單一貼文，數據格式不正確");
-//     }
-//   } catch (error) {
-//     console.error("取得單一貼文錯誤:", error);
-//     message.error("單一貼文取得失敗，請檢查網絡或稍後再試！");
-//   }
-// };
-
 // 刪除貼文
 const handleDelete = async (postId) => {
   if (!authStore.accessToken) {

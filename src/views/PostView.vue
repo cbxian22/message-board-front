@@ -95,11 +95,7 @@ const adjustTextareaHeight = () => {
   }
 };
 
-// 監聽內容變化
-watch(content, () => {
-  adjustTextareaHeight();
-});
-
+// 獲取 <input type="file">
 const triggerFileInput = () => {
   fileInputRef.value?.click();
 };
@@ -280,6 +276,11 @@ onMounted(() => {
 onUnmounted(() => {
   document.removeEventListener("mousedown", closeModal);
   emitter.off("updatePost", handlePostUpdate); // 移除事件監聽
+});
+
+// 監聽內容變化
+watch(content, () => {
+  adjustTextareaHeight();
 });
 </script>
 
