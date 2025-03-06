@@ -37,7 +37,7 @@ const file = ref(null);
 const fileUrl = ref(null);
 const fileInputRef = ref(null);
 const isOpenModal = ref(false);
-// const selectedPostId = ref(null);
+const selectedPostId = ref(null);
 const postId = route.params.id;
 
 // 貼文＿打開 Modal
@@ -117,18 +117,17 @@ const handleDelete = async (postId) => {
 };
 
 // 貼文＿修改
-const handleUpdate = async () => {
+const handleUpdate = async (postId) => {
   if (!authStore.accessToken) {
     message.error("請先登入！");
     return;
   }
+  selectedPostId.value = postId;
   isOpenModal.value = true;
 };
 
 // 貼文＿處理更新
 const handlePostUpdate = (updatedPost) => {
-  console.log(updatedPost);
-
   if (post.value && post.value.id === updatedPost.id) {
     post.value = {
       ...post.value,
@@ -136,6 +135,7 @@ const handlePostUpdate = (updatedPost) => {
       file_url: updatedPost.file_url,
     };
     isOpenModal.value = false;
+    selectedPostId.value = null; // 清空選中貼文
   }
 };
 
@@ -272,7 +272,6 @@ const adjustTextareaHeight = () => {
 onMounted(() => {
   document.addEventListener("mousedown", closeModal);
   adjustTextareaHeight();
-  fetchSingleComment(postId);
   emitter.on("updatePost", handlePostUpdate);
 });
 
@@ -324,7 +323,7 @@ watch(content, () => {
                       authStore.isLoggedIn && authStore.userName === post.name
                     "
                   >
-                    <button class="modal-link" @click="handleUpdate()">
+                    <button class="modal-link" @click="handleUpdate(postId)">
                       <img class="icon" :src="Editicon" alt="Edit icon" />
                       <span>編輯</span>
                     </button>
@@ -453,7 +452,7 @@ watch(content, () => {
   </div>
   <div v-else>正在加載貼文...</div>
 
-  <UpdatePostView v-model="isOpenModal" :post-id="postId" />
+  <UpdatePostView v-model="isOpenModal" :post-id="selectedPostId" />
   <Navbar />
 </template>
 
