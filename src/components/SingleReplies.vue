@@ -15,6 +15,7 @@ import Moreicon from "../assets/Moreicon.svg";
 import Editicon from "../assets/Editicon.svg";
 import Deleteicon from "../assets/Deleteicon.svg";
 import Flagicon from "../assets/Flagicon.svg";
+import { positionProp } from "naive-ui/es/layout/src/interface";
 
 const route = useRoute();
 const emit = defineEmits();
@@ -37,6 +38,7 @@ const buttonRefs = ref({});
 const isOpenModal = ref(false);
 const isLikeProcessing = ref(false);
 const selectedReplyId = ref(null);
+const postId = route.params.id;
 
 // 回覆＿打開 Modal
 const openModal = (event, replyId) => {
@@ -134,7 +136,7 @@ const handleDelete = async (replayId) => {
     const response = await apiClient.delete(`/replies/${replayId}/${userId}`);
     message.success("刪除回覆成功！");
     console.log(response);
-    await fetchReplies();
+    await fetchReplies(postId);
   } catch (error) {
     console.error("刪除失敗:", error.message);
     message.error("刪除失敗");
@@ -213,7 +215,7 @@ const handlelike = async (id) => {
 
 onMounted(async () => {
   document.addEventListener("mousedown", closeModal);
-  fetchReplies(route.params.id);
+  fetchReplies(postId);
   emitter.on("updateReply", handleReplyUpdate); // 監聽更新事件
 });
 
