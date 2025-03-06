@@ -225,7 +225,7 @@ const uploadFile = async () => {
 };
 
 // 回覆＿提交上傳資料庫
-const handleMessage = async () => {
+const handleMessage = async (postId) => {
   if (!authStore.userId || !authStore.accessToken) {
     message.error("請先登入！");
     return;
@@ -233,17 +233,20 @@ const handleMessage = async () => {
   loadingBar.start();
   try {
     const uploadedFileUrl = await uploadFile();
-    const response = await apiClient.post(`/posts/${authStore.userId}`, {
-      content: content.value,
-      fileUrl: uploadedFileUrl,
-      parentId: post.value.id, // 將回覆與父貼文關聯
-    });
+    const response = await apiClient.post(
+      `/replies/${postId}/${authStore.userId}`,
+      {
+        content: content.value,
+        fileUrl: uploadedFileUrl,
+        // parentId: post.value.id,
+      }
+    );
     if (response.status === 201) {
       content.value = "";
       file.value = null;
       fileUrl.value = null;
       message.success("回覆成功！");
-      emit("newReply", response.data); // 通知父組件有新回覆
+      // emit("newReply", response.data);
     } else {
       message.error("回覆失敗！");
       loadingBar.error();
