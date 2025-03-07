@@ -33,6 +33,7 @@ const props = defineProps({
 
 const replies = ref([]);
 const content = ref("");
+const textarea = ref(null);
 const file = ref(null); // 上傳檔案
 const fileUrl = ref(null); // 檔案預覽URL
 const fileInputRef = ref(null); // 檔案輸入引用
@@ -150,15 +151,7 @@ const handleDelete = async (replayId) => {
 };
 
 // 回覆＿修改
-// const handleUpdate = async (replayId) => {
-//   if (!authStore.accessToken) {
-//     message.error("請先登入！");
-//     return;
-//   }
-//   selectedReplyId.value = replayId;
-//   // isOpenModal.value = true;
-//   isEditing.value = true;
-// };
+
 // 修改後的處理編輯函數
 const handleUpdate = (replyId) => {
   if (!authStore.accessToken) {
@@ -171,6 +164,7 @@ const handleUpdate = (replyId) => {
     editingReplyId.value = replyId;
     content.value = reply.content;
     fileUrl.value = reply.file_url;
+    nextTick(() => adjustTextareaHeight());
   }
 };
 
@@ -181,20 +175,6 @@ const cancelEdit = () => {
   file.value = null;
   fileUrl.value = null;
 };
-
-// 回覆＿處理更新
-// const handleReplyUpdate = (updatedReply) => {
-//   const index = replies.value.findIndex((c) => c.id === updatedReply.id);
-//   if (index !== -1) {
-//     replies.value[index] = {
-//       ...replies.value[index],
-//       content: updatedReply.content,
-//       file_url: updatedReply.file_url,
-//     };
-//     isOpenModal.value = false;
-//     selectedReplyId.value = null;
-//   }
-// };
 
 // 回覆＿按讚
 const handlelike = async (id) => {
@@ -290,16 +270,6 @@ const uploadFile = async () => {
   }
 };
 
-// 判斷是否有變更
-// const hasChanges = computed(() => {
-//   if (!postData.value) {
-//     return content.value.trim() || file.value;
-//   }
-//   const isContentChanged = content.value !== (postData.value.content || "");
-//   const isFileUrlChanged = fileUrl.value !== (postData.value.file_url || null);
-//   const isFileAdded = !!file.value;
-//   return isContentChanged || isFileUrlChanged || isFileAdded;
-// });
 // 檢查是否有變更
 const hasChanges = computed(() => {
   const reply = replies.value.find((r) => r.id === editingReplyId.value);
@@ -333,27 +303,6 @@ const handleMessage = async (replayId) => {
         file_url: uploadedFileUrl,
       }
     );
-    // const uploadedFileUrl = await uploadFile();
-    // const response = await apiClient.put(
-    //   `/posts/${props.postId}/${authStore.userId}`,
-    //   {
-    //     content: content.value,
-    //     fileUrl: uploadedFileUrl,
-    //   }
-    // );
-
-    // if (response.status === 200) {
-    //   const updatedPost = {
-    //     id: props.postId,
-    //     content: content.value,
-    //     file_url: uploadedFileUrl,
-    //   };
-    //   emitter.emit("updatePost", updatedPost); // 通知父組件
-    //   message.success("貼文更新成功！");
-    //   content.value = "";
-    //   file.value = null;
-    //   fileUrl.value = null;
-    //   emit("update:modelValue", false); // 關閉模態
     if (response.status === 200) {
       const index = replies.value.findIndex(
         (r) => r.id === editingReplyId.value
@@ -378,16 +327,7 @@ const handleMessage = async (replayId) => {
 };
 
 // 檢查是否啟用提交按鈕
-// const isSubmitDisabled = computed(() => {
-//   if (!postData.value) {
-//     return !(content.value.trim() || file.value);
-//   }
-//   const isContentUnchanged = content.value === (postData.value.content || "");
-//   const isFileUrlUnchanged =
-//     fileUrl.value === (postData.value.file_url || null);
-//   const noNewFile = !file.value;
-//   return isContentUnchanged && isFileUrlUnchanged && noNewFile;
-// });
+
 const isSubmitDisabled = computed(() => {
   const reply = replies.value.find((r) => r.id === editingReplyId.value);
   if (!reply) return !content.value.trim() && !file.value;
@@ -397,34 +337,38 @@ const isSubmitDisabled = computed(() => {
     !file.value
   );
 });
+
+// 調整 textarea 高度
 const adjustTextareaHeight = () => {
   nextTick(() => {
     if (textarea.value) {
-      textarea.value.style.height = "auto";
-      textarea.value.style.height = `${textarea.value.scrollHeight}px`;
+      textarea.value.style.height = "auto"; // 重置高度以獲取真實 scrollHeight
+      const contentHeight = textarea.value.scrollHeight;
+      // 設置高度為內容高度，但不超過 100px
+      textarea.value.style.height = `${Math.min(contentHeight, 100)}px`;
+      console.log(
+        "scrollHeight:",
+        textarea.value.scrollHeight,
+        "height:",
+        textarea.value.style.height
+      ); // 調試用
     }
   });
 };
 
 // 監聽內容變化並調整高度
 watch(content, () => {
-  nextTick(() => {
-    if (textarea.value) {
-      textarea.value.style.height = "auto";
-      textarea.value.style.height = `${textarea.value.scrollHeight}px`;
-    }
-  });
+  adjustTextareaHeight();
 });
 
 onMounted(async () => {
   document.addEventListener("mousedown", closeModal);
   fetchReplies(postId);
-  // emitter.on("updateReply", handleReplyUpdate); // 監聽更新事件
+  adjustTextareaHeight();
 });
 
 onUnmounted(() => {
   document.removeEventListener("mousedown", closeModal);
-  // emitter.off("updateReply", handleReplyUpdate); // 移除事件監聽
 });
 </script>
 
@@ -466,11 +410,12 @@ onUnmounted(() => {
           >
             <div class="modal-content" @click.stop>
               <ul>
-                <li
+                <!-- <li
                   v-if="
                     authStore.isLoggedIn && authStore.userName === reply.name
                   "
-                >
+                > -->
+                <li>
                   <button class="modal-link" @click="handleUpdate(reply.id)">
                     <img class="icon" :src="Editicon" alt="Editicon" />
                     <span>編輯</span>
@@ -498,8 +443,8 @@ onUnmounted(() => {
         </div>
       </div>
 
-      <!-- 沒有編輯時正常顯示 -->
       <div class="reply-content">
+        <!-- 沒有編輯時正常顯示 -->
         <template v-if="!(isEditing && editingReplyId === reply.id)">
           <p>{{ reply.content }}</p>
           <span v-if="reply.file_url">
@@ -539,8 +484,8 @@ onUnmounted(() => {
             v-model="content"
             placeholder="編輯您的回覆..."
             class="edit-textarea"
-            @input="adjustTextareaHeight"
           ></textarea>
+
           <div v-if="fileUrl" class="file-preview">
             <n-image :src="fileUrl" alt="檔案預覽" class="preview-img" />
             <button @click="cancelFilePreview" class="cancel-preview-button">
@@ -750,14 +695,27 @@ onUnmounted(() => {
   object-fit: contain;
 }
 
-/* ai */
 .edit-textarea {
+  border: none;
+  outline: none;
+  resize: none;
+  background: transparent;
   width: 100%;
-  min-height: 100px;
-  padding: 10px;
-  border: 1px solid #ccc;
-  border-radius: 4px;
-  resize: vertical;
+  font-size: 14px;
+  padding-right: 30px;
+  color: rgb(243, 245, 247);
+  max-height: 100px; /* 設置最大高度為 100px */
+  overflow-y: auto; /* 超過 100px 時顯示滾動條 */
+}
+
+.edit-textarea::placeholder {
+  color: #aaa;
+  opacity: 0.7;
+}
+
+/* 光模式下的文字顏色 */
+.light-mode .edit-textarea {
+  color: rgb(0, 0, 0);
 }
 
 .file-preview {
