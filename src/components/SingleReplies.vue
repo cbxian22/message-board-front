@@ -45,7 +45,7 @@ const content = ref("");
 const textareas = ref({});
 const file = ref(null); // 上傳檔案
 const fileUrl = ref(null); // 檔案預覽URL
-const fileInputRef = ref(null); // 檔案輸入引用
+const fileInputRefs = ref({}); // 檔案輸入引用
 const editingReplyId = ref(null); // 正在編輯的回覆ID
 const modalState = ref({});
 const modalRefs = ref({});
@@ -159,8 +159,6 @@ const handleDelete = async (replayId) => {
   }
 };
 
-// 回覆＿修改
-
 // 修改後的處理編輯函數
 const handleUpdate = (replyId) => {
   if (!authStore.accessToken) {
@@ -242,11 +240,16 @@ const handlelike = async (id) => {
 
 // 獲取 <input type="file">
 const triggerFileInput = () => {
-  fileInputRef.value?.click();
+  const fileInput = fileInputRefs.value[replyId];
+  if (fileInput) {
+    fileInput.click();
+  } else {
+    console.warn(`File input for reply ${replyId} not found.`);
+  }
 };
 
-// 處理檔案上傳並顯示預覽
-const handleFileUpload = (event) => {
+// 修改 handleFileUpload，確保只更新當前編輯的檔案
+const handleFileUpload = (event, replyId) => {
   const selectedFile = event.target.files[0];
   if (selectedFile) {
     console.log("檔案已選擇:", selectedFile.name);
@@ -332,7 +335,7 @@ const handleMessage = async () => {
       }
       message.success("回覆更新成功！");
       cancelEdit();
-      await fetchReplies();
+      await fetchReplies(postId);
     }
   } catch (error) {
     console.error("貼文更新錯誤:", error);
@@ -519,12 +522,12 @@ onUnmounted(() => {
 
           <input
             type="file"
-            ref="fileInputRef"
-            @change="handleFileUpload"
+            :ref="(el) => (fileInputRefs[reply.id] = el)"
+            @change="handleFileUpload($event, reply.id)"
             style="display: none"
           />
           <div class="edit-actions">
-            <button @click="triggerFileInput" class="add-file-btn">
+            <button @click="triggerFileInput(reply.id)" class="add-file-btn">
               <img :src="Noteicon" alt="新增檔案" />
             </button>
             <button
