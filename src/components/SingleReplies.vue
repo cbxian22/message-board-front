@@ -41,7 +41,7 @@ const props = defineProps({
 
 const replies = ref([]);
 const content = ref("");
-const textarea = ref(null);
+const textareas = ref({});
 const file = ref(null); // 上傳檔案
 const fileUrl = ref(null); // 檔案預覽URL
 const fileInputRef = ref(null); // 檔案輸入引用
@@ -353,38 +353,40 @@ const isSubmitDisabled = computed(() => {
 });
 
 // 調整 textarea 高度
-const adjustTextareaHeight = () => {
+// 調整 textarea 高度
+const adjustTextareaHeight = (replyId) => {
   nextTick(() => {
-    // Guard against null or undefined
-    if (!textarea.value) {
-      console.warn("Textarea element is not available yet.");
+    const textarea = textareas.value[replyId];
+    if (!textarea) {
+      console.warn(
+        `Textarea element for reply ${replyId} is not available yet.`
+      );
       return;
     }
-
-    textarea.value.style.height = "auto"; // Reset height to get true scrollHeight
-    const contentHeight = textarea.value.scrollHeight;
-    textarea.value.style.height = `${Math.min(contentHeight, 100)}px`; // Set height with max of 100px
+    textarea.style.height = "auto"; // 重置高度以獲取真實 scrollHeight
+    const contentHeight = textarea.scrollHeight;
+    textarea.style.height = `${Math.min(contentHeight, 100)}px`; // 設置最大高度為 100px
     console.log(
       "scrollHeight:",
-      textarea.value.scrollHeight,
+      textarea.scrollHeight,
       "height:",
-      textarea.value.style.height
-    ); // Debugging
+      textarea.style.height
+    );
   });
 };
 
 // 監聽內容變化並調整高度
 watch(content, () => {
   if (isEditing.value && editingReplyId.value) {
-    adjustTextareaHeight();
+    adjustTextareaHeight(editingReplyId.value);
   }
 });
 
 onMounted(async () => {
   document.addEventListener("mousedown", closeModal);
-  fetchReplies(postId);
+  await fetchReplies(postId);
   if (isEditing.value && editingReplyId.value) {
-    adjustTextareaHeight();
+    adjustTextareaHeight(editingReplyId.value);
   }
 });
 
