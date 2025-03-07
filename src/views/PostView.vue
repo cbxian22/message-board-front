@@ -655,7 +655,7 @@ watch(content, () => {
   background: transparent;
   width: 100%;
   font-size: 14px;
-  padding: 20px;
+  padding: 0 20px;
   color: rgb(243, 245, 247);
   line-height: 1.5;
   max-height: 100px;
