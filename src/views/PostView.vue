@@ -757,6 +757,7 @@ watch(content, () => {
 }
 
 .message-form-end button {
+  margin-top: 5px;
   padding: 10px 20px;
   border: 0.5px solid rgba(102, 102, 102, 0.5);
   border-radius: 10px;
