@@ -31,13 +31,13 @@ const authStore = useAuthStore();
 const dateStore = useDateStore();
 const message = useMessage();
 
-const props = defineProps({
-  modelValue: Boolean,
-  postId: {
-    type: [String, Number],
-    required: true,
-  },
-});
+// const props = defineProps({
+//   modelValue: Boolean,
+//   postId: {
+//     type: [String, Number],
+//     required: true,
+//   },
+// });
 
 const replies = ref([]);
 const content = ref("");
@@ -301,7 +301,7 @@ const handleMessage = async () => {
     return;
   }
 
-  if (!props.postId) {
+  if (!postId) {
     message.error("無效的貼文 ID！");
     return;
   }
