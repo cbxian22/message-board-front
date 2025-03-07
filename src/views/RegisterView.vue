@@ -81,16 +81,7 @@
         </div>
 
         <div class="form-group">
-          <button
-            class="register-btn"
-            type="submit"
-            :disabled="
-              (accountError ||
-                passwordError ||
-                nameError ||
-                accountNameError) !== ''
-            "
-          >
+          <button class="register-btn" type="submit" :disabled="isFormInvalid">
             <n-spin v-if="isTouched" stroke="#FFF" :size="20" />註冊
           </button>
         </div>
@@ -108,7 +99,7 @@
 
 <script setup>
 import { NSpin, useMessage } from "naive-ui";
-import { ref } from "vue";
+import { ref, computed } from "vue";
 import { useRouter } from "vue-router";
 import apiClient from "../stores/axiosConfig";
 
@@ -142,6 +133,8 @@ const validateAccount = () => {
 
   if (!account.value) {
     accountError.value = "請輸入電子郵件";
+  } else if (/\s/.test(account.value)) {
+    accountError.value = "電子郵件地址禁止使用空白鍵";
   } else if (!emailPattern.test(account.value)) {
     accountError.value = "請輸入有效的電子郵件地址";
   } else if (account.value.length > 254) {
@@ -149,8 +142,7 @@ const validateAccount = () => {
   } else {
     const domain = account.value.split("@")[1].toLowerCase();
     if (!validDomains.includes(domain)) {
-      accountError.value =
-        "請使用支援的電子郵件服務 (Gmail, Yahoo, Hotmail 等)";
+      accountError.value = "請輸入有效的電子郵件地址";
     } else {
       accountError.value = "";
     }
@@ -163,6 +155,8 @@ const validatePassword = () => {
 
   if (!password.value) {
     passwordError.value = "請輸入密碼";
+  } else if (/\s/.test(password.value)) {
+    passwordError.value = "密碼禁止使用空白鍵";
   } else if (password.value.length < 8) {
     passwordError.value = "密碼需至少8個字符";
   } else if (password.value.length > 128) {
@@ -179,6 +173,8 @@ const validatePassword = () => {
 const validateName = () => {
   if (!name.value) {
     nameError.value = "請輸入全名";
+  } else if (/\s/.test(name.value)) {
+    nameError.value = "全名禁止使用空白鍵";
   } else if (name.value.length < 3) {
     nameError.value = "全名需至少3個字符";
   } else if (name.value.length > 50) {
@@ -192,6 +188,8 @@ const validateAccountName = () => {
   const validPattern = /^[a-z0-9._]+$/;
   if (!accountName.value) {
     accountNameError.value = "請輸入用戶名稱";
+  } else if (/\s/.test(accountName.value)) {
+    accountNameError.value = "用戶名稱禁止使用空白鍵";
   } else if (!validPattern.test(accountName.value)) {
     accountNameError.value = "只能使用小寫英文、數字、點(.)和下劃線(_)";
   } else if (accountName.value.length < 3) {
@@ -203,6 +201,20 @@ const validateAccountName = () => {
   }
 };
 
+// 改進按鈕禁用邏輯
+const isFormInvalid = computed(() => {
+  return (
+    accountError.value ||
+    passwordError.value ||
+    nameError.value ||
+    accountNameError.value ||
+    !account.value ||
+    !password.value ||
+    !name.value ||
+    !accountName.value
+  );
+});
+
 const handleRegister = async () => {
   // 在提交前強制執行所有驗證
   validateAccount();
@@ -210,6 +222,7 @@ const handleRegister = async () => {
   validateName();
   validateAccountName();
 
+  if (isFormInvalid.value) return;
   isTouched.value = true;
 
   try {
