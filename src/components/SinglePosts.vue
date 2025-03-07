@@ -125,8 +125,8 @@ const handleDeleteConfirm = (postId) => {
     modalState.value[key] = false;
   });
   dialog.warning({
-    content: "需要再次加入好友才可以瀏覽私人帳號！",
-    positiveText: "解除好友",
+    content: "刪除貼文後回覆也將一併刪除，且無法復原！",
+    positiveText: "刪除",
     negativeText: "取消",
     onPositiveClick: () => {
       handleDelete(postId);

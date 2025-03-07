@@ -1,7 +1,14 @@
 <script setup>
 import { ref, watch, computed, defineEmits, onMounted, onUnmounted } from "vue";
-import { useRoute } from "vue-router"; // 引入 useRoute
-import { NBadge, useMessage, NImage, NButton, useLoadingBar } from "naive-ui";
+import { useRoute } from "vue-router";
+import {
+  NBadge,
+  useMessage,
+  NImage,
+  NButton,
+  useLoadingBar,
+  useDialog,
+} from "naive-ui";
 import { useAuthStore } from "../stores/authStore";
 import { useDateStore } from "../stores/dateStore";
 import apiClient from "../stores/axiosConfig";
@@ -26,16 +33,17 @@ const emit = defineEmits(["updatePost", "deletePost", "likePost", "newReply"]);
 const authStore = useAuthStore();
 const dateStore = useDateStore();
 const message = useMessage();
+const dialog = useDialog();
 const loadingBar = useLoadingBar();
 
 const post = ref(null);
-const isModalOpen = ref(false);
 const isLikeProcessing = ref(false);
 const textareaRef = ref(null);
 const content = ref("");
 const file = ref(null);
 const fileUrl = ref(null);
 const fileInputRef = ref(null);
+const isModalOpen = ref(false);
 const isOpenModal = ref(false);
 const selectedPostId = ref(null);
 
@@ -98,6 +106,21 @@ const fetchSingleComment = async (postId) => {
   }
 };
 
+// 貼文＿刪除確認
+const handleDeleteConfirm = (postId) => {
+  // 關閉 Modal
+  isModalOpen.value = false;
+
+  dialog.warning({
+    content: "刪除貼文後回覆也將一併刪除，且無法復原！",
+    positiveText: "刪除",
+    negativeText: "取消",
+    onPositiveClick: () => {
+      handleDelete(postId);
+    },
+  });
+};
+
 // 貼文＿刪除
 const handleDelete = async (postId) => {
   if (!authStore.accessToken) {
@@ -121,6 +144,7 @@ const handleUpdate = async (postId) => {
     message.error("請先登入！");
     return;
   }
+  isModalOpen.value = false;
   selectedPostId.value = postId;
   isOpenModal.value = true;
 };
@@ -333,7 +357,10 @@ watch(content, () => {
                       authStore.isLoggedIn && authStore.userName === post.name
                     "
                   >
-                    <button class="modal-link" @click="handleDelete(post.id)">
+                    <button
+                      class="modal-link"
+                      @click="handleDeleteConfirm(post.id)"
+                    >
                       <img class="icon" :src="Deleteicon" alt="Delete icon" />
                       <span>刪除</span>
                     </button>
