@@ -8,7 +8,7 @@ import {
   onUnmounted,
   nextTick,
 } from "vue";
-import { NBadge, useMessage, NImage } from "naive-ui";
+import { NBadge, useMessage, NImage, useLoadingBar } from "naive-ui";
 import { useAuthStore } from "../stores/authStore";
 import { useDateStore } from "../stores/dateStore";
 import { useRoute } from "vue-router";
@@ -30,6 +30,7 @@ const emit = defineEmits();
 const authStore = useAuthStore();
 const dateStore = useDateStore();
 const message = useMessage();
+const loadingBar = useLoadingBar();
 
 // const props = defineProps({
 //   modelValue: Boolean,
@@ -172,13 +173,6 @@ const handleUpdate = (replyId) => {
     editingReplyId.value = replyId;
     content.value = reply.content;
     fileUrl.value = reply.file_url;
-    nextTick(() => {
-      if (textarea.value) {
-        adjustTextareaHeight();
-      } else {
-        console.warn("Textarea not found after update.");
-      }
-    });
   }
 };
 
