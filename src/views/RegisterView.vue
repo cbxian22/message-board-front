@@ -55,7 +55,13 @@
         <div class="form-group">
           <span class="error-message" v-if="nameError">{{ nameError }}</span>
           <label for="name" :class="{ active: name }" class="floating-label">
-            <input id="name" v-model="name" type="text" @blur="validateName" />
+            <input
+              id="name"
+              v-model="name"
+              type="text"
+              @blur="validateName"
+              maxlength="25"
+            />
             <span>全名</span>
           </label>
         </div>
@@ -173,12 +179,10 @@ const validatePassword = () => {
 const validateName = () => {
   if (!name.value) {
     nameError.value = "請輸入全名";
-  } else if (/\s/.test(name.value)) {
-    nameError.value = "全名禁止使用空白鍵";
   } else if (name.value.length < 3) {
     nameError.value = "全名需至少3個字符";
-  } else if (name.value.length > 50) {
-    nameError.value = "全名不得超過50個字符";
+  } else if (name.value.length >= 25) {
+    nameError.value = "全名不得超過25個字符";
   } else {
     nameError.value = "";
   }
@@ -194,7 +198,7 @@ const validateAccountName = () => {
     accountNameError.value = "只能使用小寫英文、數字、點(.)和下劃線(_)";
   } else if (accountName.value.length < 3) {
     accountNameError.value = "用戶名稱需至少3個字符";
-  } else if (accountName.value.length > 20) {
+  } else if (accountName.value.length >= 20) {
     accountNameError.value = "用戶名稱最多20個字符";
   } else {
     accountNameError.value = "";
