@@ -239,28 +239,13 @@ const handlelike = async (id) => {
 //  因為不用 Modal Update Reply 且部分功能雷同，直接寫入此檔案
 
 // 獲取 <input type="file">
-const triggerFileInput = () => {
+// 修改 triggerFileInput，接受 replyId 參數
+const triggerFileInput = (replyId) => {
   const fileInput = fileInputRefs.value[replyId];
   if (fileInput) {
     fileInput.click();
   } else {
     console.warn(`File input for reply ${replyId} not found.`);
-  }
-};
-
-// 修改 handleFileUpload，確保只更新當前編輯的檔案
-const handleFileUpload = (event, replyId) => {
-  const selectedFile = event.target.files[0];
-  if (selectedFile) {
-    console.log("檔案已選擇:", selectedFile.name);
-    if (selectedFile.type.startsWith("image/")) {
-      const reader = new FileReader();
-      reader.onload = (e) => {
-        fileUrl.value = e.target.result;
-      };
-      reader.readAsDataURL(selectedFile);
-    }
-    file.value = selectedFile;
   }
 };
 
