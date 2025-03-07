@@ -332,7 +332,7 @@ const handleMessage = async () => {
       }
       message.success("回覆更新成功！");
       cancelEdit();
-      fetchReplies(props.postId);
+      await fetchReplies();
     }
   } catch (error) {
     console.error("貼文更新錯誤:", error);
