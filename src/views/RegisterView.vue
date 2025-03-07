@@ -1,4 +1,4 @@
-<!-- <template>
+<template>
   <div class="container-box">
     <div class="container">
       <div class="logo">
@@ -228,8 +228,8 @@ const togglePassword = () => {
   right: 1;
   margin-right: 60px;
 }
-</style> -->
-
+</style>
+<!-- 
 <template>
   <div class="container-box">
     <div class="container">
@@ -614,4 +614,4 @@ const togglePassword = () => {
   right: 1;
   margin-right: 60px;
 }
-</style>
+</style> -->
