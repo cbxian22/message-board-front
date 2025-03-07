@@ -1,5 +1,13 @@
 <script setup>
-import { ref, watch, computed, defineEmits, onMounted, onUnmounted } from "vue";
+import {
+  ref,
+  watch,
+  computed,
+  defineEmits,
+  onMounted,
+  onUnmounted,
+  nextTick,
+} from "vue";
 import { useRoute } from "vue-router";
 import {
   NBadge,
@@ -297,13 +305,15 @@ const adjustTextareaHeight = () => {
   }
 };
 
-onMounted(() => {
+onMounted(async () => {
   document.addEventListener("mousedown", closeModal);
   emitter.on("updatePost", handlePostUpdate);
-  fetchSingleComment(route.params.id);
+  await fetchSingleComment(route.params.id); // 等待數據加載
+  await nextTick(); // 等待 DOM 更新
   if (textareaRef.value) {
     adjustTextareaHeight();
     textareaRef.value.focus();
+    console.log("焦點已設置到 textarea:", document.activeElement);
   }
 });
 
