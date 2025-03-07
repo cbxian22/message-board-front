@@ -23,6 +23,7 @@ const userPosts = ref([]);
 
 // 組件掛載時載入資料
 onMounted(async () => {
+  console.log("Mounted with username:", props.username); // 添加日誌
   if (props.username) {
     await fetchUserData(props.username);
   }
@@ -53,6 +54,8 @@ const fetchUserData = async (username) => {
         params: { userId: localStorage.getItem("userId") },
       }),
     ]);
+
+    console.log("API Response:", { userResponse, postsResponse }); // 添加日誌
 
     if (userResponse.data.message === "使用者不存在") {
       router.replace("/not-found");
