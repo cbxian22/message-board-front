@@ -264,7 +264,7 @@ const adjustTextareaHeight = () => {
   const textarea = textareaRef.value;
   if (textarea) {
     textarea.style.height = "auto";
-    textarea.style.height = `${Math.min(textarea.scrollHeight, 150)}px`;
+    textarea.style.height = `${Math.min(textarea.scrollHeight)}px`;
   }
 };
 
