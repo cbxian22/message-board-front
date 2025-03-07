@@ -181,7 +181,7 @@ const validateName = () => {
     nameError.value = "請輸入全名";
   } else if (name.value.length < 3) {
     nameError.value = "全名需至少3個字符";
-  } else if (name.value.length >= 25) {
+  } else if (name.value.length > 25) {
     nameError.value = "全名不得超過25個字符";
   } else {
     nameError.value = "";
@@ -198,7 +198,7 @@ const validateAccountName = () => {
     accountNameError.value = "只能使用小寫英文、數字、點(.)和下劃線(_)";
   } else if (accountName.value.length < 3) {
     accountNameError.value = "用戶名稱需至少3個字符";
-  } else if (accountName.value.length >= 20) {
+  } else if (accountName.value.length > 20) {
     accountNameError.value = "用戶名稱最多20個字符";
   } else {
     accountNameError.value = "";
