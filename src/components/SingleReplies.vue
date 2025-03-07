@@ -1,5 +1,13 @@
 <script setup>
-import { ref, computed, watch, defineEmits, onMounted, onUnmounted } from "vue";
+import {
+  ref,
+  computed,
+  watch,
+  defineEmits,
+  onMounted,
+  onUnmounted,
+  nextTick,
+} from "vue";
 import { NBadge, useMessage, NImage } from "naive-ui";
 import { useAuthStore } from "../stores/authStore";
 import { useDateStore } from "../stores/dateStore";
