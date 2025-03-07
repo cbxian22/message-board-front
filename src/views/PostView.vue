@@ -97,6 +97,11 @@ const fetchSingleComment = async (postId) => {
         userLiked: comment.user_liked || false,
         replies: comment.replies || 0,
       };
+      // 數據加載完成後設置焦點
+      if (textareaRef.value) {
+        adjustTextareaHeight();
+        textareaRef.value.focus();
+      }
     } else {
       message.error("無法獲取單一貼文，數據格式不正確");
     }
@@ -294,7 +299,6 @@ const adjustTextareaHeight = () => {
 
 onMounted(() => {
   document.addEventListener("mousedown", closeModal);
-  adjustTextareaHeight();
   emitter.on("updatePost", handlePostUpdate);
   fetchSingleComment(route.params.id);
   if (textareaRef.value) {
