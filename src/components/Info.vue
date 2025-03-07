@@ -528,9 +528,7 @@ const handleDeleteAccountConfirm = () => {
     </div>
 
     <div class="set-btn" v-if="loggedInUser !== info.name">
-      <n-button v-if="isAlreadyFriend" @click="handleDeleteFriendConfirm"
-        >解除好友</n-button
-      >
+      <n-button v-if="isAlreadyFriend" @click="handleDeleteFriendConfirm">解除好友</n-button>
       <div v-else-if="isPendingReceived" class="friend-request-actions">
         <n-button @click="acceptFriendRequest">確認好友請求</n-button>
         <n-button @click="rejectFriendRequest">拒絕好友請求</n-button>
@@ -542,11 +540,7 @@ const handleDeleteAccountConfirm = () => {
 
     <!-- 抽屜視窗 -->
     <n-drawer v-model:show="show" :width="rwdwidth">
-      <n-drawer-content
-        title="編輯個人檔案"
-        closable
-        :class="themeStore.isDarkMode ? 'dark-mode' : 'light-mode'"
-      >
+      <n-drawer-content title="編輯個人檔案" closable :class="themeStore.isDarkMode ? 'dark-mode' : 'light-mode'">
         <form @submit.prevent="handleUpdate" class="container">
           <div class="form-box">
             <div class="form-inner">
@@ -556,21 +550,10 @@ const handleDeleteAccountConfirm = () => {
               </div>
               <div class="form-mod">
                 <label for="userAvatar"></label>
-                <input
-                  type="file"
-                  ref="fileInputRef"
-                  @change="handleFileUpload"
-                  id="userAvatar"
-                  accept="image/*"
-                  style="display: none"
-                />
-                <img
-                  :src="tempAvatar || info.userAvatar"
-                  alt="更新圖片"
-                  type="button"
-                  @click="triggerFileInput"
-                  class="submit-button"
-                />
+                <input type="file" ref="fileInputRef" @change="handleFileUpload" id="userAvatar" accept="image/*"
+                  style="display: none" />
+                <img :src="tempAvatar || info.userAvatar" alt="更新圖片" type="button" @click="triggerFileInput"
+                  class="submit-button" />
               </div>
             </div>
           </div>
@@ -584,15 +567,15 @@ const handleDeleteAccountConfirm = () => {
 
           <div class="form-box">
             <div class="form-mod">
-              <label for="intro">變更隱私</label>
-              <n-popover trigger="hover" :keep-alive-on-hover="false">
-                <template #trigger>
-                  <img class="icon" :src="Helpicon" alt="說明" />
-                </template>
-                <span
-                  >變更為私人帳號時，即使貼文為公開權限也只能向好友顯示。如需讓非好友者瀏覽，請設置公開帳號。</span
-                >
-              </n-popover>
+              <div class="toggle-title">
+                <label for="intro">變更隱私</label>
+                <n-popover trigger="hover" :keep-alive-on-hover="false">
+                  <template #trigger>
+                    <img class="icon" :src="Helpicon" alt="說明" />
+                  </template>
+                  <span>變更為私人帳號時，即使貼文為公開權限也只能向好友顯示。如需讓非好友者瀏覽，請設置公開帳號。</span>
+                </n-popover>
+              </div>
               <div class="toggle-container">
                 <div>
                   <span>公開</span>
@@ -608,7 +591,7 @@ const handleDeleteAccountConfirm = () => {
             <div class="form-mod">
               <n-button @click="handleUpdate">{{
                 hasChanges ? "保存變更" : "取消變更"
-              }}</n-button>
+                }}</n-button>
             </div>
           </div>
         </form>
@@ -627,10 +610,12 @@ const handleDeleteAccountConfirm = () => {
   padding: 40px 50px 25px;
   border-bottom: 0.5px solid #373737;
 }
+
 .info-box-in {
   display: flex;
   justify-content: space-between;
 }
+
 .info-box img {
   width: 100px;
   height: 100px;
@@ -644,12 +629,12 @@ const handleDeleteAccountConfirm = () => {
   flex-direction: column;
 }
 
-.info-content > .name {
+.info-content>.name {
   font-size: 25px !important;
   margin-bottom: 10px;
 }
 
-.info-content > .intro {
+.info-content>.intro {
   font-size: 13px !important;
 }
 
@@ -723,8 +708,10 @@ const handleDeleteAccountConfirm = () => {
   font-size: 14px;
   padding: 20px 0;
   color: rgb(243, 245, 247);
-  line-height: 1.5; /* 確保行高一致 */
-  height: 60px; /* 明確給 textarea 高度 */
+  line-height: 1.5;
+  /* 確保行高一致 */
+  height: 60px;
+  /* 明確給 textarea 高度 */
 }
 
 .light-mode .form-box textarea,
@@ -732,6 +719,7 @@ const handleDeleteAccountConfirm = () => {
 .light-mode .form-box .toggle-container {
   color: rgb(0, 0, 0) !important;
 }
+
 .form-box .toggle-container {
   display: flex;
   justify-content: space-between;
@@ -746,6 +734,7 @@ const handleDeleteAccountConfirm = () => {
   color: red;
   font-weight: 600;
 }
+
 .toggle-container button:hover {
   text-decoration: underline;
 }
@@ -758,6 +747,7 @@ const handleDeleteAccountConfirm = () => {
   flex-wrap: nowrap;
   width: 100%;
 }
+
 .friend-request-actions .n-button {
   flex: 1;
   width: 0;
@@ -775,6 +765,16 @@ const handleDeleteAccountConfirm = () => {
   height: 70px;
   border-radius: 50%;
   object-fit: cover;
+}
+
+.toggle-title{
+  display: flex;
+}
+
+.icon {
+  width: 24px;
+  height: 24px;
+  object-fit: contain;
 }
 
 /* 隱私切換樣式 */
@@ -798,9 +798,5 @@ const handleDeleteAccountConfirm = () => {
   margin: 0 5px;
 }
 
-.icon{
-  width: 24px;
-  height: 24px;
-  object-fit: contain;
-}
+
 </style>
