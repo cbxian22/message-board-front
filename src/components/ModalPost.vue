@@ -60,6 +60,14 @@
         </div>
 
         <div class="message-form-end">
+          <n-dropdown
+            trigger="click"
+            :options="visibilityOptions"
+            @select="handleVisibilitySelect"
+          >
+            <span>向誰發佈</span>
+          </n-dropdown>
+
           <n-button :disabled="isSubmitDisabled" @click="handleMessage"
             >發佈</n-button
           >
@@ -96,6 +104,22 @@ const prevHeight = ref("auto"); // 儲存上一次高度
 const file = ref(null);
 const fileUrl = ref(null);
 const fileInputRef = ref(null);
+const visibility = ref(null); // 預設可見性為null
+
+// 下拉選單選項
+const visibilityOptions = [
+  { label: "公開", key: "public" },
+  { label: "朋友", key: "friends" },
+  { label: "私人", key: "private" },
+];
+
+// 處理可見性選擇
+const handleVisibilitySelect = (key) => {
+  visibility.value = key;
+  message.info(
+    `已選擇發佈給：${visibilityOptions.find((opt) => opt.key === key).label}`
+  );
+};
 
 // 貼文＿檢查是否啟用提交按鈕
 const isSubmitDisabled = computed(() => !(content.value.trim() || file.value));
@@ -163,6 +187,7 @@ const handleMessage = async () => {
     const response = await apiClient.post(`/posts/${authStore.userId}`, {
       content: content.value,
       fileUrl: uploadedFileUrl,
+      visibility: visibility.value,
     });
 
     if (response.status === 201) {
@@ -170,7 +195,6 @@ const handleMessage = async () => {
       file.value = null;
       fileUrl.value = null;
       emit("update:modelValue", false);
-
       message.success("貼文成功！");
     } else {
       message.error("貼文失敗！");
