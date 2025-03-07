@@ -239,13 +239,28 @@ const handlelike = async (id) => {
 //  因為不用 Modal Update Reply 且部分功能雷同，直接寫入此檔案
 
 // 獲取 <input type="file">
-// 修改 triggerFileInput，接受 replyId 參數
 const triggerFileInput = (replyId) => {
   const fileInput = fileInputRefs.value[replyId];
   if (fileInput) {
     fileInput.click();
   } else {
     console.warn(`File input for reply ${replyId} not found.`);
+  }
+};
+
+// 應有的定義應如下，但程式碼中缺少：
+const handleFileUpload = (event) => {
+  const selectedFile = event.target.files[0];
+  if (selectedFile) {
+    console.log("檔案已選擇:", selectedFile.name);
+    if (selectedFile.type.startsWith("image/")) {
+      const reader = new FileReader();
+      reader.onload = (e) => {
+        fileUrl.value = e.target.result;
+      };
+      reader.readAsDataURL(selectedFile);
+    }
+    file.value = selectedFile;
   }
 };
 
@@ -342,7 +357,6 @@ const isSubmitDisabled = computed(() => {
   );
 });
 
-// 調整 textarea 高度
 // 調整 textarea 高度
 const adjustTextareaHeight = (replyId) => {
   nextTick(() => {
