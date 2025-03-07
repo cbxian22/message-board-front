@@ -33,11 +33,16 @@ const props = defineProps({
 
 const replies = ref([]);
 const content = ref("");
+const file = ref(null); // 上傳檔案
+const fileUrl = ref(null); // 檔案預覽URL
+const fileInputRef = ref(null); // 檔案輸入引用
+const editingReplyId = ref(null); // 正在編輯的回覆ID
 const modalState = ref({});
 const modalRefs = ref({});
 const buttonRefs = ref({});
 const isEditing = ref(false);
 const isLikeProcessing = ref(false);
+
 const selectedReplyId = ref(null);
 const postId = route.params.id;
 
@@ -145,14 +150,36 @@ const handleDelete = async (replayId) => {
 };
 
 // 回覆＿修改
-const handleUpdate = async (replayId) => {
+// const handleUpdate = async (replayId) => {
+//   if (!authStore.accessToken) {
+//     message.error("請先登入！");
+//     return;
+//   }
+//   selectedReplyId.value = replayId;
+//   // isOpenModal.value = true;
+//   isEditing.value = true;
+// };
+// 修改後的處理編輯函數
+const handleUpdate = (replyId) => {
   if (!authStore.accessToken) {
     message.error("請先登入！");
     return;
   }
-  selectedReplyId.value = replayId;
-  // isOpenModal.value = true;
-  isEditing.value = true;
+  const reply = replies.value.find((r) => r.id === replyId);
+  if (reply) {
+    isEditing.value = true;
+    editingReplyId.value = replyId;
+    content.value = reply.content;
+    fileUrl.value = reply.file_url;
+  }
+};
+
+const cancelEdit = () => {
+  isEditing.value = false;
+  editingReplyId.value = null;
+  content.value = "";
+  file.value = null;
+  fileUrl.value = null;
 };
 
 // 回覆＿處理更新
@@ -264,12 +291,21 @@ const uploadFile = async () => {
 };
 
 // 判斷是否有變更
+// const hasChanges = computed(() => {
+//   if (!postData.value) {
+//     return content.value.trim() || file.value;
+//   }
+//   const isContentChanged = content.value !== (postData.value.content || "");
+//   const isFileUrlChanged = fileUrl.value !== (postData.value.file_url || null);
+//   const isFileAdded = !!file.value;
+//   return isContentChanged || isFileUrlChanged || isFileAdded;
+// });
+// 檢查是否有變更
 const hasChanges = computed(() => {
-  if (!postData.value) {
-    return content.value.trim() || file.value;
-  }
-  const isContentChanged = content.value !== (postData.value.content || "");
-  const isFileUrlChanged = fileUrl.value !== (postData.value.file_url || null);
+  const reply = replies.value.find((r) => r.id === editingReplyId.value);
+  if (!reply) return content.value.trim() || file.value;
+  const isContentChanged = content.value !== reply.content;
+  const isFileUrlChanged = fileUrl.value !== reply.file_url;
   const isFileAdded = !!file.value;
   return isContentChanged || isFileUrlChanged || isFileAdded;
 });
@@ -291,28 +327,47 @@ const handleMessage = async (replayId) => {
   try {
     const uploadedFileUrl = await uploadFile();
     const response = await apiClient.put(
-      `/posts/${props.postId}/${authStore.userId}`,
+      `/replies/${editingReplyId.value}/${authStore.userId}`,
       {
         content: content.value,
-        fileUrl: uploadedFileUrl,
+        file_url: uploadedFileUrl,
       }
     );
+    // const uploadedFileUrl = await uploadFile();
+    // const response = await apiClient.put(
+    //   `/posts/${props.postId}/${authStore.userId}`,
+    //   {
+    //     content: content.value,
+    //     fileUrl: uploadedFileUrl,
+    //   }
+    // );
 
+    // if (response.status === 200) {
+    //   const updatedPost = {
+    //     id: props.postId,
+    //     content: content.value,
+    //     file_url: uploadedFileUrl,
+    //   };
+    //   emitter.emit("updatePost", updatedPost); // 通知父組件
+    //   message.success("貼文更新成功！");
+    //   content.value = "";
+    //   file.value = null;
+    //   fileUrl.value = null;
+    //   emit("update:modelValue", false); // 關閉模態
     if (response.status === 200) {
-      const updatedPost = {
-        id: props.postId,
-        content: content.value,
-        file_url: uploadedFileUrl,
-      };
-      emitter.emit("updatePost", updatedPost); // 通知父組件
-      message.success("貼文更新成功！");
-      content.value = "";
-      file.value = null;
-      fileUrl.value = null;
-      emit("update:modelValue", false); // 關閉模態
-    } else {
-      message.error("貼文更新失敗！");
-      loadingBar.error();
+      const index = replies.value.findIndex(
+        (r) => r.id === editingReplyId.value
+      );
+      if (index !== -1) {
+        replies.value[index] = {
+          ...replies.value[index],
+          content: content.value,
+          file_url: uploadedFileUrl,
+        };
+      }
+      message.success("回覆更新成功！");
+      cancelEdit();
+      fetchReplies(props.postId);
     }
   } catch (error) {
     console.error("貼文更新錯誤:", error);
@@ -323,16 +378,33 @@ const handleMessage = async (replayId) => {
 };
 
 // 檢查是否啟用提交按鈕
+// const isSubmitDisabled = computed(() => {
+//   if (!postData.value) {
+//     return !(content.value.trim() || file.value);
+//   }
+//   const isContentUnchanged = content.value === (postData.value.content || "");
+//   const isFileUrlUnchanged =
+//     fileUrl.value === (postData.value.file_url || null);
+//   const noNewFile = !file.value;
+//   return isContentUnchanged && isFileUrlUnchanged && noNewFile;
+// });
 const isSubmitDisabled = computed(() => {
-  if (!postData.value) {
-    return !(content.value.trim() || file.value);
-  }
-  const isContentUnchanged = content.value === (postData.value.content || "");
-  const isFileUrlUnchanged =
-    fileUrl.value === (postData.value.file_url || null);
-  const noNewFile = !file.value;
-  return isContentUnchanged && isFileUrlUnchanged && noNewFile;
+  const reply = replies.value.find((r) => r.id === editingReplyId.value);
+  if (!reply) return !content.value.trim() && !file.value;
+  return (
+    content.value === reply.content &&
+    fileUrl.value === reply.file_url &&
+    !file.value
+  );
 });
+const adjustTextareaHeight = () => {
+  nextTick(() => {
+    if (textarea.value) {
+      textarea.value.style.height = "auto";
+      textarea.value.style.height = `${textarea.value.scrollHeight}px`;
+    }
+  });
+};
 
 // 監聽內容變化並調整高度
 watch(content, () => {
@@ -427,46 +499,75 @@ onUnmounted(() => {
       </div>
 
       <!-- 沒有編輯時正常顯示 -->
-      <div v-if="!isEditing" class="reply-content">
-        <p>{{ reply.content }}</p>
-        <span v-if="reply.file_url">
-          <n-image
-            v-if="isImage(reply.file_url)"
-            :src="reply.file_url"
-            alt="reply media"
-            lazy
-            :preview-disabled="false"
-            class="reply-image"
-          >
-            <template #placeholder>
-              <div class="media-placeholder">Loading Image...</div>
-            </template>
-          </n-image>
-          <div v-else-if="isVideo(reply.file_url)" class="video-wrapper">
-            <video
+      <div class="reply-content">
+        <template v-if="!(isEditing && editingReplyId === reply.id)">
+          <p>{{ reply.content }}</p>
+          <span v-if="reply.file_url">
+            <n-image
+              v-if="isImage(reply.file_url)"
               :src="reply.file_url"
-              controls
-              class="reply-video"
-              preload="auto"
-              @error="
-                (e) => {
-                  console.error('Video load error:', reply.file_url, e);
-                  message.error('影片載入失敗，請檢查格式或網絡');
-                }
-              "
-            />
+              alt="reply media"
+              lazy
+              :preview-disabled="false"
+              class="reply-image"
+            >
+              <template #placeholder>
+                <div class="media-placeholder">Loading Image...</div>
+              </template>
+            </n-image>
+            <div v-else-if="isVideo(reply.file_url)" class="video-wrapper">
+              <video
+                :src="reply.file_url"
+                controls
+                class="reply-video"
+                preload="auto"
+                @error="
+                  (e) => {
+                    console.error('Video load error:', reply.file_url, e);
+                    message.error('影片載入失敗，請檢查格式或網絡');
+                  }
+                "
+              />
+            </div>
+          </span>
+        </template>
+
+        <!-- 編輯模式 -->
+        <template v-else>
+          <textarea
+            ref="textarea"
+            v-model="content"
+            placeholder="編輯您的回覆..."
+            class="edit-textarea"
+            @input="adjustTextareaHeight"
+          ></textarea>
+          <div v-if="fileUrl" class="file-preview">
+            <n-image :src="fileUrl" alt="檔案預覽" class="preview-img" />
+            <button @click="cancelFilePreview" class="cancel-preview-button">
+              移除
+            </button>
           </div>
-        </span>
-      </div>
-      <!-- 編輯模式 -->
-      <div v-else class="reply-content">
-        <textarea
-          ref="textarea"
-          v-model="content"
-          id="content"
-          placeholder="編輯您的回覆..."
-          @input="adjustTextareaHeight"
-        ></textarea>
+
+          <input
+            type="file"
+            ref="fileInputRef"
+            @change="handleFileUpload"
+            style="display: none"
+          />
+          <div class="edit-actions">
+            <button @click="triggerFileInput" class="add-file-btn">
+              <img :src="Noteicon" alt="新增檔案" />
+            </button>
+            <button
+              @click="handleMessage"
+              :disabled="isSubmitDisabled"
+              class="save-btn"
+            >
+              儲存
+            </button>
+            <button @click="cancelEdit" class="cancel-btn">取消</button>
+          </div>
+        </template>
       </div>
 
       <div class="reply-section">
@@ -492,31 +593,6 @@ onUnmounted(() => {
               <n-badge :value="reply.likes || 0" />
             </div>
           </li> -->
-          <div class="file-upload-container">
-            <div class="file-upload-select">
-              <input
-                type="file"
-                ref="fileInputRef"
-                @change="handleFileUpload"
-                class="file-input"
-                style="display: none"
-              />
-              <button
-                type="button"
-                @click="triggerFileInput"
-                class="submit-button"
-              >
-                <img :src="Noteicon" alt="Noteicon" />
-              </button>
-            </div>
-
-            <div v-if="fileUrl" class="file-preview">
-              <img :src="fileUrl" alt="File Preview" class="preview-img" />
-              <button @click="cancelFilePreview" class="cancel-preview-button">
-                <img :src="Closeicon" alt="Closeicon" />
-              </button>
-            </div>
-          </div>
         </ul>
       </div>
     </div>
@@ -672,5 +748,41 @@ onUnmounted(() => {
   width: 100%;
   height: auto;
   object-fit: contain;
+}
+
+/* ai */
+.edit-textarea {
+  width: 100%;
+  min-height: 100px;
+  padding: 10px;
+  border: 1px solid #ccc;
+  border-radius: 4px;
+  resize: vertical;
+}
+
+.file-preview {
+  margin: 10px 0;
+}
+
+.preview-img {
+  max-width: 200px;
+  max-height: 200px;
+}
+.edit-actions {
+  margin-top: 10px;
+  display: flex;
+  gap: 10px;
+}
+
+.add-file-btn,
+.save-btn,
+.cancel-btn {
+  padding: 5px 15px;
+  border-radius: 4px;
+}
+
+.save-btn:disabled {
+  opacity: 0.5;
+  cursor: not-allowed;
 }
 </style>
