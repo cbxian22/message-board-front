@@ -587,7 +587,7 @@ const handleDeleteAccountConfirm = () => {
               <div class="toggle-title">
                 <label for="intro">變更隱私</label>
                 <n-popover
-                  style="max-width: 300px"
+                  style="max-width: 250px"
                   trigger="hover"
                   :keep-alive-on-hover="false"
                 >
