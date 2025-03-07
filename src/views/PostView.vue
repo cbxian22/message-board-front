@@ -105,11 +105,6 @@ const fetchSingleComment = async (postId) => {
         userLiked: comment.user_liked || false,
         replies: comment.replies || 0,
       };
-      // 數據加載完成後設置焦點
-      if (textareaRef.value) {
-        adjustTextareaHeight();
-        textareaRef.value.focus();
-      }
     } else {
       message.error("無法獲取單一貼文，數據格式不正確");
     }
@@ -308,12 +303,11 @@ const adjustTextareaHeight = () => {
 onMounted(async () => {
   document.addEventListener("mousedown", closeModal);
   emitter.on("updatePost", handlePostUpdate);
-  await fetchSingleComment(route.params.id); // 等待數據加載
-  await nextTick(); // 等待 DOM 更新
+  await fetchSingleComment(route.params.id);
+  await nextTick();
   if (textareaRef.value) {
     adjustTextareaHeight();
     textareaRef.value.focus();
-    console.log("焦點已設置到 textarea:", document.activeElement);
   }
 });
 
