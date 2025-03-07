@@ -60,17 +60,20 @@
         </div>
 
         <div class="message-form-end">
-          <n-dropdown
-            trigger="click"
-            :options="visibilityOptions"
-            @select="handleVisibilitySelect"
-          >
-            <span>向誰發佈</span>
-          </n-dropdown>
-
-          <n-button :disabled="isSubmitDisabled" @click="handleMessage"
-            >發佈</n-button
-          >
+          <div class="toWho">
+            <n-dropdown
+              trigger="click"
+              :options="visibilityOptions"
+              @select="handleVisibilitySelect"
+            >
+              <span>向誰發佈</span>
+            </n-dropdown>
+          </div>
+          <div>
+            <n-button :disabled="isSubmitDisabled" @click="handleMessage"
+              >發佈</n-button
+            >
+          </div>
         </div>
       </form>
     </div>
@@ -389,10 +392,14 @@ watch(content, () => {
   flex: 1;
   display: flex;
   align-items: center;
-  justify-content: end;
+  justify-content: space-around;
   margin: 20px 30px;
   max-height: 52px;
   min-height: 52px;
+}
+
+.message-form-end .toWho {
+  cursor: pointer;
 }
 
 .message-form-end button {
