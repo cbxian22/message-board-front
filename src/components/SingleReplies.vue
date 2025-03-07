@@ -173,6 +173,14 @@ const handleUpdate = (replyId) => {
     editingReplyId.value = replyId;
     content.value = reply.content;
     fileUrl.value = reply.file_url;
+    nextTick(() => {
+      const textarea = textareas.value[replyId];
+      if (textarea) {
+        adjustTextareaHeight(replyId);
+      } else {
+        console.warn(`Textarea for reply ${replyId} not found after update.`);
+      }
+    });
   }
 };
 
