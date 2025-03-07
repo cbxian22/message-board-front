@@ -8,6 +8,7 @@ import {
   useLoadingBar,
   useMessage,
   useDialog,
+  NPopover,
 } from "naive-ui";
 import { useAuthStore } from "../stores/authStore";
 import { useThemeStore } from "../stores/themeStore";
@@ -15,6 +16,8 @@ import { useRouter } from "vue-router";
 import apiClient from "../stores/axiosConfig";
 import { emitter } from "../main";
 import Login from "./ModalLogin.vue";
+
+import Helpicon from "../assets/Helpicon.svg";
 
 const props = defineProps({
   userData: Object, // 從父組件接收用戶資料
@@ -582,6 +585,14 @@ const handleDeleteAccountConfirm = () => {
           <div class="form-box">
             <div class="form-mod">
               <label for="intro">變更隱私</label>
+              <n-popover trigger="hover" :keep-alive-on-hover="false">
+                <template #trigger>
+                  <img class="icon" :src="Helpicon" alt="說明" />
+                </template>
+                <span
+                  >變更為私人帳號時，即使貼文為公開權限也只能向好友顯示。如需讓非好友者瀏覽，請設置公開帳號。</span
+                >
+              </n-popover>
               <div class="toggle-container">
                 <div>
                   <span>公開</span>
