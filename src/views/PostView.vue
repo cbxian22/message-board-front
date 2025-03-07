@@ -297,6 +297,10 @@ onMounted(() => {
   adjustTextareaHeight();
   emitter.on("updatePost", handlePostUpdate);
   fetchSingleComment(route.params.id);
+  if (textareaRef.value) {
+    adjustTextareaHeight();
+    textareaRef.value.focus();
+  }
 });
 
 onUnmounted(() => {
@@ -451,7 +455,6 @@ watch(content, () => {
                 ref="textareaRef"
                 v-model="content"
                 placeholder="想回覆點什麼呢？"
-                autofocus
               ></textarea>
             </div>
             <div class="message-form-end">
