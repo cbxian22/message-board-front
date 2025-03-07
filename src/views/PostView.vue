@@ -452,7 +452,7 @@ watch(content, () => {
   </div>
   <div v-else>正在加載貼文...</div>
 
-  <UpdatePostView v-model="isOpenModal" :post-id="1" />
+  <UpdatePostView v-model="isOpenModal" :post-id="selectedPostId" />
   <Navbar />
 </template>
 
