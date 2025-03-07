@@ -32,6 +32,7 @@ const props = defineProps({
 });
 
 const replies = ref([]);
+const content = ref("");
 const modalState = ref({});
 const modalRefs = ref({});
 const buttonRefs = ref({});
