@@ -252,7 +252,7 @@ const togglePassword = () => {
               v-model="account"
               type="text"
               required
-              @input="validateAccount"
+              @blur="validateAccount"
               maxlength="254"
             />
             <span>郵件或用戶帳號</span>
@@ -273,7 +273,7 @@ const togglePassword = () => {
               :type="ishowing ? 'text' : 'password'"
               v-model="password"
               required
-              @input="validatePassword"
+              @blur="validatePassword"
               maxlength="128"
             />
             <span>輸入密碼</span>
@@ -296,7 +296,7 @@ const togglePassword = () => {
               v-model="name"
               type="text"
               required
-              @input="validateName"
+              @blur="validateName"
             />
             <span>全名</span>
           </label>
@@ -316,7 +316,7 @@ const togglePassword = () => {
               v-model="accountName"
               type="text"
               required
-              @input="validateAccountName"
+              @blur="validateAccountName"
               maxlength="20"
             />
             <span>用戶名稱</span>
@@ -463,7 +463,7 @@ const handleRegister = async () => {
     const response = await apiClient.post("/auth/register", {
       name: name.value,
       account: account.value,
-      accountName: accountName.value, // 加入 accountName
+      accountName: accountName.value,
       password: password.value,
       role: role,
     });
@@ -558,10 +558,11 @@ const togglePassword = () => {
 
 .error-message {
   position: absolute;
-  top: -20px;
+  top: -18px; /* 調整位置避免重疊 */
   left: 0;
-  color: red;
+  color: #ff0000; /* 明確指定紅色 */
   font-size: 12px;
+  z-index: 1; /* 確保在浮動標籤上方 */
 }
 
 .register-btn {
