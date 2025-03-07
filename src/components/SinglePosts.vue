@@ -1,6 +1,6 @@
 <script setup>
 import { ref, defineEmits, onMounted, onUnmounted } from "vue";
-import { NBadge, useMessage, NImage } from "naive-ui";
+import { NBadge, useMessage, NImage, useDialog } from "naive-ui";
 import { useAuthStore } from "../stores/authStore";
 import { useDateStore } from "../stores/dateStore";
 import { useRouter } from "vue-router";
@@ -22,6 +22,7 @@ const emit = defineEmits();
 const authStore = useAuthStore();
 const dateStore = useDateStore();
 const message = useMessage();
+const dialog = useDialog();
 
 const comments = ref([]);
 const modalState = ref({});
@@ -117,13 +118,24 @@ const fetchComments = async () => {
   }
 };
 
-// 貼文＿刪除
-const handleDelete = async (postId) => {
+// 貼文＿刪除確認
+const handleDeleteConfirm = (postId) => {
   // 關閉所有 Modal
   Object.keys(modalState.value).forEach((key) => {
     modalState.value[key] = false;
   });
+  dialog.warning({
+    content: "需要再次加入好友才可以瀏覽私人帳號！",
+    positiveText: "解除好友",
+    negativeText: "取消",
+    onPositiveClick: () => {
+      handleDelete(postId);
+    },
+  });
+};
 
+// 貼文＿刪除
+const handleDelete = async (postId) => {
   if (!authStore.accessToken) {
     message.error("請先登入！");
     return;
@@ -284,7 +296,10 @@ onUnmounted(() => {
                     authStore.isLoggedIn && authStore.userName === comment.name
                   "
                 >
-                  <button class="modal-link" @click="handleDelete(comment.id)">
+                  <button
+                    class="modal-link"
+                    @click="handleDeleteConfirm(comment.id)"
+                  >
                     <img class="icon" :src="Deleteicon" alt="Deleteicon" />
                     <span>刪除</span>
                   </button>
