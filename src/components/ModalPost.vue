@@ -79,7 +79,13 @@
 
 <script setup>
 import { ref, nextTick, watch, computed } from "vue";
-import { NButton, useLoadingBar, useMessage, useDialog } from "naive-ui";
+import {
+  NButton,
+  useLoadingBar,
+  useMessage,
+  useDialog,
+  NDropdown,
+} from "naive-ui";
 import { useSocketStore } from "../stores/socketStore";
 import { useAuthStore } from "../stores/authStore";
 import apiClient from "../stores/axiosConfig"; // 引入 apiClient
