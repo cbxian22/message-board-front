@@ -119,6 +119,11 @@ const fetchComments = async () => {
 
 // 貼文＿刪除
 const handleDelete = async (postId) => {
+  // 關閉所有 Modal
+  Object.keys(modalState.value).forEach((key) => {
+    modalState.value[key] = false;
+  });
+
   if (!authStore.accessToken) {
     message.error("請先登入！");
     return;
@@ -141,9 +146,12 @@ const handleUpdate = async (postId) => {
     message.error("請先登入！");
     return;
   }
+  // 關閉所有 Modal
+  Object.keys(modalState.value).forEach((key) => {
+    modalState.value[key] = false;
+  });
   selectedPostId.value = postId;
   isOpenModal.value = true;
-  closeModal();
 };
 
 // 貼文＿處理更新
