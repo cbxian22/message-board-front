@@ -491,7 +491,7 @@ watch(content, () => {
 .reply-section {
   display: flex;
   margin-left: -10px;
-  align-items: center;
+  align-items: flex-start;
 }
 
 .reply-section ul {
