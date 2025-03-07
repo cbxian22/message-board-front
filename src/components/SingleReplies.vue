@@ -295,7 +295,7 @@ const hasChanges = computed(() => {
 });
 
 // 回覆＿提交更新
-const handleMessage = async (replayId) => {
+const handleMessage = async () => {
   if (!authStore.userId || !authStore.accessToken) {
     message.error("請先登入！");
     return;
@@ -502,7 +502,7 @@ onUnmounted(() => {
         <!-- 編輯模式 -->
         <template v-else>
           <textarea
-            ref="textarea"
+            :ref="(el) => (textareas[reply.id] = el)"
             v-model="content"
             placeholder="編輯您的回覆..."
             class="edit-textarea"
