@@ -478,9 +478,8 @@ watch(content, () => {
     <SingleReplies :post-id="postId" />
   </div>
   <div v-else>正在加載貼文...</div>
-
-  <UpdatePostView v-model="isOpenModal" :post-id="selectedPostId" />
   <Navbar />
+  <UpdatePostView v-model="isOpenModal" :post-id="selectedPostId" />
 </template>
 
 <style scoped>
