@@ -657,8 +657,9 @@ watch(content, () => {
   font-size: 14px;
   padding: 20px;
   color: rgb(243, 245, 247);
-  height: 40px;
   line-height: 1.5;
+  max-height: 100px;
+  overflow-y: auto;
 }
 
 .fixed-textarea::placeholder {

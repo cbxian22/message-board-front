@@ -730,8 +730,8 @@ onUnmounted(() => {
   font-size: 14px;
   padding-right: 30px;
   color: rgb(243, 245, 247);
-  max-height: 100px; /* 設置最大高度為 100px */
-  overflow-y: auto; /* 超過 100px 時顯示滾動條 */
+  max-height: 100px;
+  overflow-y: auto;
 }
 
 .edit-textarea::placeholder {
