@@ -772,6 +772,7 @@ const handleDeleteAccountConfirm = () => {
 }
 
 .icon {
+  margin-left: 5px;
   width: 24px;
   height: 24px;
   object-fit: contain;
