@@ -797,4 +797,10 @@ const handleDeleteAccountConfirm = () => {
 .privacy-toggle .n-switch {
   margin: 0 5px;
 }
+
+.icon{
+  width: 24px;
+  height: 24px;
+  object-fit: contain;
+}
 </style>
