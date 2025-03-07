@@ -392,13 +392,15 @@ watch(content, () => {
   flex: 1;
   display: flex;
   align-items: center;
-  justify-content: space-around;
+  justify-content: space-between;
   margin: 20px 30px;
   max-height: 52px;
   min-height: 52px;
 }
 
 .message-form-end .toWho {
+  color: #aaa;
+  opacity: 0.7;
   cursor: pointer;
 }
 
