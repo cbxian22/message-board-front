@@ -172,7 +172,13 @@ const handleUpdate = (replyId) => {
     editingReplyId.value = replyId;
     content.value = reply.content;
     fileUrl.value = reply.file_url;
-    nextTick(() => adjustTextareaHeight());
+    nextTick(() => {
+      if (textarea.value) {
+        adjustTextareaHeight();
+      } else {
+        console.warn("Textarea not found after update.");
+      }
+    });
   }
 };
 
@@ -349,30 +355,37 @@ const isSubmitDisabled = computed(() => {
 // 調整 textarea 高度
 const adjustTextareaHeight = () => {
   nextTick(() => {
-    if (textarea.value) {
-      textarea.value.style.height = "auto"; // 重置高度以獲取真實 scrollHeight
-      const contentHeight = textarea.value.scrollHeight;
-      // 設置高度為內容高度，但不超過 100px
-      textarea.value.style.height = `${Math.min(contentHeight, 100)}px`;
-      console.log(
-        "scrollHeight:",
-        textarea.value.scrollHeight,
-        "height:",
-        textarea.value.style.height
-      ); // 調試用
+    // Guard against null or undefined
+    if (!textarea.value) {
+      console.warn("Textarea element is not available yet.");
+      return;
     }
+
+    textarea.value.style.height = "auto"; // Reset height to get true scrollHeight
+    const contentHeight = textarea.value.scrollHeight;
+    textarea.value.style.height = `${Math.min(contentHeight, 100)}px`; // Set height with max of 100px
+    console.log(
+      "scrollHeight:",
+      textarea.value.scrollHeight,
+      "height:",
+      textarea.value.style.height
+    ); // Debugging
   });
 };
 
 // 監聽內容變化並調整高度
 watch(content, () => {
-  adjustTextareaHeight();
+  if (isEditing.value && editingReplyId.value) {
+    adjustTextareaHeight();
+  }
 });
 
 onMounted(async () => {
   document.addEventListener("mousedown", closeModal);
   fetchReplies(postId);
-  adjustTextareaHeight();
+  if (isEditing.value && editingReplyId.value) {
+    adjustTextareaHeight();
+  }
 });
 
 onUnmounted(() => {
@@ -418,12 +431,11 @@ onUnmounted(() => {
           >
             <div class="modal-content" @click.stop>
               <ul>
-                <!-- <li
+                <li
                   v-if="
                     authStore.isLoggedIn && authStore.userName === reply.name
                   "
-                > -->
-                <li>
+                >
                   <button class="modal-link" @click="handleUpdate(reply.id)">
                     <img class="icon" :src="Editicon" alt="Editicon" />
                     <span>編輯</span>
