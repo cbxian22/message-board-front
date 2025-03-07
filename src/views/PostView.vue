@@ -638,7 +638,7 @@ watch(content, () => {
 .user-content {
   display: flex;
   flex-direction: row;
-  align-items: center;
+  align-items: flex-start;
   width: 100%;
 }
 
