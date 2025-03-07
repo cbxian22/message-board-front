@@ -38,7 +38,6 @@ const fileUrl = ref(null);
 const fileInputRef = ref(null);
 const isOpenModal = ref(false);
 const selectedPostId = ref(null);
-// const postId = route.params.id;
 
 // 貼文＿打開 Modal
 const openModal = (event) => {

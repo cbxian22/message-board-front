@@ -15,7 +15,7 @@ import Moreicon from "../assets/Moreicon.svg";
 import Editicon from "../assets/Editicon.svg";
 import Deleteicon from "../assets/Deleteicon.svg";
 import Flagicon from "../assets/Flagicon.svg";
-import { positionProp } from "naive-ui/es/layout/src/interface";
+import Noteicon from "../assets/Noteicon.svg";
 
 const route = useRoute();
 const emit = defineEmits();
@@ -216,6 +216,63 @@ const handlelike = async (id) => {
 
 //  因為不用 Modal Update Reply 且部分功能雷同，直接寫入此檔案
 
+// 獲取 <input type="file">
+const triggerFileInput = () => {
+  fileInputRef.value?.click();
+};
+
+// 處理檔案上傳並顯示預覽
+const handleFileUpload = (event) => {
+  const selectedFile = event.target.files[0];
+  if (selectedFile) {
+    console.log("檔案已選擇:", selectedFile.name);
+    if (selectedFile.type.startsWith("image/")) {
+      const reader = new FileReader();
+      reader.onload = (e) => {
+        fileUrl.value = e.target.result;
+      };
+      reader.readAsDataURL(selectedFile);
+    }
+    file.value = selectedFile;
+  }
+};
+
+// 取消檔案預覽
+const cancelFilePreview = () => {
+  fileUrl.value = null;
+  file.value = null;
+};
+
+// 獨立處理圖片上傳
+const uploadFile = async () => {
+  if (!file.value) return fileUrl.value || null;
+  try {
+    console.log("開始上傳檔案...");
+    const { data } = await apiClient.get("/upload", {
+      params: { filename: file.value.name, contentType: file.value.type },
+    });
+    await apiClient.put(data.uploadUrl, file.value, {
+      headers: { "Content-Type": file.value.type },
+    });
+    console.log("檔案上傳成功:", data.fileUrl);
+    return data.fileUrl;
+  } catch (error) {
+    console.error("檔案上傳失敗:", error);
+    return null;
+  }
+};
+
+// 判斷是否有變更
+const hasChanges = computed(() => {
+  if (!postData.value) {
+    return content.value.trim() || file.value;
+  }
+  const isContentChanged = content.value !== (postData.value.content || "");
+  const isFileUrlChanged = fileUrl.value !== (postData.value.file_url || null);
+  const isFileAdded = !!file.value;
+  return isContentChanged || isFileUrlChanged || isFileAdded;
+});
+
 // 回覆＿提交更新
 const handleMessage = async (replayId) => {
   if (!authStore.userId || !authStore.accessToken) {
@@ -263,6 +320,28 @@ const handleMessage = async (replayId) => {
     loadingBar.finish();
   }
 };
+
+// 檢查是否啟用提交按鈕
+const isSubmitDisabled = computed(() => {
+  if (!postData.value) {
+    return !(content.value.trim() || file.value);
+  }
+  const isContentUnchanged = content.value === (postData.value.content || "");
+  const isFileUrlUnchanged =
+    fileUrl.value === (postData.value.file_url || null);
+  const noNewFile = !file.value;
+  return isContentUnchanged && isFileUrlUnchanged && noNewFile;
+});
+
+// 監聽內容變化並調整高度
+watch(content, () => {
+  nextTick(() => {
+    if (textarea.value) {
+      textarea.value.style.height = "auto";
+      textarea.value.style.height = `${textarea.value.scrollHeight}px`;
+    }
+  });
+});
 
 onMounted(async () => {
   document.addEventListener("mousedown", closeModal);
@@ -346,7 +425,8 @@ onUnmounted(() => {
         </div>
       </div>
 
-      <div class="reply-content">
+      <!-- 沒有編輯時正常顯示 -->
+      <div v-if="!isEditing" class="reply-content">
         <p>{{ reply.content }}</p>
         <span v-if="reply.file_url">
           <n-image
@@ -377,6 +457,16 @@ onUnmounted(() => {
           </div>
         </span>
       </div>
+      <!-- 編輯模式 -->
+      <div v-else class="reply-content">
+        <textarea
+          ref="textarea"
+          v-model="content"
+          id="content"
+          placeholder="編輯您的回覆..."
+          @input="adjustTextareaHeight"
+        ></textarea>
+      </div>
 
       <div class="reply-section">
         <ul>
@@ -393,18 +483,39 @@ onUnmounted(() => {
             </div>
           </li>
           <!-- 當 isEditing = true 出現-->
-          <li v-if="isEditing">
+          <!-- <li v-if="isEditing">
             <div class="reply-count" @click="">
               <button class="reply-link">
-                <img
-                  :class="{ icon: !reply.userLiked }"
-                  :src="reply.userLiked ? FavoriteRedicon : Favoriteicon"
-                  alt="Like"
-                />
+                <img :src="Noteicon" alt="Noteicon" />
               </button>
               <n-badge :value="reply.likes || 0" />
             </div>
-          </li>
+          </li> -->
+          <div class="file-upload-container">
+            <div class="file-upload-select">
+              <input
+                type="file"
+                ref="fileInputRef"
+                @change="handleFileUpload"
+                class="file-input"
+                style="display: none"
+              />
+              <button
+                type="button"
+                @click="triggerFileInput"
+                class="submit-button"
+              >
+                <img :src="Noteicon" alt="Noteicon" />
+              </button>
+            </div>
+
+            <div v-if="fileUrl" class="file-preview">
+              <img :src="fileUrl" alt="File Preview" class="preview-img" />
+              <button @click="cancelFilePreview" class="cancel-preview-button">
+                <img :src="Closeicon" alt="Closeicon" />
+              </button>
+            </div>
+          </div>
         </ul>
       </div>
     </div>
