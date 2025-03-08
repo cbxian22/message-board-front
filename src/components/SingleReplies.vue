@@ -121,7 +121,7 @@ const fetchReplies = async (postId) => {
         content: reply.content,
         timestamp: new Date(reply.created_at),
         file_url: reply.file_url,
-        name: reply.replies_name,
+        name: reply.user_name,
         user_avatar: reply.user_avatar,
         likes: reply.likes || 0,
         userLiked: reply.user_liked || false,

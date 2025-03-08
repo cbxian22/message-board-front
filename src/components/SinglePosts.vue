@@ -98,7 +98,7 @@ const fetchComments = async () => {
         timestamp: new Date(comment.created_at),
         file_url: comment.file_url,
         visibility: comment.visibility,
-        name: comment.account_name,
+        name: comment.user_name,
         user_avatar: comment.user_avatar,
         likes: comment.likes || 0,
         userLiked: comment.user_liked || false,
