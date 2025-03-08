@@ -44,7 +44,7 @@ const router = createRouter({
       component: () => import("../views/Chatlist.vue"),
     },
     {
-      path: "/@:username",
+      path: "/@:accountname",
       name: "Profile",
       component: () => import("../views/ProfileView.vue"),
       props: true,

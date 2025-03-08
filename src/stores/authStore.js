@@ -19,6 +19,7 @@ export const useAuthStore = defineStore("auth", {
     isLoggedIn: false,
     userId: null,
     userName: "",
+    accountName: "",
     userAvatar: "",
     role: "",
     accessToken: null,
@@ -38,11 +39,13 @@ export const useAuthStore = defineStore("auth", {
         if (!response.ok) throw new Error("Failed to fetch user data");
         const data = await response.json();
         this.userName = data.name || "未知用戶";
+        this.accountName = data.accountname || "未知用戶";
         this.userAvatar =
           data.avatar_url ||
           "https://storage.googleapis.com/message_board_storage/default_profile.jpg";
         this.role = data.role || "";
         localStorage.setItem("userName", this.userName);
+        localStorage.setItem("accountName", this.accountName);
         localStorage.setItem("userAvatar", this.userAvatar);
         localStorage.setItem("role", this.role);
       } catch (error) {
@@ -156,6 +159,7 @@ export const useAuthStore = defineStore("auth", {
         isLoggedIn: false,
         userId: null,
         userName: "",
+        accountName: "",
         userAvatar: "",
         role: "",
         accessToken: null,
@@ -166,6 +170,7 @@ export const useAuthStore = defineStore("auth", {
         "refreshToken",
         "userId",
         "userName",
+        "accountName",
         "userAvatar",
         "role",
       ].forEach((key) => localStorage.removeItem(key));
@@ -203,6 +208,7 @@ export const useAuthStore = defineStore("auth", {
         isLoggedIn: false,
         userId: null,
         userName: "",
+        accountName: "",
         userAvatar: "",
         role: "",
         accessToken: null,
@@ -213,6 +219,7 @@ export const useAuthStore = defineStore("auth", {
         "refreshToken",
         "userId",
         "userName",
+        "accountName",
         "userAvatar",
         "role",
       ].forEach((key) => localStorage.removeItem(key));

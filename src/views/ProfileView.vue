@@ -13,7 +13,7 @@ import Backicon from "../assets/Backicon.svg";
 
 // const aru = computed(() => socketStore.messages.length > 0);
 
-const props = defineProps(["username"]);
+const props = defineProps(["accountname"]);
 const router = useRouter();
 const route = useRoute();
 const authStore = useAuthStore();
@@ -23,34 +23,34 @@ const userPosts = ref([]);
 
 // 組件掛載時載入資料
 onMounted(async () => {
-  console.log("Mounted with username:", props.username); // 添加日誌
-  if (props.username) {
-    await fetchUserData(props.username);
+  console.log("Mounted with accountname:", props.accountname); // 添加日誌
+  if (props.accountname) {
+    await fetchUserData(props.accountname);
   }
 
   // 監聽刷新事件
   emitter.on("refreshPost", (data) => {
-    const usernameToFetch = data?.newUsername || props.username;
-    console.log("Refreshing with username:", usernameToFetch);
-    fetchUserData(usernameToFetch);
+    const accountnameToFetch = data?.newAccountname || props.accountname;
+    console.log("Refreshing with accountname:", accountnameToFetch);
+    fetchUserData(accountnameToFetch);
   });
 });
 
 watch(
-  () => [props.username, route.params.username],
-  async ([newUsername]) => {
-    if (newUsername) {
-      await fetchUserData(newUsername);
+  () => [props.accountname, route.params.accountname],
+  async ([newAccountname]) => {
+    if (newAccountname) {
+      await fetchUserData(newAccountname);
     }
   }
 );
 
 // 獲取使用者資料
-const fetchUserData = async (username) => {
+const fetchUserData = async (accountname) => {
   try {
     const [userResponse, postsResponse] = await Promise.all([
-      apiClient.get(`/users/${username}`),
-      apiClient.get(`/posts/user/${username}`, {
+      apiClient.get(`/users/${accountname}`),
+      apiClient.get(`/posts/user/${accountname}`, {
         params: { userId: localStorage.getItem("userId") },
       }),
     ]);
@@ -65,6 +65,7 @@ const fetchUserData = async (username) => {
     userData.value = {
       id: userResponse.data.id,
       name: userResponse.data.name,
+      accountName: userResponse.data.accountname,
       intro: userResponse.data.intro,
       userAvatar: userResponse.data.avatar_url,
       is_private: Boolean(userResponse.data.is_private),
@@ -96,7 +97,7 @@ const isFromNavbar = () => {
 
 // 是否為自己的個人頁面
 const isOwnProfile = () => {
-  return authStore.isLoggedIn && props.username === authStore.userName;
+  return authStore.isLoggedIn && props.accountname === authStore.accountname;
 };
 
 // 返回按鈕是否應隱藏
