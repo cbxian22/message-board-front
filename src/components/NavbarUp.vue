@@ -90,7 +90,7 @@ const shouldShowMenuIcon = computed(() => {
   if (!authStore.isLoggedIn) return true;
   if (
     route.name === "Profile" &&
-    route.params.accountname === authStore.accountname
+    route.params.accountname === authStore.accountName
   ) {
     return true;
   }
@@ -101,7 +101,7 @@ const shouldShowChatAndNotification = computed(() => {
   if (!authStore.isLoggedIn) return false;
   if (
     route.name === "Profile" &&
-    route.params.accountname === authStore.accountname
+    route.params.accountname === authStore.accountName
   ) {
     return false;
   }
