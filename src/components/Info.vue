@@ -671,7 +671,6 @@ const handleDeleteAccountConfirm = () => {
 .info-content > .name {
   font-size: 24px !important;
   font-weight: 700;
-  margin-bottom: 5px;
 }
 
 .info-content > .account-name {
