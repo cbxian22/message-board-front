@@ -14,9 +14,9 @@ export const useNavStore = defineStore("nav", () => {
 
   const syncWithRoute = () => {
     const path = route.path;
-    const currentUsername = route.params.username; // 動態路由中的 username
+    const currentUsername = route.params.accountname; // 動態路由中的 username
 
-    console.log("Syncing with route:", path, "Username:", currentUsername); // 除錯用
+    console.log("Syncing with route:", path, "accountname:", currentUsername); // 除錯用
 
     switch (path) {
       case "/":
@@ -33,7 +33,7 @@ export const useNavStore = defineStore("nav", () => {
         break;
       default:
         if (path.startsWith("/@")) {
-          if (currentUsername && currentUsername === authStore.userName) {
+          if (currentUsername && currentUsername === authStore.accountName) {
             activeItem.value = "profile"; // 自己的頁面
           } else {
             activeItem.value = undefined; // 他人的頁面或其他動態路由
