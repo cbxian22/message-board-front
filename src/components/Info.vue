@@ -396,7 +396,7 @@ const handleUpdate = async () => {
   try {
     const uploadedFileUrl = await uploadFile();
     const response = await apiClient.put("/users/profile", {
-      accountName: accountName.value,
+      accountname: accountName.value,
       name: name.value,
       intro: intro.value,
       fileUrl: uploadedFileUrl || info.value.userAvatar,
