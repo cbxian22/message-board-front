@@ -46,6 +46,8 @@ const friendRequestSent = ref(false);
 const isPendingReceived = ref(false);
 const isAlreadyFriend = ref(false);
 const pendingRequestId = ref(null);
+const accountNameError = ref("");
+const nameError = ref("");
 
 const toFriendsList = () => {
   router.push("/friendslist");
@@ -393,6 +395,8 @@ const handleUpdate = async () => {
   }
 
   loadingBar.start();
+  validateName();
+  validateAccountName();
   try {
     const uploadedFileUrl = await uploadFile();
     const response = await apiClient.put("/users/profile", {
@@ -512,6 +516,35 @@ const handleDeleteAccountConfirm = () => {
     },
   });
 };
+
+const validateName = () => {
+  if (!name.value) {
+    nameError.value = "請輸入全名";
+  } else if (name.value.length < 3) {
+    nameError.value = "全名需至少3個字符";
+  } else if (name.value.length > 25) {
+    nameError.value = "全名不得超過25個字符";
+  } else {
+    nameError.value = "";
+  }
+};
+
+const validateAccountName = () => {
+  const validPattern = /^[a-z0-9._]+$/;
+  if (!accountName.value) {
+    accountNameError.value = "請輸入用戶名稱";
+  } else if (/\s/.test(accountName.value)) {
+    accountNameError.value = "用戶名稱禁止使用空白鍵";
+  } else if (!validPattern.test(accountName.value)) {
+    accountNameError.value = "只能使用小寫英文、數字、點(.)和下劃線(_)";
+  } else if (accountName.value.length < 3) {
+    accountNameError.value = "用戶名稱需至少3個字符";
+  } else if (accountName.value.length > 20) {
+    accountNameError.value = "用戶名稱最多20個字符";
+  } else {
+    accountNameError.value = "";
+  }
+};
 </script>
 
 <template>
@@ -560,7 +593,15 @@ const handleDeleteAccountConfirm = () => {
             <div class="form-inner">
               <div class="form-mod full">
                 <label for="accountName">用戶名稱</label>
-                <input v-model="accountName" id="accountName" type="text" />
+                <span class="error-message" v-if="accountNameError">{{
+                  accountNameError
+                }}</span>
+                <input
+                  v-model="accountName"
+                  id="accountName"
+                  type="text"
+                  @blur="validateAccountName"
+                />
               </div>
 
               <div class="form-mod">
@@ -586,8 +627,16 @@ const handleDeleteAccountConfirm = () => {
 
           <div class="form-box">
             <div class="form-mod">
+              <span class="error-message" v-if="nameError">{{
+                nameError
+              }}</span>
               <label for="name">全名</label>
-              <input v-model="name" id="name" type="text" />
+              <input
+                v-model="name"
+                id="name"
+                type="text"
+                @blur="validateName"
+              />
             </div>
           </div>
 
@@ -843,5 +892,10 @@ const handleDeleteAccountConfirm = () => {
 
 .privacy-toggle .n-switch {
   margin: 0 5px;
+}
+
+.error-message {
+  color: #ff0000; /* 明確指定紅色 */
+  font-size: 12px;
 }
 </style>
