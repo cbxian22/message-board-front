@@ -97,7 +97,7 @@ const isFromNavbar = () => {
 
 // 是否為自己的個人頁面
 const isOwnProfile = () => {
-  return authStore.isLoggedIn && props.accountname === authStore.accountname;
+  return authStore.isLoggedIn && props.accountname === authStore.accountName;
 };
 
 // 返回按鈕是否應隱藏
