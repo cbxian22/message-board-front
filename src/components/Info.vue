@@ -545,6 +545,16 @@ const validateAccountName = () => {
     accountNameError.value = "";
   }
 };
+
+// 改進按鈕禁用邏輯
+const isFormInvalid = computed(() => {
+  return (
+    nameError.value ||
+    accountNameError.value ||
+    !name.value ||
+    !accountName.value
+  );
+});
 </script>
 
 <template>
@@ -677,7 +687,7 @@ const validateAccountName = () => {
 
           <div class="form-box">
             <div class="form-mod">
-              <n-button @click="handleUpdate">{{
+              <n-button :disabled="isFormInvalid" @click="handleUpdate">{{
                 hasChanges ? "保存變更" : "取消變更"
               }}</n-button>
             </div>
@@ -897,5 +907,9 @@ const validateAccountName = () => {
 .error-message {
   color: #ff0000; /* 明確指定紅色 */
   font-size: 12px;
+}
+
+.form-mod.n-button:disabled {
+  cursor: not-allowed;
 }
 </style>
