@@ -417,7 +417,7 @@ const handleUpdate = async () => {
       localStorage.setItem("accountName", authStore.accountName);
       localStorage.setItem("userName", authStore.userName);
       localStorage.setItem("userAvatar", authStore.userAvatar);
-      loggedInUser.value = name.value;
+      loggedInUser.value = accountName.value;
 
       info.value = {
         ...info.value,
