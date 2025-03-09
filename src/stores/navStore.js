@@ -14,9 +14,9 @@ export const useNavStore = defineStore("nav", () => {
 
   const syncWithRoute = () => {
     const path = route.path;
-    const currentUsername = route.params.accountname; // 動態路由中的 username
+    const currentUsername = route.params.accountname;
 
-    console.log("Syncing with route:", path, "accountname:", currentUsername); // 除錯用
+    console.log("Syncing with route:", path, "accountname:", currentUsername);
 
     switch (path) {
       case "/":

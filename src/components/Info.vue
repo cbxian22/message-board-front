@@ -30,12 +30,13 @@ const authStore = useAuthStore();
 const message = useMessage();
 const dialog = useDialog();
 
-const loggedInUser = ref(authStore.userName);
+const loggedInUser = ref(authStore.accountName);
+const accountName = ref("");
+const name = ref("");
+const intro = ref("");
 const show = ref(false);
 const rwdwidth = ref("100vw");
 const info = ref({});
-const name = ref("");
-const intro = ref("");
 const file = ref(null);
 const fileInputRef = ref(null);
 const tempAvatar = ref(null);
@@ -50,11 +51,11 @@ const toFriendsList = () => {
   router.push("/friendslist");
 };
 
-// 監聽 authStore.userName 的變化並同步 loggedInUser
+// 監聽 authStore.accountName 的變化並同步 loggedInUser
 watch(
-  () => authStore.userName,
-  (newName) => {
-    loggedInUser.value = newName;
+  () => authStore.accountName,
+  (newAccountName) => {
+    loggedInUser.value = newAccountName;
   }
 );
 
@@ -74,6 +75,7 @@ watch(
 
 watch(show, (newValue) => {
   if (newValue) {
+    accountName.value = info.value.accountName || "";
     name.value = info.value.name || "";
     intro.value = info.value.intro || "";
     tempAvatar.value = info.value.userAvatar;
@@ -363,6 +365,7 @@ const uploadFile = async () => {
 // 計算是否有變更
 const hasChanges = computed(() => {
   return (
+    accountName.value !== info.value.accountName ||
     name.value !== info.value.name ||
     intro.value !== info.value.intro ||
     tempAvatar.value !== info.value.userAvatar ||
@@ -377,7 +380,7 @@ const handleUpdate = async () => {
     return;
   }
 
-  if (info.value.name !== authStore.userName) {
+  if (info.value.accountName !== authStore.accountName) {
     message.error("您只能編輯自己的資料！");
     show.value = false;
     return;
@@ -393,6 +396,7 @@ const handleUpdate = async () => {
   try {
     const uploadedFileUrl = await uploadFile();
     const response = await apiClient.put("/users/profile", {
+      accountName: accountName.value,
       name: name.value,
       intro: intro.value,
       fileUrl: uploadedFileUrl || info.value.userAvatar,
@@ -402,14 +406,17 @@ const handleUpdate = async () => {
     console.log("後端回應:", response.data);
 
     if (response.status === 200) {
+      authStore.accountName = accountName.value;
       authStore.userName = name.value;
       authStore.userAvatar = uploadedFileUrl || info.value.userAvatar;
+      localStorage.setItem("accountName", authStore.accountName);
       localStorage.setItem("userName", authStore.userName);
       localStorage.setItem("userAvatar", authStore.userAvatar);
       loggedInUser.value = name.value;
 
       info.value = {
         ...info.value,
+        accountName: accountName.value,
         name: name.value,
         intro: intro.value,
         userAvatar: uploadedFileUrl || info.value.userAvatar,
@@ -417,8 +424,8 @@ const handleUpdate = async () => {
       };
 
       await nextTick();
-      emitter.emit("refreshPost", { newUsername: name.value });
-      await router.push(`/@${name.value}`);
+      emitter.emit("refreshPost", { newAccountName: accountName.value });
+      await router.push(`/@${accountName.value}`);
       show.value = false;
       message.success("更新成功！");
     } else {
@@ -453,7 +460,7 @@ const updateWidth = () => {
 };
 
 const accountDelete = async () => {
-  if (info.value.name !== authStore.userName) {
+  if (info.value.accountName !== authStore.accountName) {
     message.error("您只能刪除自己的資料！");
     return;
   }
@@ -511,8 +518,8 @@ const handleDeleteAccountConfirm = () => {
   <div class="info-box">
     <div class="info-box-in">
       <div class="info-content">
+        <p class="account-name">{{ info.accountname }}</p>
         <p class="name">{{ info.name }}</p>
-        <p>{{ info.accountname }}</p>
         <p class="intro">{{ info.intro }}</p>
       </div>
       <div class="info-img">
@@ -521,14 +528,14 @@ const handleDeleteAccountConfirm = () => {
     </div>
 
     <!-- 切換 -->
-    <div class="set-btn" v-if="loggedInUser === info.name">
+    <div class="set-btn" v-if="loggedInUser === info.accountName">
       <div class="friend-request-actions">
         <n-button @click="show = true"> 編輯個人檔案 </n-button>
         <n-button @click="toFriendsList"> 好友 </n-button>
       </div>
     </div>
 
-    <div class="set-btn" v-if="loggedInUser !== info.name">
+    <div class="set-btn" v-if="loggedInUser !== info.accountName">
       <n-button v-if="isAlreadyFriend" @click="handleDeleteFriendConfirm"
         >解除好友</n-button
       >
@@ -552,7 +559,11 @@ const handleDeleteAccountConfirm = () => {
           <div class="form-box">
             <div class="form-inner">
               <div class="form-mod full">
-                <label for="name">名稱</label>
+                <label for="accountName">用戶名稱</label>
+                <input v-model="accountName" id="accountName" type="text" />
+              </div>
+              <div class="form-mod full">
+                <label for="name">全名</label>
                 <input v-model="name" id="name" type="text" />
               </div>
               <div class="form-mod">
