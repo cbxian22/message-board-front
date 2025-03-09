@@ -628,7 +628,7 @@ const isFormInvalid = computed(() => {
                   :src="tempAvatar || info.userAvatar"
                   alt="更新圖片"
                   type="button"
-                  @click="triggerFileInput"
+                  @input="triggerFileInput"
                   class="submit-button"
                 />
               </div>
@@ -645,7 +645,7 @@ const isFormInvalid = computed(() => {
                 v-model="name"
                 id="name"
                 type="text"
-                @blur="validateName"
+                @input="validateName"
               />
             </div>
           </div>
