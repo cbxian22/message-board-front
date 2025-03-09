@@ -394,9 +394,10 @@ const handleUpdate = async () => {
     return;
   }
 
-  loadingBar.start();
   validateName();
   validateAccountName();
+  if (isFormInvalid.value) return;
+  loadingBar.start();
   try {
     const uploadedFileUrl = await uploadFile();
     const response = await apiClient.put("/users/profile", {
@@ -610,7 +611,7 @@ const isFormInvalid = computed(() => {
                   v-model="accountName"
                   id="accountName"
                   type="text"
-                  @blur="validateAccountName"
+                  @input="validateAccountName"
                 />
               </div>
 
@@ -637,10 +638,10 @@ const isFormInvalid = computed(() => {
 
           <div class="form-box">
             <div class="form-mod">
+              <label for="name">全名</label>
               <span class="error-message" v-if="nameError">{{
                 nameError
               }}</span>
-              <label for="name">全名</label>
               <input
                 v-model="name"
                 id="name"
