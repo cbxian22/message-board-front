@@ -518,8 +518,8 @@ const handleDeleteAccountConfirm = () => {
   <div class="info-box">
     <div class="info-box-in">
       <div class="info-content">
-        <p class="account-name">{{ info.accountname }}</p>
         <p class="name">{{ info.name }}</p>
+        <p class="account-name">{{ info.accountName }}</p>
         <p class="intro">{{ info.intro }}</p>
       </div>
       <div class="info-img">
@@ -669,12 +669,20 @@ const handleDeleteAccountConfirm = () => {
 }
 
 .info-content > .name {
-  font-size: 25px !important;
-  margin-bottom: 10px;
+  font-size: 24px !important;
+  font-weight: 700;
+  margin-bottom: 5px;
+}
+
+.info-content > .account-name {
+  font-size: 15px !important;
+  font-weight: 400;
 }
 
 .info-content > .intro {
-  font-size: 13px !important;
+  margin-top: 15px;
+  font-size: 15px !important;
+  font-weight: 400;
 }
 
 .set-btn {
