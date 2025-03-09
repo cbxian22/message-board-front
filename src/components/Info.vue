@@ -54,8 +54,8 @@ const toFriendsList = () => {
 // 監聽 authStore.accountName 的變化並同步 loggedInUser
 watch(
   () => authStore.accountName,
-  (newAccountName) => {
-    loggedInUser.value = newAccountName;
+  (newAccountname) => {
+    loggedInUser.value = newAccountname;
   }
 );
 
@@ -424,7 +424,7 @@ const handleUpdate = async () => {
       };
 
       await nextTick();
-      emitter.emit("refreshPost", { newAccountName: accountName.value });
+      emitter.emit("refreshPost", { newAccountname: accountName.value });
       await router.push(`/@${accountName.value}`);
       show.value = false;
       message.success("更新成功！");
