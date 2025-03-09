@@ -562,10 +562,7 @@ const handleDeleteAccountConfirm = () => {
                 <label for="accountName">用戶名稱</label>
                 <input v-model="accountName" id="accountName" type="text" />
               </div>
-              <div class="form-mod full">
-                <label for="name">全名</label>
-                <input v-model="name" id="name" type="text" />
-              </div>
+
               <div class="form-mod">
                 <label for="userAvatar"></label>
                 <input
@@ -584,6 +581,13 @@ const handleDeleteAccountConfirm = () => {
                   class="submit-button"
                 />
               </div>
+            </div>
+          </div>
+
+          <div class="form-box">
+            <div class="form-mod">
+              <label for="name">全名</label>
+              <input v-model="name" id="name" type="text" />
             </div>
           </div>
 
