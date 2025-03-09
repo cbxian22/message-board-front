@@ -512,6 +512,7 @@ const handleDeleteAccountConfirm = () => {
     <div class="info-box-in">
       <div class="info-content">
         <p class="name">{{ info.name }}</p>
+        <p>{{ info.accountname }}</p>
         <p class="intro">{{ info.intro }}</p>
       </div>
       <div class="info-img">

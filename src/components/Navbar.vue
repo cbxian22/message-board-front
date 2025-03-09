@@ -48,7 +48,10 @@
 
       <li v-if="authStore.isLoggedIn" @click="setActive('profile')">
         <router-link
-          :to="{ path: `/@${authStore.userName}`, query: { from: 'navbar' } }"
+          :to="{
+            path: `/@${authStore.accountName}`,
+            query: { from: 'navbar' },
+          }"
           class="nav-link"
           :class="{ active: navStore.activeItem === 'profile' }"
         >
