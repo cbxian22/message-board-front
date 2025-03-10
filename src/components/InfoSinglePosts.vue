@@ -7,6 +7,7 @@ import { useRouter } from "vue-router";
 import apiClient from "../stores/axiosConfig"; // 引入 apiClient
 import { emitter } from "../main";
 
+import Login from "./ModalLogin.vue";
 import UpdatePostView from "./ModalUpdatePost.vue";
 
 import Replyicon from "../assets/Replyicon.svg";
@@ -36,7 +37,16 @@ const buttonRefs = ref({});
 const isOpenModal = ref(false);
 const isLikeProcessing = ref(false); // 用於追踪點讚狀態
 const selectedComment = ref(null); // 用於儲存當前選中的單一留言
+const isLoginModalOpen = ref(false);
 
+// 登入確認＿like
+const checkTokenAndOpenModal = (id) => {
+  if (!authStore.userId || !authStore.accessToken) {
+    isLoginModalOpen.value = true;
+  } else {
+    handlelike(id);
+  }
+};
 // 檔案類型檢查
 const isImage = (url) => {
   const imageExtensions = [".jpg", ".jpeg", ".png", ".gif", ".bmp", ".webp"];
@@ -56,7 +66,7 @@ watch(
 );
 
 watch(
-  () => authStore.userName,
+  () => authStore.accountName,
   (newName) => {
     loggedInUser.value = newName;
   }
@@ -347,7 +357,10 @@ const handlelike = async (id) => {
       <div class="reply">
         <ul>
           <li>
-            <div class="reply-count" @click="handlelike(comment.id)">
+            <div
+              class="reply-count"
+              @click="checkTokenAndOpenModal(comment.id)"
+            >
               <button class="reply-link">
                 <img
                   :class="{ icon: !comment.userLiked }"
@@ -371,6 +384,8 @@ const handlelike = async (id) => {
     </div>
   </div>
   <UpdatePostView v-model="isOpenModal" :comment="selectedComment" />
+  <!-- 登入 Modal -->
+  <Login v-model="isLoginModalOpen" />
 </template>
 
 <style scoped>
