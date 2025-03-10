@@ -698,8 +698,8 @@ watch(
   margin: 8px 0 10px;
   color: rgb(243, 245, 247);
   line-height: 1.5;
-  min-height: 50px !important;
   overflow-y: auto;
+  min-height: 60px !important;
 }
 
 .fixed-textarea::placeholder {
