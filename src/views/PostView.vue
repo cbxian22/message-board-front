@@ -94,7 +94,12 @@ const isPreviewImage = computed(() => {
 });
 
 const isPreviewVideo = computed(() => {
-  return file.value && file.value.type.startsWith("video/");
+  const isVideo =
+    file.value &&
+    (file.value.type.startsWith("video/") ||
+      file.value.type === "video/quicktime");
+  console.log("isPreviewVideo:", isVideo, "file type:", file.value?.type);
+  return isVideo;
 });
 
 // 貼文＿獲取單一
@@ -241,19 +246,28 @@ const triggerFileInput = () => {
 const handleFileUpload = (event) => {
   const selectedFile = event.target.files[0];
   if (selectedFile) {
-    console.log("檔案已選擇:", selectedFile.name);
+    console.log("檔案已選擇:", selectedFile.name, "類型:", selectedFile.type);
+    if (fileUrl.value && file.value && file.value.type.startsWith("video/")) {
+      URL.revokeObjectURL(fileUrl.value);
+    }
     file.value = selectedFile;
 
-    // 根據檔案類型生成預覽
-    const reader = new FileReader();
-    reader.onload = (e) => {
-      fileUrl.value = e.target.result; // Base64 URL
-    };
-
     if (selectedFile.type.startsWith("image/")) {
-      reader.readAsDataURL(selectedFile); // 圖片用 Base64
-    } else if (selectedFile.type.startsWith("video/")) {
-      fileUrl.value = URL.createObjectURL(selectedFile); // 影片用 Blob URL
+      const reader = new FileReader();
+      reader.onload = (e) => {
+        fileUrl.value = e.target.result;
+        console.log("圖片預覽 URL 已生成:", fileUrl.value.slice(0, 50) + "...");
+      };
+      reader.readAsDataURL(selectedFile);
+    } else if (
+      selectedFile.type.startsWith("video/") ||
+      selectedFile.type === "video/quicktime"
+    ) {
+      fileUrl.value = URL.createObjectURL(selectedFile);
+      console.log("影片預覽 URL 已生成:", fileUrl.value);
+    } else {
+      console.log("不支援的檔案類型:", selectedFile.type);
+      message.error("僅支援圖片和影片檔案！");
     }
   }
 };
