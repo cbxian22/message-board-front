@@ -404,6 +404,10 @@ watch(content, () => {
   cursor: pointer;
 }
 
+.n-dropdown-menu .n-popover-shared .n-dropdown {
+  width: 200px;
+}
+
 .message-form-end button {
   padding: 10px 20px;
   border: 0.5px solid rgba(102, 102, 102, 0.5);
