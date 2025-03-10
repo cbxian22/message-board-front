@@ -174,18 +174,16 @@ const handleUpdate = async (postId) => {
 };
 
 // 貼文＿處理更新
-const handlePostUpdate = (updatedPost) => {
-  const index = comments.value.findIndex((c) => c.id === updatedPost.id);
-  if (index !== -1) {
-    comments.value[index] = {
-      ...comments.value[index],
-      content: updatedPost.content,
-      file_url: updatedPost.file_url,
-    };
-    // isOpenModal.value = false; // 關閉 Modal
-    // selectedPostId.value = null; // 清空選中貼文
-  }
-};
+// const handlePostUpdate = (updatedPost) => {
+//   const index = comments.value.findIndex((c) => c.id === updatedPost.id);
+//   if (index !== -1) {
+//     comments.value[index] = {
+//       ...comments.value[index],
+//       content: updatedPost.content,
+//       file_url: updatedPost.file_url,
+//     };
+//   }
+// };
 
 // 貼文＿按讚
 const handlelike = async (id) => {
@@ -241,12 +239,12 @@ const handleReply = async (postId) => {
 onMounted(async () => {
   fetchComments();
   document.addEventListener("mousedown", closeModal);
-  emitter.on("updatePost", handlePostUpdate); // 監聽更新事件
+  // emitter.on("updatePost", handlePostUpdate); // 監聽更新事件
 });
 
 onUnmounted(() => {
   document.removeEventListener("mousedown", closeModal);
-  emitter.off("updatePost", handlePostUpdate); // 移除事件監聽
+  // emitter.off("updatePost", handlePostUpdate); // 移除事件監聽
 });
 </script>
 
