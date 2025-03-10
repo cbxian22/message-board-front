@@ -168,19 +168,6 @@ const handleUpdate = async (postId) => {
   emitter.emit("openUpdateModal", postId);
 };
 
-// // 貼文＿處理更新
-// const handlePostUpdate = (updatedPost) => {
-//   if (post.value && post.value.id === updatedPost.id) {
-//     post.value = {
-//       ...post.value,
-//       content: updatedPost.content,
-//       file_url: updatedPost.file_url,
-//     };
-//     isOpenModal.value = false;
-//     selectedPostId.value = null; // 清空選中貼文
-//   }
-// };
-
 // 貼文＿按讚
 const handlelike = async (id) => {
   if (!authStore.userId || !authStore.accessToken) {
@@ -223,7 +210,11 @@ const isSubmitDisabled = computed(() => !(content.value.trim() || file.value));
 
 // 回覆＿獲取 <input type="file">
 const triggerFileInput = () => {
-  fileInputRef.value?.click();
+  if (!authStore.userId || !authStore.accessToken) {
+    emitter.emit("openLoginModal");
+  } else {
+    fileInputRef.value?.click();
+  }
 };
 
 // 回覆＿檢查檔案上傳處理，並顯示預覽
@@ -307,6 +298,12 @@ const adjustTextareaHeight = () => {
   if (textarea) {
     textarea.style.height = "auto";
     textarea.style.height = `${Math.min(textarea.scrollHeight)}px`;
+  }
+};
+
+const textareaType = () => {
+  if (!authStore.userId || !authStore.accessToken) {
+    emitter.emit("openLoginModal");
   }
 };
 
@@ -471,6 +468,7 @@ watch(content, () => {
               <textarea
                 id="content"
                 ref="textareaRef"
+                @input="textareaType"
                 v-model="content"
                 placeholder="想回覆點什麼呢？"
               ></textarea>
