@@ -469,6 +469,7 @@ watch(content, () => {
                 id="content"
                 ref="textareaRef"
                 @input="textareaType"
+                :readonly="!authStore.userId || !authStore.accessToken"
                 v-model="content"
                 placeholder="想回覆點什麼呢？"
               ></textarea>
