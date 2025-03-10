@@ -28,7 +28,7 @@ const dateStore = useDateStore();
 const message = useMessage();
 const dialog = useDialog();
 
-const loggedInUser = ref(authStore.accountName);
+// const loggedInUser = ref(authStore.accountName);
 const username = ref(router.currentRoute.value.params.accountname);
 const comments = ref(props.posts || []);
 const modalState = ref({});
@@ -247,12 +247,12 @@ watch(
   }
 );
 
-watch(
-  () => authStore.accountName,
-  (newName) => {
-    loggedInUser.value = newName;
-  }
-);
+// watch(
+//   () => authStore.accountName,
+//   (newName) => {
+//     loggedInUser.value = newName;
+//   }
+// );
 
 watch(
   () => router.currentRoute.value.params.accountname,
