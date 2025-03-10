@@ -243,12 +243,18 @@ const triggerFileInput = () => {
 //   }
 // };
 
-const handleFileUpload = (event) => {
+const handleFileUpload = async (event) => {
   const selectedFile = event.target.files[0];
   if (selectedFile) {
     console.log("檔案已選擇:", selectedFile.name, "類型:", selectedFile.type);
-    if (fileUrl.value && file.value && file.value.type.startsWith("video/")) {
+    if (
+      fileUrl.value &&
+      file.value &&
+      (file.value.type.startsWith("video/") ||
+        file.value.type === "video/quicktime")
+    ) {
       URL.revokeObjectURL(fileUrl.value);
+      console.log("已清理舊的影片 Blob URL");
     }
     file.value = selectedFile;
 
@@ -257,6 +263,7 @@ const handleFileUpload = (event) => {
       reader.onload = (e) => {
         fileUrl.value = e.target.result;
         console.log("圖片預覽 URL 已生成:", fileUrl.value.slice(0, 50) + "...");
+        nextTick(() => console.log("圖片 URL 已更新，應觸發渲染"));
       };
       reader.readAsDataURL(selectedFile);
     } else if (
@@ -265,10 +272,14 @@ const handleFileUpload = (event) => {
     ) {
       fileUrl.value = URL.createObjectURL(selectedFile);
       console.log("影片預覽 URL 已生成:", fileUrl.value);
+      await nextTick(); // 確保 DOM 更新
+      console.log("影片 URL 已更新，應觸發渲染");
     } else {
       console.log("不支援的檔案類型:", selectedFile.type);
       message.error("僅支援圖片和影片檔案！");
     }
+  } else {
+    console.log("未選擇任何檔案");
   }
 };
 
@@ -279,8 +290,14 @@ const handleFileUpload = (event) => {
 // };
 
 const cancelFilePreview = () => {
-  if (fileUrl.value && file.value && file.value.type.startsWith("video/")) {
+  if (
+    fileUrl.value &&
+    file.value &&
+    (file.value.type.startsWith("video/") ||
+      file.value.type === "video/quicktime")
+  ) {
     URL.revokeObjectURL(fileUrl.value);
+    console.log("已清理影片 Blob URL");
   }
   fileUrl.value = null;
   file.value = null;
