@@ -47,45 +47,6 @@ const checkTokenAndOpenModal = (id) => {
     handlelike(id);
   }
 };
-// 檔案類型檢查
-const isImage = (url) => {
-  const imageExtensions = [".jpg", ".jpeg", ".png", ".gif", ".bmp", ".webp"];
-  return imageExtensions.some((ext) => url.toLowerCase().endsWith(ext));
-};
-
-const isVideo = (url) => {
-  const videoExtensions = [".mp4", ".webm", ".ogg", ".mov"];
-  return videoExtensions.some((ext) => url.toLowerCase().endsWith(ext));
-};
-
-watch(
-  () => props.posts,
-  (newPosts) => {
-    comments.value = newPosts || [];
-  }
-);
-
-watch(
-  () => authStore.accountName,
-  (newName) => {
-    loggedInUser.value = newName;
-  }
-);
-
-watch(
-  () => router.currentRoute.value.params.username,
-  (newUsername) => {
-    username.value = newUsername;
-  }
-);
-
-// 點擊圖示回到最上
-const scrollToTop = () => {
-  window.scrollTo({
-    top: 0,
-    left: 0,
-  });
-};
 
 // 打開 Modal
 const openModal = (event, commentId) => {
@@ -124,17 +85,17 @@ const closeModal = (event) => {
   }
 };
 
-onMounted(() => {
-  document.addEventListener("mousedown", closeModal);
-  emitter.on("refreshPost", () => {
-    emitter.emit("fetchUserData");
-  });
-});
+// 檔案類型檢查
+const isImage = (url) => {
+  const imageExtensions = [".jpg", ".jpeg", ".png", ".gif", ".bmp", ".webp"];
+  return imageExtensions.some((ext) => url.toLowerCase().endsWith(ext));
+};
 
-onUnmounted(() => {
-  document.removeEventListener("mousedown", closeModal);
-  emitter.off("refreshPost", () => {});
-});
+// 檔案類型檢查
+const isVideo = (url) => {
+  const videoExtensions = [".mp4", ".webm", ".ogg", ".mov"];
+  return videoExtensions.some((ext) => url.toLowerCase().endsWith(ext));
+};
 
 // 獲取單一貼文
 const fetchSingleComment = async (postId) => {
@@ -165,7 +126,23 @@ const fetchSingleComment = async (postId) => {
   }
 };
 
-// 刪除留言
+// 刪除確認
+const handleDeleteConfirm = (postId) => {
+  // 關閉所有 Modal
+  Object.keys(modalState.value).forEach((key) => {
+    modalState.value[key] = false;
+  });
+  dialog.warning({
+    content: "刪除貼文後回覆也將一併刪除，且無法復原！",
+    positiveText: "刪除",
+    negativeText: "取消",
+    onPositiveClick: () => {
+      handleDelete(postId);
+    },
+  });
+};
+
+// 刪除
 const handleDelete = async (postId) => {
   if (!authStore.accessToken) {
     message.error("請先登入！");
@@ -181,24 +158,32 @@ const handleDelete = async (postId) => {
   }
 };
 
-// 修改留言
+// 修改
 const handleUpdate = async (postId) => {
   if (!authStore.accessToken) {
     message.error("請先登入！");
     return;
   }
-  isOpenModal.value = true;
+  // 關閉所有 Modal
+  Object.keys(modalState.value).forEach((key) => {
+    modalState.value[key] = false;
+  });
   await fetchSingleComment(postId);
+  isOpenModal.value = true;
 };
 
-// 新增回覆
-const handleReply = async (postId) => {
-  if (!authStore.accessToken) {
-    message.error("請先登入！");
-    return;
+// 處理更新
+const handlePostUpdate = (updatedPost) => {
+  const index = comments.value.findIndex((c) => c.id === updatedPost.id);
+  if (index !== -1) {
+    comments.value[index] = {
+      ...comments.value[index],
+      content: updatedPost.content,
+      file_url: updatedPost.file_url,
+    };
+    isOpenModal.value = false; // 關閉 Modal
+    selectedPostId.value = null; // 清空選中貼文
   }
-  await fetchSingleComment(postId);
-  router.push({ name: "CommentView", params: { postId } });
 };
 
 // 按讚
@@ -249,6 +234,54 @@ const handlelike = async (id) => {
     isLikeProcessing.value = false;
   }
 };
+
+// 導向＿回覆
+const handleReply = async (postId) => {
+  router.push({ name: "Post", params: { postId } });
+};
+
+watch(
+  () => props.posts,
+  (newPosts) => {
+    comments.value = newPosts || [];
+  }
+);
+
+watch(
+  () => authStore.accountName,
+  (newName) => {
+    loggedInUser.value = newName;
+  }
+);
+
+watch(
+  () => router.currentRoute.value.params.username,
+  (newUsername) => {
+    username.value = newUsername;
+  }
+);
+
+onMounted(() => {
+  document.addEventListener("mousedown", closeModal);
+  // emitter.on("refreshPost", () => {
+  //   emitter.emit("fetchUserData");
+  // });
+  emitter.on("updatePost", handlePostUpdate); // 監聽更新事件
+});
+
+onUnmounted(() => {
+  document.removeEventListener("mousedown", closeModal);
+  // emitter.off("refreshPost", () => {});
+  emitter.off("updatePost", handlePostUpdate); // 移除事件監聽
+});
+
+// 點擊圖示回到最上
+const scrollToTop = () => {
+  window.scrollTo({
+    top: 0,
+    left: 0,
+  });
+};
 </script>
 
 <template>
@@ -294,7 +327,10 @@ const handlelike = async (id) => {
                   </button>
                 </li>
                 <li v-if="loggedInUser === accountName">
-                  <button class="modal-link" @click="handleDelete(comment.id)">
+                  <button
+                    class="modal-link"
+                    @click="handleDeleteConfirm(comment.id)"
+                  >
                     <img class="icon" :src="Deleteicon" alt="Deleteicon" />
                     <span>刪除</span>
                   </button>
