@@ -90,7 +90,9 @@ const isVideo = (url) => {
 };
 
 const isPreviewImage = computed(() => {
-  return file.value && file.value.type.startsWith("image/");
+  const isImage = file.value && file.value.type?.startsWith("image/");
+  console.log("isPreviewImage:", isImage, "file type:", file.value?.type);
+  return isImage;
 });
 
 const isPreviewVideo = computed(() => {
@@ -244,21 +246,35 @@ const triggerFileInput = () => {
 // };
 
 const handleFileUpload = async (event) => {
-  const selectedFile = event.target.files[0];
-  if (selectedFile) {
-    console.log("檔案已選擇:", selectedFile.name, "類型:", selectedFile.type);
+  try {
+    const selectedFile = event.target.files[0];
+    if (!selectedFile) {
+      console.log("未選擇任何檔案");
+      return;
+    }
+
+    console.log(
+      "檔案已選擇:",
+      selectedFile.name,
+      "類型:",
+      selectedFile.type || "未定義"
+    );
+
+    // 清理舊的 Blob URL（如果存在）
     if (
       fileUrl.value &&
       file.value &&
-      (file.value.type.startsWith("video/") ||
+      (file.value.type?.startsWith("video/") ||
         file.value.type === "video/quicktime")
     ) {
       URL.revokeObjectURL(fileUrl.value);
       console.log("已清理舊的影片 Blob URL");
     }
+
     file.value = selectedFile;
 
-    if (selectedFile.type.startsWith("image/")) {
+    // 處理圖片
+    if (selectedFile.type?.startsWith("image/")) {
       const reader = new FileReader();
       reader.onload = (e) => {
         fileUrl.value = e.target.result;
@@ -266,20 +282,25 @@ const handleFileUpload = async (event) => {
         nextTick(() => console.log("圖片 URL 已更新，應觸發渲染"));
       };
       reader.readAsDataURL(selectedFile);
-    } else if (
-      selectedFile.type.startsWith("video/") ||
+    }
+    // 處理影片
+    else if (
+      selectedFile.type?.startsWith("video/") ||
       selectedFile.type === "video/quicktime"
     ) {
       fileUrl.value = URL.createObjectURL(selectedFile);
       console.log("影片預覽 URL 已生成:", fileUrl.value);
-      await nextTick(); // 確保 DOM 更新
+      await nextTick();
       console.log("影片 URL 已更新，應觸發渲染");
-    } else {
-      console.log("不支援的檔案類型:", selectedFile.type);
+    }
+    // 不支援的檔案類型
+    else {
+      console.log("不支援的檔案類型:", selectedFile.type || "未定義");
       message.error("僅支援圖片和影片檔案！");
     }
-  } else {
-    console.log("未選擇任何檔案");
+  } catch (error) {
+    console.error("處理檔案上傳時發生錯誤:", error);
+    message.error("檔案處理失敗，請重試！");
   }
 };
 
@@ -376,7 +397,12 @@ onMounted(async () => {
 });
 
 onUnmounted(() => {
-  if (fileUrl.value && file.value && file.value.type.startsWith("video/")) {
+  if (
+    fileUrl.value &&
+    file.value &&
+    (file.value.type?.startsWith("video/") ||
+      file.value.type === "video/quicktime")
+  ) {
     URL.revokeObjectURL(fileUrl.value);
   }
   document.removeEventListener("mousedown", closeModal);
