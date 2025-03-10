@@ -7,9 +7,6 @@ import { useRouter } from "vue-router";
 import apiClient from "../stores/axiosConfig"; // 引入 apiClient
 import { emitter } from "../main";
 
-import Login from "./ModalLogin.vue";
-import UpdatePostView from "./ModalUpdatePost.vue";
-
 import Replyicon from "../assets/Replyicon.svg";
 import Favoriteicon from "../assets/Favoriteicon.svg";
 import FavoriteRedicon from "../assets/FavoriteRedicon.svg";
@@ -28,7 +25,6 @@ const dateStore = useDateStore();
 const message = useMessage();
 const dialog = useDialog();
 
-// const loggedInUser = ref(authStore.accountName);
 const username = ref(router.currentRoute.value.params.accountname);
 const comments = ref(props.posts || []);
 const modalState = ref({});
@@ -42,7 +38,7 @@ const isLoginModalOpen = ref(false);
 // 登入確認＿like
 const checkTokenAndOpenModal = (id) => {
   if (!authStore.userId || !authStore.accessToken) {
-    isLoginModalOpen.value = true;
+    emitter.emit("openLoginModal");
   } else {
     handlelike(id);
   }
@@ -51,19 +47,13 @@ const checkTokenAndOpenModal = (id) => {
 // 打開 Modal
 const openModal = (event, commentId) => {
   event.stopPropagation();
-
-  // 如果當前 Modal 已開啟，則關閉它
   if (modalState.value[commentId]) {
     modalState.value[commentId] = false;
     return;
   }
-
-  // 先關閉所有其他留言的 Modal
   Object.keys(modalState.value).forEach((key) => {
     modalState.value[key] = false;
   });
-
-  // 只打開當前點擊的留言的 Modal
   modalState.value[commentId] = true;
 };
 
@@ -173,23 +163,22 @@ const handleUpdate = async (postId) => {
   Object.keys(modalState.value).forEach((key) => {
     modalState.value[key] = false;
   });
-  selectedPostId.value = postId;
-  isOpenModal.value = true;
+  emitter.emit("openUpdateModal", postId);
 };
 
-// 處理更新
-const handlePostUpdate = (updatedPost) => {
-  const index = comments.value.findIndex((c) => c.id === updatedPost.id);
-  if (index !== -1) {
-    comments.value[index] = {
-      ...comments.value[index],
-      content: updatedPost.content,
-      file_url: updatedPost.file_url,
-    };
-    isOpenModal.value = false; // 關閉 Modal
-    selectedPostId.value = null; // 清空選中貼文
-  }
-};
+// // 處理更新
+// const handlePostUpdate = (updatedPost) => {
+//   const index = comments.value.findIndex((c) => c.id === updatedPost.id);
+//   if (index !== -1) {
+//     comments.value[index] = {
+//       ...comments.value[index],
+//       content: updatedPost.content,
+//       file_url: updatedPost.file_url,
+//     };
+//     isOpenModal.value = false; // 關閉 Modal
+//     selectedPostId.value = null; // 清空選中貼文
+//   }
+// };
 
 // 按讚
 const handlelike = async (id) => {
@@ -251,13 +240,6 @@ watch(
     comments.value = newPosts || [];
   }
 );
-
-// watch(
-//   () => authStore.accountName,
-//   (newName) => {
-//     loggedInUser.value = newName;
-//   }
-// );
 
 watch(
   () => router.currentRoute.value.params.accountname,

@@ -7,9 +7,6 @@ import { useRouter } from "vue-router";
 import apiClient from "../stores/axiosConfig";
 import { emitter } from "../main";
 
-import Login from "./ModalLogin.vue";
-// import UpdatePostView from "./ModalUpdatePost.vue";
-
 import Replyicon from "../assets/Replyicon.svg";
 import Favoriteicon from "../assets/Favoriteicon.svg";
 import FavoriteRedicon from "../assets/FavoriteRedicon.svg";
@@ -30,14 +27,10 @@ const modalState = ref({});
 const modalRefs = ref({});
 const buttonRefs = ref({});
 const isLikeProcessing = ref(false);
-// const isOpenModal = ref(false);
-// const selectedPostId = ref(null);
-// const isLoginModalOpen = ref(false);
 
 // 登入確認＿like
 const checkTokenAndOpenModal = (id) => {
   if (!authStore.userId || !authStore.accessToken) {
-    // isLoginModalOpen.value = true;
     emitter.emit("openLoginModal");
   } else {
     handlelike(id);
@@ -169,21 +162,7 @@ const handleUpdate = async (postId) => {
     modalState.value[key] = false;
   });
   emitter.emit("openUpdateModal", postId);
-  // selectedPostId.value = postId;
-  // isOpenModal.value = true;
 };
-
-// 貼文＿處理更新
-// const handlePostUpdate = (updatedPost) => {
-//   const index = comments.value.findIndex((c) => c.id === updatedPost.id);
-//   if (index !== -1) {
-//     comments.value[index] = {
-//       ...comments.value[index],
-//       content: updatedPost.content,
-//       file_url: updatedPost.file_url,
-//     };
-//   }
-// };
 
 // 貼文＿按讚
 const handlelike = async (id) => {
@@ -239,12 +218,10 @@ const handleReply = async (postId) => {
 onMounted(async () => {
   fetchComments();
   document.addEventListener("mousedown", closeModal);
-  // emitter.on("updatePost", handlePostUpdate); // 監聽更新事件
 });
 
 onUnmounted(() => {
   document.removeEventListener("mousedown", closeModal);
-  // emitter.off("updatePost", handlePostUpdate); // 移除事件監聽
 });
 </script>
 
@@ -384,8 +361,6 @@ onUnmounted(() => {
       </div>
     </div>
   </div>
-  <!-- <UpdatePostView v-model="isOpenModal" :post-id="selectedPostId" />
-  <Login v-model="isLoginModalOpen" /> -->
 </template>
 
 <style scoped>
