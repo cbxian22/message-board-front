@@ -350,6 +350,24 @@ watch(
     }
   }
 );
+
+watch(
+  () => props.modelValue,
+  (newValue) => {
+    if (newValue && props.postId) {
+      if (!originalPostData.value) {
+        fetchSingleComment(props.postId); // 如果沒有原始資料，從 API 獲取
+      } else {
+        // 恢復到原始資料
+        content.value = originalPostData.value.content || "";
+        fileUrl.value = originalPostData.value.file_url || null;
+        visibility.value = originalPostData.value.visibility || null;
+        file.value = null;
+        postData.value = { ...originalPostData.value };
+      }
+    }
+  }
+);
 </script>
 
 <style scoped>
