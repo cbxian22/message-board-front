@@ -21,7 +21,7 @@
               :class="{ active: account }"
               class="floating-label"
             >
-              <input id="account" type="text" v-model="account" required />
+              <input id="account" type="text" v-model="account" />
               <span>輸入用戶帳號</span>
             </label>
           </div>
@@ -36,8 +36,6 @@
                 id="password"
                 :type="ishowing ? 'text' : 'password'"
                 v-model="password"
-                required
-                @input="checkPasswordInput"
               />
               <span>輸入密碼</span>
               <button
@@ -52,9 +50,16 @@
           </div>
 
           <div class="form-group">
-            <button :class="['btn', 'login-btn']" type="submit">
+            <button
+              :class="['btn', 'login-btn']"
+              type="submit"
+              :disabled="isFormInvalid"
+            >
               <n-spin v-if="isTouched" stroke="#FFF" :size="20" />登入
             </button>
+          </div>
+          <div class="form-group" v-if="errorMessage">
+            <span class="error-message">{{ errorMessage }}</span>
           </div>
         </form>
       </div>
@@ -71,9 +76,8 @@
 
 <script setup>
 import { NSpin } from "naive-ui";
-import { ref, onMounted } from "vue";
+import { ref, onMounted, computed } from "vue";
 import { useRouter } from "vue-router";
-import axios from "axios";
 import { useAuthStore } from "@/stores/authStore";
 import apiClient from "@/stores/axiosConfig"; // 引入 apiClient
 
@@ -86,11 +90,43 @@ const password = ref("");
 const isLoading = ref(true);
 const ishowing = ref(false);
 const isTouched = ref(false);
+const errorMessage = ref("");
+
+const isFormInvalid = computed(() => {
+  return !account.value || !password.value;
+});
+
+const validateAccount = () => {
+  if (/\s/.test(account.value)) {
+    errorMessage.value = "請確認帳密碼號格式";
+    return false;
+  }
+  if (account.value.length > 254) {
+    errorMessage.value = "請確認帳密碼號格式";
+    return false;
+  }
+  errorMessage.value = "";
+  return true;
+};
+
+const validatePassword = () => {
+  if (/\s/.test(password.value)) {
+    errorMessage.value = "請確認帳密碼號格式";
+    return false;
+  }
+  if (password.value.length > 128) {
+    errorMessage.value = "請確認帳密碼號格式";
+    return false;
+  }
+  errorMessage.value = "";
+  return true;
+};
 
 const login = async () => {
+  errorMessage.value = "";
   isTouched.value = true; // 發送請求前，顯示 loading 狀態
-  if (!account.value || !password.value) {
-    alert("請輸入用戶名和密碼！");
+
+  if (!validateAccount() || !validatePassword()) {
     isTouched.value = false;
     return;
   }
@@ -105,16 +141,16 @@ const login = async () => {
     console.log("後端回應:", response.data);
 
     if (response.data.success) {
-      authStore.login(response.data); // 傳入整個回應物件
+      authStore.login(response.data);
       router.push("/");
     } else {
-      alert(response.data.message || "登錄失敗，請檢查用戶名或密碼！");
+      errorMessage.value = "請確認帳號密碼";
     }
   } catch (error) {
     console.error("登錄錯誤:", error);
-    alert("登入失敗，請檢查用戶帳號或密碼！");
+    errorMessage.value = "請確認帳號密碼";
   } finally {
-    isTouched.value = false; // 無論成功或失敗，最後都應該隱藏 loading
+    isTouched.value = false;
   }
 };
 
@@ -214,7 +250,12 @@ onMounted(() => {
   border-radius: 4px;
 }
 
-.login-btn:hover {
+.login-btn:disabled {
+  background-color: #ccc !important;
+  cursor: not-allowed;
+}
+
+.login-btn:not(:disabled):hover {
   background-color: #0095f6 !important;
 }
 
@@ -247,5 +288,10 @@ onMounted(() => {
   position: absolute;
   right: 1;
   margin-right: 60px;
+}
+
+.error-message {
+  color: #ff0000; /* 明確指定紅色 */
+  font-size: 12px;
 }
 </style>
