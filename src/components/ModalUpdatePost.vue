@@ -66,7 +66,7 @@
               :options="visibilityOptions"
               @select="handleVisibilitySelect"
             >
-              <span>向誰發佈</span>
+              <span>向誰發佈 {{ visibilityLabel }}</span>
             </n-dropdown>
           </div>
           <n-button :disabled="isSubmitDisabled" @click="handleMessage"
@@ -125,6 +125,12 @@ const visibilityOptions = [
   { label: "朋友", key: "friends" },
   { label: "私人", key: "private" },
 ];
+
+const visibilityLabel = computed(() => {
+  if (!visibility.value) return ""; // 未選擇時顯示空字串
+  const option = visibilityOptions.find((opt) => opt.key === visibility.value);
+  return option ? option.label : "";
+});
 
 // 處理可見性選擇
 const handleVisibilitySelect = (key) => {
