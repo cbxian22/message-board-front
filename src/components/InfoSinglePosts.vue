@@ -237,7 +237,7 @@ const handlelike = async (id) => {
 
 // 導向＿回覆
 const handleReply = async (postId) => {
-  router.push({ name: "Post", params: { postId } });
+  router.push({ name: "Post", params: { id: postId } });
 };
 
 watch(
