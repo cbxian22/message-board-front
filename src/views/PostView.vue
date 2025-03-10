@@ -293,7 +293,7 @@ const handleMessage = async (postId) => {
 const adjustTextareaHeight = () => {
   const textarea = textareaRef.value;
   if (textarea) {
-    textarea.style.height = "50px";
+    textarea.style.height = "auto";
     textarea.style.height = `${Math.min(textarea.scrollHeight)}px`;
   }
 };
@@ -305,12 +305,6 @@ onMounted(async () => {
   if (textareaRef.value) {
     adjustTextareaHeight();
     textareaRef.value.focus();
-    textareaRef.value.addEventListener("keydown", (e) => {
-      if (e.key === "Enter") {
-        content.value += "\n"; // 手動確保換行符號
-        adjustTextareaHeight(); // 立即調整高度
-      }
-    });
   }
 });
 
@@ -704,10 +698,10 @@ watch(
   margin: 8px 0 10px;
   color: rgb(243, 245, 247);
   line-height: 1.5;
-  /* max-height: 100px; */
+  min-height: 50px;
   overflow-y: auto;
-  white-space: pre-wrap;
-  word-wrap: break-word;
+  white-space: pre-wrap !important;
+  word-wrap: break-word !important;
 }
 
 .fixed-textarea::placeholder {
