@@ -89,6 +89,14 @@ const isVideo = (url) => {
   return videoExtensions.some((ext) => url.toLowerCase().endsWith(ext));
 };
 
+const isPreviewImage = computed(() => {
+  return file.value && file.value.type.startsWith("image/");
+});
+
+const isPreviewVideo = computed(() => {
+  return file.value && file.value.type.startsWith("video/");
+});
+
 // 貼文＿獲取單一
 const fetchSingleComment = async (postId) => {
   try {
@@ -215,23 +223,51 @@ const triggerFileInput = () => {
 };
 
 // 回覆＿檢查檔案上傳處理，並顯示預覽
+// const handleFileUpload = (event) => {
+//   const selectedFile = event.target.files[0];
+//   if (selectedFile) {
+//     console.log("檔案已選擇:", selectedFile.name);
+//     if (selectedFile.type.startsWith("image/")) {
+//       const reader = new FileReader();
+//       reader.onload = (e) => {
+//         fileUrl.value = e.target.result;
+//       };
+//       reader.readAsDataURL(selectedFile);
+//     }
+//     file.value = selectedFile;
+//   }
+// };
+
 const handleFileUpload = (event) => {
   const selectedFile = event.target.files[0];
   if (selectedFile) {
     console.log("檔案已選擇:", selectedFile.name);
-    if (selectedFile.type.startsWith("image/")) {
-      const reader = new FileReader();
-      reader.onload = (e) => {
-        fileUrl.value = e.target.result;
-      };
-      reader.readAsDataURL(selectedFile);
-    }
     file.value = selectedFile;
+
+    // 根據檔案類型生成預覽
+    const reader = new FileReader();
+    reader.onload = (e) => {
+      fileUrl.value = e.target.result; // Base64 URL
+    };
+
+    if (selectedFile.type.startsWith("image/")) {
+      reader.readAsDataURL(selectedFile); // 圖片用 Base64
+    } else if (selectedFile.type.startsWith("video/")) {
+      fileUrl.value = URL.createObjectURL(selectedFile); // 影片用 Blob URL
+    }
   }
 };
 
 // 回覆＿取消檔案預覽，重設檔案選擇
+// const cancelFilePreview = () => {
+//   fileUrl.value = null;
+//   file.value = null;
+// };
+
 const cancelFilePreview = () => {
+  if (fileUrl.value && file.value && file.value.type.startsWith("video/")) {
+    URL.revokeObjectURL(fileUrl.value);
+  }
   fileUrl.value = null;
   file.value = null;
 };
@@ -309,8 +345,15 @@ onMounted(async () => {
 });
 
 onUnmounted(() => {
+  if (fileUrl.value && file.value && file.value.type.startsWith("video/")) {
+    URL.revokeObjectURL(fileUrl.value);
+  }
   document.removeEventListener("mousedown", closeModal);
 });
+
+// onUnmounted(() => {
+//   document.removeEventListener("mousedown", closeModal);
+// });
 
 // 監聽內容，調整高度
 watch(
@@ -479,9 +522,29 @@ watch(
           </div>
         </div>
 
-        <div v-if="fileUrl" class="file-preview-wrapper">
+        <!-- <div v-if="fileUrl" class="file-preview-wrapper">
           <div class="file-preview">
             <img :src="fileUrl" alt="File Preview" class="preview-img" />
+            <button @click="cancelFilePreview" class="cancel-preview-button">
+              <img :src="Closeicon" alt="Close icon" />
+            </button>
+          </div>
+        </div> -->
+        <div v-if="fileUrl" class="file-preview-wrapper">
+          <div class="file-preview">
+            <img
+              v-if="isPreviewImage"
+              :src="fileUrl"
+              alt="File Preview"
+              class="preview-img"
+            />
+            <video
+              v-else-if="isPreviewVideo"
+              :src="fileUrl"
+              controls
+              class="preview-video"
+              preload="auto"
+            />
             <button @click="cancelFilePreview" class="cancel-preview-button">
               <img :src="Closeicon" alt="Close icon" />
             </button>
@@ -736,7 +799,8 @@ watch(
   position: relative;
 }
 
-.preview-img {
+.preview-img,
+.preview-video {
   max-width: 100%;
   max-height: 200px;
   object-fit: contain;
