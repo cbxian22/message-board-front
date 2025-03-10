@@ -404,8 +404,11 @@ watch(content, () => {
   cursor: pointer;
 }
 
-.n-dropdown-menu .n-popover-shared .n-dropdown {
-  width: 200px;
+.n-dropdown-menu
+  .n-dropdown-option
+  .n-dropdown-option-body
+  .n-dropdown-option-body__label {
+  padding: 0 15px !important;
 }
 
 .message-form-end button {
