@@ -63,6 +63,8 @@
           <div class="toWho">
             <n-dropdown
               trigger="click"
+              width="125"
+              placement="bottom-start"
               :options="visibilityOptions"
               @select="handleVisibilitySelect"
             >
@@ -106,14 +108,14 @@ const loadingBar = useLoadingBar();
 const props = defineProps(["modelValue"]);
 const emit = defineEmits(["update:modelValue"]);
 
+// const prevHeight = ref("auto"); // 儲存上一次高度
 const userName = computed(() => authStore.userName || "未知用户");
 const content = ref("");
 const textarea = ref(null); // 取得 textarea DOM 節點
-const prevHeight = ref("auto"); // 儲存上一次高度
 const file = ref(null);
 const fileUrl = ref(null);
 const fileInputRef = ref(null);
-const visibility = ref(null); // 預設可見性為null
+const visibility = ref(null);
 
 // 下拉選單選項
 const visibilityOptions = [
@@ -402,10 +404,6 @@ watch(content, () => {
   color: #aaa;
   opacity: 0.7;
   cursor: pointer;
-}
-
-.message-form-end :deep(.n-dropdown-option-body__label) {
-  padding: 0 15px !important;
 }
 
 .message-form-end button {

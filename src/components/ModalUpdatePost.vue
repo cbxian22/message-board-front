@@ -58,6 +58,17 @@
         </div>
 
         <div class="message-form-end">
+          <div class="toWho">
+            <n-dropdown
+              trigger="click"
+              width="125"
+              placement="bottom-start"
+              :options="visibilityOptions"
+              @select="handleVisibilitySelect"
+            >
+              <span>向誰發佈</span>
+            </n-dropdown>
+          </div>
           <n-button :disabled="isSubmitDisabled" @click="handleMessage"
             >發佈</n-button
           >
@@ -99,6 +110,22 @@ const file = ref(null);
 const fileUrl = ref(null);
 const fileInputRef = ref(null);
 const postData = ref(null); // 儲存從 API 獲取的貼文資料
+const visibility = ref(null);
+
+// 下拉選單選項
+const visibilityOptions = [
+  { label: "公開", key: "public" },
+  { label: "朋友", key: "friends" },
+  { label: "私人", key: "private" },
+];
+
+// 處理可見性選擇
+const handleVisibilitySelect = (key) => {
+  visibility.value = key;
+  message.info(
+    `已選擇發佈給：${visibilityOptions.find((opt) => opt.key === key).label}`
+  );
+};
 
 // 檢查是否啟用提交按鈕
 const isSubmitDisabled = computed(() => {
@@ -208,6 +235,7 @@ const handleMessage = async () => {
       {
         content: content.value,
         fileUrl: uploadedFileUrl,
+        visibility: visibility.value,
       }
     );
 
@@ -425,10 +453,16 @@ watch(
   flex: 1;
   display: flex;
   align-items: center;
-  justify-content: end;
+  justify-content: space-between;
   margin: 20px 30px;
   max-height: 52px;
   min-height: 52px;
+}
+
+.message-form-end .toWho {
+  color: #aaa;
+  opacity: 0.7;
+  cursor: pointer;
 }
 
 .message-form-end button {
