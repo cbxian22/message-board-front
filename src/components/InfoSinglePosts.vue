@@ -37,6 +37,7 @@ const buttonRefs = ref({});
 const isOpenModal = ref(false);
 const isLikeProcessing = ref(false); // 用於追踪點讚狀態
 const selectedComment = ref(null); // 用於儲存當前選中的單一留言
+const selectedPostId = ref(null);
 const isLoginModalOpen = ref(false);
 
 // 登入確認＿like
@@ -168,7 +169,7 @@ const handleUpdate = async (postId) => {
   Object.keys(modalState.value).forEach((key) => {
     modalState.value[key] = false;
   });
-  await fetchSingleComment(postId);
+  selectedPostId.value = postId;
   isOpenModal.value = true;
 };
 
@@ -429,7 +430,7 @@ const scrollToTop = () => {
       </div>
     </div>
   </div>
-  <UpdatePostView v-model="isOpenModal" :comment="selectedComment" />
+  <UpdatePostView v-model="isOpenModal" :post-id="selectedPostId" />
   <!-- 登入 Modal -->
   <Login v-model="isLoginModalOpen" />
 </template>
