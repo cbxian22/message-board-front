@@ -345,12 +345,7 @@ const scrollToTop = () => {
                     <span>刪除</span>
                   </button>
                 </li>
-                <li
-                  v-if="
-                    authStore.isLoggedIn &&
-                    authStore.accountName === comment.name
-                  "
-                >
+                <li v-if="authStore.accountName !== comment.name">
                   <button class="modal-link">
                     <img class="icon" :src="Flagicon" alt="Flagicon" />
                     <span>檢舉</span>
