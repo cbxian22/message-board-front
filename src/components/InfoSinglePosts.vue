@@ -320,13 +320,13 @@ const scrollToTop = () => {
           >
             <div class="modal-content" @click.stop>
               <ul>
-                <li v-if="loggedInUser === accountName">
+                <li v-if="loggedInUser === authStore.accountName">
                   <button class="modal-link" @click="handleUpdate(comment.id)">
                     <img class="icon" :src="Editicon" alt="Editicon" />
                     <span>編輯</span>
                   </button>
                 </li>
-                <li v-if="loggedInUser === accountName">
+                <li v-if="loggedInUser === authStore.accountName">
                   <button
                     class="modal-link"
                     @click="handleDeleteConfirm(comment.id)"
@@ -335,7 +335,7 @@ const scrollToTop = () => {
                     <span>刪除</span>
                   </button>
                 </li>
-                <li v-if="loggedInUser !== accountName">
+                <li v-if="loggedInUser !== authStore.accountName">
                   <button class="modal-link">
                     <img class="icon" :src="Flagicon" alt="Flagicon" />
                     <span>檢舉</span>
