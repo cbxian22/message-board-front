@@ -370,7 +370,8 @@ watch(content, () => {
                 <ul>
                   <li
                     v-if="
-                      authStore.isLoggedIn && authStore.userName === post.name
+                      authStore.isLoggedIn &&
+                      authStore.accountName === post.name
                     "
                   >
                     <button class="modal-link" @click="handleUpdate(post.id)">
@@ -380,7 +381,8 @@ watch(content, () => {
                   </li>
                   <li
                     v-if="
-                      authStore.isLoggedIn && authStore.userName === post.name
+                      authStore.isLoggedIn &&
+                      authStore.accountName === post.name
                     "
                   >
                     <button
@@ -391,7 +393,7 @@ watch(content, () => {
                       <span>刪除</span>
                     </button>
                   </li>
-                  <li v-if="authStore.userName !== post.name">
+                  <li v-if="authStore.accountName !== post.name">
                     <button class="modal-link">
                       <img class="icon" :src="Flagicon" alt="Flag icon" />
                       <span>檢舉</span>

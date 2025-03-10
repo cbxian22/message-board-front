@@ -294,7 +294,8 @@ onUnmounted(() => {
               <ul>
                 <li
                   v-if="
-                    authStore.isLoggedIn && authStore.userName === comment.name
+                    authStore.isLoggedIn &&
+                    authStore.accountName === comment.name
                   "
                 >
                   <button class="modal-link" @click="handleUpdate(comment.id)">
@@ -304,7 +305,8 @@ onUnmounted(() => {
                 </li>
                 <li
                   v-if="
-                    authStore.isLoggedIn && authStore.userName === comment.name
+                    authStore.isLoggedIn &&
+                    authStore.accountName === comment.name
                   "
                 >
                   <button
@@ -315,7 +317,7 @@ onUnmounted(() => {
                     <span>刪除</span>
                   </button>
                 </li>
-                <li v-if="authStore.userName !== comment.name">
+                <li v-if="authStore.accountName !== comment.name">
                   <button class="modal-link">
                     <img class="icon" :src="Flagicon" alt="Flagicon" />
                     <span>檢舉</span>
