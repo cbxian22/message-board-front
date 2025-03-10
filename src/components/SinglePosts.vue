@@ -34,6 +34,7 @@ const isLikeProcessing = ref(false);
 const selectedPostId = ref(null);
 const isLoginModalOpen = ref(false);
 
+// 登入確認＿like
 const checkTokenAndOpenModal = (id) => {
   if (!authStore.userId || !authStore.accessToken) {
     isLoginModalOpen.value = true;

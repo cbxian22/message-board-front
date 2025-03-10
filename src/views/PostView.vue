@@ -25,6 +25,7 @@ import Navbar from "../components/Navbar.vue";
 import NavbarUp from "../components/NavbarUp.vue";
 import SingleReplies from "../components/SingleReplies.vue";
 import UpdatePostView from "../components/ModalUpdatePost.vue";
+import Login from "./ModalLogin.vue";
 
 import Backicon from "../assets/Backicon.svg";
 import Favoriteicon from "../assets/Favoriteicon.svg";
@@ -55,6 +56,16 @@ const fileInputRef = ref(null);
 const isModalOpen = ref(false);
 const isOpenModal = ref(false);
 const selectedPostId = ref(null);
+const isLoginModalOpen = ref(false);
+
+// 登入確認＿like
+const checkTokenAndOpenModal = (id) => {
+  if (!authStore.userId || !authStore.accessToken) {
+    isLoginModalOpen.value = true;
+  } else {
+    handlelike(id);
+  }
+};
 
 // 貼文＿打開 Modal
 const openModal = (event) => {
@@ -427,7 +438,7 @@ watch(content, () => {
         <div class="reply-section">
           <ul>
             <li>
-              <div class="reply-count" @click="handlelike(post.id)">
+              <div class="reply-count" @click="checkTokenAndOpenModal(post.id)">
                 <button class="reply-link">
                   <img
                     :class="{ icon: !post.userLiked }"
@@ -494,6 +505,8 @@ watch(content, () => {
   <div v-else>正在加載貼文...</div>
   <Navbar />
   <UpdatePostView v-model="isOpenModal" :post-id="selectedPostId" />
+  <!-- 登入 Modal -->
+  <Login v-model="isLoginModalOpen" />
 </template>
 
 <style scoped>
