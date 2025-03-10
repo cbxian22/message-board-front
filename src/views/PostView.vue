@@ -301,12 +301,6 @@ const adjustTextareaHeight = () => {
   }
 };
 
-const textareaType = () => {
-  if (!authStore.userId || !authStore.accessToken) {
-    emitter.emit("openLoginModal");
-  }
-};
-
 onMounted(async () => {
   document.addEventListener("mousedown", closeModal);
   await fetchSingleComment(route.params.id);
@@ -468,7 +462,6 @@ watch(content, () => {
               <textarea
                 id="content"
                 ref="textareaRef"
-                @input="textareaType"
                 :readonly="!authStore.userId || !authStore.accessToken"
                 v-model="content"
                 placeholder="想回覆點什麼呢？"
