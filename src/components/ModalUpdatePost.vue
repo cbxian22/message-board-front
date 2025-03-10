@@ -141,8 +141,12 @@ const isSubmitDisabled = computed(() => {
   const isContentUnchanged = content.value === (postData.value.content || "");
   const isFileUrlUnchanged =
     fileUrl.value === (postData.value.file_url || null);
+  const isVisibilityChanged =
+    visibility.value === (postData.value.visibility || null);
   const noNewFile = !file.value;
-  return isContentUnchanged && isFileUrlUnchanged && noNewFile;
+  return (
+    isContentUnchanged && isFileUrlUnchanged && isVisibilityChanged && noNewFile
+  );
 });
 
 // 獲取單一貼文
@@ -250,12 +254,14 @@ const handleMessage = async () => {
         id: props.postId,
         content: content.value,
         file_url: uploadedFileUrl,
+        visibility: visibility.value,
       };
       emitter.emit("updatePost", updatedPost); // 通知父組件
       message.success("貼文更新成功！");
       content.value = "";
       file.value = null;
       fileUrl.value = null;
+      visibility.value = null;
       emit("update:modelValue", false); // 關閉模態
     } else {
       message.error("貼文更新失敗！");
@@ -276,8 +282,12 @@ const hasChanges = computed(() => {
   }
   const isContentChanged = content.value !== (postData.value.content || "");
   const isFileUrlChanged = fileUrl.value !== (postData.value.file_url || null);
+  const isVisibilityChanged =
+    visibility.value !== (postData.value.visibility || null);
   const isFileAdded = !!file.value;
-  return isContentChanged || isFileUrlChanged || isFileAdded;
+  return (
+    isContentChanged || isFileUrlChanged || isVisibilityChanged || isFileAdded
+  );
 });
 
 // 處理 Modal 關閉邏輯
