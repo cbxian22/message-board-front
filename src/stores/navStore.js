@@ -15,6 +15,7 @@ export const useNavStore = defineStore("nav", () => {
   const syncWithRoute = () => {
     const path = route.path;
     const currentUsername = route.params.accountname;
+    const fromNavbar = route.query.from === "navbar"; // 檢查查詢參數
 
     console.log("Syncing with route:", path, "accountname:", currentUsername);
 
@@ -32,11 +33,11 @@ export const useNavStore = defineStore("nav", () => {
         activeItem.value = "profile";
         break;
       default:
-        if (path.endsWith("navbar")) {
+        if (path.startsWith("/@") && fromNavbar) {
           if (currentUsername && currentUsername === authStore.accountName) {
             activeItem.value = "profile"; // 自己的頁面
           } else {
-            activeItem.value = undefined; // 他人的頁面或其他動態路由
+            activeItem.value = undefined; // 他人的頁面
           }
         } else {
           activeItem.value = undefined; // 未匹配的路由
