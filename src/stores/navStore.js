@@ -6,7 +6,7 @@ import { useAuthStore } from "../stores/authStore";
 export const useNavStore = defineStore("nav", () => {
   const authStore = useAuthStore();
   const route = useRoute();
-  const activeItem = ref("home"); // 預設 home
+  const activeItem = ref("home");
 
   const setActive = (item) => {
     activeItem.value = item;

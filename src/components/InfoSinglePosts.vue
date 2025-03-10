@@ -29,7 +29,7 @@ const message = useMessage();
 const dialog = useDialog();
 
 const loggedInUser = ref(authStore.userName);
-const username = ref(router.currentRoute.value.params.username);
+const username = ref(router.currentRoute.value.params.accountname);
 const comments = ref(props.posts || []);
 const modalState = ref({});
 const modalRefs = ref({});
@@ -255,7 +255,7 @@ watch(
 );
 
 watch(
-  () => router.currentRoute.value.params.username,
+  () => router.currentRoute.value.params.accountname,
   (newUsername) => {
     username.value = newUsername;
   }
