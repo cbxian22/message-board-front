@@ -8,7 +8,7 @@ import {
   onUnmounted,
   nextTick,
 } from "vue";
-import { useRoute } from "vue-router";
+import { useRoute, useRouter } from "vue-router";
 import {
   NBadge,
   useMessage,
@@ -37,6 +37,7 @@ import Noteicon from "../assets/Noteicon.svg";
 import Closeicon from "../assets/Closeicon.svg";
 
 const route = useRoute();
+const router = useRouter();
 const emit = defineEmits(["updatePost", "deletePost", "likePost", "newReply"]);
 const authStore = useAuthStore();
 const dateStore = useDateStore();
@@ -106,11 +107,12 @@ const fetchSingleComment = async (postId) => {
         replies: comment.replies || 0,
       };
     } else {
-      message.error("無法獲取單一貼文，數據格式不正確");
+      console.error("無法獲取單一貼文，數據格式不正確");
+      router.replace("/not-found");
+      return;
     }
   } catch (error) {
     console.error("取得單一貼文錯誤:", error);
-    message.error("單一貼文取得失敗，請檢查網絡或稍後再試！");
   }
 };
 
