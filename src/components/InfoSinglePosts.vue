@@ -151,8 +151,13 @@ const handleDelete = async (postId) => {
   try {
     const userId = authStore.userId;
     const response = await apiClient.delete(`/posts/${postId}/${userId}`);
-    message.success("刪除貼文成功！");
-    console.log(response);
+    if (response.status === 200) {
+      comments.value = comments.value.filter(
+        (comment) => comment.id !== postId
+      );
+      message.success("刪除貼文成功！");
+      console.log(response);
+    }
   } catch {
     message.error("刪除失敗！");
   }
