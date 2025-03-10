@@ -405,9 +405,9 @@ const scrollToTop = () => {
       </div>
     </div>
   </div>
-  <UpdatePostView v-model="isOpenModal" :post-id="selectedPostId" />
+  <!-- <UpdatePostView v-model="isOpenModal" :post-id="selectedPostId" /> -->
   <!-- 登入 Modal -->
-  <Login v-model="isLoginModalOpen" />
+  <!-- <Login v-model="isLoginModalOpen" /> -->
 </template>
 
 <style scoped>
