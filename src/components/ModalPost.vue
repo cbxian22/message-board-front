@@ -404,12 +404,7 @@ watch(content, () => {
   cursor: pointer;
 }
 
-:deep(
-    .n-dropdown-menu
-      .n-dropdown-option
-      .n-dropdown-option-body
-      .n-dropdown-option-body__label
-  ) {
+.message-form-end :deep(.n-dropdown-option-body__label) {
   padding: 0 15px !important;
 }
 
