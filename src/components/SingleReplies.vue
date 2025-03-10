@@ -15,8 +15,6 @@ import { useRoute } from "vue-router";
 import apiClient from "../stores/axiosConfig";
 import { emitter } from "../main";
 
-// import UpdateReplyView from "./ModalUpdateReply.vue";
-
 import Favoriteicon from "../assets/Favoriteicon.svg";
 import FavoriteRedicon from "../assets/FavoriteRedicon.svg";
 import Moreicon from "../assets/Moreicon.svg";
@@ -32,14 +30,6 @@ const dateStore = useDateStore();
 const message = useMessage();
 const loadingBar = useLoadingBar();
 
-// const props = defineProps({
-//   modelValue: Boolean,
-//   postId: {
-//     type: [String, Number],
-//     required: true,
-//   },
-// });
-
 const replies = ref([]);
 const content = ref("");
 const textareas = ref({});
@@ -53,25 +43,27 @@ const buttonRefs = ref({});
 const isEditing = ref(false);
 const isLikeProcessing = ref(false);
 
-const selectedReplyId = ref(null);
 const postId = route.params.id;
+
+// 登入確認＿like
+const checkTokenAndOpenModal = (id) => {
+  if (!authStore.userId || !authStore.accessToken) {
+    emitter.emit("openLoginModal");
+  } else {
+    handlelike(id);
+  }
+};
 
 // 回覆＿打開 Modal
 const openModal = (event, replyId) => {
   event.stopPropagation();
-
-  // 如果當前 Modal 已開啟，則關閉它
   if (modalState.value[replyId]) {
     modalState.value[replyId] = false;
     return;
   }
-
-  // 先關閉所有其他留言的 Modal
   Object.keys(modalState.value).forEach((key) => {
     modalState.value[key] = false;
   });
-
-  // 只打開當前點擊的留言的 Modal
   modalState.value[replyId] = true;
 };
 
@@ -80,12 +72,10 @@ const closeModal = (event) => {
   const clickedInsideModal = Object.keys(modalRefs.value).some((id) => {
     const modal = modalRefs.value[id];
     const button = buttonRefs.value[id];
-
     return (
       modal && (modal.contains(event.target) || button.contains(event.target))
     );
   });
-
   if (!clickedInsideModal) {
     Object.keys(modalState.value).forEach((key) => {
       modalState.value[key] = false;
@@ -288,16 +278,6 @@ const uploadFile = async () => {
     return null;
   }
 };
-
-// 檢查是否有變更
-const hasChanges = computed(() => {
-  const reply = replies.value.find((r) => r.id === editingReplyId.value);
-  if (!reply) return content.value.trim() || file.value;
-  const isContentChanged = content.value !== reply.content;
-  const isFileUrlChanged = fileUrl.value !== reply.file_url;
-  const isFileAdded = !!file.value;
-  return isContentChanged || isFileUrlChanged || isFileAdded;
-});
 
 // 回覆＿提交更新
 const handleMessage = async () => {
@@ -544,7 +524,7 @@ onUnmounted(() => {
       <div class="reply-section">
         <ul>
           <li>
-            <div class="reply-count" @click="handlelike(reply.id)">
+            <div class="reply-count" @click="checkTokenAndOpenModal(reply.id)">
               <button class="reply-link">
                 <img
                   :class="{ icon: !reply.userLiked }"
@@ -568,7 +548,6 @@ onUnmounted(() => {
       </div>
     </div>
   </div>
-  <!-- <UpdateReplyView v-model="isOpenModal" :post-id="selectedReplyId" /> -->
 </template>
 
 <style scoped>
