@@ -7,6 +7,7 @@ import { useRouter } from "vue-router";
 import apiClient from "../stores/axiosConfig";
 import { emitter } from "../main";
 
+import Login from "./ModalLogin.vue";
 import UpdatePostView from "./ModalUpdatePost.vue";
 
 import Replyicon from "../assets/Replyicon.svg";
@@ -31,6 +32,15 @@ const buttonRefs = ref({});
 const isOpenModal = ref(false);
 const isLikeProcessing = ref(false);
 const selectedPostId = ref(null);
+const isLoginModalOpen = ref(false);
+
+const checkTokenAndOpenModal = (id) => {
+  if (!authStore.userId || !authStore.accessToken) {
+    isLoginModalOpen.value = true;
+  } else {
+    handlelike(id);
+  }
+};
 
 // 貼文＿打開 Modal
 const openModal = (event, commentId) => {
@@ -351,7 +361,10 @@ onUnmounted(() => {
       <div class="reply">
         <ul>
           <li>
-            <div class="reply-count" @click="handlelike(comment.id)">
+            <div
+              class="reply-count"
+              @click="checkTokenAndOpenModal(comment.id)"
+            >
               <button class="reply-link">
                 <img
                   :class="{ icon: !comment.userLiked }"
@@ -375,6 +388,8 @@ onUnmounted(() => {
     </div>
   </div>
   <UpdatePostView v-model="isOpenModal" :post-id="selectedPostId" />
+  <!-- 登入 Modal -->
+  <Login v-model="isLoginModalOpen" />
 </template>
 
 <style scoped>
