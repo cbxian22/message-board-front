@@ -8,7 +8,7 @@ import apiClient from "../stores/axiosConfig";
 import { emitter } from "../main";
 
 import Login from "./ModalLogin.vue";
-import UpdatePostView from "./ModalUpdatePost.vue";
+// import UpdatePostView from "./ModalUpdatePost.vue";
 
 import Replyicon from "../assets/Replyicon.svg";
 import Favoriteicon from "../assets/Favoriteicon.svg";
@@ -29,15 +29,16 @@ const comments = ref([]);
 const modalState = ref({});
 const modalRefs = ref({});
 const buttonRefs = ref({});
-const isOpenModal = ref(false);
 const isLikeProcessing = ref(false);
-const selectedPostId = ref(null);
-const isLoginModalOpen = ref(false);
+// const isOpenModal = ref(false);
+// const selectedPostId = ref(null);
+// const isLoginModalOpen = ref(false);
 
 // 登入確認＿like
 const checkTokenAndOpenModal = (id) => {
   if (!authStore.userId || !authStore.accessToken) {
-    isLoginModalOpen.value = true;
+    // isLoginModalOpen.value = true;
+    emitter.emit("openLoginModal");
   } else {
     handlelike(id);
   }
@@ -46,19 +47,13 @@ const checkTokenAndOpenModal = (id) => {
 // 貼文＿打開 Modal
 const openModal = (event, commentId) => {
   event.stopPropagation();
-
-  // 如果當前 Modal 已開啟，則關閉它
   if (modalState.value[commentId]) {
     modalState.value[commentId] = false;
     return;
   }
-
-  // 先關閉所有其他留言的 Modal
   Object.keys(modalState.value).forEach((key) => {
     modalState.value[key] = false;
   });
-
-  // 只打開當前點擊的留言的 Modal
   modalState.value[commentId] = true;
 };
 
@@ -173,8 +168,9 @@ const handleUpdate = async (postId) => {
   Object.keys(modalState.value).forEach((key) => {
     modalState.value[key] = false;
   });
-  selectedPostId.value = postId;
-  isOpenModal.value = true;
+  emitter.emit("openUpdateModal", postId); // 告訴父組件打開編輯
+  // selectedPostId.value = postId;
+  // isOpenModal.value = true;
 };
 
 // 貼文＿處理更新
@@ -186,8 +182,8 @@ const handlePostUpdate = (updatedPost) => {
       content: updatedPost.content,
       file_url: updatedPost.file_url,
     };
-    isOpenModal.value = false; // 關閉 Modal
-    selectedPostId.value = null; // 清空選中貼文
+    // isOpenModal.value = false; // 關閉 Modal
+    // selectedPostId.value = null; // 清空選中貼文
   }
 };
 
@@ -390,9 +386,8 @@ onUnmounted(() => {
       </div>
     </div>
   </div>
-  <UpdatePostView v-model="isOpenModal" :post-id="selectedPostId" />
-  <!-- 登入 Modal -->
-  <Login v-model="isLoginModalOpen" />
+  <!-- <UpdatePostView v-model="isOpenModal" :post-id="selectedPostId" />
+  <Login v-model="isLoginModalOpen" /> -->
 </template>
 
 <style scoped>

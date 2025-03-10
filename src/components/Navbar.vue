@@ -69,9 +69,10 @@
 </template>
 
 <script setup>
-import { ref, computed } from "vue";
+import { ref, computed, onMounted, onUnmounted } from "vue";
 import { useAuthStore } from "../stores/authStore";
 import { useNavStore } from "../stores/navStore";
+import { emitter } from "../main";
 
 import PostView from "./ModalPost.vue";
 import Login from "./ModalLogin.vue";
@@ -97,14 +98,28 @@ const toTop = () => {
   window.scrollTo(0, 0);
 };
 
+// 監聽事件，確保外部也能觸發開啟登入 Modal
+const openLoginModal = () => {
+  isLoginModalOpen.value = true;
+};
+
 const checkTokenAndOpenModal = () => {
   if (!authStore.userId || !authStore.accessToken) {
     isLoginModalOpen.value = true;
+    emitter.emit("openLoginModal");
   } else {
     isPostModalOpen.value = true;
     setActive("add"); // 點擊時設為活躍
   }
 };
+
+onMounted(() => {
+  emitter.on("openLoginModal", openLoginModal);
+});
+
+onUnmounted(() => {
+  emitter.off("openLoginModal", openLoginModal);
+});
 </script>
 
 <style scoped>
