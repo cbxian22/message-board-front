@@ -24,8 +24,6 @@ import { emitter } from "../main";
 import Navbar from "../components/Navbar.vue";
 import NavbarUp from "../components/NavbarUp.vue";
 import SingleReplies from "../components/SingleReplies.vue";
-import UpdatePostView from "../components/ModalUpdatePost.vue";
-import Login from "../components/ModalLogin.vue";
 
 import Backicon from "../assets/Backicon.svg";
 import Favoriteicon from "../assets/Favoriteicon.svg";
@@ -61,7 +59,7 @@ const isLoginModalOpen = ref(false);
 // 登入確認＿like
 const checkTokenAndOpenModal = (id) => {
   if (!authStore.userId || !authStore.accessToken) {
-    isLoginModalOpen.value = true;
+    emitter.emit("openLoginModal");
   } else {
     handlelike(id);
   }
@@ -167,22 +165,21 @@ const handleUpdate = async (postId) => {
     return;
   }
   isModalOpen.value = false;
-  selectedPostId.value = postId;
-  isOpenModal.value = true;
+  emitter.emit("openUpdateModal", postId);
 };
 
-// 貼文＿處理更新
-const handlePostUpdate = (updatedPost) => {
-  if (post.value && post.value.id === updatedPost.id) {
-    post.value = {
-      ...post.value,
-      content: updatedPost.content,
-      file_url: updatedPost.file_url,
-    };
-    isOpenModal.value = false;
-    selectedPostId.value = null; // 清空選中貼文
-  }
-};
+// // 貼文＿處理更新
+// const handlePostUpdate = (updatedPost) => {
+//   if (post.value && post.value.id === updatedPost.id) {
+//     post.value = {
+//       ...post.value,
+//       content: updatedPost.content,
+//       file_url: updatedPost.file_url,
+//     };
+//     isOpenModal.value = false;
+//     selectedPostId.value = null; // 清空選中貼文
+//   }
+// };
 
 // 貼文＿按讚
 const handlelike = async (id) => {
@@ -292,7 +289,6 @@ const handleMessage = async (postId) => {
       file.value = null;
       fileUrl.value = null;
       message.success("回覆成功！");
-      // emit("newReply", response.data);
     } else {
       message.error("回覆失敗！");
       loadingBar.error();
@@ -316,7 +312,6 @@ const adjustTextareaHeight = () => {
 
 onMounted(async () => {
   document.addEventListener("mousedown", closeModal);
-  emitter.on("updatePost", handlePostUpdate);
   await fetchSingleComment(route.params.id);
   await nextTick();
   if (textareaRef.value) {
@@ -327,7 +322,6 @@ onMounted(async () => {
 
 onUnmounted(() => {
   document.removeEventListener("mousedown", closeModal);
-  emitter.off("updatePost", handlePostUpdate);
 });
 
 // 監聽內容，調整高度
@@ -506,9 +500,6 @@ watch(content, () => {
   </div>
   <div v-else>正在加載貼文...</div>
   <Navbar />
-  <UpdatePostView v-model="isOpenModal" :post-id="selectedPostId" />
-  <!-- 登入 Modal -->
-  <Login v-model="isLoginModalOpen" />
 </template>
 
 <style scoped>

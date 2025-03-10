@@ -30,10 +30,7 @@ const comments = ref(props.posts || []);
 const modalState = ref({});
 const modalRefs = ref({});
 const buttonRefs = ref({});
-const isOpenModal = ref(false);
 const isLikeProcessing = ref(false);
-const selectedPostId = ref(null);
-const isLoginModalOpen = ref(false);
 
 // 登入確認＿like
 const checkTokenAndOpenModal = (id) => {
@@ -87,35 +84,6 @@ const isVideo = (url) => {
   return videoExtensions.some((ext) => url.toLowerCase().endsWith(ext));
 };
 
-// 獲取單一貼文
-// const fetchSingleComment = async (postId) => {
-//   try {
-//     const userId = authStore.userId || localStorage.getItem("userId");
-//     const response = await apiClient.get(`/posts/${postId}`, {
-//       params: { userId },
-//     });
-//     if (response.status === 200) {
-//       const comment = response.data;
-//       selectedComment.value = {
-//         id: comment.id,
-//         content: comment.content,
-//         name: comment.user_name,
-//         timestamp: new Date(comment.created_at),
-//         file_url: comment.file_url,
-//         user_avatar: comment.user_avatar,
-//         likes: comment.likes || 0,
-//         userLiked: comment.user_liked || false,
-//         replies: comment.replies,
-//       };
-//     } else {
-//       message.error("無法獲取單一留言，數據格式不正確！");
-//     }
-//   } catch (error) {
-//     console.error("取得單一留言錯誤:", error);
-//     message.error("單一留言取得失敗，請檢查網絡或稍後再試！");
-//   }
-// };
-
 // 刪除確認
 const handleDeleteConfirm = (postId) => {
   // 關閉所有 Modal
@@ -165,20 +133,6 @@ const handleUpdate = async (postId) => {
   });
   emitter.emit("openUpdateModal", postId);
 };
-
-// // 處理更新
-// const handlePostUpdate = (updatedPost) => {
-//   const index = comments.value.findIndex((c) => c.id === updatedPost.id);
-//   if (index !== -1) {
-//     comments.value[index] = {
-//       ...comments.value[index],
-//       content: updatedPost.content,
-//       file_url: updatedPost.file_url,
-//     };
-//     isOpenModal.value = false; // 關閉 Modal
-//     selectedPostId.value = null; // 清空選中貼文
-//   }
-// };
 
 // 按讚
 const handlelike = async (id) => {
@@ -250,16 +204,10 @@ watch(
 
 onMounted(() => {
   document.addEventListener("mousedown", closeModal);
-  // emitter.on("refreshPost", () => {
-  //   emitter.emit("fetchUserData");
-  // });
-  emitter.on("updatePost", handlePostUpdate); // 監聽更新事件
 });
 
 onUnmounted(() => {
   document.removeEventListener("mousedown", closeModal);
-  // emitter.off("refreshPost", () => {});
-  emitter.off("updatePost", handlePostUpdate); // 移除事件監聽
 });
 
 // 點擊圖示回到最上
