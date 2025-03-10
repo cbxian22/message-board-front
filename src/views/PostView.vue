@@ -52,9 +52,6 @@ const file = ref(null);
 const fileUrl = ref(null);
 const fileInputRef = ref(null);
 const isModalOpen = ref(false);
-const isOpenModal = ref(false);
-const selectedPostId = ref(null);
-const isLoginModalOpen = ref(false);
 
 // 登入確認＿like
 const checkTokenAndOpenModal = (id) => {
@@ -296,7 +293,7 @@ const handleMessage = async (postId) => {
 const adjustTextareaHeight = () => {
   const textarea = textareaRef.value;
   if (textarea) {
-    textarea.style.height = "auto";
+    textarea.style.height = "50px";
     textarea.style.height = `${Math.min(textarea.scrollHeight)}px`;
   }
 };
@@ -308,6 +305,12 @@ onMounted(async () => {
   if (textareaRef.value) {
     adjustTextareaHeight();
     textareaRef.value.focus();
+    textareaRef.value.addEventListener("keydown", (e) => {
+      if (e.key === "Enter") {
+        content.value += "\n"; // 手動確保換行符號
+        adjustTextareaHeight(); // 立即調整高度
+      }
+    });
   }
 });
 
@@ -316,9 +319,13 @@ onUnmounted(() => {
 });
 
 // 監聽內容，調整高度
-watch(content, () => {
-  adjustTextareaHeight();
-});
+watch(
+  content,
+  () => {
+    adjustTextareaHeight();
+  },
+  { immediate: true }
+);
 </script>
 
 <template>
@@ -697,8 +704,10 @@ watch(content, () => {
   margin: 8px 0 10px;
   color: rgb(243, 245, 247);
   line-height: 1.5;
-  max-height: 100px;
+  /* max-height: 100px; */
   overflow-y: auto;
+  white-space: pre-wrap;
+  word-wrap: break-word;
 }
 
 .fixed-textarea::placeholder {
