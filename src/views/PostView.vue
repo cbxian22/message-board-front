@@ -113,6 +113,7 @@ const fetchSingleComment = async (postId) => {
     }
   } catch (error) {
     console.error("取得單一貼文錯誤:", error);
+    router.replace("/not-found");
   }
 };
 
