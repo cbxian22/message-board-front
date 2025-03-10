@@ -698,10 +698,8 @@ watch(
   margin: 8px 0 10px;
   color: rgb(243, 245, 247);
   line-height: 1.5;
-  min-height: 50px;
+  min-height: 50px !important;
   overflow-y: auto;
-  white-space: pre-wrap !important;
-  word-wrap: break-word !important;
 }
 
 .fixed-textarea::placeholder {
