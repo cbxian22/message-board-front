@@ -1,6 +1,6 @@
 <script setup>
 import { ref, onMounted, onUnmounted, watch } from "vue";
-import { NBadge, useMessage, NImage } from "naive-ui";
+import { NBadge, useMessage, NImage, useDialog } from "naive-ui";
 import { useAuthStore } from "../stores/authStore";
 import { useDateStore } from "../stores/dateStore";
 import { useRouter } from "vue-router";
@@ -26,17 +26,16 @@ const router = useRouter();
 const authStore = useAuthStore();
 const dateStore = useDateStore();
 const message = useMessage();
+const dialog = useDialog();
 
 const loggedInUser = ref(authStore.userName);
 const username = ref(router.currentRoute.value.params.username);
 const comments = ref(props.posts || []);
 const modalState = ref({});
-const commentImages = ref([]);
 const modalRefs = ref({});
 const buttonRefs = ref({});
 const isOpenModal = ref(false);
-const isLikeProcessing = ref(false); // 用於追踪點讚狀態
-const selectedComment = ref(null); // 用於儲存當前選中的單一留言
+const isLikeProcessing = ref(false);
 const selectedPostId = ref(null);
 const isLoginModalOpen = ref(false);
 
@@ -99,33 +98,33 @@ const isVideo = (url) => {
 };
 
 // 獲取單一貼文
-const fetchSingleComment = async (postId) => {
-  try {
-    const userId = authStore.userId || localStorage.getItem("userId");
-    const response = await apiClient.get(`/posts/${postId}`, {
-      params: { userId },
-    });
-    if (response.status === 200) {
-      const comment = response.data;
-      selectedComment.value = {
-        id: comment.id,
-        content: comment.content,
-        name: comment.user_name,
-        timestamp: new Date(comment.created_at),
-        file_url: comment.file_url,
-        user_avatar: comment.user_avatar,
-        likes: comment.likes || 0,
-        userLiked: comment.user_liked || false,
-        replies: comment.replies,
-      };
-    } else {
-      message.error("無法獲取單一留言，數據格式不正確！");
-    }
-  } catch (error) {
-    console.error("取得單一留言錯誤:", error);
-    message.error("單一留言取得失敗，請檢查網絡或稍後再試！");
-  }
-};
+// const fetchSingleComment = async (postId) => {
+//   try {
+//     const userId = authStore.userId || localStorage.getItem("userId");
+//     const response = await apiClient.get(`/posts/${postId}`, {
+//       params: { userId },
+//     });
+//     if (response.status === 200) {
+//       const comment = response.data;
+//       selectedComment.value = {
+//         id: comment.id,
+//         content: comment.content,
+//         name: comment.user_name,
+//         timestamp: new Date(comment.created_at),
+//         file_url: comment.file_url,
+//         user_avatar: comment.user_avatar,
+//         likes: comment.likes || 0,
+//         userLiked: comment.user_liked || false,
+//         replies: comment.replies,
+//       };
+//     } else {
+//       message.error("無法獲取單一留言，數據格式不正確！");
+//     }
+//   } catch (error) {
+//     console.error("取得單一留言錯誤:", error);
+//     message.error("單一留言取得失敗，請檢查網絡或稍後再試！");
+//   }
+// };
 
 // 刪除確認
 const handleDeleteConfirm = (postId) => {
@@ -357,17 +356,6 @@ const scrollToTop = () => {
           </div>
         </div>
       </div>
-
-      <!-- <div class="comment-content">
-        <p>{{ comment.content }}</p>
-        <span v-if="comment.file_url" class="comment-file">
-          <img
-            :src="comment.file_url"
-            alt="comment.file_url"
-            ref="commentImages"
-          />
-        </span>
-      </div> -->
 
       <div class="comment-content">
         <p>{{ comment.content }}</p>
