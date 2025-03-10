@@ -80,7 +80,13 @@
 
 <script setup>
 import { ref, nextTick, watch, computed, onMounted } from "vue";
-import { NButton, useLoadingBar, useMessage, useDialog } from "naive-ui";
+import {
+  NButton,
+  useLoadingBar,
+  useMessage,
+  useDialog,
+  NDropdown,
+} from "naive-ui";
 import { useAuthStore } from "../stores/authStore";
 import apiClient from "../stores/axiosConfig";
 import Modal from "./Modal.vue";
