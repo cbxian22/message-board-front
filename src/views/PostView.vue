@@ -25,7 +25,7 @@ import Navbar from "../components/Navbar.vue";
 import NavbarUp from "../components/NavbarUp.vue";
 import SingleReplies from "../components/SingleReplies.vue";
 import UpdatePostView from "../components/ModalUpdatePost.vue";
-import Login from "./ModalLogin.vue";
+import Login from "../components/ModalLogin.vue";
 
 import Backicon from "../assets/Backicon.svg";
 import Favoriteicon from "../assets/Favoriteicon.svg";
