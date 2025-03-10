@@ -675,6 +675,8 @@ onUnmounted(() => {
 
 .reply-content p {
   margin-bottom: 10px;
+  white-space: pre-wrap;
+  word-wrap: break-word;
 }
 
 /* url 圖片影片 */

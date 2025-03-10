@@ -460,6 +460,8 @@ const scrollToTop = () => {
 
 .comment-content p {
   margin-bottom: 10px;
+  white-space: pre-wrap;
+  word-wrap: break-word;
 }
 
 .info-modal {

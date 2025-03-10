@@ -650,6 +650,8 @@ watch(
 
 .comment-content p {
   margin-bottom: 10px;
+  white-space: pre-wrap;
+  word-wrap: break-word;
 }
 
 .n-image {
