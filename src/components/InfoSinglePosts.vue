@@ -28,7 +28,7 @@ const dateStore = useDateStore();
 const message = useMessage();
 const dialog = useDialog();
 
-const loggedInUser = ref(authStore.userName);
+const loggedInUser = ref(authStore.accountName);
 const username = ref(router.currentRoute.value.params.accountname);
 const comments = ref(props.posts || []);
 const modalState = ref({});
