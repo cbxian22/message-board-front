@@ -321,6 +321,7 @@ watch(content, () => {
   font-size: 14px;
   padding-right: 30px;
   color: rgb(243, 245, 247);
+  min-height: 70px !important;
 }
 
 .user-content textarea::placeholder {
