@@ -115,7 +115,8 @@ const textarea = ref(null);
 const file = ref(null);
 const fileUrl = ref(null);
 const fileInputRef = ref(null);
-const postData = ref(null); // 儲存從 API 獲取的貼文資料
+const postData = ref(null); // 當前貼文狀態
+const originalPostData = ref(null); // 原始貼文資料快照
 const visibility = ref(null);
 
 // 下拉選單選項
@@ -166,8 +167,10 @@ const fetchSingleComment = async (postId) => {
         content: comment.content,
         file_url: comment.file_url,
       };
-      content.value = comment.content || "";
-      fileUrl.value = comment.file_url || null;
+      originalPostData.value = { ...postData.value };
+      content.value = originalPostData.value.content || "";
+      fileUrl.value = originalPostData.value.file_url || null;
+      visibility.value = originalPostData.value.visibility || null;
       file.value = null;
     } else {
       message.error("無法獲取單一貼文，數據格式不正確");
@@ -256,13 +259,18 @@ const handleMessage = async () => {
         file_url: uploadedFileUrl,
         visibility: visibility.value,
       };
+
       emitter.emit("updatePost", updatedPost); // 通知父組件
       message.success("貼文更新成功！");
+
+      postData.value = { ...updatedPost };
+      originalPostData.value = { ...updatedPost };
+
       content.value = "";
       file.value = null;
       fileUrl.value = null;
       visibility.value = null;
-      emit("update:modelValue", false); // 關閉模態
+      emit("update:modelValue", false);
     } else {
       message.error("貼文更新失敗！");
       loadingBar.error();
@@ -300,9 +308,13 @@ const handleModalClose = (newValue) => {
       positiveText: "關閉",
       negativeText: "取消",
       onPositiveClick: () => {
-        content.value = "";
-        file.value = null;
-        fileUrl.value = null;
+        if (originalPostData.value) {
+          content.value = originalPostData.value.content || "";
+          fileUrl.value = originalPostData.value.file_url || null;
+          visibility.value = originalPostData.value.visibility || null;
+          file.value = null;
+          postData.value = { ...originalPostData.value }; // 同步 postData
+        }
         emit("update:modelValue", false);
       },
       onNegativeClick: () => {
