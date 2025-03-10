@@ -32,7 +32,7 @@ export const useNavStore = defineStore("nav", () => {
         activeItem.value = "profile";
         break;
       default:
-        if (path.startsWith("/@")) {
+        if (path.endsWith("navbar")) {
           if (currentUsername && currentUsername === authStore.accountName) {
             activeItem.value = "profile"; // 自己的頁面
           } else {
