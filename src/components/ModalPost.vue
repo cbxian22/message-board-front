@@ -404,10 +404,12 @@ watch(content, () => {
   cursor: pointer;
 }
 
-.n-dropdown-menu
-  .n-dropdown-option
-  .n-dropdown-option-body
-  .n-dropdown-option-body__label {
+:deep(
+    .n-dropdown-menu
+      .n-dropdown-option
+      .n-dropdown-option-body
+      .n-dropdown-option-body__label
+  ) {
   padding: 0 15px !important;
 }
 
