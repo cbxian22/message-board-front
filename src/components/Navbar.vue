@@ -64,6 +64,9 @@
   <!-- 貼文 Modal -->
   <PostView v-model="isPostModalOpen" />
 
+  <!-- 貼文 Modal -->
+  <UpdatePostView v-model="isUpdateModalOpen" :postId="selectedPostId" />
+
   <!-- 登入 Modal -->
   <Login v-model="isLoginModalOpen" />
 </template>
@@ -75,6 +78,7 @@ import { useNavStore } from "../stores/navStore";
 import { emitter } from "../main";
 
 import PostView from "./ModalPost.vue";
+import UpdatePostView from "./ModalUpdatePost.vue";
 import Login from "./ModalLogin.vue";
 
 import Homeicon from "../assets/Homeicon.svg";
@@ -87,6 +91,8 @@ const navStore = useNavStore();
 
 const isPostModalOpen = ref(false);
 const isLoginModalOpen = ref(false);
+const isUpdateModalOpen = ref(false);
+const selectedPostId = ref(null);
 
 const setActive = (item) => {
   navStore.setActive(item);
@@ -103,6 +109,12 @@ const openLoginModal = () => {
   isLoginModalOpen.value = true;
 };
 
+// 監聽 openUpdateModal 事件
+const openUpdateModal = (postId) => {
+  selectedPostId.value = postId;
+  isUpdateModalOpen.value = true;
+};
+
 const checkTokenAndOpenModal = () => {
   if (!authStore.userId || !authStore.accessToken) {
     isLoginModalOpen.value = true;
@@ -115,10 +127,12 @@ const checkTokenAndOpenModal = () => {
 
 onMounted(() => {
   emitter.on("openLoginModal", openLoginModal);
+  emitter.on("openUpdateModal", openUpdateModal);
 });
 
 onUnmounted(() => {
   emitter.off("openLoginModal", openLoginModal);
+  emitter.off("openUpdateModal", openUpdateModal);
 });
 </script>
 

@@ -168,7 +168,7 @@ const handleUpdate = async (postId) => {
   Object.keys(modalState.value).forEach((key) => {
     modalState.value[key] = false;
   });
-  emitter.emit("openUpdateModal", postId); // 告訴父組件打開編輯
+  emitter.emit("openUpdateModal", postId);
   // selectedPostId.value = postId;
   // isOpenModal.value = true;
 };
