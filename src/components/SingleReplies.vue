@@ -866,6 +866,7 @@ const fetchReplies = async (postId) => {
   } catch (error) {
     console.error("取得回覆錯誤:", error);
     message.error("回覆載入失敗");
+    replies.value = [];
   }
 };
 
