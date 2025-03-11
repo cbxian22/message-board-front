@@ -332,6 +332,11 @@ const cancelFilePreview = () => {
   }
   fileUrl.value = null;
   file.value = null;
+  // 重置檔案輸入
+  if (fileInputRef.value) {
+    fileInputRef.value.value = null;
+    console.log("已重置檔案輸入");
+  }
 };
 
 // 回覆＿獨立處理圖片上傳
@@ -414,6 +419,9 @@ onUnmounted(() => {
       file.value.type === "video/quicktime")
   ) {
     URL.revokeObjectURL(fileUrl.value);
+  }
+  if (fileInputRef.value) {
+    fileInputRef.value.value = null;
   }
   document.removeEventListener("mousedown", closeModal);
 });
@@ -618,7 +626,7 @@ watch(
         </div>
       </div>
     </div>
-    <SingleReplies :post-id="postId" />
+    <SingleReplies />
   </div>
   <div v-else>正在加載貼文...</div>
   <Navbar />
