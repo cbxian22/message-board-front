@@ -36,7 +36,7 @@ const content = ref("");
 const textareas = ref({});
 const file = ref(null); // 上傳檔案
 const fileUrl = ref(null); // 檔案預覽URL
-const fileInputRefs = ref({}); // 檔案輸入引用
+// const fileInputRefs = ref({}); // 檔案輸入引用
 const fileInputRef = ref(null); // 檔案輸入引用
 const editingReplyId = ref(null); // 正在編輯的回覆ID
 const modalState = ref({});
@@ -236,17 +236,9 @@ const handlelike = async (id) => {
 //  因為不用 Modal Update Reply 且部分功能雷同，直接寫入此檔案
 
 // 獲取 <input type="file">
-const triggerFileInput = (replyId) => {
-  fileInputRef = fileInputRefs.value[replyId];
-  if (fileInputRef) {
-    fileInputRef.click();
-  } else {
-    console.warn(`File input for reply ${replyId} not found.`);
-  }
+const triggerFileInput = () => {
+  fileInputRef.value?.click();
 };
-// const triggerFileInput = () => {
-//   fileInputRef.value?.click();
-// };
 
 // 應有的定義應如下，但程式碼中缺少：
 // const handleFileUpload = (event) => {
@@ -537,6 +529,27 @@ onUnmounted(() => {
             class="edit-textarea"
           ></textarea>
 
+          <input
+            type="file"
+            :ref="(el) => (fileInputRefs[reply.id] = el)"
+            @change="handleFileUpload($event, reply.id)"
+            style="display: none"
+          />
+          <div class="edit-actions">
+            <button @click="triggerFileInput(reply.id)" class="add-file-btn">
+              <img :src="Noteicon" alt="新增檔案" />
+            </button>
+            <button
+              @click="handleMessage"
+              :disabled="isSubmitDisabled"
+              class="save-btn"
+            >
+              儲存
+            </button>
+            <button @click="cancelEdit" class="cancel-btn">取消</button>
+          </div>
+
+          <!-- 預覽 -->
           <div v-if="fileUrl">
             <div class="file-preview">
               <img
@@ -556,26 +569,6 @@ onUnmounted(() => {
                 <img :src="Closeicon" alt="Close icon" />
               </button>
             </div>
-          </div>
-
-          <input
-            type="file"
-            :ref="(el) => (fileInputRefs[reply.id] = el)"
-            @change="handleFileUpload($event, reply.id)"
-            style="display: none"
-          />
-          <div class="edit-actions">
-            <button @click="triggerFileInput(reply.id)" class="add-file-btn">
-              <img :src="Noteicon" alt="新增檔案" />
-            </button>
-            <button
-              @click="handleMessage"
-              :disabled="isSubmitDisabled"
-              class="save-btn"
-            >
-              儲存
-            </button>
-            <button @click="cancelEdit" class="cancel-btn">取消</button>
           </div>
         </template>
       </div>
