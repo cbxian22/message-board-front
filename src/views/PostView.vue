@@ -502,7 +502,7 @@ watch(
           </div>
         </div>
 
-        <div v-if="fileUrl">
+        <div v-if="fileUrl" class="file-preview-container">
           <div class="file-preview">
             <img
               v-if="isPreviewImage"
@@ -759,6 +759,10 @@ watch(
   border: none;
   cursor: pointer;
   padding: 5px;
+}
+
+.file-preview-container {
+  display: flex;
 }
 
 .file-preview {
