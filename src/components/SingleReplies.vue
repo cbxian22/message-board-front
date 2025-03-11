@@ -22,6 +22,7 @@ import Editicon from "../assets/Editicon.svg";
 import Deleteicon from "../assets/Deleteicon.svg";
 import Flagicon from "../assets/Flagicon.svg";
 import Noteicon from "../assets/Noteicon.svg";
+import Closeicon from "../assets/Closeicon.svg";
 
 const route = useRoute();
 const emit = defineEmits();
@@ -35,7 +36,8 @@ const content = ref("");
 const textareas = ref({});
 const file = ref(null); // 上傳檔案
 const fileUrl = ref(null); // 檔案預覽URL
-const fileInputRefs = ref({}); // 檔案輸入引用
+// const fileInputRefs = ref({}); // 檔案輸入引用
+const fileInputRef = ref(null); // 檔案輸入引用
 const editingReplyId = ref(null); // 正在編輯的回覆ID
 const modalState = ref({});
 const modalRefs = ref({});
@@ -84,16 +86,21 @@ const closeModal = (event) => {
 };
 
 // 回覆＿檔案類型檢查
-const isImage = (url) => {
-  const imageExtensions = [".jpg", ".jpeg", ".png", ".gif", ".bmp", ".webp"];
-  return imageExtensions.some((ext) => url.toLowerCase().endsWith(ext));
+const getFileType = (fileOrUrl) => {
+  if (typeof fileOrUrl === "string") {
+    const ext = fileOrUrl.split(".").pop().toLowerCase();
+    if (["jpg", "jpeg", "png", "gif", "bmp", "webp"].includes(ext))
+      return "image";
+    if (["mp4", "webm", "ogg", "mov"].includes(ext)) return "video";
+  } else if (fileOrUrl?.type) {
+    if (fileOrUrl.type.startsWith("image/")) return "image";
+    if (fileOrUrl.type.startsWith("video/")) return "video";
+  }
+  return null;
 };
 
-// 回覆＿檔案類型檢查
-const isVideo = (url) => {
-  const videoExtensions = [".mp4", ".webm", ".ogg", ".mov"];
-  return videoExtensions.some((ext) => url.toLowerCase().endsWith(ext));
-};
+const isPreviewImage = computed(() => getFileType(file.value) === "image");
+const isPreviewVideo = computed(() => getFileType(file.value) === "video");
 
 // 回覆＿獲取
 const fetchReplies = async (postId) => {
@@ -229,37 +236,73 @@ const handlelike = async (id) => {
 //  因為不用 Modal Update Reply 且部分功能雷同，直接寫入此檔案
 
 // 獲取 <input type="file">
-const triggerFileInput = (replyId) => {
-  const fileInput = fileInputRefs.value[replyId];
-  if (fileInput) {
-    fileInput.click();
-  } else {
-    console.warn(`File input for reply ${replyId} not found.`);
-  }
+// const triggerFileInput = (replyId) => {
+//   const fileInput = fileInputRefs.value[replyId];
+//   if (fileInput) {
+//     fileInput.click();
+//   } else {
+//     console.warn(`File input for reply ${replyId} not found.`);
+//   }
+// };
+const triggerFileInput = () => {
+  fileInputRef.value?.click();
 };
 
 // 應有的定義應如下，但程式碼中缺少：
+// const handleFileUpload = (event) => {
+//   const selectedFile = event.target.files[0];
+//   if (selectedFile) {
+//     console.log("檔案已選擇:", selectedFile.name);
+//     if (selectedFile.type.startsWith("image/")) {
+//       const reader = new FileReader();
+//       reader.onload = (e) => {
+//         fileUrl.value = e.target.result;
+//       };
+//       reader.readAsDataURL(selectedFile);
+//     }
+//     file.value = selectedFile;
+//   }
+// };
 const handleFileUpload = (event) => {
   const selectedFile = event.target.files[0];
-  if (selectedFile) {
-    console.log("檔案已選擇:", selectedFile.name);
+  if (!selectedFile) return;
+
+  if (fileUrl.value) URL.revokeObjectURL(fileUrl.value);
+  file.value = selectedFile;
+
+  try {
     if (selectedFile.type.startsWith("image/")) {
       const reader = new FileReader();
       reader.onload = (e) => {
         fileUrl.value = e.target.result;
       };
+      reader.onerror = () => {
+        message.error("圖片讀取失敗！");
+      };
       reader.readAsDataURL(selectedFile);
+    } else if (selectedFile.type.startsWith("video/")) {
+      fileUrl.value = URL.createObjectURL(selectedFile);
+    } else {
+      file.value = null;
+      message.error("僅支援圖片和影片檔案！");
     }
-    file.value = selectedFile;
+  } catch (error) {
+    file.value = null;
+    fileUrl.value = null;
+    message.error("檔案處理失敗，請重試！");
   }
 };
-
 // 取消檔案預覽
+// const cancelFilePreview = () => {
+//   fileUrl.value = null;
+//   file.value = null;
+// };
 const cancelFilePreview = () => {
+  if (fileUrl.value) URL.revokeObjectURL(fileUrl.value);
   fileUrl.value = null;
   file.value = null;
+  if (fileInputRef.value) fileInputRef.value.value = null;
 };
-
 // 獨立處理圖片上傳
 const uploadFile = async () => {
   if (!file.value) return fileUrl.value || null;
@@ -376,6 +419,8 @@ onMounted(async () => {
 
 onUnmounted(() => {
   document.removeEventListener("mousedown", closeModal);
+  if (fileUrl.value) URL.revokeObjectURL(fileUrl.value);
+  if (fileInputRef.value) fileInputRef.value.value = null;
 });
 </script>
 
@@ -492,11 +537,25 @@ onUnmounted(() => {
             class="edit-textarea"
           ></textarea>
 
-          <div v-if="fileUrl" class="file-preview">
-            <n-image :src="fileUrl" alt="檔案預覽" class="preview-img" />
-            <button @click="cancelFilePreview" class="cancel-preview-button">
-              移除
-            </button>
+          <div v-if="fileUrl">
+            <div class="file-preview">
+              <img
+                v-if="isPreviewImage"
+                :src="fileUrl"
+                alt="File Preview"
+                class="preview-img"
+              />
+              <video
+                v-else-if="isPreviewVideo"
+                :src="fileUrl"
+                controls
+                class="preview-video"
+                preload="auto"
+              />
+              <button @click="cancelFilePreview" class="cancel-preview-button">
+                <img :src="Closeicon" alt="Close icon" />
+              </button>
+            </div>
           </div>
 
           <input
@@ -535,15 +594,6 @@ onUnmounted(() => {
               <n-badge :value="reply.likes || 0" />
             </div>
           </li>
-          <!-- 當 isEditing = true 出現-->
-          <!-- <li v-if="isEditing">
-            <div class="reply-count" @click="">
-              <button class="reply-link">
-                <img :src="Noteicon" alt="Noteicon" />
-              </button>
-              <n-badge :value="reply.likes || 0" />
-            </div>
-          </li> -->
         </ul>
       </div>
     </div>
@@ -729,9 +779,12 @@ onUnmounted(() => {
   margin: 10px 0;
 }
 
-.preview-img {
-  max-width: 200px;
+.preview-img,
+.preview-video {
+  max-width: 100%;
   max-height: 200px;
+  object-fit: contain;
+  border-radius: 8px;
 }
 .edit-actions {
   margin-top: 10px;
