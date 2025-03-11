@@ -169,8 +169,12 @@ const getFileType = (fileOrUrl) => {
   return null;
 };
 
-const isPreviewImage = computed(() => getFileType(file.value) === "image");
-const isPreviewVideo = computed(() => getFileType(file.value) === "video");
+const isPreviewImage = computed(
+  () => getFileType(file.value || fileUrl.value) === "image"
+);
+const isPreviewVideo = computed(
+  () => getFileType(file.value || fileUrl.value) === "video"
+);
 
 // 檢查是否啟用提交按鈕
 const isSubmitDisabled = computed(() => {

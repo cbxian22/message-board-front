@@ -63,10 +63,15 @@ const getFileType = (fileOrUrl) => {
   return null;
 };
 
-const isPreviewImage = computed(() => getFileType(file.value) === "image");
-const isPreviewVideo = computed(() => getFileType(file.value) === "video");
 const isImage = (url) => getFileType(url) === "image";
 const isVideo = (url) => getFileType(url) === "video";
+
+const isPreviewImage = computed(
+  () => getFileType(file.value || fileUrl.value) === "image"
+);
+const isPreviewVideo = computed(
+  () => getFileType(file.value || fileUrl.value) === "video"
+);
 
 // 回覆＿打開 Modal
 const openModal = (event, replyId) => {
