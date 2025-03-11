@@ -502,7 +502,7 @@ watch(
           </div>
         </div>
 
-        <div v-if="fileUrl" class="file-preview-wrapper">
+        <div v-if="fileUrl">
           <div class="file-preview">
             <img
               v-if="isPreviewImage"
@@ -761,10 +761,6 @@ watch(
   padding: 5px;
 }
 
-.file-preview-wrapper {
-  margin-left: 10px;
-}
-
 .file-preview {
   margin-top: 10px;
   text-align: flex-start;
@@ -793,7 +789,6 @@ watch(
   display: flex;
   justify-content: center;
   align-items: center;
-  border: none;
 }
 
 .message-form-end button {
