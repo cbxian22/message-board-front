@@ -215,7 +215,6 @@ const triggerFileInput = () => {
   if (!authStore.userId || !authStore.accessToken) {
     emitter.emit("openLoginModal");
   } else {
-    console.log("觸發檔案輸入");
     fileInputRef.value?.click();
   }
 };
@@ -236,23 +235,34 @@ const triggerFileInput = () => {
 //   }
 // };
 
-const handleFileUpload = async (event) => {
+// 回覆＿處理檔案上傳與預覽
+const handleFileUpload = (event) => {
   const selectedFile = event.target.files[0];
   if (!selectedFile) return;
 
-  if (fileUrl.value) URL.revokeObjectURL(fileUrl.value); // 清理舊 URL
+  if (fileUrl.value) URL.revokeObjectURL(fileUrl.value);
   file.value = selectedFile;
 
-  if (selectedFile.type.startsWith("image/")) {
-    const reader = new FileReader();
-    reader.onload = (e) => {
-      fileUrl.value = e.target.result;
-    };
-    reader.readAsDataURL(selectedFile);
-  } else if (selectedFile.type.startsWith("video/")) {
-    fileUrl.value = URL.createObjectURL(selectedFile);
-  } else {
-    message.error("僅支援圖片和影片檔案！");
+  try {
+    if (selectedFile.type.startsWith("image/")) {
+      const reader = new FileReader();
+      reader.onload = (e) => {
+        fileUrl.value = e.target.result;
+      };
+      reader.onerror = () => {
+        message.error("圖片讀取失敗！");
+      };
+      reader.readAsDataURL(selectedFile);
+    } else if (selectedFile.type.startsWith("video/")) {
+      fileUrl.value = URL.createObjectURL(selectedFile);
+    } else {
+      file.value = null;
+      message.error("僅支援圖片和影片檔案！");
+    }
+  } catch (error) {
+    file.value = null;
+    fileUrl.value = null;
+    message.error("檔案處理失敗，請重試！");
   }
 };
 
@@ -263,6 +273,7 @@ const handleFileUpload = async (event) => {
 // };
 
 // 取消預覽
+// 回覆＿取消預覽
 const cancelFilePreview = () => {
   if (fileUrl.value) URL.revokeObjectURL(fileUrl.value);
   fileUrl.value = null;
@@ -343,17 +354,8 @@ onMounted(async () => {
 });
 
 onUnmounted(() => {
-  if (
-    fileUrl.value &&
-    file.value &&
-    (file.value.type?.startsWith("video/") ||
-      file.value.type === "video/quicktime")
-  ) {
-    URL.revokeObjectURL(fileUrl.value);
-  }
-  if (fileInputRef.value) {
-    fileInputRef.value.value = null;
-  }
+  if (fileUrl.value) URL.revokeObjectURL(fileUrl.value);
+  if (fileInputRef.value) fileInputRef.value.value = null;
   document.removeEventListener("mousedown", closeModal);
 });
 // onUnmounted(() => {
@@ -537,11 +539,15 @@ watch(
         </div> -->
         <div v-if="fileUrl" class="file-preview-wrapper">
           <div class="file-preview">
-            <img v-if="getFileType(post.file_url) === 'image'""
-            :src="post.file_url" alt="File Preview" class="preview-img" />
+            <img
+              v-if="isPreviewImage"
+              :src="fileUrl"
+              alt="File Preview"
+              class="preview-img"
+            />
             <video
-              v-else-if="getFileType(post.file_url) === 'video'"
-              :src="post.file_url"
+              v-else-if="isPreviewVideo"
+              :src="fileUrl"
               controls
               class="preview-video"
               preload="auto"
@@ -768,7 +774,7 @@ watch(
   min-height: 60px !important;
 }
 
-.fixed-textarea::placeholder {
+.user-content textarea::placeholder {
   color: #aaa;
   opacity: 0.7;
 }
@@ -842,7 +848,7 @@ watch(
   --n-border-hover: 1px solid #fff !important;
 }
 
-.light-mode .fixed-textarea {
+.light-mode .user-content textarea {
   background-color: #f5f5f5;
   color: #000;
   border: 1px solid #ccc;
