@@ -840,6 +840,7 @@ const closeModal = (event) => {
       modalState.value[key] = false;
     });
     event.preventDefault();
+    event.stopPropagation();
   }
 };
 
@@ -905,13 +906,18 @@ const handleUpdate = async (replyId) => {
               textarea.focus();
               textarea.select(); // 選中文字，增強聚焦效果
               // 檢查焦點是否生效
-              if (document.activeElement !== textarea) {
+              const activeElement = document.activeElement;
+              if (activeElement !== textarea) {
                 console.warn(
                   "Focus failed, active element is:",
-                  document.activeElement
+                  activeElement ? activeElement.tagName : "null",
+                  activeElement
                 );
-                // 強制恢復焦點
+                // 再次嘗試聚焦
                 textarea.focus();
+                textarea.select();
+              } else {
+                console.log("Focus succeeded on textarea");
               }
             } else {
               console.warn(`Textarea for reply ${currentReplyId} not found.`);
@@ -920,6 +926,7 @@ const handleUpdate = async (replyId) => {
         },
       });
     });
+
     if (!shouldProceed) return; // 如果用戶選擇「取消」，停止執行
   }
 
