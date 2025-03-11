@@ -713,10 +713,6 @@ onUnmounted(() => {
   cursor: pointer;
 }
 
-.else-upload-li {
-  display: flex;
-}
-
 .reply-count .n-badge {
   --n-color: transition !important;
 }
