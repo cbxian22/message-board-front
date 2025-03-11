@@ -90,7 +90,8 @@ const getFileType = (fileOrUrl) => {
   }
   return null;
 };
-
+const isImage = (fileUrl) => getFileType(fileUrl) === "image";
+const isVideo = (fileUrl) => getFileType(fileUrl) === "video";
 const isPreviewImage = computed(() => getFileType(file.value) === "image");
 const isPreviewVideo = computed(() => getFileType(file.value) === "video");
 
