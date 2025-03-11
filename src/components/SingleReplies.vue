@@ -849,8 +849,14 @@ onUnmounted(() => {
 .add-file-btn,
 .save-btn,
 .cancel-btn {
-  padding: 5px 15px;
-  border-radius: 4px;
+  /* padding: 5px 15px;
+  border-radius: 4px; */
+  display: flex;
+  flex-direction: row;
+  align-items: center;
+  padding: 5px 5px;
+  margin-right: 10px;
+  cursor: pointer;
 }
 
 .save-btn:disabled {
