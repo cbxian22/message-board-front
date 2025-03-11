@@ -745,7 +745,7 @@ onUnmounted(() => {
 </style> -->
 <script setup>
 import { ref, computed, watch, onMounted, onUnmounted, nextTick } from "vue";
-import { NBadge, useMessage, NImage, useLoadingBar } from "naive-ui";
+import { NBadge, useMessage, NImage, useLoadingBar, useDialog } from "naive-ui";
 import { useAuthStore } from "../stores/authStore";
 import { useDateStore } from "../stores/dateStore";
 import { useRoute } from "vue-router";
@@ -766,6 +766,7 @@ const authStore = useAuthStore();
 const dateStore = useDateStore();
 const message = useMessage();
 const loadingBar = useLoadingBar();
+const dialog = useDialog();
 
 const replies = ref([]);
 const content = ref("");
@@ -965,6 +966,22 @@ const uploadFile = async () => {
     console.error("檔案上傳失敗:", error);
     return null;
   }
+};
+
+// 貼文＿刪除確認
+const handleDeleteConfirm = (replayId) => {
+  // 關閉所有 Modal
+  Object.keys(modalState.value).forEach((key) => {
+    modalState.value[key] = false;
+  });
+  dialog.warning({
+    content: "刪除貼文後回覆也將一併刪除，且無法復原！",
+    positiveText: "刪除",
+    negativeText: "取消",
+    onPositiveClick: () => {
+      handleDelete(replayId);
+    },
+  });
 };
 
 // 回覆＿刪除
@@ -1177,7 +1194,10 @@ onUnmounted(() => {
                     authStore.isLoggedIn && authStore.accountName === reply.name
                   "
                 >
-                  <button class="modal-link" @click="handleDelete(reply.id)">
+                  <button
+                    class="modal-link"
+                    @click="handleDeleteConfirm(reply.id)"
+                  >
                     <img class="icon" :src="Deleteicon" alt="Deleteicon" />
                     <span>刪除</span>
                   </button>
