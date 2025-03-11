@@ -421,14 +421,6 @@ onUnmounted(() => {
   position: relative;
 }
 
-.preview-img,
-.preview-video {
-  max-width: 100%;
-  max-height: 200px;
-  object-fit: contain;
-  border-radius: 8px;
-}
-
 .cancel-preview-button {
   position: absolute;
   top: 0;
