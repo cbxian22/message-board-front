@@ -540,7 +540,7 @@ onUnmounted(() => {
         </template>
 
         <!-- 編輯模式 -->
-        <template v-else>
+        <template v-if="isEditing && editingReplyId === reply.id">
           <textarea
             :ref="(el) => (textareas[reply.id] = el)"
             v-model="content"
@@ -606,28 +606,37 @@ onUnmounted(() => {
               <n-badge :value="reply.likes || 0" />
             </div>
           </li>
-          <li>
+          <li
+            class="else-upload-li"
+            v-if="isEditing && editingReplyId === reply.id"
+          >
             <input
               type="file"
               :ref="(el) => (fileInputRefs[reply.id] = el)"
               @change="handleFileUpload"
               style="display: none"
             />
-            <button @click="triggerFileInput(reply.id)" class="add-file-btn">
+            <button @click="triggerFileInput(reply.id)" class="else-upload">
               <img :src="Noteicon" alt="新增檔案" />
             </button>
           </li>
-          <li>
+          <li
+            class="else-upload-li"
+            v-if="isEditing && editingReplyId === reply.id"
+          >
             <button
               @click="handleMessage"
               :disabled="isSubmitDisabled"
-              class="save-btn"
+              class="else-upload"
             >
               儲存
             </button>
           </li>
-          <li>
-            <button @click="cancelEdit" class="cancel-btn">取消</button>
+          <li
+            class="else-upload-li"
+            v-if="isEditing && editingReplyId === reply.id"
+          >
+            <button @click="cancelEdit" class="else-upload">取消</button>
           </li>
         </ul>
       </div>
@@ -695,13 +704,17 @@ onUnmounted(() => {
   list-style-type: none;
 }
 
-.reply-count {
+.reply-count .else-upload {
   display: flex;
   flex-direction: row;
   align-items: center;
   padding: 5px 5px;
   margin-right: 10px;
   cursor: pointer;
+}
+
+.else-upload-li {
+  display: flex;
 }
 
 .reply-count .n-badge {
