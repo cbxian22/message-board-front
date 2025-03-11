@@ -846,30 +846,42 @@ onUnmounted(() => {
   color: rgb(0, 0, 0);
 }
 
-.file-preview {
-  margin: 10px 0;
+.preview-img,
+.preview-video {
+  max-width: 100%;
+  max-height: 200px;
+  object-fit: contain;
+  border-radius: 8px;
 }
 
-.preview-img {
-  max-width: 200px;
-  max-height: 200px;
+/* 取消預覽 */
+.file-preview {
+  margin-top: 10px;
+  text-align: center;
+  position: relative;
 }
-.edit-actions {
+
+/* .edit-actions {
   margin-top: 10px;
   display: flex;
   gap: 10px;
-}
-
-/* .add-file-btn,
-.save-btn,
-.cancel-btn {
-  display: flex;
-  flex-direction: row;
-  align-items: center;
-  padding: 5px 5px;
-  margin-right: 10px;
-  cursor: pointer;
 } */
+
+.cancel-preview-button {
+  position: absolute;
+  top: 0;
+  right: 0;
+  color: var(--n-text-color) !important;
+  background-color: var(--n-body-color) !important;
+  border-radius: 50%;
+  width: 30px;
+  height: 30px;
+  font-size: 16px;
+  cursor: pointer;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+}
 
 .save-btn:disabled {
   opacity: 0.5;

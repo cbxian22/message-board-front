@@ -401,11 +401,6 @@ onUnmounted(() => {
 }
 
 /* 預覽 */
-.file-preview {
-  margin-top: 10px;
-  text-align: center;
-}
-
 .preview-img,
 .preview-video {
   max-width: 100%;
