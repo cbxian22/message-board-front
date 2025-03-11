@@ -839,8 +839,6 @@ const closeModal = (event) => {
     Object.keys(modalState.value).forEach((key) => {
       modalState.value[key] = false;
     });
-    event.preventDefault();
-    event.stopPropagation();
   }
 };
 
