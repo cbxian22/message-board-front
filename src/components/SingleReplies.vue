@@ -869,7 +869,7 @@ const fetchReplies = async (postId) => {
 };
 
 // 編輯回覆
-const handleUpdate = (replyId) => {
+const handleUpdate = async (replyId) => {
   if (!authStore.accessToken) {
     message.error("請先登入！");
     return;
@@ -879,20 +879,28 @@ const handleUpdate = (replyId) => {
     modalState.value[key] = false;
   });
 
-  // 如果已在編輯其他回覆且有未儲存變更，提示確認
+  // 如果已在編輯其他回覆且有未儲存變更，等待用戶確認
   if (
     isEditing.value &&
     editingReplyId.value !== replyId &&
     hasUnsavedChanges.value
   ) {
-    dialog.warning({
-      content: "您有未儲存的變更，確定要編輯其他回覆嗎？",
-      positiveText: "確定",
-      negativeText: "取消",
-      onPositiveClick: () => {
-        cancelEdit(); // 否則清理當前編輯
-      },
+    const shouldProceed = await new Promise((resolve) => {
+      dialog.warning({
+        content: "您有未儲存的變更，確定要編輯其他回覆嗎？",
+        positiveText: "確定",
+        negativeText: "取消",
+        onPositiveClick: () => {
+          cancelEdit(); // 清理當前編輯
+          resolve(true); // 繼續編輯新回覆
+        },
+        onNegativeClick: () => {
+          resolve(false); // 保持當前編輯
+        },
+      });
     });
+
+    if (!shouldProceed) return; // 如果用戶選擇「取消」，停止執行
   }
 
   const reply = replies.value.find((r) => r.id === replyId);
