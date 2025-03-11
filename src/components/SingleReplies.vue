@@ -617,7 +617,10 @@ onUnmounted(() => {
               <img :src="Noteicon" alt="新增檔案" />
             </button>
           </li>
-          <li v-if="isEditing && editingReplyId === reply.id">
+          <li
+            class="save-btn-li"
+            v-if="isEditing && editingReplyId === reply.id"
+          >
             <button
               @click="handleMessage"
               :disabled="isSubmitDisabled"
@@ -626,7 +629,10 @@ onUnmounted(() => {
               儲存
             </button>
           </li>
-          <li v-if="isEditing && editingReplyId === reply.id">
+          <li
+            class="cancel-btn-li"
+            v-if="isEditing && editingReplyId === reply.id"
+          >
             <button @click="cancelEdit" class="cancel-btn">取消</button>
           </li>
         </ul>
@@ -695,7 +701,15 @@ onUnmounted(() => {
   list-style-type: none;
 }
 
-.reply-count {
+.save-btn-li,
+.cancel-btn-li {
+  display: flex;
+}
+
+.reply-count,
+.add-file-btn,
+.save-btn,
+.cancel-btn {
   display: flex;
   flex-direction: row;
   align-items: center;
@@ -846,18 +860,16 @@ onUnmounted(() => {
   gap: 10px;
 }
 
-.add-file-btn,
+/* .add-file-btn,
 .save-btn,
 .cancel-btn {
-  /* padding: 5px 15px;
-  border-radius: 4px; */
   display: flex;
   flex-direction: row;
   align-items: center;
   padding: 5px 5px;
   margin-right: 10px;
   cursor: pointer;
-}
+} */
 
 .save-btn:disabled {
   opacity: 0.5;
