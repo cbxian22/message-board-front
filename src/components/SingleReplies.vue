@@ -864,6 +864,10 @@ const handleUpdate = (replyId) => {
     return;
   }
 
+  Object.keys(modalState.value).forEach((key) => {
+    modalState.value[key] = false;
+  });
+
   // 如果已在編輯其他回覆，先取消之前的編輯
   if (isEditing.value && editingReplyId.value !== replyId) {
     cancelEdit();
