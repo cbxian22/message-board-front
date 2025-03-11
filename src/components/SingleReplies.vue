@@ -902,30 +902,31 @@ const handleUpdate = (replyId) => {
     content.value = reply.content;
     fileUrl.value = reply.file_url; // 初始化為現有檔案URL
     file.value = null; // 重置新上傳的檔案
-    nextTick(() => adjustTextareaHeight(replyId));
+    nextTick(() => {
+      adjustTextareaHeight(replyId);
+      const textarea = textareas.value[replyId];
+      if (textarea) {
+        textarea.focus();
+      } else {
+        console.warn(`Textarea for reply ${replyId} not found.`);
+      }
+    });
   }
 };
 
 // 取消編輯
 const cancelEdit = () => {
-  dialog.warning({
-    content: "您有未儲存的變更，確定要編輯其他回覆嗎？",
-    positiveText: "確定",
-    negativeText: "取消",
-    onPositiveClick: () => {
-      isEditing.value = false;
-      editingReplyId.value = null;
-      content.value = "";
-      if (
-        fileUrl.value &&
-        !replies.value.some((r) => r.file_url === fileUrl.value)
-      ) {
-        URL.revokeObjectURL(fileUrl.value); // 清理非原始檔案的預覽
-      }
-      fileUrl.value = null;
-      file.value = null;
-    },
-  });
+  isEditing.value = false;
+  editingReplyId.value = null;
+  content.value = "";
+  if (
+    fileUrl.value &&
+    !replies.value.some((r) => r.file_url === fileUrl.value)
+  ) {
+    URL.revokeObjectURL(fileUrl.value); // 清理非原始檔案的預覽
+  }
+  fileUrl.value = null;
+  file.value = null;
 };
 
 // 觸發檔案輸入
