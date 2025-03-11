@@ -65,6 +65,8 @@ const getFileType = (fileOrUrl) => {
 
 const isPreviewImage = computed(() => getFileType(file.value) === "image");
 const isPreviewVideo = computed(() => getFileType(file.value) === "video");
+const isImage = (url) => getFileType(url) === "image";
+const isVideo = (url) => getFileType(url) === "video";
 
 // 回覆＿打開 Modal
 const openModal = (event, replyId) => {
@@ -515,7 +517,7 @@ onUnmounted(() => {
           <p>{{ reply.content }}</p>
           <span v-if="reply.file_url">
             <n-image
-              v-if="isPreviewImage(reply.file_url)"
+              v-if="isImage(reply.file_url)"
               :src="reply.file_url"
               alt="reply media"
               lazy
@@ -526,10 +528,7 @@ onUnmounted(() => {
                 <div class="media-placeholder">Loading Image...</div>
               </template>
             </n-image>
-            <div
-              v-else-if="isPreviewVideo(reply.file_url)"
-              class="video-wrapper"
-            >
+            <div v-else-if="isVideo(reply.file_url)" class="video-wrapper">
               <video
                 :src="reply.file_url"
                 controls
