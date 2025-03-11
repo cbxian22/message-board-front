@@ -896,36 +896,11 @@ const handleUpdate = async (replyId) => {
         },
         onNegativeClick: () => {
           resolve(false); // 保持當前編輯
-          nextTick(() => {
-            const currentReplyId = editingReplyId.value; // 使用當前編輯的 replyId
-            const textarea = textareas.value[currentReplyId];
-            if (textarea) {
-              adjustTextareaHeight(currentReplyId);
-              textarea.focus();
-              textarea.select(); // 選中文字，增強聚焦效果
-              // 檢查焦點是否生效
-              const activeElement = document.activeElement;
-              if (activeElement !== textarea) {
-                console.warn(
-                  "Focus failed, active element is:",
-                  activeElement ? activeElement.tagName : "null",
-                  activeElement
-                );
-                // 再次嘗試聚焦
-                textarea.focus();
-                textarea.select();
-              } else {
-                console.log("Focus succeeded on textarea");
-              }
-            } else {
-              console.warn(`Textarea for reply ${currentReplyId} not found.`);
-            }
-          });
         },
       });
     });
 
-    if (!shouldProceed) return; // 如果用戶選擇「取消」，停止執行
+    if (!shouldProceed) return;
   }
 
   const reply = replies.value.find((r) => r.id === replyId);
@@ -1248,7 +1223,9 @@ onUnmounted(() => {
               <ul>
                 <li
                   v-if="
-                    authStore.isLoggedIn && authStore.accountName === reply.name
+                    authStore.isLoggedIn &&
+                    authStore.accountName === reply.name &&
+                    editingReplyId.value !== reply.id
                   "
                 >
                   <button class="modal-link" @click="handleUpdate(reply.id)">
