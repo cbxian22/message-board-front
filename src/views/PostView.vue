@@ -879,6 +879,7 @@ const postFileType = computed(() =>
   fileUploadStore.getFileType(post.value?.file_url)
 );
 
+// 登入確認＿like
 const checkTokenAndOpenModal = (id) => {
   if (!authStore.userId || !authStore.accessToken) {
     emitter.emit("openLoginModal");
@@ -887,11 +888,13 @@ const checkTokenAndOpenModal = (id) => {
   }
 };
 
+// 貼文＿打開 Modal
 const openModal = (event) => {
   event.stopPropagation();
   isModalOpen.value = !isModalOpen.value;
 };
 
+// 貼文＿關閉 Modal
 const closeModal = (event) => {
   const modalContent = event.target.closest(".modal-content");
   const infoLink = event.target.closest(".info-link");
@@ -900,6 +903,7 @@ const closeModal = (event) => {
   }
 };
 
+// 貼文＿獲取單一
 const fetchSingleComment = async (postId) => {
   try {
     const userId = authStore.userId || localStorage.getItem("userId");
@@ -933,6 +937,7 @@ const fetchSingleComment = async (postId) => {
   }
 };
 
+// 貼文＿刪除確認
 const handleDeleteConfirm = (postId) => {
   isModalOpen.value = false;
   dialog.warning({
@@ -945,6 +950,7 @@ const handleDeleteConfirm = (postId) => {
   });
 };
 
+// 貼文＿刪除
 const handleDelete = async (postId) => {
   if (!authStore.accessToken) {
     message.error("請先登入！");
@@ -961,6 +967,7 @@ const handleDelete = async (postId) => {
   }
 };
 
+// 貼文＿修改
 const handleUpdate = async (postId) => {
   if (!authStore.accessToken) {
     message.error("請先登入！");
@@ -970,6 +977,7 @@ const handleUpdate = async (postId) => {
   emitter.emit("openUpdateModal", postId);
 };
 
+// 貼文＿按讚
 const handlelike = async (id) => {
   if (!authStore.userId || !authStore.accessToken) {
     message.error("請先登入！");
@@ -1004,10 +1012,12 @@ const handlelike = async (id) => {
   }
 };
 
+// 回覆＿檢查是否啟用提交按鈕
 const isSubmitDisabled = computed(
   () => !(content.value.trim() || fileUploadStore.getFile(instanceId))
 );
 
+// 回覆＿獲取 <input type="file">
 const triggerFileInput = () => {
   if (!authStore.userId || !authStore.accessToken) {
     emitter.emit("openLoginModal");
@@ -1016,6 +1026,7 @@ const triggerFileInput = () => {
   }
 };
 
+// 回覆＿獨立處理圖片上傳
 const uploadFile = async () => {
   const file = fileUploadStore.getFile(instanceId);
   if (!file) return null;
@@ -1034,6 +1045,7 @@ const uploadFile = async () => {
   }
 };
 
+// 回覆＿提交上傳資料庫
 const handleMessage = async (postId) => {
   if (!authStore.userId || !authStore.accessToken) {
     message.error("請先登入！");
@@ -1066,11 +1078,12 @@ const handleMessage = async (postId) => {
   }
 };
 
+// 動態調整高度
 const adjustTextareaHeight = () => {
   const textarea = textareaRef.value;
   if (textarea) {
     textarea.style.height = "auto";
-    textarea.style.height = `${textarea.scrollHeight}px`; // 修正高度計算
+    textarea.style.height = `${textarea.scrollHeight}px`; // 修正 Math.min 問題
   }
 };
 
@@ -1089,6 +1102,7 @@ onUnmounted(() => {
   document.removeEventListener("mousedown", closeModal);
 });
 
+// 監聽內容，調整高度
 watch(
   content,
   () => {
@@ -1099,7 +1113,7 @@ watch(
 </script>
 <template>
   <NavbarUp />
-  <div v-if="post" class="container-box container">
+  <div class="container-box container" v-if="post">
     <div class="comment-box">
       <div class="photo-content">
         <router-link :to="`/@${post.name}`">
@@ -1281,7 +1295,7 @@ watch(
             <button
               @click="
                 fileUploadStore.cancelFilePreview(instanceId);
-                fileInputRef.value.value = '';
+                if (fileInputRef.value) fileInputRef.value.value = '';
               "
               class="cancel-preview-button"
             >
@@ -1292,6 +1306,7 @@ watch(
       </div>
     </div>
   </div>
+
   <div v-else>正在加載貼文...</div>
   <Navbar />
 </template>
