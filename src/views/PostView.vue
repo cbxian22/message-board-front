@@ -1208,7 +1208,9 @@ watch(
               <input
                 type="file"
                 ref="localFileInputRef"
-                @change="fileUploadStore.handleFileUpload(instanceId, $event)"
+                @change="
+                  fileUploadStore.handleFileUpload(instanceId, $event, message)
+                "
                 class="file-input"
                 style="display: none"
               />

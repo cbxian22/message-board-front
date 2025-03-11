@@ -1,10 +1,8 @@
 import { defineStore } from "pinia";
-import { ref, computed } from "vue";
-import { useMessage } from "naive-ui";
+import { ref } from "vue";
 
 export const useFileUploadStore = defineStore("fileUpload", () => {
-  const files = ref({}); // 儲存多個檔案狀態，key 為組件 ID
-  const message = useMessage();
+  const files = ref({});
 
   const getFileType = (fileOrUrl) => {
     if (typeof fileOrUrl === "string") {
@@ -27,7 +25,7 @@ export const useFileUploadStore = defineStore("fileUpload", () => {
     }
   };
 
-  const handleFileUpload = (instanceId, event) => {
+  const handleFileUpload = (instanceId, event, message) => {
     const selectedFile = event.target.files[0];
     if (!selectedFile) return;
 
