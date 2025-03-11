@@ -65,8 +65,12 @@ const getFileType = (fileOrUrl) => {
 
 const isPreviewImage = computed(() => getFileType(file.value) === "image");
 const isPreviewVideo = computed(() => getFileType(file.value) === "video");
-const isImage = (url) => getFileType(url) === "image";
-const isVideo = (url) => getFileType(url) === "video";
+const isImage = (url) => {
+  return getFileType(url) === "image";
+};
+const isVideo = (url) => {
+  return getFileType(url) === "video";
+};
 
 // 回覆＿打開 Modal
 const openModal = (event, replyId) => {
