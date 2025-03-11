@@ -46,16 +46,6 @@
               </div>
 
               <!-- 圖片預覽區域 -->
-              <!-- <div v-if="fileUrl" class="file-preview">
-                <img :src="fileUrl" alt="File Preview" class="preview-img" />
-                <button
-                  @click="cancelFilePreview"
-                  class="cancel-preview-button"
-                >
-                  <img :src="Closeicon" alt="Closeicon" />
-                </button>
-              </div> -->
-              <!--  -->
               <div v-if="fileUrl">
                 <div class="file-preview">
                   <img
@@ -79,7 +69,6 @@
                   </button>
                 </div>
               </div>
-              <!--  -->
             </div>
           </div>
         </div>
@@ -183,21 +172,6 @@ const triggerFileInput = () => {
 };
 
 // 貼文＿檢查檔案上傳處理，並顯示預覽
-// const handleFileUpload = (event) => {
-//   const selectedFile = event.target.files[0];
-//   if (selectedFile) {
-//     console.log("檔案已選擇:", selectedFile.name);
-//     if (selectedFile.type.startsWith("image/")) {
-//       const reader = new FileReader();
-//       reader.onload = (e) => {
-//         fileUrl.value = e.target.result;
-//       };
-//       reader.readAsDataURL(selectedFile);
-//     }
-//     file.value = selectedFile;
-//   }
-// };
-
 const handleFileUpload = (event) => {
   const selectedFile = event.target.files[0];
   if (!selectedFile) return;
@@ -229,11 +203,6 @@ const handleFileUpload = (event) => {
 };
 
 // 貼文＿取消檔案預覽，重設檔案選擇
-// const cancelFilePreview = () => {
-//   fileUrl.value = null;
-//   file.value = null;
-// };
-
 const cancelFilePreview = () => {
   if (fileUrl.value) URL.revokeObjectURL(fileUrl.value);
   fileUrl.value = null;

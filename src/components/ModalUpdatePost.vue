@@ -44,7 +44,7 @@
                 </button>
               </div>
 
-              <div v-if="fileUrl" class="file-preview">
+              <!-- <div v-if="fileUrl" class="file-preview">
                 <img :src="fileUrl" alt="File Preview" class="preview-img" />
                 <button
                   @click="cancelFilePreview"
@@ -52,6 +52,30 @@
                 >
                   <img :src="Closeicon" alt="Closeicon" />
                 </button>
+              </div> -->
+              <!-- 圖片預覽區域 -->
+              <div v-if="fileUrl">
+                <div class="file-preview">
+                  <img
+                    v-if="isPreviewImage"
+                    :src="fileUrl"
+                    alt="File Preview"
+                    class="preview-img"
+                  />
+                  <video
+                    v-else-if="isPreviewVideo"
+                    :src="fileUrl"
+                    controls
+                    class="preview-video"
+                    preload="auto"
+                  />
+                  <button
+                    @click="cancelFilePreview"
+                    class="cancel-preview-button"
+                  >
+                    <img :src="Closeicon" alt="Close icon" />
+                  </button>
+                </div>
               </div>
             </div>
           </div>
@@ -79,7 +103,7 @@
 </template>
 
 <script setup>
-import { ref, nextTick, watch, computed, onMounted } from "vue";
+import { ref, nextTick, watch, computed, onMounted, onUnmounted } from "vue";
 import {
   NButton,
   useLoadingBar,
@@ -140,6 +164,23 @@ const handleVisibilitySelect = (key) => {
   );
 };
 
+// 檔案類型檢查
+const getFileType = (fileOrUrl) => {
+  if (typeof fileOrUrl === "string") {
+    const ext = fileOrUrl.split(".").pop().toLowerCase();
+    if (["jpg", "jpeg", "png", "gif", "bmp", "webp"].includes(ext))
+      return "image";
+    if (["mp4", "webm", "ogg", "mov"].includes(ext)) return "video";
+  } else if (fileOrUrl?.type) {
+    if (fileOrUrl.type.startsWith("image/")) return "image";
+    if (fileOrUrl.type.startsWith("video/")) return "video";
+  }
+  return null;
+};
+
+const isPreviewImage = computed(() => getFileType(file.value) === "image");
+const isPreviewVideo = computed(() => getFileType(file.value) === "video");
+
 // 檢查是否啟用提交按鈕
 const isSubmitDisabled = computed(() => {
   if (!postData.value) {
@@ -193,25 +234,59 @@ const triggerFileInput = () => {
 };
 
 // 處理檔案上傳並顯示預覽
+// const handleFileUpload = (event) => {
+//   const selectedFile = event.target.files[0];
+//   if (selectedFile) {
+//     console.log("檔案已選擇:", selectedFile.name);
+//     if (selectedFile.type.startsWith("image/")) {
+//       const reader = new FileReader();
+//       reader.onload = (e) => {
+//         fileUrl.value = e.target.result;
+//       };
+//       reader.readAsDataURL(selectedFile);
+//     }
+//     file.value = selectedFile;
+//   }
+// };
 const handleFileUpload = (event) => {
   const selectedFile = event.target.files[0];
-  if (selectedFile) {
-    console.log("檔案已選擇:", selectedFile.name);
+  if (!selectedFile) return;
+
+  if (fileUrl.value) URL.revokeObjectURL(fileUrl.value);
+  file.value = selectedFile;
+
+  try {
     if (selectedFile.type.startsWith("image/")) {
       const reader = new FileReader();
       reader.onload = (e) => {
         fileUrl.value = e.target.result;
       };
+      reader.onerror = () => {
+        message.error("圖片讀取失敗！");
+      };
       reader.readAsDataURL(selectedFile);
+    } else if (selectedFile.type.startsWith("video/")) {
+      fileUrl.value = URL.createObjectURL(selectedFile);
+    } else {
+      file.value = null;
+      message.error("僅支援圖片和影片檔案！");
     }
-    file.value = selectedFile;
+  } catch (error) {
+    file.value = null;
+    fileUrl.value = null;
+    message.error("檔案處理失敗，請重試！");
   }
 };
-
 // 取消檔案預覽
+// const cancelFilePreview = () => {
+//   fileUrl.value = null;
+//   file.value = null;
+// };
 const cancelFilePreview = () => {
+  if (fileUrl.value) URL.revokeObjectURL(fileUrl.value);
   fileUrl.value = null;
   file.value = null;
+  if (fileInputRef.value) fileInputRef.value.value = null;
 };
 
 // 獨立處理圖片上傳
@@ -347,6 +422,11 @@ onMounted(() => {
   }
 });
 
+onUnmounted(() => {
+  if (fileUrl.value) URL.revokeObjectURL(fileUrl.value);
+  if (fileInputRef.value) fileInputRef.value.value = null;
+});
+
 // 監聽 postId 變化
 watch(
   () => props.postId,
@@ -478,7 +558,8 @@ watch(
   position: relative;
 }
 
-.preview-img {
+.preview-img,
+.preview-video {
   max-width: 100%;
   max-height: 200px;
   object-fit: contain;
