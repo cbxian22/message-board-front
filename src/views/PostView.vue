@@ -763,7 +763,7 @@ watch(
 
 .file-preview {
   margin-top: 10px;
-  text-align: flex-start;
+  text-align: center;
   position: relative;
 }
 
