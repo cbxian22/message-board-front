@@ -785,6 +785,7 @@ const postId = route.params.id;
 
 // 是否有未儲存的變更
 const hasUnsavedChanges = computed(() => {
+  if (!editingReplyId.value || !isEditing.value) return false;
   const reply = replies.value.find((r) => r.id === editingReplyId.value);
   if (!reply || !isEditing.value) return false;
   return (
@@ -901,6 +902,11 @@ const handleUpdate = async (replyId) => {
     });
 
     if (!shouldProceed) return;
+  }
+
+  if (!replies.value || !replies.value.length) {
+    console.warn("Replies not loaded yet");
+    return;
   }
 
   const reply = replies.value.find((r) => r.id === replyId);
