@@ -606,37 +606,28 @@ onUnmounted(() => {
               <n-badge :value="reply.likes || 0" />
             </div>
           </li>
-          <li
-            class="else-upload-li"
-            v-if="isEditing && editingReplyId === reply.id"
-          >
+          <li v-if="isEditing && editingReplyId === reply.id">
             <input
               type="file"
               :ref="(el) => (fileInputRefs[reply.id] = el)"
               @change="handleFileUpload"
               style="display: none"
             />
-            <button @click="triggerFileInput(reply.id)" class="else-upload">
+            <button @click="triggerFileInput(reply.id)" class="add-file-btn">
               <img :src="Noteicon" alt="新增檔案" />
             </button>
           </li>
-          <li
-            class="else-upload-li"
-            v-if="isEditing && editingReplyId === reply.id"
-          >
+          <li v-if="isEditing && editingReplyId === reply.id">
             <button
               @click="handleMessage"
               :disabled="isSubmitDisabled"
-              class="else-upload"
+              class="save-btn"
             >
               儲存
             </button>
           </li>
-          <li
-            class="else-upload-li"
-            v-if="isEditing && editingReplyId === reply.id"
-          >
-            <button @click="cancelEdit" class="else-upload">取消</button>
+          <li v-if="isEditing && editingReplyId === reply.id">
+            <button @click="cancelEdit" class="cancel-btn">取消</button>
           </li>
         </ul>
       </div>
@@ -704,7 +695,7 @@ onUnmounted(() => {
   list-style-type: none;
 }
 
-.reply-count .else-upload {
+.reply-count {
   display: flex;
   flex-direction: row;
   align-items: center;
