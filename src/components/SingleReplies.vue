@@ -783,6 +783,17 @@ const isLikeProcessing = ref(false);
 
 const postId = route.params.id;
 
+// 是否有未儲存的變更
+const hasUnsavedChanges = computed(() => {
+  const reply = replies.value.find((r) => r.id === editingReplyId.value);
+  if (!reply || !isEditing.value) return false;
+  return (
+    content.value !== reply.content ||
+    (fileUrl.value !== reply.file_url && fileUrl.value !== null) ||
+    file.value !== null
+  );
+});
+
 // 檢查檔案類型
 const getFileType = (fileOrUrl) => {
   if (typeof fileOrUrl === "string") {
@@ -868,9 +879,20 @@ const handleUpdate = (replyId) => {
     modalState.value[key] = false;
   });
 
-  // 如果已在編輯其他回覆，先取消之前的編輯
-  if (isEditing.value && editingReplyId.value !== replyId) {
-    cancelEdit();
+  // 如果已在編輯其他回覆且有未儲存變更，提示確認
+  if (
+    isEditing.value &&
+    editingReplyId.value !== replyId &&
+    hasUnsavedChanges.value
+  ) {
+    dialog.warning({
+      content: "您有未儲存的變更，確定要編輯其他回覆嗎？",
+      positiveText: "確定",
+      negativeText: "取消",
+      onPositiveClick: () => {
+        cancelEdit(); // 否則清理當前編輯
+      },
+    });
   }
 
   const reply = replies.value.find((r) => r.id === replyId);
@@ -886,17 +908,24 @@ const handleUpdate = (replyId) => {
 
 // 取消編輯
 const cancelEdit = () => {
-  isEditing.value = false;
-  editingReplyId.value = null;
-  content.value = "";
-  if (
-    fileUrl.value &&
-    !replies.value.some((r) => r.file_url === fileUrl.value)
-  ) {
-    URL.revokeObjectURL(fileUrl.value); // 清理非原始檔案的預覽
-  }
-  fileUrl.value = null;
-  file.value = null;
+  dialog.warning({
+    content: "您有未儲存的變更，確定要編輯其他回覆嗎？",
+    positiveText: "確定",
+    negativeText: "取消",
+    onPositiveClick: () => {
+      isEditing.value = false;
+      editingReplyId.value = null;
+      content.value = "";
+      if (
+        fileUrl.value &&
+        !replies.value.some((r) => r.file_url === fileUrl.value)
+      ) {
+        URL.revokeObjectURL(fileUrl.value); // 清理非原始檔案的預覽
+      }
+      fileUrl.value = null;
+      file.value = null;
+    },
+  });
 };
 
 // 觸發檔案輸入
