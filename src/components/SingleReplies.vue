@@ -547,48 +547,6 @@ onUnmounted(() => {
             placeholder="編輯您的回覆..."
             class="edit-textarea"
           ></textarea>
-
-          <!-- <input
-            type="file"
-            :ref="(el) => (fileInputRefs[reply.id] = el)"
-            @change="handleFileUpload"
-            style="display: none"
-          />
-          <div class="edit-actions">
-            <button @click="triggerFileInput(reply.id)" class="add-file-btn">
-              <img :src="Noteicon" alt="新增檔案" />
-            </button>
-            <button
-              @click="handleMessage"
-              :disabled="isSubmitDisabled"
-              class="save-btn"
-            >
-              儲存
-            </button>
-            <button @click="cancelEdit" class="cancel-btn">取消</button>
-          </div> -->
-
-          <!-- 檔案預覽 -->
-          <!-- <div v-if="fileUrl">
-            <div class="file-preview">
-              <img
-                v-if="isPreviewImage"
-                :src="fileUrl"
-                alt="File Preview"
-                class="preview-img"
-              />
-              <video
-                v-else-if="isPreviewVideo"
-                :src="fileUrl"
-                controls
-                class="preview-video"
-                preload="auto"
-              />
-              <button @click="cancelFilePreview" class="cancel-preview-button">
-                <img :src="Closeicon" alt="Close icon" />
-              </button>
-            </div>
-          </div> -->
         </template>
       </div>
 
@@ -638,7 +596,7 @@ onUnmounted(() => {
         </ul>
       </div>
 
-      <div v-if="fileUrl">
+      <div v-if="fileUrl" class="file-preview-container">
         <div class="file-preview">
           <img
             v-if="isPreviewImage"
@@ -846,6 +804,10 @@ onUnmounted(() => {
   color: rgb(0, 0, 0);
 }
 
+.file-preview-container {
+  display: flex;
+}
+
 .preview-img,
 .preview-video {
   max-width: 100%;
@@ -860,12 +822,6 @@ onUnmounted(() => {
   text-align: center;
   position: relative;
 }
-
-/* .edit-actions {
-  margin-top: 10px;
-  display: flex;
-  gap: 10px;
-} */
 
 .cancel-preview-button {
   position: absolute;
