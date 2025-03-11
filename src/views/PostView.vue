@@ -872,8 +872,12 @@ const isLikeProcessing = ref(false);
 const textareaRef = ref(null);
 const content = ref("");
 const isModalOpen = ref(false);
-const localFileInputRef = ref(null);
+const fileInputRef = ref(null);
 const instanceId = route.params.id;
+
+const postFileType = computed(() =>
+  fileUploadStore.getFileType(post.value?.file_url)
+);
 
 const checkTokenAndOpenModal = (id) => {
   if (!authStore.userId || !authStore.accessToken) {
@@ -1004,6 +1008,14 @@ const isSubmitDisabled = computed(
   () => !(content.value.trim() || fileUploadStore.getFile(instanceId))
 );
 
+const triggerFileInput = () => {
+  if (!authStore.userId || !authStore.accessToken) {
+    emitter.emit("openLoginModal");
+  } else {
+    fileInputRef.value?.click();
+  }
+};
+
 const uploadFile = async () => {
   const file = fileUploadStore.getFile(instanceId);
   if (!file) return null;
@@ -1017,6 +1029,7 @@ const uploadFile = async () => {
     return data.fileUrl;
   } catch (error) {
     console.error("檔案上傳失敗:", error);
+    message.error("檔案上傳失敗，請稍後再試！");
     return null;
   }
 };
@@ -1039,6 +1052,7 @@ const handleMessage = async (postId) => {
     if (response.status === 201) {
       content.value = "";
       fileUploadStore.cancelFilePreview(instanceId);
+      if (fileInputRef.value) fileInputRef.value.value = ""; // 重置檔案輸入
       message.success("回覆成功！");
     } else {
       message.error("回覆失敗！");
@@ -1056,7 +1070,7 @@ const adjustTextareaHeight = () => {
   const textarea = textareaRef.value;
   if (textarea) {
     textarea.style.height = "auto";
-    textarea.style.height = `${Math.min(textarea.scrollHeight)}px`;
+    textarea.style.height = `${textarea.scrollHeight}px`; // 修正高度計算
   }
 };
 
@@ -1083,10 +1097,9 @@ watch(
   { immediate: true }
 );
 </script>
-
 <template>
   <NavbarUp />
-  <div class="container-box container" v-if="post">
+  <div v-if="post" class="container-box container">
     <div class="comment-box">
       <div class="photo-content">
         <router-link :to="`/@${post.name}`">
@@ -1157,7 +1170,7 @@ watch(
           <p>{{ post.content }}</p>
           <span v-if="post.file_url">
             <n-image
-              v-if="fileUploadStore.getFileType(post.file_url) === 'image'"
+              v-if="postFileType === 'image'"
               :src="post.file_url"
               alt="post media"
               lazy
@@ -1168,10 +1181,7 @@ watch(
                 <div class="media-placeholder">Loading Image...</div>
               </template>
             </n-image>
-            <div
-              v-else-if="fileUploadStore.getFileType(post.file_url) === 'video'"
-              class="video-wrapper"
-            >
+            <div v-else-if="postFileType === 'video'" class="video-wrapper">
               <video
                 :src="post.file_url"
                 controls
@@ -1205,54 +1215,27 @@ watch(
           </ul>
           <div class="user-content">
             <div class="file-upload-container">
-              <input
-                type="file"
-                ref="localFileInputRef"
-                @change="
-                  fileUploadStore.handleFileUpload(instanceId, $event, message)
-                "
-                class="file-input"
-                style="display: none"
-              />
-              <button
-                type="button"
-                @click="
-                  fileUploadStore.triggerFileInput(
-                    instanceId,
-                    authStore,
-                    localFileInputRef
-                  )
-                "
-                class="submit-button"
-              >
-                <img :src="Noteicon" alt="Note icon" />
-              </button>
-
-              <div
-                v-if="fileUploadStore.getFileUrl(instanceId)"
-                class="file-preview-wrapper"
-              >
-                <div class="file-preview">
-                  <img
-                    v-if="fileUploadStore.isPreviewImage(instanceId)"
-                    :src="fileUploadStore.getFileUrl(instanceId)"
-                    alt="File Preview"
-                    class="preview-img"
-                  />
-                  <video
-                    v-else-if="fileUploadStore.isPreviewVideo(instanceId)"
-                    :src="fileUploadStore.getFileUrl(instanceId)"
-                    controls
-                    class="preview-video"
-                    preload="auto"
-                  />
-                  <button
-                    @click="fileUploadStore.cancelFilePreview(instanceId)"
-                    class="cancel-preview-button"
-                  >
-                    <img :src="Closeicon" alt="Close icon" />
-                  </button>
-                </div>
+              <div class="file-upload-select">
+                <input
+                  type="file"
+                  ref="fileInputRef"
+                  @change="
+                    fileUploadStore.handleFileUpload(
+                      instanceId,
+                      $event,
+                      message
+                    )
+                  "
+                  class="file-input"
+                  style="display: none"
+                />
+                <button
+                  type="button"
+                  @click="triggerFileInput"
+                  class="submit-button"
+                >
+                  <img :src="Noteicon" alt="Note icon" />
+                </button>
               </div>
             </div>
 
@@ -1276,13 +1259,43 @@ watch(
             </div>
           </div>
         </div>
+
+        <div
+          v-if="fileUploadStore.getFileUrl(instanceId)"
+          class="file-preview-wrapper"
+        >
+          <div class="file-preview">
+            <img
+              v-if="fileUploadStore.isPreviewImage(instanceId)"
+              :src="fileUploadStore.getFileUrl(instanceId)"
+              alt="File Preview"
+              class="preview-img"
+            />
+            <video
+              v-else-if="fileUploadStore.isPreviewVideo(instanceId)"
+              :src="fileUploadStore.getFileUrl(instanceId)"
+              controls
+              class="preview-video"
+              preload="auto"
+            />
+            <button
+              @click="
+                fileUploadStore.cancelFilePreview(instanceId);
+                fileInputRef.value.value = '';
+              "
+              class="cancel-preview-button"
+            >
+              <img :src="Closeicon" alt="Close icon" />
+            </button>
+          </div>
+        </div>
       </div>
     </div>
-    <SingleReplies />
   </div>
   <div v-else>正在加載貼文...</div>
   <Navbar />
 </template>
+
 <style scoped>
 .container-box {
   width: 650px;
@@ -1291,42 +1304,35 @@ watch(
   justify-self: center;
   margin: 100px 0;
 }
-
 .comment-box {
   padding: 20px 25px 15px 25px;
   border-bottom: 0.5px solid #373737;
   display: flex;
 }
-
 .photo-content {
   margin-right: 15px;
 }
-
 .comment {
   display: flex;
   flex-direction: column;
   flex: 1;
 }
-
 .photo {
   border-radius: 50%;
   width: 50px;
   height: 50px;
   object-fit: cover;
 }
-
 .reply-section {
   display: flex;
   margin-left: -10px;
   align-items: flex-start;
 }
-
 .reply-section ul {
   display: flex;
   flex-direction: row;
   list-style-type: none;
 }
-
 .reply-count {
   display: flex;
   flex-direction: row;
@@ -1335,91 +1341,74 @@ watch(
   margin-right: 10px;
   cursor: pointer;
 }
-
 .reply-count .n-badge {
   --n-color: transition !important;
 }
-
 .reply-link {
   display: flex;
   align-items: center;
   justify-content: center;
 }
-
 .reply-count:hover,
 .info-link:hover {
   background-color: rgba(128, 128, 128, 0.15) !important;
   border-radius: 10px;
   transition: background-color 0.3s ease, color 0.3s ease;
 }
-
 .info {
   display: flex;
   flex-direction: row;
   justify-content: space-between;
 }
-
 .info-span {
   display: flex;
   align-items: center;
 }
-
 .info-span .comment-author {
   color: #fff;
   font-weight: 900;
   transition: color 0.3s ease;
 }
-
 .info-span .comment-author:hover {
   text-decoration: underline;
 }
-
 .light-mode .info-span .comment-author {
   color: #000;
   font-weight: 900;
   transition: color 0.3s ease;
 }
-
 .info-span .comment-time {
   margin-left: 10px;
   color: #707070;
 }
-
 .info-modal {
   position: relative;
 }
-
 .info-link {
   display: flex;
   align-items: center;
   justify-content: center;
   padding: 5px 10px;
 }
-
 .dark-mode .modal-overlay {
   background: rgb(24, 24, 24);
   transition: background-color 0.3s ease, color 0.3s ease;
 }
-
 .light-mode .modal-overlay {
   background: rgb(255, 255, 255);
   transition: background-color 0.3s ease, color 0.3s ease;
 }
-
 .dark-mode .modal-overlay .modal-content {
   background: rgb(24, 24, 24);
 }
-
 .light-mode .modal-overlay .modal-content {
   background: rgb(255, 255, 255);
 }
-
 .modal-content ul {
   list-style: none;
   padding: 0;
   margin: 0;
 }
-
 .info-modal .modal-link {
   width: 100%;
   display: flex;
@@ -1427,56 +1416,46 @@ watch(
   align-items: center;
   padding: 5px 10px;
 }
-
 .modal-link img {
   margin-right: 8px;
 }
-
 .comment-content {
   margin-bottom: 10px;
 }
-
 .comment-content p {
   margin-bottom: 10px;
   white-space: pre-wrap;
   word-wrap: break-word;
 }
-
 .n-image {
   width: 75%;
   max-width: 75%;
 }
-
 :deep(.n-image img) {
   max-width: 100%;
   object-fit: contain;
   max-height: 350px;
 }
-
 .video-wrapper {
   width: 75%;
   max-width: 75%;
 }
-
 .comment-video {
   width: 100%;
   height: auto;
   object-fit: contain;
 }
-
 .user-content {
   display: flex;
   flex-direction: row;
   align-items: flex-start;
   width: 100%;
 }
-
 .textarea-wrapper {
   display: flex;
   align-items: center;
   flex: 1;
 }
-
 .user-content textarea {
   border: none;
   outline: none;
@@ -1491,39 +1470,32 @@ watch(
   overflow-y: auto;
   min-height: 60px !important;
 }
-
 .user-content textarea::placeholder {
   color: #aaa;
   opacity: 0.7;
 }
-
 .user-content .file-upload-container {
   display: flex;
   flex-direction: column;
   align-items: flex-start;
 }
-
 .user-content .file-input {
   display: none;
 }
-
 .user-content .submit-button {
   background-color: transparent;
   border: none;
   cursor: pointer;
   padding: 5px;
 }
-
 .file-preview-wrapper {
   margin-left: 10px;
 }
-
 .file-preview {
   margin-top: 10px;
   text-align: flex-start;
   position: relative;
 }
-
 .preview-img,
 .preview-video {
   max-width: 100%;
@@ -1531,7 +1503,6 @@ watch(
   object-fit: contain;
   border-radius: 8px;
 }
-
 .cancel-preview-button {
   position: absolute;
   top: 0;
@@ -1548,24 +1519,20 @@ watch(
   align-items: center;
   border: none;
 }
-
 .message-form-end button {
   margin-top: 5px;
   padding: 10px 20px;
   border: 0.5px solid rgba(102, 102, 102, 0.5);
   border-radius: 10px;
 }
-
 .n-button {
   --n-text-color-hover: #000 !important;
   --n-border-hover: 1px solid #000 !important;
 }
-
 .dark-mode .n-button {
   --n-text-color-hover: #fff !important;
   --n-border-hover: 1px solid #fff !important;
 }
-
 .light-mode .user-content textarea {
   background-color: #f5f5f5;
   color: #000;
