@@ -219,22 +219,6 @@ const triggerFileInput = () => {
   }
 };
 
-// 回覆＿檢查檔案上傳處理，並顯示預覽
-// const handleFileUpload = (event) => {
-//   const selectedFile = event.target.files[0];
-//   if (selectedFile) {
-//     console.log("檔案已選擇:", selectedFile.name);
-//     if (selectedFile.type.startsWith("image/")) {
-//       const reader = new FileReader();
-//       reader.onload = (e) => {
-//         fileUrl.value = e.target.result;
-//       };
-//       reader.readAsDataURL(selectedFile);
-//     }
-//     file.value = selectedFile;
-//   }
-// };
-
 // 回覆＿處理檔案上傳與預覽
 const handleFileUpload = (event) => {
   const selectedFile = event.target.files[0];
@@ -266,13 +250,6 @@ const handleFileUpload = (event) => {
   }
 };
 
-// 回覆＿取消檔案預覽，重設檔案選擇
-// const cancelFilePreview = () => {
-//   fileUrl.value = null;
-//   file.value = null;
-// };
-
-// 取消預覽
 // 回覆＿取消預覽
 const cancelFilePreview = () => {
   if (fileUrl.value) URL.revokeObjectURL(fileUrl.value);
@@ -314,7 +291,6 @@ const handleMessage = async (postId) => {
       {
         content: content.value,
         fileUrl: uploadedFileUrl,
-        // parentId: post.value.id,
       }
     );
     if (response.status === 201) {
@@ -358,9 +334,6 @@ onUnmounted(() => {
   if (fileInputRef.value) fileInputRef.value.value = null;
   document.removeEventListener("mousedown", closeModal);
 });
-// onUnmounted(() => {
-//   document.removeEventListener("mousedown", closeModal);
-// });
 
 // 監聽內容，調整高度
 watch(
