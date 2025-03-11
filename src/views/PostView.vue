@@ -77,32 +77,22 @@ const closeModal = (event) => {
   }
 };
 
-// 貼文＿檔案類型檢查
-const isImage = (url) => {
-  const imageExtensions = [".jpg", ".jpeg", ".png", ".gif", ".bmp", ".webp"];
-  return imageExtensions.some((ext) => url.toLowerCase().endsWith(ext));
+// 檔案類型檢查
+const getFileType = (fileOrUrl) => {
+  if (typeof fileOrUrl === "string") {
+    const ext = fileOrUrl.split(".").pop().toLowerCase();
+    if (["jpg", "jpeg", "png", "gif", "bmp", "webp"].includes(ext))
+      return "image";
+    if (["mp4", "webm", "ogg", "mov"].includes(ext)) return "video";
+  } else if (fileOrUrl?.type) {
+    if (fileOrUrl.type.startsWith("image/")) return "image";
+    if (fileOrUrl.type.startsWith("video/")) return "video";
+  }
+  return null;
 };
 
-// 貼文＿檔案類型檢查
-const isVideo = (url) => {
-  const videoExtensions = [".mp4", ".webm", ".ogg", ".mov"];
-  return videoExtensions.some((ext) => url.toLowerCase().endsWith(ext));
-};
-
-const isPreviewImage = computed(() => {
-  const isImage = file.value && file.value.type?.startsWith("image/");
-  console.log("isPreviewImage:", isImage, "file type:", file.value?.type);
-  return isImage;
-});
-
-const isPreviewVideo = computed(() => {
-  const isVideo =
-    file.value &&
-    (file.value.type?.startsWith("video/") ||
-      file.value.type === "video/quicktime");
-  console.log("isPreviewVideo:", isVideo, "file type:", file.value?.type);
-  return isVideo;
-});
+const isPreviewImage = computed(() => getFileType(file.value) === "image");
+const isPreviewVideo = computed(() => getFileType(file.value) === "video");
 
 // 貼文＿獲取單一
 const fetchSingleComment = async (postId) => {
@@ -247,70 +237,22 @@ const triggerFileInput = () => {
 // };
 
 const handleFileUpload = async (event) => {
-  try {
-    console.log("handleFileUpload 開始執行");
-    const selectedFile = event.target.files[0];
-    if (!selectedFile) {
-      console.log("未選擇任何檔案");
-      return;
-    }
+  const selectedFile = event.target.files[0];
+  if (!selectedFile) return;
 
-    // 強制輸出檔案資訊
-    console.log("檔案已選擇:", selectedFile.name);
-    console.log("檔案類型 (type):", selectedFile.type || "未定義");
-    console.log("檔案大小:", selectedFile.size, "bytes");
+  if (fileUrl.value) URL.revokeObjectURL(fileUrl.value); // 清理舊 URL
+  file.value = selectedFile;
 
-    if (
-      fileUrl.value &&
-      file.value &&
-      (file.value.type?.startsWith("video/") ||
-        file.value.type === "video/quicktime")
-    ) {
-      URL.revokeObjectURL(fileUrl.value);
-      console.log("已清理舊的影片 Blob URL");
-    }
-
-    file.value = selectedFile;
-
-    // 根據 type 或副檔名判斷檔案類型
-    const fileExtension = selectedFile.name.split(".").pop().toLowerCase();
-    console.log("檔案副檔名:", fileExtension);
-
-    if (
-      selectedFile.type?.startsWith("image/") ||
-      ["jpg", "jpeg", "png", "gif", "bmp", "webp"].includes(fileExtension)
-    ) {
-      console.log("進入圖片處理分支");
-      const reader = new FileReader();
-      reader.onload = (e) => {
-        fileUrl.value = e.target.result;
-        console.log("圖片預覽 URL 已生成:", fileUrl.value.slice(0, 50) + "...");
-        nextTick(() => console.log("圖片 URL 已更新，應觸發渲染"));
-      };
-      reader.onerror = (e) => console.error("圖片讀取錯誤:", e);
-      reader.readAsDataURL(selectedFile);
-    } else if (
-      selectedFile.type?.startsWith("video/") ||
-      selectedFile.type === "video/quicktime" ||
-      ["mp4", "webm", "ogg", "mov"].includes(fileExtension)
-    ) {
-      console.log("進入影片處理分支");
-      fileUrl.value = URL.createObjectURL(selectedFile);
-      console.log("影片預覽 URL 已生成:", fileUrl.value);
-      await nextTick();
-      console.log("影片 URL 已更新，應觸發渲染");
-    } else {
-      console.log(
-        "不支援的檔案類型 - type:",
-        selectedFile.type || "未定義",
-        "副檔名:",
-        fileExtension
-      );
-      message.error("僅支援圖片和影片檔案！");
-    }
-  } catch (error) {
-    console.error("處理檔案上傳時發生錯誤:", error);
-    message.error("檔案處理失敗，請重試！");
+  if (selectedFile.type.startsWith("image/")) {
+    const reader = new FileReader();
+    reader.onload = (e) => {
+      fileUrl.value = e.target.result;
+    };
+    reader.readAsDataURL(selectedFile);
+  } else if (selectedFile.type.startsWith("video/")) {
+    fileUrl.value = URL.createObjectURL(selectedFile);
+  } else {
+    message.error("僅支援圖片和影片檔案！");
   }
 };
 
@@ -320,23 +262,12 @@ const handleFileUpload = async (event) => {
 //   file.value = null;
 // };
 
+// 取消預覽
 const cancelFilePreview = () => {
-  if (
-    fileUrl.value &&
-    file.value &&
-    (file.value.type?.startsWith("video/") ||
-      file.value.type === "video/quicktime")
-  ) {
-    URL.revokeObjectURL(fileUrl.value);
-    console.log("已清理影片 Blob URL");
-  }
+  if (fileUrl.value) URL.revokeObjectURL(fileUrl.value);
   fileUrl.value = null;
   file.value = null;
-  // 重置檔案輸入
-  if (fileInputRef.value) {
-    fileInputRef.value.value = null;
-    console.log("已重置檔案輸入");
-  }
+  if (fileInputRef.value) fileInputRef.value.value = null;
 };
 
 // 回覆＿獨立處理圖片上傳
@@ -606,15 +537,11 @@ watch(
         </div> -->
         <div v-if="fileUrl" class="file-preview-wrapper">
           <div class="file-preview">
-            <img
-              v-if="isPreviewImage"
-              :src="fileUrl"
-              alt="File Preview"
-              class="preview-img"
-            />
+            <img v-if="getFileType(post.file_url) === 'image'""
+            :src="post.file_url" alt="File Preview" class="preview-img" />
             <video
-              v-else-if="isPreviewVideo"
-              :src="fileUrl"
+              v-else-if="getFileType(post.file_url) === 'video'"
+              :src="post.file_url"
               controls
               class="preview-video"
               preload="auto"
