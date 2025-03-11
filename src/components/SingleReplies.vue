@@ -897,12 +897,13 @@ const handleUpdate = async (replyId) => {
         onNegativeClick: () => {
           resolve(false); // 保持當前編輯
           nextTick(() => {
-            adjustTextareaHeight(replyId);
-            const textarea = textareas.value[replyId];
+            const currentReplyId = editingReplyId.value; // 使用當前編輯的 replyId
+            adjustTextareaHeight(currentReplyId);
+            const textarea = textareas.value[currentReplyId];
             if (textarea) {
               textarea.focus();
             } else {
-              console.warn(`Textarea for reply ${replyId} not found.`);
+              console.warn(`Textarea for reply ${currentReplyId} not found.`);
             }
           });
         },
