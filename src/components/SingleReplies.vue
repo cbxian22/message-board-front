@@ -785,7 +785,6 @@ const postId = route.params.id;
 
 // 是否有未儲存的變更
 const hasUnsavedChanges = computed(() => {
-  if (!editingReplyId.value || !isEditing.value) return false;
   const reply = replies.value.find((r) => r.id === editingReplyId.value);
   if (!reply || !isEditing.value) return false;
   return (
@@ -866,7 +865,6 @@ const fetchReplies = async (postId) => {
   } catch (error) {
     console.error("取得回覆錯誤:", error);
     message.error("回覆載入失敗");
-    replies.value = [];
   }
 };
 
@@ -903,11 +901,6 @@ const handleUpdate = async (replyId) => {
     });
 
     if (!shouldProceed) return;
-  }
-
-  if (!replies.value || !replies.value.length) {
-    console.warn("Replies not loaded yet");
-    return;
   }
 
   const reply = replies.value.find((r) => r.id === replyId);
@@ -1232,7 +1225,7 @@ onUnmounted(() => {
                   v-if="
                     authStore.isLoggedIn &&
                     authStore.accountName === reply.name &&
-                    editingReplyId.value !== reply.id
+                    !reply.id
                   "
                 >
                   <button class="modal-link" @click="handleUpdate(reply.id)">
