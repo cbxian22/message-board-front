@@ -1225,7 +1225,7 @@ onUnmounted(() => {
                   v-if="
                     authStore.isLoggedIn &&
                     authStore.accountName === reply.name &&
-                    !reply.id
+                    editingReplyId.value === null
                   "
                 >
                   <button class="modal-link" @click="handleUpdate(reply.id)">
