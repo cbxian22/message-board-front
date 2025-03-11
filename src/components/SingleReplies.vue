@@ -839,6 +839,7 @@ const closeModal = (event) => {
     Object.keys(modalState.value).forEach((key) => {
       modalState.value[key] = false;
     });
+    event.preventDefault();
   }
 };
 
@@ -898,10 +899,20 @@ const handleUpdate = async (replyId) => {
           resolve(false); // 保持當前編輯
           nextTick(() => {
             const currentReplyId = editingReplyId.value; // 使用當前編輯的 replyId
-            adjustTextareaHeight(currentReplyId);
             const textarea = textareas.value[currentReplyId];
             if (textarea) {
+              adjustTextareaHeight(currentReplyId);
               textarea.focus();
+              textarea.select(); // 選中文字，增強聚焦效果
+              // 檢查焦點是否生效
+              if (document.activeElement !== textarea) {
+                console.warn(
+                  "Focus failed, active element is:",
+                  document.activeElement
+                );
+                // 強制恢復焦點
+                textarea.focus();
+              }
             } else {
               console.warn(`Textarea for reply ${currentReplyId} not found.`);
             }
@@ -909,7 +920,6 @@ const handleUpdate = async (replyId) => {
         },
       });
     });
-
     if (!shouldProceed) return; // 如果用戶選擇「取消」，停止執行
   }
 
