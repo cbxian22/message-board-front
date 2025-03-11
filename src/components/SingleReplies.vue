@@ -896,12 +896,15 @@ const handleUpdate = async (replyId) => {
         },
         onNegativeClick: () => {
           resolve(false); // 保持當前編輯
-          const textarea = textareas.value[replyId];
-          if (textarea) {
-            textarea.focus();
-          } else {
-            console.warn(`Textarea for reply ${replyId} not found.`);
-          }
+          nextTick(() => {
+            adjustTextareaHeight(replyId);
+            const textarea = textareas.value[replyId];
+            if (textarea) {
+              textarea.focus();
+            } else {
+              console.warn(`Textarea for reply ${replyId} not found.`);
+            }
+          });
         },
       });
     });
