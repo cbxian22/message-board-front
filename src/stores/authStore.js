@@ -335,6 +335,23 @@ export const useAuthStore = defineStore("auth", {
         message.error("無法獲取用戶資料，請稍後再試", { duration: 5000 }); // 添加錯誤提示
       }
     },
+    login(data) {
+      const { success, accessToken, refreshToken } = data;
+      if (!success || !accessToken || !refreshToken) return;
+
+      const decodedToken = verifyToken(accessToken);
+      if (!decodedToken) return;
+
+      this.isLoggedIn = true;
+      this.userId = decodedToken.userId;
+      this.accessToken = accessToken;
+      this.refreshToken = refreshToken;
+      localStorage.setItem("accessToken", accessToken);
+      localStorage.setItem("refreshToken", refreshToken);
+      localStorage.setItem("userId", this.userId);
+
+      this.fetchUserData();
+    },
     async refreshAccessToken() {
       const message = useMessage(); // 在方法內部獲取 message
       const refreshToken = localStorage.getItem("refreshToken");
