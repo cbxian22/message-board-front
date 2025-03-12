@@ -36,7 +36,7 @@
           </div>
         </div>
         <p v-else class="no-friend">載入中...</p>
-        <p v-if="friends.length === 0" class="no-friend">暫無好友</p>
+        <p v-else="friends.length === 0" class="no-friend">暫無好友</p>
       </div>
     </div>
   </div>
