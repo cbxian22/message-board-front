@@ -247,6 +247,7 @@ h2 {
 }
 
 .no-friend {
+  color: #666;
   display: flex;
   padding: 20px 30px;
 }

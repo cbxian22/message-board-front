@@ -1,26 +1,34 @@
 <!-- ChatHistory.vue -->
 <template>
-  <div class="history-container">
-    <div class="header">
-      <router-link to="/" class="back-button">返回好友</router-link>
-      <h2>聊天記錄</h2>
+  <NavbarUp />
+  <div class="container-box">
+    <div class="back-icon">
+      <router-link to="#" @click.prevent="$router.back()">
+        <img class="icon" :src="Backicon" alt="Backicon" />
+      </router-link>
     </div>
-    <div class="history-list">
-      <div
-        v-for="chat in chatHistory"
-        :key="chat.friendId"
-        class="history-item"
-        @click="goToChat(chat.friendId)"
-      >
-        <img :src="chat.avatar_url" :alt="chat.name" class="avatar" />
-        <div class="chat-info">
-          <span class="friend-name">{{ chat.name }}</span>
-          <span class="last-message">{{ chat.lastMessage }}</span>
+    <div class="container">
+      <h2>信息</h2>
+      <div class="chat-list">
+        <p v-if="isLoading" class="no-chat">載入中...</p>
+
+        <div
+          v-for="chat in chatHistory"
+          :key="chat.friendId"
+          class="history-item"
+          @click="goToChat(chat.friendId)"
+        >
+          <img :src="chat.avatar_url" :alt="chat.name" class="avatar" />
+          <div class="info-name-message">
+            <span class="friend-name">{{ chat.name }}</span>
+            <span class="last-message">{{ chat.lastMessage }}</span>
+          </div>
         </div>
+        <p v-if="chatHistory.length === 0" class="no-friend">暫無聊天記錄</p>
       </div>
-      <p v-if="chatHistory.length === 0">暫無聊天記錄</p>
     </div>
   </div>
+  <Navbar />
 </template>
 
 <script setup>
@@ -28,10 +36,19 @@ import { ref, onMounted } from "vue";
 import { useRouter } from "vue-router";
 import { openDB } from "idb";
 import apiClient from "../stores/axiosConfig";
+import { useMessage, useLoadingBar, useDialog } from "naive-ui";
+
+import Navbar from "../components/Navbar.vue";
+import NavbarUp from "../components/NavbarUp.vue";
+
+import Backicon from "../assets/Backicon.svg";
 
 const router = useRouter();
 const chatHistory = ref([]);
-const friends = ref([]);
+// const friends = ref([]);
+const dialog = useDialog();
+const loadingBar = useLoadingBar();
+const message = useMessage();
 const db = ref(null);
 const currentUserId = ref(null);
 
@@ -44,11 +61,30 @@ const initDB = async () => {
   });
 };
 
+const friends = [
+  {
+    id: 4,
+    name: "胡摩豬",
+    accountname: "shan4",
+    lastMessage: "sdfsdfsdfsdfsdfsdf",
+    avatar_url:
+      "https://storage.googleapis.com/message_board_storage/1000006562.jpg",
+  },
+  {
+    id: 34,
+    name: "麥香2",
+    accountname: "50150134",
+    lastMessage:
+      "sdfsdfsdfsdfsdfssdfsdfsdfsdfsdfsdfsdfsdfsdfsdfsdfsdfsdfsdfsdfsdfsdfsdfsdfsdfsdfsdfsdfsdfdf",
+    avatar_url:
+      "https://storage.googleapis.com/message_board_storage/S__162439172.jpg",
+  },
+];
+
 // 獲取好友清單
 const fetchFriends = async () => {
   try {
-    const response = await apiClient.get("friends"); // 注意：這裡應為 "/api/friends"，之前是 "/friends"
-    friends.value = response.data;
+    const response = await apiClient.get("friends");
     console.log("獲取好友清單:", friends.value);
     await loadChatHistory();
   } catch (err) {
@@ -73,7 +109,7 @@ const fetchCurrentUser = async () => {
       "獲取用戶 ID 失敗:",
       err.response?.data?.message || err.message
     );
-    router.push("/login"); // 跳轉至登入頁面
+    // router.push("/login"); // 跳轉至登入頁面
   }
 };
 
@@ -126,67 +162,58 @@ onMounted(async () => {
 </script>
 
 <style scoped>
-.history-container {
-  max-width: 600px;
-  margin: 0 auto;
-  padding: 20px;
-  background-color: #f5f5f5;
-  min-height: 100vh;
-}
-
-.header {
+.container-box {
+  width: 650px;
   display: flex;
-  align-items: center;
-  gap: 20px;
-  padding-bottom: 10px;
+  flex-direction: column;
+  justify-self: center;
+  margin: 100px 0;
+  margin-top: calc(100px - 44px);
 }
 
-.back-button {
-  text-decoration: none;
-  color: #007bff;
-  font-size: 14px;
+.back-icon {
+  margin: 15px 0 15px 5px;
+  display: flex;
 }
 
-.back-button:hover {
-  text-decoration: underline;
+.back-icon a {
+  display: flex;
 }
 
 h2 {
-  font-size: 20px;
-  color: #333;
-  margin: 0;
-}
-
-.history-list {
-  background-color: #ffffff;
-  border-radius: 10px;
-  padding: 15px;
-  box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1);
+  padding: 20px 30px;
+  cursor: default;
+  border-bottom: 0.5px solid #373737;
 }
 
 .history-item {
   display: flex;
   align-items: center;
-  padding: 10px;
+  padding: 20px 30px;
+  border-bottom: 0.5px solid #373737;
   cursor: pointer;
-  border-bottom: 1px solid #e0e0e0;
-  transition: background-color 0.2s;
+  gap: 20px;
+}
+
+.history-item:hover {
+  background-color: #373737 !important;
+}
+
+.history-item .avatar {
+  width: 50px;
+  height: 50px;
+  border-radius: 50%;
+  object-fit: cover;
+}
+
+.info-name-message {
+  display: flex;
+  flex-direction: column;
+  width: 50%;
 }
 
 .history-item:last-child {
   border-bottom: none;
-}
-
-.history-item:hover {
-  background-color: #f0f0f0;
-}
-
-.avatar {
-  width: 40px;
-  height: 40px;
-  border-radius: 50%;
-  margin-right: 10px;
-  object-fit: cover;
 }
 
 .chat-info {
@@ -196,23 +223,20 @@ h2 {
 }
 
 .friend-name {
-  font-size: 16px;
-  color: #333;
+  display: flex;
+  flex-direction: column;
 }
 
 .last-message {
-  font-size: 14px;
   color: #666;
   white-space: nowrap;
   overflow: hidden;
   text-overflow: ellipsis;
-  max-width: 400px;
 }
 
-p {
+.no-friend {
   color: #666;
-  font-style: italic;
-  text-align: center;
-  margin: 15px 0;
+  display: flex;
+  padding: 20px 30px;
 }
 </style>
