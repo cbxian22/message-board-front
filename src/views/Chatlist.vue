@@ -24,7 +24,7 @@
             <span class="last-message">{{ chat.lastMessage }}</span>
           </div>
         </div>
-        <p v-else class="no-friend">暫無聊天記錄</p>
+        <p v-else class="no-chat">暫無聊天記錄</p>
       </div>
     </div>
   </div>
@@ -114,6 +114,8 @@ const fetchCurrentUser = async () => {
       err.response?.data?.message || err.message
     );
     // router.push("/login"); // 跳轉至登入頁面
+  } finally {
+    isLoading.value = false; // 無論成功或失敗，結束載入
   }
 };
 
@@ -238,7 +240,7 @@ h2 {
   text-overflow: ellipsis;
 }
 
-.no-friend {
+.no-chat {
   color: #666;
   display: flex;
   padding: 20px 30px;
