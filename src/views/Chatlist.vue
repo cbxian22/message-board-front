@@ -63,26 +63,6 @@ const initDB = async () => {
   });
 };
 
-// const friends = [
-//   {
-//     id: 4,
-//     name: "胡摩豬",
-//     accountname: "shan4",
-//     lastMessage: "sdfsdfsdfsdfsdfsdf",
-//     avatar_url:
-//       "https://storage.googleapis.com/message_board_storage/1000006562.jpg",
-//   },
-//   {
-//     id: 34,
-//     name: "麥香2",
-//     accountname: "50150134",
-//     lastMessage:
-//       "sdfsdfsdfsdfsdfssdfsdfsdfsdfsdfsdfsdfsdfsdfsdfsdfsdfsdfsdfsdfsdfsdfsdfsdfsdfsdfsdfsdfsdfdf",
-//     avatar_url:
-//       "https://storage.googleapis.com/message_board_storage/S__162439172.jpg",
-//   },
-// ];
-
 // 獲取好友清單
 
 const fetchFriends = async () => {
@@ -113,7 +93,8 @@ const fetchCurrentUser = async () => {
       "獲取用戶 ID 失敗:",
       err.response?.data?.message || err.message
     );
-    // router.push("/login"); // 跳轉至登入頁面
+    message.error(err.response?.data?.message || err.message);
+    router.push("/login"); // 跳轉至登入頁面
   } finally {
     isLoading.value = false; // 無論成功或失敗，結束載入
   }
@@ -202,7 +183,10 @@ h2 {
 }
 
 .history-item:hover {
-  background-color: #373737 !important;
+  background-color: rgba(55, 55, 55, 0.2) !important;
+}
+.light-mode .history-item:hover {
+  background-color: rgba(55, 55, 55, 0.08) !important;
 }
 
 .history-item .avatar {
