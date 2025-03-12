@@ -45,7 +45,7 @@ import Backicon from "../assets/Backicon.svg";
 
 const router = useRouter();
 const chatHistory = ref([]);
-// const friends = ref([]);
+const friends = ref([]);
 const dialog = useDialog();
 const loadingBar = useLoadingBar();
 const message = useMessage();
@@ -61,27 +61,28 @@ const initDB = async () => {
   });
 };
 
-const friends = [
-  {
-    id: 4,
-    name: "胡摩豬",
-    accountname: "shan4",
-    lastMessage: "sdfsdfsdfsdfsdfsdf",
-    avatar_url:
-      "https://storage.googleapis.com/message_board_storage/1000006562.jpg",
-  },
-  {
-    id: 34,
-    name: "麥香2",
-    accountname: "50150134",
-    lastMessage:
-      "sdfsdfsdfsdfsdfssdfsdfsdfsdfsdfsdfsdfsdfsdfsdfsdfsdfsdfsdfsdfsdfsdfsdfsdfsdfsdfsdfsdfsdfdf",
-    avatar_url:
-      "https://storage.googleapis.com/message_board_storage/S__162439172.jpg",
-  },
-];
+// const friends = [
+//   {
+//     id: 4,
+//     name: "胡摩豬",
+//     accountname: "shan4",
+//     lastMessage: "sdfsdfsdfsdfsdfsdf",
+//     avatar_url:
+//       "https://storage.googleapis.com/message_board_storage/1000006562.jpg",
+//   },
+//   {
+//     id: 34,
+//     name: "麥香2",
+//     accountname: "50150134",
+//     lastMessage:
+//       "sdfsdfsdfsdfsdfssdfsdfsdfsdfsdfsdfsdfsdfsdfsdfsdfsdfsdfsdfsdfsdfsdfsdfsdfsdfsdfsdfsdfsdfdf",
+//     avatar_url:
+//       "https://storage.googleapis.com/message_board_storage/S__162439172.jpg",
+//   },
+// ];
 
 // 獲取好友清單
+
 const fetchFriends = async () => {
   try {
     const response = await apiClient.get("friends");
