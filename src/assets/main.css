@@ -238,6 +238,13 @@ html ::root {
   }
 
   .friend-item {
-    padding: 20px 2px !important;
+    padding: 20px 10px !important;
   }
+
+  .friend-item .chat-button,
+  .remove-button {
+    padding: 5px 10px !important
+  }
+
+
 }
