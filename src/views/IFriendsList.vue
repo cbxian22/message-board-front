@@ -10,6 +10,7 @@
     <div class="container">
       <h2>{{ authStore.accountName }}</h2>
       <div class="friend-list">
+        <p v-if="isLoading" class="no-friend">載入中...</p>
         <div
           v-if="friends"
           v-for="friend in friends"
@@ -35,8 +36,7 @@
             </button>
           </div>
         </div>
-        <p v-else class="no-friend">載入中...</p>
-        <p v-else="friends.length === 0" class="no-friend">暫無好友</p>
+        <p v-else class="no-friend">暫無好友</p>
       </div>
     </div>
   </div>
@@ -63,6 +63,7 @@ const message = useMessage();
 
 const friends = ref([]);
 const currentUserId = ref(null);
+const isLoading = ref(true);
 
 // 獲取當前用戶 ID
 const fetchCurrentUser = async () => {
@@ -77,6 +78,8 @@ const fetchCurrentUser = async () => {
       err.response?.data?.message || err.message
     );
     message.error(err.response?.data?.message || err.message);
+  } finally {
+    isLoading.value = false;
   }
 };
 
