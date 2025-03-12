@@ -236,4 +236,8 @@ html ::root {
     flex: auto !important;
     max-height: none !important;
   }
+
+  .friend-item {
+    padding: 20px 2px !important;
+  }
 }

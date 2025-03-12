@@ -3,7 +3,7 @@
   <NavbarUp />
   <div class="container-box">
     <div class="back-icon">
-      <router-link to="`/@${authStore.accountName}`">
+      <router-link :to="-1" replace>
         <img class="icon" :src="Backicon" alt="Backicon" />
       </router-link>
     </div>
@@ -45,56 +45,56 @@ import Backicon from "../assets/Backicon.svg";
 
 const router = useRouter();
 const authStore = useAuthStore();
-const friends = ref([]);
+// const friends = ref([]);
 const currentUserId = ref(null);
 
 // 獲取當前用戶 ID
-const fetchCurrentUser = async () => {
-  try {
-    const response = await apiClient.get("/auth/me");
-    currentUserId.value = response.data.id.toString();
-    console.log("當前用戶 ID:", currentUserId.value);
-    await fetchFriends(); // 成功獲取用戶 ID 後載入好友清單
-  } catch (err) {
-    console.error(
-      "獲取用戶 ID 失敗:",
-      err.response?.data?.message || err.message
-    );
-    router.push("/login"); // 跳轉至登入頁面
-  }
-};
+// const fetchCurrentUser = async () => {
+//   try {
+//     const response = await apiClient.get("/auth/me");
+//     currentUserId.value = response.data.id.toString();
+//     console.log("當前用戶 ID:", currentUserId.value);
+//     await fetchFriends(); // 成功獲取用戶 ID 後載入好友清單
+//   } catch (err) {
+//     console.error(
+//       "獲取用戶 ID 失敗:",
+//       err.response?.data?.message || err.message
+//     );
+//     router.push("/login"); // 跳轉至登入頁面
+//   }
+// };
 
-// 獲取好友清單
-const fetchFriends = async () => {
-  try {
-    const response = await apiClient.get("/friends"); // 修正為 "/api/friends"
-    friends.value = response.data;
-    console.log("獲取好友清單:", friends.value);
-  } catch (err) {
-    console.error(
-      "獲取好友清單失敗:",
-      err.response?.data?.message || err.message
-    );
-    // 可選擇顯示錯誤訊息，暫不處理
-  }
-};
+// // 獲取好友清單
+// const fetchFriends = async () => {
+//   try {
+//     const response = await apiClient.get("/friends"); // 修正為 "/api/friends"
+//     friends.value = response.data;
+//     console.log("獲取好友清單:", friends.value);
+//   } catch (err) {
+//     console.error(
+//       "獲取好友清單失敗:",
+//       err.response?.data?.message || err.message
+//     );
+//     // 可選擇顯示錯誤訊息，暫不處理
+//   }
+// };
 
-// const friends = [
-//   {
-//     id: 4,
-//     name: "胡摩豬",
-//     accountname: "shan4",
-//     avatar_url:
-//       "https://storage.googleapis.com/message_board_storage/1000006562.jpg",
-//   },
-//   {
-//     id: 34,
-//     name: "麥香2",
-//     accountname: "50150134",
-//     avatar_url:
-//       "https://storage.googleapis.com/message_board_storage/S__162439172.jpg",
-//   },
-// ];
+const friends = [
+  {
+    id: 4,
+    name: "胡摩豬",
+    accountname: "shan4",
+    avatar_url:
+      "https://storage.googleapis.com/message_board_storage/1000006562.jpg",
+  },
+  {
+    id: 34,
+    name: "麥香2",
+    accountname: "50150134",
+    avatar_url:
+      "https://storage.googleapis.com/message_board_storage/S__162439172.jpg",
+  },
+];
 
 // 跳轉到聊天頁面
 
