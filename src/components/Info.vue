@@ -264,7 +264,7 @@ const rejectFriendRequest = async () => {
   }
 };
 
-// 解除好友
+// 移除好友
 const deleteFriend = async () => {
   if (!authStore.accessToken) {
     isLoginModalOpen.value = true;
@@ -280,10 +280,10 @@ const deleteFriend = async () => {
       friendRequestSent.value = false;
       isPendingReceived.value = false;
       pendingRequestId.value = null;
-      message.success("已解除好友！");
+      message.success("已移除好友！");
     }
   } catch (error) {
-    console.error("解除好友失敗:", error);
+    console.error("移除好友失敗:", error);
     if (error.response?.status === 404) {
       message.error("好友關係不存在！");
     } else if (error.response?.status === 401) {
@@ -291,7 +291,7 @@ const deleteFriend = async () => {
       authStore.logout();
       isLoginModalOpen.value = true;
     } else {
-      message.error("解除好友失敗，請稍後再試！");
+      message.error("移除好友失敗，請稍後再試！");
     }
     loadingBar.error();
   } finally {
@@ -499,7 +499,7 @@ const accountDelete = async () => {
 const handleDeleteFriendConfirm = () => {
   dialog.warning({
     content: "需要再次加入好友才可以瀏覽私人帳號！",
-    positiveText: "解除好友",
+    positiveText: "移除好友",
     negativeText: "取消",
     onPositiveClick: () => {
       deleteFriend();
@@ -581,7 +581,7 @@ const isFormInvalid = computed(() => {
 
     <div class="set-btn" v-if="loggedInUser !== info.accountName">
       <n-button v-if="isAlreadyFriend" @click="handleDeleteFriendConfirm"
-        >解除好友</n-button
+        >移除好友</n-button
       >
       <div v-else-if="isPendingReceived" class="friend-request-actions">
         <n-button @click="acceptFriendRequest">確認好友請求</n-button>

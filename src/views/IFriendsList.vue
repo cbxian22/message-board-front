@@ -22,7 +22,12 @@
             <button @click="goToChat(friend.id)" class="chat-button">
               發送信息
             </button>
-            <button class="remove-button">移除好友</button>
+            <button
+              @click="handleDeleteFriendConfirm(friend.id)"
+              class="remove-button"
+            >
+              移除好友
+            </button>
           </div>
         </div>
         <p v-if="friends.length === 0">暫無好友</p>
@@ -37,6 +42,7 @@ import { ref, onMounted } from "vue";
 import { useRouter } from "vue-router";
 import apiClient from "../stores/axiosConfig";
 import { useAuthStore } from "../stores/authStore";
+import { useLoadingBar, useDialog } from "naive-ui";
 
 import Navbar from "../components/Navbar.vue";
 import NavbarUp from "../components/NavbarUp.vue";
@@ -45,6 +51,9 @@ import Backicon from "../assets/Backicon.svg";
 
 const router = useRouter();
 const authStore = useAuthStore();
+const dialog = useDialog();
+const loadingBar = useLoadingBar();
+
 const friends = ref([]);
 const currentUserId = ref(null);
 
@@ -75,7 +84,6 @@ const fetchFriends = async () => {
       "獲取好友清單失敗:",
       err.response?.data?.message || err.message
     );
-    // 可選擇顯示錯誤訊息，暫不處理
   }
 };
 
@@ -98,8 +106,53 @@ const fetchFriends = async () => {
 
 // 跳轉到聊天頁面
 
+const handleDeleteFriendConfirm = (id) => {
+  dialog.warning({
+    content: "需要再次加入好友才可以瀏覽私人帳號！",
+    positiveText: "移除好友",
+    negativeText: "取消",
+    onPositiveClick: () => {
+      deleteFriend(id);
+    },
+  });
+};
+
+const deleteFriend = async (id) => {
+  if (!authStore.accessToken) {
+    isLoginModalOpen.value = true;
+    return;
+  }
+
+  const friendId = id;
+  loadingBar.start();
+  try {
+    const response = await apiClient.delete(`/friends/${friendId}`);
+    if (response.status === 200) {
+      isAlreadyFriend.value = false;
+      friendRequestSent.value = false;
+      isPendingReceived.value = false;
+      pendingRequestId.value = null;
+      message.success("已移除好友！");
+    }
+  } catch (error) {
+    console.error("移除好友失敗:", error);
+    if (error.response?.status === 404) {
+      message.error("好友關係不存在！");
+    } else if (error.response?.status === 401) {
+      message.error("登入已過期，請重新登入！");
+      authStore.logout();
+      isLoginModalOpen.value = true;
+    } else {
+      message.error("移除好友失敗，請稍後再試！");
+    }
+    loadingBar.error();
+  } finally {
+    loadingBar.finish();
+  }
+};
+
 const goToChat = (friendId) => {
-  router.push({ name: "Chat", params: { friendId } }); // 修正為 "ChatView"，與路由一致
+  router.push({ name: "Chat", params: { friendId } });
 };
 
 // 頁面掛載時執行
