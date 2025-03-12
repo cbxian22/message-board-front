@@ -79,7 +79,7 @@ const fetchCurrentUser = async () => {
       err.response?.data?.message || err.message
     );
     message.error(err.response?.data?.message || err.message);
-    router.push("/login"); // 跳轉至登入頁面
+    router.push("/"); // 跳轉至登入頁面
   } finally {
     isLoading.value = false;
   }
