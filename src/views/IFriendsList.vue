@@ -42,7 +42,7 @@ import { ref, onMounted } from "vue";
 import { useRouter } from "vue-router";
 import apiClient from "../stores/axiosConfig";
 import { useAuthStore } from "../stores/authStore";
-import { useLoadingBar, useDialog } from "naive-ui";
+import { useMessage, useLoadingBar, useDialog } from "naive-ui";
 
 import Navbar from "../components/Navbar.vue";
 import NavbarUp from "../components/NavbarUp.vue";
@@ -53,6 +53,7 @@ const router = useRouter();
 const authStore = useAuthStore();
 const dialog = useDialog();
 const loadingBar = useLoadingBar();
+const message = useMessage();
 
 const friends = ref([]);
 const currentUserId = ref(null);
@@ -63,7 +64,7 @@ const fetchCurrentUser = async () => {
     const response = await apiClient.get("/auth/me");
     currentUserId.value = response.data.id.toString();
     console.log("當前用戶 ID:", currentUserId.value);
-    await fetchFriends(); // 成功獲取用戶 ID 後載入好友清單
+    await fetchFriends();
   } catch (err) {
     console.error(
       "獲取用戶 ID 失敗:",
@@ -76,7 +77,7 @@ const fetchCurrentUser = async () => {
 // 獲取好友清單
 const fetchFriends = async () => {
   try {
-    const response = await apiClient.get("/friends"); // 修正為 "/api/friends"
+    const response = await apiClient.get("/friends");
     friends.value = response.data;
     console.log("獲取好友清單:", friends.value);
   } catch (err) {
@@ -128,10 +129,7 @@ const deleteFriend = async (id) => {
   try {
     const response = await apiClient.delete(`/friends/${friendId}`);
     if (response.status === 200) {
-      isAlreadyFriend.value = false;
-      friendRequestSent.value = false;
-      isPendingReceived.value = false;
-      pendingRequestId.value = null;
+      await fetchFriends();
       message.success("已移除好友！");
     }
   } catch (error) {
