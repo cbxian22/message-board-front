@@ -25,7 +25,6 @@ export const useAuthStore = defineStore("auth", {
     role: "",
     accessToken: null,
     refreshToken: null,
-    isPrivate: false, // 添加 isPrivate
   }),
   actions: {
     async fetchUserData() {
