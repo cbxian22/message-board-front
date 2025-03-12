@@ -248,6 +248,6 @@ h2 {
 
 .no-friend {
   display: flex;
-  padding: 30px 20px;
+  padding: 20px 30px;
 }
 </style>
