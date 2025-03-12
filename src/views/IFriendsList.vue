@@ -12,6 +12,7 @@
       <div class="friend-list">
         <p v-if="isLoading" class="no-friend">載入中...</p>
         <div
+          v-else-if="friends.length > 0"
           v-if="friends"
           v-for="friend in friends"
           :key="friend.id"

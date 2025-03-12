@@ -11,8 +11,8 @@
       <h2>信息</h2>
       <div class="chat-list">
         <p v-if="isLoading" class="no-chat">載入中...</p>
-
         <div
+          v-else-if="chatHistory.length > 0"
           v-for="chat in chatHistory"
           :key="chat.friendId"
           class="history-item"
@@ -24,7 +24,7 @@
             <span class="last-message">{{ chat.lastMessage }}</span>
           </div>
         </div>
-        <p v-if="chatHistory.length === 0" class="no-friend">暫無聊天記錄</p>
+        <p v-else class="no-friend">暫無聊天記錄</p>
       </div>
     </div>
   </div>
@@ -44,11 +44,13 @@ import NavbarUp from "../components/NavbarUp.vue";
 import Backicon from "../assets/Backicon.svg";
 
 const router = useRouter();
-const chatHistory = ref([]);
-const friends = ref([]);
 const dialog = useDialog();
 const loadingBar = useLoadingBar();
 const message = useMessage();
+
+const chatHistory = ref([]);
+const friends = ref([]);
+const isLoading = ref(true);
 const db = ref(null);
 const currentUserId = ref(null);
 
@@ -85,7 +87,8 @@ const initDB = async () => {
 
 const fetchFriends = async () => {
   try {
-    const response = await apiClient.get("friends");
+    const response = await apiClient.get("/friends");
+    friends.value = response.data; // 將回應資料存入 friends
     console.log("獲取好友清單:", friends.value);
     await loadChatHistory();
   } catch (err) {
