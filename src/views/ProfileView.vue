@@ -111,7 +111,7 @@ const shouldHideBackIcon = () => {
   <div class="container-box">
     <div class="back-icon" :class="{ hidden: shouldHideBackIcon() }">
       <router-link to="/">
-        <img :src="Backicon" alt="Backicon" />
+        <img class="icon" :src="Backicon" alt="Backicon" />
       </router-link>
     </div>
 
@@ -134,7 +134,11 @@ const shouldHideBackIcon = () => {
 }
 
 .back-icon {
-  margin: 0 0 20px 5px;
+  margin: 15px 0 15px 5px;
+  display: flex;
+}
+
+.back-icon a {
   display: flex;
 }
 
@@ -147,8 +151,7 @@ const shouldHideBackIcon = () => {
   display: flex;
 }
 
-/* 淺色下更改引入 icon 顏色 */
-.light-mode img {
+/* .light-mode img {
   filter: invert(1) grayscale(100%) contrast(100%) brightness(0);
-}
+} */
 </style>

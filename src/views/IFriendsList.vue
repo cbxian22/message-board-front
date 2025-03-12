@@ -1,27 +1,50 @@
 <!-- Friends.vue -->
 <template>
-  <div class="friends-container">
-    <h2>我的好友</h2>
-    <div class="friend-list">
-      <div v-for="friend in friends" :key="friend.id" class="friend-item">
-        <img :src="friend.avatar_url" :alt="friend.name" class="avatar" />
-        <span class="friend-name">{{ friend.name }}</span>
-        <div class="actions">
-          <button @click="goToChat(friend.id)" class="chat-button">聊天</button>
-          <button class="remove-button">解除好友</button>
+  <NavbarUp />
+  <div class="container-box">
+    <div class="back-icon">
+      <router-link to="`/@${authStore.accountName}`">
+        <img class="icon" :src="Backicon" alt="Backicon" />
+      </router-link>
+    </div>
+    <div class="container">
+      <h2>{{ authStore.accountName }}</h2>
+      <div class="friend-list">
+        <div v-for="friend in friends" :key="friend.id" class="friend-item">
+          <router-link :to="`/@${friend.accountname}`" class="info">
+            <img :src="friend.avatar_url" :alt="friend.name" class="avatar" />
+            <div class="info-name">
+              <span class="friend-name">{{ friend.name }}</span>
+              <span class="friend-account-name">{{ friend.accountname }}</span>
+            </div>
+          </router-link>
+          <div class="actions">
+            <button @click="goToChat(friend.id)" class="chat-button">
+              發送信息
+            </button>
+            <button class="remove-button">移除好友</button>
+          </div>
         </div>
+        <p v-if="friends.length === 0">暫無好友</p>
       </div>
-      <p v-if="friends.length === 0">暫無好友</p>
     </div>
   </div>
+  <Navbar />
 </template>
 
 <script setup>
 import { ref, onMounted } from "vue";
 import { useRouter } from "vue-router";
 import apiClient from "../stores/axiosConfig";
+import { useAuthStore } from "../stores/authStore";
+
+import Navbar from "../components/Navbar.vue";
+import NavbarUp from "../components/NavbarUp.vue";
+
+import Backicon from "../assets/Backicon.svg";
 
 const router = useRouter();
+const authStore = useAuthStore();
 const friends = ref([]);
 const currentUserId = ref(null);
 
@@ -56,101 +79,113 @@ const fetchFriends = async () => {
   }
 };
 
+// const friends = [
+//   {
+//     id: 4,
+//     name: "胡摩豬",
+//     accountname: "shan4",
+//     avatar_url:
+//       "https://storage.googleapis.com/message_board_storage/1000006562.jpg",
+//   },
+//   {
+//     id: 34,
+//     name: "麥香2",
+//     accountname: "50150134",
+//     avatar_url:
+//       "https://storage.googleapis.com/message_board_storage/S__162439172.jpg",
+//   },
+// ];
+
 // 跳轉到聊天頁面
+
 const goToChat = (friendId) => {
   router.push({ name: "Chat", params: { friendId } }); // 修正為 "ChatView"，與路由一致
 };
 
 // 頁面掛載時執行
 onMounted(async () => {
-  await fetchCurrentUser(); // 將所有初始化邏輯移至 fetchCurrentUser 內
+  await fetchCurrentUser();
 });
 </script>
 
 <style scoped>
-.friends-container {
-  max-width: 600px;
-  margin: 0 auto;
-  padding: 20px;
-  background-color: #f5f5f5;
-  min-height: 100vh;
+.container-box {
+  width: 650px;
+  display: flex;
+  flex-direction: column;
+  justify-self: center;
+  margin: 100px 0;
+  margin-top: calc(100px - 44px);
+}
+
+.back-icon {
+  margin: 15px 0 15px 5px;
+  display: flex;
+}
+
+.back-icon a {
+  display: flex;
 }
 
 h2 {
-  font-size: 20px;
-  color: #333;
-  margin: 20px 0 10px;
-}
-
-.friend-list {
-  background-color: #ffffff;
-  border-radius: 10px;
-  padding: 15px;
-  box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1);
+  padding: 20px 30px;
+  cursor: default;
+  border-bottom: 0.5px solid #373737;
 }
 
 .friend-item {
   display: flex;
   align-items: center;
-  padding: 10px;
-  border-bottom: 1px solid #e0e0e0;
+  padding: 20px 30px;
+  justify-content: space-between;
+  border-bottom: 0.5px solid #373737;
+}
+
+.friend-item .info {
+  display: flex;
+  align-items: center;
+  gap: 20px;
+}
+
+.friend-item .info .avatar {
+  width: 50px;
+  height: 50px;
+  border-radius: 50%;
+  object-fit: cover;
+}
+
+.info-name {
+  display: flex;
+  flex-direction: column;
+}
+
+.friend-item .info .friend-name {
+  cursor: pointer;
+}
+
+.friend-item .info .friend-account-name {
+  cursor: pointer;
 }
 
 .friend-item:last-child {
   border-bottom: none;
 }
 
-.avatar {
-  width: 40px;
-  height: 40px;
-  border-radius: 50%;
-  margin-right: 10px;
-  object-fit: cover;
-}
-
-.friend-name {
-  flex: 1;
-  font-size: 16px;
-  color: #333;
-}
-
-.actions {
+.friend-item .actions {
   display: flex;
   gap: 10px;
 }
 
-.chat-button {
-  padding: 5px 10px;
-  background-color: #007bff;
-  color: #ffffff;
-  border: none;
-  border-radius: 5px;
-  cursor: pointer;
-  transition: background-color 0.2s;
-}
-
-.chat-button:hover {
-  background-color: #0056b3;
-}
-
+.friend-item .chat-button,
 .remove-button {
-  padding: 5px 10px;
-  background-color: #dc3545;
-  color: #ffffff;
+  padding: 10px 15px;
   border: none;
-  border-radius: 5px;
-  cursor: pointer;
-  transition: background-color 0.2s;
 }
 
+.friend-item .chat-button:hover,
 .remove-button:hover {
-  background-color: #c82333;
-}
-
-p {
-  color: #666;
-  font-style: italic;
-  text-align: center;
-  margin: 15px 0;
+  background-color: rgba(128, 128, 128, 0.15) !important;
+  border-radius: 10px;
+  transition: background-color 0.3s ease, color 0.3s ease;
 }
 </style>
