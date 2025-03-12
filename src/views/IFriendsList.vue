@@ -10,7 +10,12 @@
     <div class="container">
       <h2>{{ authStore.accountName }}</h2>
       <div class="friend-list">
-        <div v-for="friend in friends" :key="friend.id" class="friend-item">
+        <div
+          v-if="friends"
+          v-for="friend in friends"
+          :key="friend.id"
+          class="friend-item"
+        >
           <router-link :to="`/@${friend.accountname}`" class="info">
             <img :src="friend.avatar_url" :alt="friend.name" class="avatar" />
             <div class="info-name">
@@ -30,7 +35,8 @@
             </button>
           </div>
         </div>
-        <p v-if="friends.length === 0">暫無好友</p>
+        <p v-else class="no-friend">載入中...</p>
+        <p v-if="friends.length === 0" class="no-friend">暫無好友</p>
       </div>
     </div>
   </div>
@@ -70,7 +76,7 @@ const fetchCurrentUser = async () => {
       "獲取用戶 ID 失敗:",
       err.response?.data?.message || err.message
     );
-    router.push("/login"); // 跳轉至登入頁面
+    message.error(err.response?.data?.message || err.message);
   }
 };
 
@@ -235,5 +241,10 @@ h2 {
   background-color: rgba(128, 128, 128, 0.15) !important;
   border-radius: 10px;
   transition: background-color 0.3s ease, color 0.3s ease;
+}
+
+.no-friend {
+  display: flex;
+  padding: 20px;
 }
 </style>
