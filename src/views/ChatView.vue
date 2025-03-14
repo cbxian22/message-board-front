@@ -1291,6 +1291,7 @@ onBeforeUnmount(() => {
 
 .content {
   word-wrap: break-word;
+  white-space: pre-wrap;
   color: #000;
 }
 
