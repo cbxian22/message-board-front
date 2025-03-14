@@ -730,7 +730,7 @@ onBeforeUnmount(() => {
         <router-link :to="`/@${friend.accountname}`" class="info">
           <img :src="friend.avatar_url" :alt="friend.name" class="avatar" />
           <div class="info-name">
-            <span class="friend-name">{{ friendName }}</span>
+            <span class="friend-name">{{ friend.name }}</span>
             <span class="friend-account-name">{{ friend.accountname }}</span>
           </div>
         </router-link>
@@ -853,10 +853,14 @@ const selectedFile = ref(null);
 const currentUserId = ref(null);
 const db = ref(null);
 const friendName = ref("");
-const friend = ref({});
 const file = ref(null);
 const fileUrl = ref(null);
 const fileInputRef = ref(null);
+const friend = ref({
+  name: "載入中...",
+  accountname: "",
+  avatar_url: "",
+});
 
 // 動態調整高度的函數
 const adjustTextareaHeight = () => {
@@ -1049,7 +1053,21 @@ const fetchFriendName = async () => {
     const friend = response.data.find(
       (f) => f.id.toString() === props.friendId
     );
-    friendName.value = friend ? friend.name : "未知好友";
+    // friendName.value = friend ? friend.name : "未知好友";
+    if (friendData) {
+      friend.value = {
+        id: friendData.id,
+        name: friendData.name,
+        accountname: friendData.accountname || friendData.username || "",
+        avatar_url: friendData.avatar_url || "",
+      };
+    } else {
+      friend.value = {
+        name: "未知好友",
+        accountname: "",
+        avatar_url: "",
+      };
+    }
   } catch (err) {
     console.error("獲取好友名稱失敗:", err);
     friendName.value = "未知好友";
@@ -1294,7 +1312,6 @@ onBeforeUnmount(() => {
   border-radius: 20px;
   align-items: flex-end;
   box-sizing: border-box;
-  background-color: #fff;
   height: auto; /* 高度自適應 */
   min-height: 60px; /* 最小高度 */
 }
