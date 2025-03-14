@@ -806,7 +806,7 @@ onBeforeUnmount(() => {
             v-model="newMessage"
             ref="textarea"
             placeholder="輸入訊息..."
-            @keydown.enter="handleEnter"
+            @keydown.shift.enter="handleEnter"
             class="message-input"
           ></textarea>
         </div>
