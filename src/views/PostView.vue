@@ -540,11 +540,10 @@ watch(
   margin: 100px 0;
 }
 
-/* .comment-box {
+.comment-box {
   padding: 20px 25px 15px 25px;
-  border-bottom: 0.5px solid #373737;
   display: flex;
-} */
+}
 
 .photo-content {
   margin-right: 15px;
