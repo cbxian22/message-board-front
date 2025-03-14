@@ -577,7 +577,7 @@ onUnmounted(() => {
               style="display: none"
             />
             <button @click="triggerFileInput(reply.id)" class="add-file-btn">
-              <img :src="Noteicon" alt="新增檔案" />
+              <img class="icon" :src="Noteicon" alt="新增檔案" />
             </button>
           </li>
           <li

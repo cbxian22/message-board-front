@@ -477,7 +477,7 @@ watch(
                   @click="triggerFileInput"
                   class="submit-button"
                 >
-                  <img :src="Noteicon" alt="Note icon" />
+                  <img class="icon" :src="Noteicon" alt="Note icon" />
                 </button>
               </div>
             </div>
