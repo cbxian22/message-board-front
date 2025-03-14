@@ -1047,13 +1047,27 @@ const markAsRead = (messageId, senderId, receiverId) => {
 };
 
 // 獲取好友名稱
+// const fetchFriendName = async () => {
+//   try {
+//     const response = await apiClient.get("/friends");
+//     const friend = response.data.find(
+//       (f) => f.id.toString() === props.friendId
+//     );
+//     friendName.value = friend ? friend.name : "未知好友";
+//   } catch (err) {
+//     console.error("獲取好友名稱失敗:", err);
+//     friendName.value = "未知好友";
+//   }
+// };
+
 const fetchFriendName = async () => {
   try {
     const response = await apiClient.get("/friends");
-    const friend = response.data.find(
+    console.log("API 回應:", response.data); // 檢查返回數據
+    const friendData = response.data.find(
       (f) => f.id.toString() === props.friendId
     );
-    // friendName.value = friend ? friend.name : "未知好友";
+    console.log("找到的好友:", friendData); // 檢查 friendData
     if (friendData) {
       friend.value = {
         id: friendData.id,
@@ -1070,8 +1084,13 @@ const fetchFriendName = async () => {
     }
   } catch (err) {
     console.error("獲取好友名稱失敗:", err);
-    friendName.value = "未知好友";
+    friend.value = {
+      name: "未知好友",
+      accountname: "",
+      avatar_url: "",
+    };
   }
+  console.log("最終 friend.value:", friend.value); // 檢查最終結果
 };
 
 // 獲取當前用戶 ID
