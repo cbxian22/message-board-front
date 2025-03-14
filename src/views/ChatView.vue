@@ -1219,6 +1219,7 @@ onBeforeUnmount(() => {
   flex-direction: column;
   margin: 0 auto;
   margin-top: 2.5vh;
+  overflow: hidden;
 }
 
 .container {
