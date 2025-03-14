@@ -199,6 +199,14 @@ html ::root {
     overflow: hidden;
   }
 
+  .messages {
+    flex: 1;
+    padding: 10px;
+    overflow-y: auto;
+    overflow-x: hidden;
+    min-height: 100px;
+  }
+
   /* 讓 navbarup 內的元素左右內縮 */
   .navbar-up {
     padding: 0 15px !important;
