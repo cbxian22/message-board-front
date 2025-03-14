@@ -193,8 +193,9 @@ html ::root {
 
   .container-box {
     width: 100% !important;
-    height: 95vh !important;
+    height: 100% !important;
     padding: 0 5px;
+    margin: 0;
     overflow: hidden;
   }
 
