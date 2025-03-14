@@ -144,11 +144,20 @@ const login = async () => {
       authStore.login(response.data);
       router.push("/");
     } else {
-      errorMessage.value = "請確認帳號密碼";
+      message.error("登入失敗！");
+      console.log("登入失敗！:", response.data.message);
     }
   } catch (error) {
-    console.error("登錄錯誤:", error);
-    errorMessage.value = "請確認帳號密碼";
+    console.error("登入時發生錯誤:", error);
+
+    if (error.response) {
+      console.log("後端回應:", error.response.data); // 確認後端回傳的內容
+      message.error(
+        error.response.data.message || "登入失敗，請檢查輸入資訊！"
+      );
+    } else {
+      message.error("無法連線至伺服器，請稍後再試！");
+    }
   } finally {
     isTouched.value = false;
   }
