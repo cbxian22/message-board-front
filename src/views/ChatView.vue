@@ -806,7 +806,7 @@ onBeforeUnmount(() => {
             v-model="newMessage"
             ref="textarea"
             placeholder="輸入訊息..."
-            @keydown.shift.enter="handleEnter"
+            @keydown.enter="handleEnter"
             class="message-input"
           ></textarea>
         </div>
@@ -885,10 +885,11 @@ const adjustTextareaHeight = () => {
 };
 
 const handleEnter = (event) => {
-  if (event.shiftKey) return; // 允許 Shift + Enter 換行
-  event.preventDefault(); // 阻止預設提交行為
-  newMessage.value += "\n"; // 模擬換行
-  nextTick(() => adjustTextareaHeight()); // 讓高度更新
+  if (event.shiftKey) {
+  } else {
+    event.preventDefault(); // 防止換行
+  }
+  nextTick(() => adjustTextareaHeight());
 };
 
 // 監聽 newMessage 和 fileUrl 的變化
