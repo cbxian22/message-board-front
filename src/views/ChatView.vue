@@ -853,6 +853,7 @@ const selectedFile = ref(null);
 const currentUserId = ref(null);
 const db = ref(null);
 const friendName = ref("");
+const friend = ref({});
 const file = ref(null);
 const fileUrl = ref(null);
 const fileInputRef = ref(null);
