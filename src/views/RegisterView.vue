@@ -167,8 +167,6 @@ const validatePassword = () => {
     passwordError.value = "密碼需至少8個字符";
   } else if (password.value.length > 128) {
     passwordError.value = "密碼不得超過128個字符";
-  } else if (!hasUpperCase) {
-    passwordError.value = "密碼需包含至少一個大寫字母";
   } else if (!hasNumber) {
     passwordError.value = "密碼需包含至少一個數字";
   } else {
