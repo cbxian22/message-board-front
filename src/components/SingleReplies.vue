@@ -447,7 +447,7 @@ onUnmounted(() => {
     :key="reply.id"
     :class="[
       'reply-box',
-      { 'has-reply': reply.length > 0 },
+      { 'has-reply': replies.length > 0 },
       { 'last-reply': index === replies.length - 1 },
     ]"
   >
