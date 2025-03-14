@@ -868,7 +868,16 @@ const adjustTextareaHeight = () => {
     if (textarea.value && textareabox.value) {
       textarea.value.style.height = "auto";
       textareabox.value.style.height = "auto";
-      const textHeight = Math.min(textarea.value.scrollHeight, 100);
+
+      const lineHeight =
+        parseInt(getComputedStyle(textarea.value).lineHeight) || 20;
+      const lines = newMessage.value.split("\n").length;
+      const textHeight = Math.min(
+        Math.max(lines * lineHeight, lineHeight),
+        100
+      );
+      // const textHeight = Math.min(textarea.value.scrollHeight, 100);
+
       textarea.value.style.height = `${textHeight}px`;
       let totalHeight = textHeight;
       if (fileUrl.value) {
