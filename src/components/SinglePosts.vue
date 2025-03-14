@@ -371,6 +371,7 @@ onUnmounted(() => {
 .comment-box {
   padding: 20px 25px 15px 25px;
   display: flex;
+  border-bottom: none !important;
 }
 
 .comment-box .has-content {
