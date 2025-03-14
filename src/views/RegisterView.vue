@@ -156,7 +156,6 @@ const validateAccount = () => {
 };
 
 const validatePassword = () => {
-  const hasUpperCase = /[A-Z]/.test(password.value);
   const hasNumber = /\d/.test(password.value);
 
   if (!password.value) {
