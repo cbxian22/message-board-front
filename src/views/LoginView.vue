@@ -75,14 +75,15 @@
 </template>
 
 <script setup>
-import { NSpin } from "naive-ui";
 import { ref, onMounted, computed } from "vue";
+import { NSpin, useMessage } from "naive-ui";
 import { useRouter } from "vue-router";
 import { useAuthStore } from "@/stores/authStore";
 import apiClient from "@/stores/axiosConfig"; // 引入 apiClient
 
 const authStore = useAuthStore();
 const router = useRouter();
+const message = useMessage();
 
 const role = ref("user");
 const account = ref("");
@@ -151,7 +152,7 @@ const login = async () => {
     console.error("登入時發生錯誤:", error);
 
     if (error.response) {
-      console.log("後端回應:", error.response.data); // 確認後端回傳的內容
+      console.log("後端回應:", error.response.data);
       message.error(
         error.response.data.message || "登入失敗，請檢查輸入資訊！"
       );
