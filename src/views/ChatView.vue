@@ -1405,8 +1405,9 @@ onBeforeUnmount(() => {
 @media (max-width: 500px) {
   .container-box {
     width: 100%;
-    height: 95vh;
-    margin-top: 2.5vh;
+    height: 80vh;
+    margin-top: 10vh;
+    overflow: hidden;
   }
 }
 </style>
