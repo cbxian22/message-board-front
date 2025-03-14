@@ -969,6 +969,21 @@ const addOrUpdateMessage = (message) => {
 };
 
 // 發送消息
+// const sendMessage = async () => {
+//   if (newMessage.value.trim() || selectedFile.value) {
+//     const message = {
+//       senderId: currentUserId.value,
+//       receiverId: props.friendId,
+//       content: newMessage.value,
+//       media: selectedFile.value ? await processFile(selectedFile.value) : null,
+//     };
+//     console.log("發送消息:", message);
+//     socket.value.emit("sendMessage", message);
+//     newMessage.value = "";
+//     selectedFile.value = null;
+//     scrollToBottom();
+//   }
+// };
 const sendMessage = async () => {
   if (newMessage.value.trim() || selectedFile.value) {
     const message = {
@@ -977,42 +992,80 @@ const sendMessage = async () => {
       content: newMessage.value,
       media: selectedFile.value ? await processFile(selectedFile.value) : null,
     };
-    console.log("發送消息:", message);
+    console.log("發送消息:", message); // 檢查 media 是否有值
     socket.value.emit("sendMessage", message);
     newMessage.value = "";
     selectedFile.value = null;
+    fileUrl.value = null; // 清空預覽
+    file.value = null; // 清空檔案
+    if (fileInputRef.value) fileInputRef.value.value = null; // 重置輸入
     scrollToBottom();
   }
 };
 
 // 檢查檔案上傳處理，並顯示預覽
+// const handleFileUpload = (event) => {
+//   const selectedFile = event.target.files[0];
+//   if (!selectedFile) return;
+
+//   if (fileUrl.value) URL.revokeObjectURL(fileUrl.value);
+//   file.value = selectedFile;
+
+//   try {
+//     if (selectedFile.type.startsWith("image/")) {
+//       const reader = new FileReader();
+//       reader.onload = (e) => {
+//         fileUrl.value = e.target.result;
+//         adjustTextareaHeight(); // 上傳後調整高度
+//       };
+//       reader.onerror = () => {
+//         message.error("圖片讀取失敗！");
+//       };
+//       reader.readAsDataURL(selectedFile);
+//     } else if (selectedFile.type.startsWith("video/")) {
+//       fileUrl.value = URL.createObjectURL(selectedFile);
+//       adjustTextareaHeight(); // 上傳後調整高度
+//     } else {
+//       file.value = null;
+//       message.error("僅支援圖片和影片檔案！");
+//     }
+//   } catch (error) {
+//     file.value = null;
+//     fileUrl.value = null;
+//     message.error("檔案處理失敗，請重試！");
+//   }
+// };
+
 const handleFileUpload = (event) => {
-  const selectedFile = event.target.files[0];
-  if (!selectedFile) return;
+  const selectedFileLocal = event.target.files[0]; // 改名避免混淆
+  if (!selectedFileLocal) return;
 
   if (fileUrl.value) URL.revokeObjectURL(fileUrl.value);
-  file.value = selectedFile;
+  file.value = selectedFileLocal;
+  selectedFile.value = selectedFileLocal; // 同步更新 selectedFile.value
 
   try {
-    if (selectedFile.type.startsWith("image/")) {
+    if (selectedFileLocal.type.startsWith("image/")) {
       const reader = new FileReader();
       reader.onload = (e) => {
         fileUrl.value = e.target.result;
-        adjustTextareaHeight(); // 上傳後調整高度
+        adjustTextareaHeight();
       };
       reader.onerror = () => {
         message.error("圖片讀取失敗！");
       };
-      reader.readAsDataURL(selectedFile);
-    } else if (selectedFile.type.startsWith("video/")) {
-      fileUrl.value = URL.createObjectURL(selectedFile);
-      adjustTextareaHeight(); // 上傳後調整高度
+      reader.readAsDataURL(selectedFileLocal);
+    } else if (selectedFileLocal.type.startsWith("video/")) {
+      fileUrl.value = URL.createObjectURL(selectedFileLocal);
+      adjustTextareaHeight();
     } else {
       file.value = null;
+      selectedFile.value = null; // 清空
       message.error("僅支援圖片和影片檔案！");
     }
   } catch (error) {
     file.value = null;
+    selectedFile.value = null; // 清空
     fileUrl.value = null;
     message.error("檔案處理失敗，請重試！");
   }
@@ -1023,6 +1076,7 @@ const cancelFilePreview = () => {
   if (fileUrl.value) URL.revokeObjectURL(fileUrl.value);
   fileUrl.value = null;
   file.value = null;
+  selectedFile.value = null; // 同步清空
   if (fileInputRef.value) fileInputRef.value.value = null;
   adjustTextareaHeight(); // 取消後調整高度
 };
