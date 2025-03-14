@@ -805,8 +805,8 @@ onBeforeUnmount(() => {
           <textarea
             v-model="newMessage"
             ref="textarea"
-            @keyup.enter="sendMessage"
             placeholder="輸入訊息..."
+            @keyup.shift.enter="sendMessage"
             class="message-input"
           ></textarea>
         </div>
@@ -1219,7 +1219,6 @@ onBeforeUnmount(() => {
   flex-direction: column;
   margin: 0 auto;
   margin-top: 2.5vh;
-  overflow: hidden;
 }
 
 .container {

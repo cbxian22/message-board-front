@@ -191,6 +191,13 @@ html ::root {
 
 @media (max-width: 500px) {
 
+  .container-box {
+    width: 100% !important;
+    height: 95vh !important;
+    padding: 0 5px;
+    overflow: hidden;
+  }
+
   /* 讓 navbarup 內的元素左右內縮 */
   .navbar-up {
     padding: 0 15px !important;
