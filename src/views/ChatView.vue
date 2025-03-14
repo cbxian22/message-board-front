@@ -1240,7 +1240,7 @@ onBeforeUnmount(() => {
   display: flex;
   padding: 10px 30px;
   gap: 20px;
-  border-bottom: 1px solid #e0e0e0;
+  border-bottom: 0.5px solid #373737;
 }
 
 .back-icon {
@@ -1273,11 +1273,11 @@ onBeforeUnmount(() => {
 }
 
 .messages {
-  flex: 1; /* 靈活縮放，占據剩餘空間 */
+  flex: 1;
   padding: 10px;
   overflow-y: auto;
   overflow-x: hidden;
-  min-height: 100px; /* 確保不會過小 */
+  min-height: 100px;
 }
 
 .message {
@@ -1327,12 +1327,12 @@ onBeforeUnmount(() => {
   padding: 10px;
   margin: 15px;
   gap: 10px;
-  border: 1px solid #ddd;
+  border-bottom: 0.5px solid #373737;
   border-radius: 20px;
   align-items: flex-end;
   box-sizing: border-box;
-  height: auto; /* 高度自適應 */
-  min-height: 60px; /* 最小高度 */
+  height: auto;
+  min-height: 60px;
 }
 
 .custom-input-container {
@@ -1353,6 +1353,12 @@ onBeforeUnmount(() => {
   resize: none;
   line-height: 1.2;
   box-sizing: border-box;
+  color: #fff;
+  background-color: transparent !important;
+}
+
+.light-mode .message-input {
+  color: #000;
 }
 
 .file-preview {
@@ -1401,6 +1407,6 @@ onBeforeUnmount(() => {
 }
 
 .send-button:hover {
-  /* 可添加懸停效果 */
+  color: #373737 !important;
 }
 </style>
