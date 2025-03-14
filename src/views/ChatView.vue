@@ -1327,7 +1327,7 @@ onBeforeUnmount(() => {
   padding: 10px;
   margin: 15px;
   gap: 10px;
-  border-bottom: 0.5px solid #373737;
+  border: 0.5px solid #373737;
   border-radius: 20px;
   align-items: flex-end;
   box-sizing: border-box;
