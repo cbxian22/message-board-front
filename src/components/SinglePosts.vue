@@ -231,8 +231,7 @@ onUnmounted(() => {
     :key="comment.id"
     :class="[
       'comment-box',
-      { 'has-content': comments.length > 0 },
-      { 'last-comment': index === comments.length - 1 },
+      { 'with-border': comments.length > 0 && index !== comments.length - 1 },
     ]"
   >
     <div class="photo-content">
@@ -371,16 +370,16 @@ onUnmounted(() => {
 .comment-box {
   padding: 20px 25px 15px 25px;
   display: flex;
-  border: none !important;
+  border-bottom: none;
 }
 
-.comment-box.has-content {
+.comment-box.with-border {
   border-bottom: 0.5px solid #373737;
 }
 
-.comment-box.last-comment {
+/* .comment-box.last-comment {
   border-bottom: none !important;
-}
+} */
 
 .photo-content {
   margin-right: 15px;
