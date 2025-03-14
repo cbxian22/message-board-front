@@ -442,191 +442,193 @@ onUnmounted(() => {
 </script>
 
 <template>
-  <div
-    v-for="(reply, index) in replies"
-    :key="reply.id"
-    :class="[
-      'reply-box',
-      { 'has-reply': replies.length > 0 },
-      { 'last-reply': index === replies.length - 1 },
-    ]"
-  >
-    <div class="photo-content">
-      <router-link :to="`/@${reply.name}`">
-        <img :src="reply.user_avatar" alt="頭像" class="photo" />
-      </router-link>
-    </div>
+  <div v-if="replies.length > 0">
+    <div
+      v-for="(reply, index) in replies"
+      :key="reply.id"
+      :class="['reply-box', { 'with-border': index !== replies.length - 1 }]"
+    >
+      <div class="photo-content">
+        <router-link :to="`/@${reply.name}`">
+          <img :src="reply.user_avatar" alt="頭像" class="photo" />
+        </router-link>
+      </div>
 
-    <div class="reply">
-      <div class="info">
-        <div class="info-span">
-          <router-link class="reply-author" :to="`/@${reply.name}`">
-            {{ reply.name }}
-          </router-link>
-          <span class="reply-time">
-            {{ dateStore.formatDate(reply.timestamp) }}
-          </span>
-        </div>
+      <div class="reply">
+        <div class="info">
+          <div class="info-span">
+            <router-link class="reply-author" :to="`/@${reply.name}`">
+              {{ reply.name }}
+            </router-link>
+            <span class="reply-time">
+              {{ dateStore.formatDate(reply.timestamp) }}
+            </span>
+          </div>
 
-        <div class="info-modal">
-          <button
-            :ref="(el) => (buttonRefs[reply.id] = el)"
-            @click="openModal($event, reply.id)"
-            class="info-link"
-          >
-            <img class="icon" :src="Moreicon" alt="Moreicon" />
-          </button>
-          <div
-            v-show="modalState[reply.id]"
-            class="modal-overlay"
-            :ref="(el) => (modalRefs[reply.id] = el)"
-          >
-            <div class="modal-content" @click.stop>
-              <ul>
-                <li
-                  v-if="
-                    authStore.isLoggedIn &&
-                    authStore.accountName === reply.name &&
-                    !(isEditing && editingReplyId === reply.id)
-                  "
-                >
-                  <button class="modal-link" @click="handleUpdate(reply.id)">
-                    <img class="icon" :src="Editicon" alt="Editicon" />
-                    <span>編輯</span>
-                  </button>
-                </li>
-                <li
-                  v-if="
-                    authStore.isLoggedIn && authStore.accountName === reply.name
-                  "
-                >
-                  <button
-                    class="modal-link"
-                    @click="handleDeleteConfirm(reply.id)"
+          <div class="info-modal">
+            <button
+              :ref="(el) => (buttonRefs[reply.id] = el)"
+              @click="openModal($event, reply.id)"
+              class="info-link"
+            >
+              <img class="icon" :src="Moreicon" alt="Moreicon" />
+            </button>
+            <div
+              v-show="modalState[reply.id]"
+              class="modal-overlay"
+              :ref="(el) => (modalRefs[reply.id] = el)"
+            >
+              <div class="modal-content" @click.stop>
+                <ul>
+                  <li
+                    v-if="
+                      authStore.isLoggedIn &&
+                      authStore.accountName === reply.name &&
+                      !(isEditing && editingReplyId === reply.id)
+                    "
                   >
-                    <img class="icon" :src="Deleteicon" alt="Deleteicon" />
-                    <span>刪除</span>
-                  </button>
-                </li>
-                <li v-if="authStore.accountName !== reply.name">
-                  <button class="modal-link">
-                    <img class="icon" :src="Flagicon" alt="Flagicon" />
-                    <span>檢舉</span>
-                  </button>
-                </li>
-              </ul>
+                    <button class="modal-link" @click="handleUpdate(reply.id)">
+                      <img class="icon" :src="Editicon" alt="Editicon" />
+                      <span>編輯</span>
+                    </button>
+                  </li>
+                  <li
+                    v-if="
+                      authStore.isLoggedIn &&
+                      authStore.accountName === reply.name
+                    "
+                  >
+                    <button
+                      class="modal-link"
+                      @click="handleDeleteConfirm(reply.id)"
+                    >
+                      <img class="icon" :src="Deleteicon" alt="Deleteicon" />
+                      <span>刪除</span>
+                    </button>
+                  </li>
+                  <li v-if="authStore.accountName !== reply.name">
+                    <button class="modal-link">
+                      <img class="icon" :src="Flagicon" alt="Flagicon" />
+                      <span>檢舉</span>
+                    </button>
+                  </li>
+                </ul>
+              </div>
             </div>
           </div>
         </div>
-      </div>
 
-      <div class="reply-content">
-        <!-- 正常顯示 -->
-        <template v-if="!(isEditing && editingReplyId === reply.id)">
-          <p>{{ reply.content }}</p>
-          <span v-if="reply.file_url">
-            <n-image
-              v-if="isImage(reply.file_url)"
-              :src="reply.file_url"
-              alt="reply media"
-              lazy
-              :preview-disabled="false"
-              class="reply-image"
-            >
-              <template #placeholder>
-                <div class="media-placeholder">Loading Image...</div>
-              </template>
-            </n-image>
-            <div v-else-if="isVideo(reply.file_url)" class="video-wrapper">
-              <video
+        <div class="reply-content">
+          <!-- 正常顯示 -->
+          <template v-if="!(isEditing && editingReplyId === reply.id)">
+            <p>{{ reply.content }}</p>
+            <span v-if="reply.file_url">
+              <n-image
+                v-if="isImage(reply.file_url)"
                 :src="reply.file_url"
-                controls
-                class="reply-video"
-                preload="auto"
-              />
-            </div>
-          </span>
-        </template>
-
-        <!-- 編輯模式 -->
-        <template v-if="isEditing && editingReplyId === reply.id">
-          <textarea
-            :ref="(el) => (textareas[reply.id] = el)"
-            v-model="content"
-            placeholder="編輯您的回覆..."
-            class="edit-textarea"
-          ></textarea>
-        </template>
-      </div>
-
-      <div class="reply-section">
-        <ul>
-          <li>
-            <div class="reply-count" @click="checkTokenAndOpenModal(reply.id)">
-              <button class="reply-link">
-                <img
-                  :class="{ icon: !reply.userLiked }"
-                  :src="reply.userLiked ? FavoriteRedicon : Favoriteicon"
-                  alt="Like"
+                alt="reply media"
+                lazy
+                :preview-disabled="false"
+                class="reply-image"
+              >
+                <template #placeholder>
+                  <div class="media-placeholder">Loading Image...</div>
+                </template>
+              </n-image>
+              <div v-else-if="isVideo(reply.file_url)" class="video-wrapper">
+                <video
+                  :src="reply.file_url"
+                  controls
+                  class="reply-video"
+                  preload="auto"
                 />
-              </button>
-              <n-badge :value="reply.likes || 0" />
-            </div>
-          </li>
-          <li v-if="isEditing && editingReplyId === reply.id">
-            <input
-              type="file"
-              :ref="(el) => (fileInputRefs[reply.id] = el)"
-              @change="handleFileUpload"
-              style="display: none"
-            />
-            <button @click="triggerFileInput(reply.id)" class="add-file-btn">
-              <img class="icon" :src="Noteicon" alt="新增檔案" />
-            </button>
-          </li>
-          <li
-            class="save-btn-li"
-            v-if="isEditing && editingReplyId === reply.id"
-          >
-            <button
-              @click="handleMessage"
-              :disabled="isSubmitDisabled"
-              class="save-btn"
-            >
-              儲存
-            </button>
-          </li>
-          <li
-            class="cancel-btn-li"
-            v-if="isEditing && editingReplyId === reply.id"
-          >
-            <button @click="cancelEdit" class="cancel-btn">取消</button>
-          </li>
-        </ul>
-      </div>
+              </div>
+            </span>
+          </template>
 
-      <div v-if="fileUrl" class="file-preview-container">
-        <div class="file-preview">
-          <img
-            v-if="isPreviewImage"
-            :src="fileUrl"
-            alt="File Preview"
-            class="preview-img"
-          />
-          <video
-            v-else-if="isPreviewVideo"
-            :src="fileUrl"
-            controls
-            class="preview-video"
-            preload="auto"
-          />
-          <button @click="cancelFilePreview" class="cancel-preview-button">
-            <img :src="Closeicon" alt="Close icon" />
-          </button>
+          <!-- 編輯模式 -->
+          <template v-if="isEditing && editingReplyId === reply.id">
+            <textarea
+              :ref="(el) => (textareas[reply.id] = el)"
+              v-model="content"
+              placeholder="編輯您的回覆..."
+              class="edit-textarea"
+            ></textarea>
+          </template>
         </div>
-      </div>
 
-      <!--  -->
+        <div class="reply-section">
+          <ul>
+            <li>
+              <div
+                class="reply-count"
+                @click="checkTokenAndOpenModal(reply.id)"
+              >
+                <button class="reply-link">
+                  <img
+                    :class="{ icon: !reply.userLiked }"
+                    :src="reply.userLiked ? FavoriteRedicon : Favoriteicon"
+                    alt="Like"
+                  />
+                </button>
+                <n-badge :value="reply.likes || 0" />
+              </div>
+            </li>
+            <li v-if="isEditing && editingReplyId === reply.id">
+              <input
+                type="file"
+                :ref="(el) => (fileInputRefs[reply.id] = el)"
+                @change="handleFileUpload"
+                style="display: none"
+              />
+              <button @click="triggerFileInput(reply.id)" class="add-file-btn">
+                <img class="icon" :src="Noteicon" alt="新增檔案" />
+              </button>
+            </li>
+            <li
+              class="save-btn-li"
+              v-if="isEditing && editingReplyId === reply.id"
+            >
+              <button
+                @click="handleMessage"
+                :disabled="isSubmitDisabled"
+                class="save-btn"
+              >
+                儲存
+              </button>
+            </li>
+            <li
+              class="cancel-btn-li"
+              v-if="isEditing && editingReplyId === reply.id"
+            >
+              <button @click="cancelEdit" class="cancel-btn">取消</button>
+            </li>
+          </ul>
+        </div>
+
+        <div v-if="fileUrl" class="file-preview-container">
+          <div class="file-preview">
+            <img
+              v-if="isPreviewImage"
+              :src="fileUrl"
+              alt="File Preview"
+              class="preview-img"
+            />
+            <video
+              v-else-if="isPreviewVideo"
+              :src="fileUrl"
+              controls
+              class="preview-video"
+              preload="auto"
+            />
+            <button @click="cancelFilePreview" class="cancel-preview-button">
+              <img :src="Closeicon" alt="Close icon" />
+            </button>
+          </div>
+        </div>
+
+        <!--  -->
+      </div>
     </div>
   </div>
 </template>
@@ -634,15 +636,11 @@ onUnmounted(() => {
 .reply-box {
   padding: 20px 25px 15px 25px;
   display: flex;
-  border: none !important;
+  border: none;
 }
 
-.reply-box.has-reply {
+.reply-box.with-border {
   border-bottom: 0.5px solid #373737;
-}
-
-.reply-box.last-reply {
-  border-bottom: none !important;
 }
 
 .photo-content {
