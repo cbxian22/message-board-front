@@ -863,49 +863,18 @@ const friend = ref({
 });
 
 // 動態調整高度的函數
-// const adjustTextareaHeight = () => {
-//   nextTick(() => {
-//     if (textarea.value && textareabox.value) {
-//       textarea.value.style.height = "auto";
-//       textareabox.value.style.height = "auto";
-//       const textHeight = Math.min(textarea.value.scrollHeight, 100);
-//       textarea.value.style.height = `${textHeight}px`;
-//       let totalHeight = textHeight;
-//       if (fileUrl.value) {
-//         totalHeight += 90;
-//       }
-//       textareabox.value.style.height = `${totalHeight}px`;
-//       if (textarea.value.scrollHeight > 100) {
-//         textarea.value.style.overflowY = "auto";
-//       } else {
-//         textarea.value.style.overflowY = "hidden";
-//       }
-//     }
-//   });
-// };
-
 const adjustTextareaHeight = () => {
   nextTick(() => {
     if (textarea.value && textareabox.value) {
-      textarea.value.style.height = "auto"; // 重置高度
+      textarea.value.style.height = "auto";
       textareabox.value.style.height = "auto";
-
-      const lineHeight =
-        parseInt(getComputedStyle(textarea.value).lineHeight) || 20;
-      const lines = (newMessage.value || "").split("\n").length;
-      const textHeight = Math.min(
-        Math.max(lines * lineHeight, lineHeight),
-        100
-      ); // 至少一行，最大 100px
-
+      const textHeight = Math.min(textarea.value.scrollHeight, 100);
       textarea.value.style.height = `${textHeight}px`;
-
       let totalHeight = textHeight;
       if (fileUrl.value) {
         totalHeight += 90;
       }
       textareabox.value.style.height = `${totalHeight}px`;
-
       if (textarea.value.scrollHeight > 100) {
         textarea.value.style.overflowY = "auto";
       } else {
