@@ -242,7 +242,15 @@ const handleRegister = async () => {
     }
   } catch (error) {
     console.error("註冊時發生錯誤:", error);
-    message.error("註冊失敗，請稍後再試！");
+
+    if (error.response) {
+      console.log("後端回應:", error.response.data); // 確認後端回傳的內容
+      message.error(
+        error.response.data.message || "註冊失敗，請檢查輸入資訊！"
+      );
+    } else {
+      message.error("無法連線至伺服器，請稍後再試！");
+    }
   } finally {
     isTouched.value = false;
   }
