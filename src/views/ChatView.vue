@@ -853,6 +853,7 @@ const textareabox = ref(null);
 const selectedFile = ref(null);
 const currentUserId = ref(null);
 const db = ref(null);
+const textareaRef = ref(null);
 const friendName = ref("");
 const file = ref(null);
 const fileUrl = ref(null);
