@@ -373,11 +373,11 @@ onUnmounted(() => {
   display: flex;
 }
 
-.comment-box.has-content {
+.comment-box .has-content {
   border-bottom: 0.5px solid #373737;
 }
 
-.comment-box.last-comment {
+.comment-box .last-comment {
   border-bottom: none !important;
 }
 
