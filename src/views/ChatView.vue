@@ -863,34 +863,83 @@ const friend = ref({
 });
 
 // 動態調整高度的函數
+// const adjustTextareaHeight = () => {
+//   nextTick(() => {
+//     if (textarea.value && textareabox.value) {
+//       textarea.value.style.height = "auto";
+//       textareabox.value.style.height = "auto";
+//       const textHeight = Math.min(textarea.value.scrollHeight, 100);
+//       textarea.value.style.height = `${textHeight}px`;
+//       let totalHeight = textHeight;
+//       if (fileUrl.value) {
+//         totalHeight += 90;
+//       }
+//       textareabox.value.style.height = `${totalHeight}px`;
+//       if (textarea.value.scrollHeight > 100) {
+//         textarea.value.style.overflowY = "auto";
+//       } else {
+//         textarea.value.style.overflowY = "hidden";
+//       }
+//     }
+//   });
+// };
+
 const adjustTextareaHeight = () => {
   nextTick(() => {
     if (textarea.value && textareabox.value) {
+      // 重置高度
       textarea.value.style.height = "auto";
       textareabox.value.style.height = "auto";
-      const textHeight = Math.min(textarea.value.scrollHeight, 100);
+
+      // 計算文字高度，至少顯示一行
+      const minTextHeight = 20; // 假設一行高度約為 20px，根據實際情況調整
+      const textHeight = Math.max(textarea.value.scrollHeight, minTextHeight);
+
+      // 設置 textarea 的高度
       textarea.value.style.height = `${textHeight}px`;
+
+      // 計算總高度（包括預覽區域）
       let totalHeight = textHeight;
       if (fileUrl.value) {
-        totalHeight += 90;
+        totalHeight += 90; // 預覽區域高度
       }
+
+      // 設置容器高度
       textareabox.value.style.height = `${totalHeight}px`;
+
+      // 處理滾動條
       if (textarea.value.scrollHeight > 100) {
         textarea.value.style.overflowY = "auto";
       } else {
         textarea.value.style.overflowY = "hidden";
       }
+
+      // 確保 textarea 始終從頂部顯示內容
+      textarea.value.scrollTop = 0;
     }
   });
 };
 
+// const handleEnter = (event) => {
+//   if (event.shiftKey) {
+//   } else {
+//     event.preventDefault(); // 防止換行
+//     sendMessage();
+//   }
+//   nextTick(() => adjustTextareaHeight());
+// };
+
 const handleEnter = (event) => {
   if (event.shiftKey) {
+    // Shift + Enter 換行，不發送訊息
   } else {
-    event.preventDefault(); // 防止換行
+    event.preventDefault(); // 防止默認換行
     sendMessage();
   }
-  nextTick(() => adjustTextareaHeight());
+  nextTick(() => {
+    adjustTextareaHeight();
+    textarea.value.scrollTop = 0; // 確保內容從頂部顯示
+  });
 };
 
 // 監聽 newMessage 和 fileUrl 的變化
@@ -1341,7 +1390,9 @@ onBeforeUnmount(() => {
   gap: 5px;
   flex-direction: column;
   overflow: hidden;
-  display: inline-flex;
+  /* display: inline-flex; */
+  display: flex;
+  position: relative; /* 確保子元素相對定位 */
   padding: 8px;
 }
 
@@ -1365,6 +1416,7 @@ onBeforeUnmount(() => {
 .file-preview {
   display: flex;
   justify-content: flex-start;
+  order: 0; /* 預覽區域在 textarea 上方 */
 }
 
 .file-preview-position {
