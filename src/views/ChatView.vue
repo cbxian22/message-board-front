@@ -1,532 +1,288 @@
-<!-- chatView.vue  welldown-->
-<!-- <template>
-  <div>
-    <ul>
-      <li v-for="msg in messages" :key="msg.id">
-        <span>{{ msg.content }}</span>
-        <img
-          v-if="msg.media && msg.media.type === 'image'"
-          :src="msg.media.data"
-          alt="圖片"
-          style="max-width: 200px"
-        />
-        <video
-          v-if="msg.media && msg.media.type === 'video'"
-          controls
-          :src="msg.media.data"
-          style="max-width: 200px"
-        ></video>
-        <span v-if="msg.senderId === currentUserId && msg.isRead">已讀</span>
-      </li>
-    </ul>
-    <input
-      v-model="newMessage"
-      @keyup.enter="sendMessage"
-      placeholder="輸入文字"
-    />
-    <input type="file" accept="image/*,video/*" @change="handleFileUpload" />
-    <button @click="sendMessage">發送</button>
-  </div>
-</template>
-
-<script>
-import { io } from "socket.io-client";
-import { openDB } from "idb";
-import apiClient from "../stores/axiosConfig";
-
-export default {
-  data() {
-    return {
-      socket: null,
-      messages: [],
-      newMessage: "",
-      selectedFile: null,
-      currentUserId: null,
-      friendId: null,
-      db: null,
-    };
-  },
-  async mounted() {
-    this.db = await openDB("chatDB", 1, {
-      upgrade(db) {
-        db.createObjectStore("messages", { keyPath: "id" });
-      },
-    });
-
-    await this.loadMessages();
-
-    try {
-      const response = await apiClient.get("/auth/me");
-      this.currentUserId = response.data.id.toString();
-      console.log("當前用戶 ID:", this.currentUserId);
-    } catch (err) {
-      console.error(
-        "獲取用戶 ID 失敗:",
-        err.response?.data?.message || err.message
-      );
-      this.currentUserId = "2"; // 預設值
-    }
-
-    this.friendId = this.currentUserId === "2" ? "4" : "2"; // 測試用
-    await this.loadMessages();
-
-    this.socket = io("wss://message-board-server-7yot.onrender.com", {
-      query: { userId: this.currentUserId },
-    });
-
-    this.socket.on("connect", () => {
-      console.log("WebSocket 連接成功");
-    });
-
-    this.socket.on("connect_error", (err) => {
-      console.log("WebSocket 連接錯誤:", err);
-    });
-
-    this.socket.on("receiveMessage", async (message) => {
-      console.log("收到消息:", message);
-      await this.saveMessage(message);
-      this.addOrUpdateMessage(message);
-      if (message.receiverId === this.currentUserId && !message.isRead) {
-        this.markAsRead(message.id, message.senderId, message.receiverId);
-      }
-    });
-
-    this.socket.on("messageSent", async (message) => {
-      console.log("消息已發送:", message);
-      await this.saveMessage(message);
-      this.addOrUpdateMessage(message);
-    });
-
-    this.socket.on("messageRead", async ({ messageId }) => {
-      console.log("收到消息已讀通知:", messageId);
-      let msg = this.messages.find((m) => m.id === messageId);
-      if (msg) {
-        msg.isRead = true; // 直接修改屬性
-        await this.updateMessage(msg);
-        console.log("更新現有消息已讀狀態:", msg);
-        // 確保 UI 更新
-        this.messages = [...this.messages];
-      } else {
-        console.log(
-          `消息 ${messageId} 未在當前 messages 中，嘗試從 IndexedDB 載入`
-        );
-        const allMessages = await this.db.getAll("messages");
-        const missingMsg = allMessages.find((m) => m.id === messageId);
-        if (missingMsg) {
-          missingMsg.isRead = true;
-          await this.saveMessage(missingMsg);
-          this.addOrUpdateMessage(missingMsg);
-          console.log("從 IndexedDB 載入並更新消息:", missingMsg);
-          // 強制觸發 UI 更新
-          this.messages = [...this.messages];
-        } else {
-          console.log(`消息 ${messageId} 在 IndexedDB 中也未找到`);
-        }
-      }
-    });
-
-    this.socket.on("syncMessages", async (messages) => {
-      console.log("收到短期同步消息:", messages);
-      for (const message of messages) {
-        await this.saveMessage(message);
-        this.addOrUpdateMessage(message);
-        if (message.receiverId === this.currentUserId && !message.isRead) {
-          this.markAsRead(message.id, message.senderId, message.receiverId);
-        }
-      }
-    });
-  },
-  methods: {
-    async sendMessage() {
-      if (this.newMessage.trim() || this.selectedFile) {
-        const message = {
-          senderId: this.currentUserId,
-          receiverId: this.friendId,
-          content: this.newMessage,
-          media: this.selectedFile
-            ? await this.processFile(this.selectedFile)
-            : null,
-        };
-        console.log("發送消息:", message);
-        this.socket.emit("sendMessage", message);
-        this.newMessage = "";
-        this.selectedFile = null;
-      }
-    },
-    handleFileUpload(event) {
-      this.selectedFile = event.target.files[0];
-    },
-    async processFile(file) {
-      return new Promise((resolve) => {
-        const reader = new FileReader();
-        reader.onload = (e) => {
-          resolve({
-            type: file.type.startsWith("image") ? "image" : "video",
-            data: e.target.result,
-          });
-        };
-        reader.readAsDataURL(file);
-      });
-    },
-    async saveMessage(message) {
-      const tx = this.db.transaction("messages", "readwrite");
-      await tx.store.put({ ...message });
-      await tx.done;
-    },
-    async updateMessage(message) {
-      const tx = this.db.transaction("messages", "readwrite");
-      await tx.store.put({ ...message });
-      await tx.done;
-      const msg = this.messages.find((m) => m.id === message.id);
-      if (msg) {
-        Object.assign(msg, message);
-      }
-    },
-    async loadMessages() {
-      const allMessages = await this.db.getAll("messages");
-      console.log("從 IndexedDB 載入消息:", allMessages);
-      this.messages = allMessages.filter(
-        (msg) =>
-          (msg.senderId === this.currentUserId &&
-            msg.receiverId === this.friendId) ||
-          (msg.senderId === this.friendId &&
-            msg.receiverId === this.currentUserId)
-      );
-      console.log("更新後的 messages 陣列:", this.messages);
-    },
-    addOrUpdateMessage(message) {
-      const existingMsg = this.messages.find((m) => m.id === message.id);
-      if (existingMsg) {
-        Object.assign(existingMsg, message);
-      } else {
-        this.messages.push({ ...message });
-      }
-    },
-    markAsRead(messageId, senderId, receiverId) {
-      console.log("標記已讀:", { messageId, senderId, receiverId });
-      this.socket.emit("markAsRead", { messageId, senderId, receiverId });
-    },
-  },
-  beforeUnmount() {
-    this.socket.disconnect();
-  },
-};
-</script>
-
-<style>
-.unread {
-  font-weight: bold;
-  color: red;
-}
-</style> -->
-
-<!-- chatView.vue test well
+<!-- ChatView.vue
 <template>
-  <div>
-    <ul>
-      <li v-for="msg in messages" :key="msg.id">
-        <span>{{ msg.content }}</span>
-        <img
-          v-if="msg.media && msg.media.type === 'image'"
-          :src="msg.media.data"
-          alt="圖片"
-          style="max-width: 200px"
-        />
-        <video
-          v-if="msg.media && msg.media.type === 'video'"
-          controls
-          :src="msg.media.data"
-          style="max-width: 200px"
-        ></video>
-        <span v-if="msg.senderId === currentUserId && msg.isRead">已讀</span>
-      </li>
-    </ul>
-    <input
-      v-model="newMessage"
-      @keyup.enter="sendMessage"
-      placeholder="輸入文字"
-    />
-    <input type="file" accept="image/*,video/*" @change="handleFileUpload" />
-    <button @click="sendMessage">發送</button>
-  </div>
-</template>
+  <div class="container-box">
+    <div class="container">
+      <div class="icon-name">
+        <div class="back-icon">
+          <router-link to="#" @click.prevent="$router.back()">
+            <img class="icon" :src="Backiconchat" alt="Backicon" />
+          </router-link>
+        </div>
+        <router-link :to="`/@${friend.accountname}`" class="info">
+          <img :src="friend.avatar_url" :alt="friend.name" class="avatar" />
+          <div class="info-name">
+            <span class="friend-name">{{ friend.name }}</span>
+            <span class="friend-account-name">{{ friend.accountname }}</span>
+          </div>
+        </router-link>
+      </div>
 
-<script setup>
-import { ref, onMounted, onBeforeUnmount } from "vue";
-import { io } from "socket.io-client";
-import { openDB } from "idb";
-import apiClient from "../stores/axiosConfig";
-
-// 定義響應式變數
-const socket = ref(null);
-const messages = ref([]);
-const newMessage = ref("");
-const selectedFile = ref(null);
-const currentUserId = ref(null);
-const friendId = ref(null);
-const db = ref(null);
-
-// 初始化資料庫並載入消息
-const loadMessages = async () => {
-  const allMessages = await db.value.getAll("messages");
-  console.log("從 IndexedDB 載入消息:", allMessages);
-  messages.value = allMessages.filter(
-    (msg) =>
-      (msg.senderId === currentUserId.value &&
-        msg.receiverId === friendId.value) ||
-      (msg.senderId === friendId.value &&
-        msg.receiverId === currentUserId.value)
-  );
-  console.log("更新後的 messages 陣列:", messages.value);
-};
-
-// 儲存消息到 IndexedDB
-const saveMessage = async (message) => {
-  const tx = db.value.transaction("messages", "readwrite");
-  await tx.store.put({ ...message });
-  await tx.done;
-};
-
-// 更新消息到 IndexedDB
-const updateMessage = async (message) => {
-  const tx = db.value.transaction("messages", "readwrite");
-  await tx.store.put({ ...message });
-  await tx.done;
-  const msg = messages.value.find((m) => m.id === message.id);
-  if (msg) Object.assign(msg, message);
-};
-
-// 添加或更新消息到本地陣列
-const addOrUpdateMessage = (message) => {
-  const existingMsg = messages.value.find((m) => m.id === message.id);
-  if (existingMsg) {
-    Object.assign(existingMsg, message);
-  } else {
-    messages.value.push({ ...message });
-  }
-};
-
-// 發送消息
-const sendMessage = async () => {
-  if (newMessage.value.trim() || selectedFile.value) {
-    const message = {
-      senderId: currentUserId.value,
-      receiverId: friendId.value,
-      content: newMessage.value,
-      media: selectedFile.value ? await processFile(selectedFile.value) : null,
-    };
-    console.log("發送消息:", message);
-    socket.value.emit("sendMessage", message);
-    newMessage.value = "";
-    selectedFile.value = null;
-  }
-};
-
-// 處理檔案上傳
-const handleFileUpload = (event) => {
-  selectedFile.value = event.target.files[0];
-};
-
-// 處理檔案轉換為 Data URL
-const processFile = (file) => {
-  return new Promise((resolve) => {
-    const reader = new FileReader();
-    reader.onload = (e) =>
-      resolve({
-        type: file.type.startsWith("image") ? "image" : "video",
-        data: e.target.result,
-      });
-    reader.readAsDataURL(file);
-  });
-};
-
-// 標記消息為已讀
-const markAsRead = (messageId, senderId, receiverId) => {
-  console.log("標記已讀:", { messageId, senderId, receiverId });
-  socket.value.emit("markAsRead", { messageId, senderId, receiverId });
-};
-
-// 頁面掛載時執行
-onMounted(async () => {
-  db.value = await openDB("chatDB", 1, {
-    upgrade(db) {
-      db.createObjectStore("messages", { keyPath: "id" });
-    },
-  });
-
-  await loadMessages();
-
-  try {
-    const response = await apiClient.get("/auth/me");
-    currentUserId.value = response.data.id.toString();
-    console.log("當前用戶 ID:", currentUserId.value);
-  } catch (err) {
-    console.error(
-      "獲取用戶 ID 失敗:",
-      err.response?.data?.message || err.message
-    );
-    currentUserId.value = "2"; // 預設值
-  }
-
-  friendId.value = currentUserId.value === "2" ? "4" : "2"; // 測試用
-  await loadMessages();
-
-  socket.value = io("wss://message-board-server-7yot.onrender.com", {
-    query: { userId: currentUserId.value },
-  });
-
-  socket.value.on("connect", () => {
-    console.log("WebSocket 連接成功");
-  });
-
-  socket.value.on("connect_error", (err) => {
-    console.log("WebSocket 連接錯誤:", err);
-  });
-
-  socket.value.on("receiveMessage", async (message) => {
-    console.log("收到消息:", message);
-    await saveMessage(message);
-    addOrUpdateMessage(message);
-    if (message.receiverId === currentUserId.value && !message.isRead) {
-      markAsRead(message.id, message.senderId, message.receiverId);
-    }
-  });
-
-  socket.value.on("messageSent", async (message) => {
-    console.log("消息已發送:", message);
-    await saveMessage(message);
-    addOrUpdateMessage(message);
-  });
-
-  socket.value.on("messageRead", async ({ messageId }) => {
-    console.log("收到消息已讀通知:", messageId);
-    let msg = messages.value.find((m) => m.id === messageId);
-    if (msg) {
-      msg.isRead = true;
-      await updateMessage(msg);
-      console.log("更新現有消息已讀狀態:", msg);
-      messages.value = [...messages.value]; // 觸發 UI 更新
-    } else {
-      console.log(
-        `消息 ${messageId} 未在當前 messages 中，嘗試從 IndexedDB 載入`
-      );
-      const allMessages = await db.value.getAll("messages");
-      const missingMsg = allMessages.find((m) => m.id === messageId);
-      if (missingMsg) {
-        missingMsg.isRead = true;
-        await saveMessage(missingMsg);
-        addOrUpdateMessage(missingMsg);
-        console.log("從 IndexedDB 載入並更新消息:", missingMsg);
-        messages.value = [...messages.value]; // 觸發 UI 更新
-      } else {
-        console.log(`消息 ${messageId} 在 IndexedDB 中也未找到`);
-      }
-    }
-  });
-
-  socket.value.on("syncMessages", async (messagesData) => {
-    console.log("收到短期同步消息:", messagesData);
-    for (const message of messagesData) {
-      await saveMessage(message);
-      addOrUpdateMessage(message);
-      if (message.receiverId === currentUserId.value && !message.isRead) {
-        markAsRead(message.id, message.senderId, message.receiverId);
-      }
-    }
-  });
-});
-
-// 頁面卸載前斷開 WebSocket
-onBeforeUnmount(() => {
-  socket.value.disconnect();
-});
-</script>
-
-<style>
-.unread {
-  font-weight: bold;
-  color: red;
-}
-</style> -->
-
-<!-- 傳入props -->
-<!-- ChatView.vue -->
-<template>
-  <div class="chat-container">
-    <div class="chat-header">
-      <router-link to="/" class="back-button">返回</router-link>
-      <h2>與 {{ friendName }} 的對話</h2>
-    </div>
-    <div class="messages">
-      <div
-        v-for="msg in messages"
-        :key="msg.id"
-        :class="[
-          'message',
-          msg.senderId === currentUserId ? 'sent' : 'received',
-        ]"
-      >
-        <span class="content">{{ msg.content }}</span>
-        <img
-          v-if="msg.media && msg.media.type === 'image'"
-          :src="msg.media.data"
-          alt="圖片"
-          class="media"
-        />
-        <video
-          v-if="msg.media && msg.media.type === 'video'"
-          controls
-          :src="msg.media.data"
-          class="media"
-        ></video>
-        <span
-          v-if="msg.senderId === currentUserId && msg.isRead"
-          class="read-status"
-          >已讀</span
+      <div class="messages">
+        <div
+          v-for="msg in messages"
+          :key="msg.id"
+          :class="[
+            'message',
+            msg.senderId === currentUserId ? 'sent' : 'received',
+          ]"
         >
+          <span class="content">{{ msg.content }}</span>
+          <img
+            v-if="msg.media && msg.media.type === 'image'"
+            :src="msg.media.data"
+            alt="圖片"
+            class="media"
+          />
+          <video
+            v-if="msg.media && msg.media.type === 'video'"
+            controls
+            :src="msg.media.data"
+            class="media"
+          ></video>
+          <span
+            v-if="msg.senderId === currentUserId && msg.isRead"
+            class="read-status"
+            >已讀</span
+          >
+        </div>
+      </div>
+      <div class="input-area">
+        <div class="file-upload-select">
+          <input
+            type="file"
+            ref="fileInputRef"
+            class="file-input"
+            @change="handleFileUpload"
+            style="display: none"
+          />
+          <button type="button" @click="triggerFileInput" class="submit-button">
+            <img class="icon" :src="Noteicon" alt="Noteicon" />
+          </button>
+        </div>
+
+        <div class="custom-input-container" ref="textareabox">
+          <div v-if="fileUrl" class="file-preview">
+            <div class="file-preview-position">
+              <img
+                v-if="isPreviewImage"
+                :src="fileUrl"
+                alt="File Preview"
+                class="preview-img"
+              />
+              <video
+                v-else-if="isPreviewVideo"
+                :src="fileUrl"
+                controls
+                class="preview-video"
+                preload="auto"
+              />
+
+              <button @click="cancelFilePreview" class="cancel-preview-button">
+                <img class="icon" :src="Closeicon" alt="Close icon" />
+              </button>
+            </div>
+          </div>
+
+          <textarea
+            v-model="newMessage"
+            ref="textarea"
+            @keyup.enter="sendMessage"
+            placeholder="輸入訊息..."
+            class="message-input"
+          ></textarea>
+        </div>
+
+        <button @click="sendMessage" class="send-button">發送</button>
       </div>
     </div>
-    <div class="input-area">
-      <input
-        v-model="newMessage"
-        @keyup.enter="sendMessage"
-        placeholder="輸入訊息..."
-        class="message-input"
-      />
-      <input
-        type="file"
-        accept="image/*,video/*"
-        @change="handleFileUpload"
-        class="file-input"
-      />
-      <button @click="sendMessage" class="send-button">發送</button>
-    </div>
   </div>
 </template>
 
 <script setup>
-import { ref, onMounted, onBeforeUnmount } from "vue";
-import { useRouter } from "vue-router"; // 引入 useRouter
+import {
+  ref,
+  onMounted,
+  computed,
+  onBeforeUnmount,
+  nextTick,
+  watch,
+} from "vue";
+import { useMessage } from "naive-ui";
+import { useRouter } from "vue-router";
 import { io } from "socket.io-client";
 import { openDB } from "idb";
 import apiClient from "../stores/axiosConfig";
 
+import Backiconchat from "../assets/Backicon-chat.svg";
+import Noteicon from "../assets/Noteicon.svg";
+import Closeicon from "../assets/Closeicon.svg";
+
 const props = defineProps({
-  friendId: String, // 從路由參數接收 friendId
+  friendId: String,
 });
 
-const router = useRouter(); // 使用路由器進行跳轉
+const router = useRouter();
+const message = useMessage();
 
 // 定義響應式變數
 const socket = ref(null);
 const messages = ref([]);
 const newMessage = ref("");
+const textarea = ref(null);
+const textareabox = ref(null);
 const selectedFile = ref(null);
 const currentUserId = ref(null);
 const db = ref(null);
 const friendName = ref("");
+const file = ref(null);
+const fileUrl = ref(null);
+const fileInputRef = ref(null);
 
-// 載入消息
+// 動態調整高度的函數
+const adjustTextareaHeight = () => {
+  nextTick(() => {
+    if (textarea.value && textareabox.value) {
+      // 重置高度為初始值
+      textarea.value.style.height = "auto"; // 先設為 auto 以正確計算 scrollHeight
+      textareabox.value.style.height = "auto";
+
+      // 計算文字內容高度（限制最大 100px）
+      const textHeight = Math.min(textarea.value.scrollHeight, 100);
+
+      // 設置 textarea 的高度
+      textarea.value.style.height = `${textHeight}px`;
+
+      // 計算總高度（文字高度 + 預覽區域高度）
+      let totalHeight = textHeight;
+      if (fileUrl.value) {
+        totalHeight += 90; // 預覽區域高度 (80px + 10px padding)
+      }
+
+      // 設置 custom-input-container 的高度
+      textareabox.value.style.height = `${totalHeight}px`;
+
+      // 處理滾動條
+      if (textarea.value.scrollHeight > 100) {
+        textarea.value.style.overflowY = "auto";
+      } else {
+        textarea.value.style.overflowY = "hidden";
+      }
+    }
+  });
+};
+
+// 監聽 newMessage 和 fileUrl 的變化
+watch(
+  [newMessage, fileUrl],
+  () => {
+    adjustTextareaHeight();
+  },
+  { immediate: true }
+);
+
+// onMounted 初始化高度
+onMounted(() => {
+  adjustTextareaHeight();
+});
+
+const triggerFileInput = () => {
+  fileInputRef.value?.click();
+};
+
+// 檔案類型檢查
+const getFileType = (fileOrUrl) => {
+  if (typeof fileOrUrl === "string") {
+    const ext = fileOrUrl.split(".").pop().toLowerCase();
+    if (["jpg", "jpeg", "png", "gif", "bmp", "webp"].includes(ext))
+      return "image";
+    if (["mp4", "webm", "ogg", "mov"].includes(ext)) return "video";
+  } else if (fileOrUrl?.type) {
+    if (fileOrUrl.type.startsWith("image/")) return "image";
+    if (fileOrUrl.type.startsWith("video/")) return "video";
+  }
+  return null;
+};
+
+const isPreviewImage = computed(() => getFileType(file.value) === "image");
+const isPreviewVideo = computed(() => getFileType(file.value) === "video");
+
+const friend = {
+  id: 4,
+  name: "胡摩豬",
+  accountname: "shan4",
+  avatar_url:
+    "https://storage.googleapis.com/message_board_storage/1000006562.jpg",
+};
+
+onMounted(async () => {
+  messages.value = [
+    {
+      id: "1",
+      senderId: currentUserId.value,
+      receiverId: props.friendId,
+      content: "嗨！最近好嗎？",
+      isRead: true,
+    },
+    {
+      id: "2",
+      senderId: props.friendId,
+      receiverId: currentUserId.value,
+      content: "我很好！你呢？",
+      isRead: true,
+    },
+    {
+      id: "3",
+      senderId: currentUserId.value,
+      receiverId: props.friendId,
+      content: "這是張圖片！",
+      media: {
+        type: "image",
+        data: "https://via.placeholder.com/150",
+      },
+      isRead: false,
+    },
+    {
+      id: "4",
+      senderId: props.friendId,
+      receiverId: currentUserId.value,
+      content: "這是一段影片！",
+      media: {
+        type: "video",
+        data: "https://samplelib.com/lib/preview/mp4/sample-5s.mp4",
+      },
+      isRead: false,
+    },
+    {
+      id: "5",
+      senderId: currentUserId.value,
+      receiverId: props.friendId,
+      content: "嗨！最近好嗎？",
+      isRead: true,
+    },
+    {
+      id: "6",
+      senderId: props.friendId,
+      receiverId: currentUserId.value,
+      content: "我很好！你呢？",
+      isRead: true,
+    },
+    {
+      id: "7",
+      senderId: currentUserId.value,
+      receiverId: props.friendId,
+      content: "嗨！最近好嗎？",
+      isRead: true,
+    },
+    {
+      id: "8",
+      senderId: props.friendId,
+      receiverId: currentUserId.value,
+      content: "我很好！你呢？",
+      isRead: true,
+    },
+  ];
+});
+
 const loadMessages = async () => {
   const allMessages = await db.value.getAll("messages");
   console.log("從 IndexedDB 載入消息:", allMessages);
@@ -582,9 +338,46 @@ const sendMessage = async () => {
   }
 };
 
-// 處理檔案上傳
+// 貼文＿檢查檔案上傳處理，並顯示預覽
 const handleFileUpload = (event) => {
-  selectedFile.value = event.target.files[0];
+  const selectedFile = event.target.files[0];
+  if (!selectedFile) return;
+
+  if (fileUrl.value) URL.revokeObjectURL(fileUrl.value);
+  file.value = selectedFile;
+
+  try {
+    if (selectedFile.type.startsWith("image/")) {
+      const reader = new FileReader();
+      reader.onload = (e) => {
+        fileUrl.value = e.target.result;
+        adjustTextareaHeight(); // 上傳後調整高度
+      };
+      reader.onerror = () => {
+        message.error("圖片讀取失敗！");
+      };
+      reader.readAsDataURL(selectedFile);
+    } else if (selectedFile.type.startsWith("video/")) {
+      fileUrl.value = URL.createObjectURL(selectedFile);
+      adjustTextareaHeight(); // 上傳後調整高度
+    } else {
+      file.value = null;
+      message.error("僅支援圖片和影片檔案！");
+    }
+  } catch (error) {
+    file.value = null;
+    fileUrl.value = null;
+    message.error("檔案處理失敗，請重試！");
+  }
+};
+
+// 貼文＿取消檔案預覽，重設檔案選擇
+const cancelFilePreview = () => {
+  if (fileUrl.value) URL.revokeObjectURL(fileUrl.value);
+  fileUrl.value = null;
+  file.value = null;
+  if (fileInputRef.value) fileInputRef.value.value = null;
+  adjustTextareaHeight(); // 上傳後調整高度
 };
 
 // 處理檔案轉換為 Data URL
@@ -726,7 +519,7 @@ const fetchCurrentUser = async () => {
       "獲取用戶 ID 失敗:",
       err.response?.data?.message || err.message
     );
-    router.push("/login"); // 跳轉至登入頁面
+    // router.push("/login"); // 跳轉至登入頁面
   }
 };
 
@@ -737,8 +530,7 @@ onMounted(async () => {
       db.createObjectStore("messages", { keyPath: "id" });
     },
   });
-
-  await fetchCurrentUser(); // 將所有初始化邏輯移至 fetchCurrentUser 內
+  await fetchCurrentUser();
 });
 
 // 頁面卸載前斷開 WebSocket
@@ -750,64 +542,73 @@ onBeforeUnmount(() => {
 </script>
 
 <style scoped>
-.chat-container {
-  max-width: 800px;
-  margin: 0 auto;
-  height: 100vh;
+.container-box {
+  width: 650px;
+  height: 95vh;
   display: flex;
+  justify-self: center;
   flex-direction: column;
-  background-color: #f5f5f5;
+  position: relative;
 }
 
-.chat-header {
-  padding: 15px 20px;
-  background-color: #ffffff;
+.icon-name {
+  display: flex;
+  padding: 10px 30px;
+  gap: 20px;
   border-bottom: 1px solid #e0e0e0;
+}
+
+.back-icon {
+  margin: 15px 0 15px 5px;
+  display: flex;
+}
+
+.back-icon a {
+  display: flex;
+}
+.back-icon img {
+  width: 24px;
+}
+
+.container .info {
   display: flex;
   align-items: center;
   gap: 20px;
 }
-
-.back-button {
-  text-decoration: none;
-  color: #007bff;
-  font-size: 14px;
+.container .info-name {
+  display: flex;
+  flex-direction: column;
 }
 
-.back-button:hover {
-  text-decoration: underline;
-}
-
-h2 {
-  margin: 0;
-  font-size: 18px;
-  color: #333;
+.container .info .avatar {
+  width: 50px;
+  height: 50px;
+  border-radius: 50%;
+  object-fit: cover;
 }
 
 .messages {
-  flex: 1;
-  padding: 20px;
+  padding: 10px;
+  height: calc(100% - 170px);
   overflow-y: auto;
-  background-color: #fafafa;
+  overflow-x: hidden;
 }
 
 .message {
-  max-width: 70%;
+  max-width: 60%;
   margin-bottom: 15px;
   padding: 10px 15px;
-  border-radius: 12px;
-  position: relative;
+  border-radius: 8px;
 }
 
 .message.sent {
-  background-color: #007bff;
-  color: #ffffff;
+  background-color: #eedfcc;
   margin-left: auto;
+  position: relative;
 }
 
 .message.received {
   background-color: #e9ecef;
-  color: #333;
   margin-right: auto;
 }
 
@@ -821,48 +622,747 @@ h2 {
   border-radius: 8px;
 }
 
+.file-input {
+  display: none;
+}
+
 .read-status {
+  position: absolute;
+  left: -30px;
+  bottom: 0;
   font-size: 12px;
-  margin-left: 10px;
+  text-align: center;
+  opacity: 0.7;
+}
+
+/* textarea */
+.input-area {
+  display: flex;
+  padding: 15px;
+  margin: 15px;
+  gap: 10px;
+  border: 1px solid #ddd;
+  border-radius: 20px;
+  align-items: flex-end;
+  box-sizing: border-box;
+  background-color: #fff;
+}
+
+.custom-input-container {
+  flex: 1;
+  gap: 5px;
+  flex-direction: column;
+  overflow: hidden;
+  display: inline-flex;
+  padding: 8px;
+}
+
+.message-input {
+  font-size: 14px;
+  width: 100%;
+  padding: 0px 5px;
+  outline: none;
+  border: none;
+  resize: none;
+  line-height: 1.2;
+  box-sizing: border-box;
+}
+
+.file-preview {
+  display: flex;
+  justify-content: flex-start;
+}
+
+.file-preview-position {
+  position: relative;
+  display: flex;
+}
+
+.preview-img,
+.preview-video {
+  max-width: 100%;
+  max-height: 80px;
+  object-fit: contain;
+  border-radius: 8px;
+}
+
+.cancel-preview-button {
+  position: absolute;
+  top: 0;
+  right: 0;
+  color: var(--n-text-color) !important;
+  background-color: var(--n-body-color) !important;
+  border-radius: 50%;
+  width: 30px;
+  height: 30px;
+  font-size: 16px;
+  cursor: pointer;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+}
+
+.file-upload-select {
+  display: flex;
+}
+
+.send-button {
+  padding: 10px 20px;
+  border: none;
+  border-radius: 20px;
+  cursor: pointer;
+}
+
+.send-button:hover {
+}
+</style> -->
+
+<!-- ChatView.vue -->
+<template>
+  <div class="container-box">
+    <div class="container">
+      <div class="icon-name">
+        <div class="back-icon">
+          <router-link to="#" @click.prevent="$router.back()">
+            <img class="icon" :src="Backiconchat" alt="Backicon" />
+          </router-link>
+        </div>
+        <router-link :to="`/@${friend.accountname}`" class="info">
+          <img :src="friend.avatar_url" :alt="friend.name" class="avatar" />
+          <div class="info-name">
+            <span class="friend-name">{{ friend.name }}</span>
+            <span class="friend-account-name">{{ friend.accountname }}</span>
+          </div>
+        </router-link>
+      </div>
+
+      <div class="messages">
+        <div
+          v-for="msg in messages"
+          :key="msg.id"
+          :class="[
+            'message',
+            msg.senderId === currentUserId ? 'sent' : 'received',
+          ]"
+        >
+          <span class="content">{{ msg.content }}</span>
+          <img
+            v-if="msg.media && msg.media.type === 'image'"
+            :src="msg.media.data"
+            alt="圖片"
+            class="media"
+          />
+          <video
+            v-if="msg.media && msg.media.type === 'video'"
+            controls
+            :src="msg.media.data"
+            class="media"
+          ></video>
+          <span
+            v-if="msg.senderId === currentUserId && msg.isRead"
+            class="read-status"
+            >已讀</span
+          >
+        </div>
+      </div>
+
+      <div class="input-area">
+        <div class="file-upload-select">
+          <input
+            type="file"
+            ref="fileInputRef"
+            class="file-input"
+            @change="handleFileUpload"
+            style="display: none"
+          />
+          <button type="button" @click="triggerFileInput" class="submit-button">
+            <img class="icon" :src="Noteicon" alt="Noteicon" />
+          </button>
+        </div>
+
+        <div class="custom-input-container" ref="textareabox">
+          <div v-if="fileUrl" class="file-preview">
+            <div class="file-preview-position">
+              <img
+                v-if="isPreviewImage"
+                :src="fileUrl"
+                alt="File Preview"
+                class="preview-img"
+              />
+              <video
+                v-else-if="isPreviewVideo"
+                :src="fileUrl"
+                controls
+                class="preview-video"
+                preload="auto"
+              />
+              <button @click="cancelFilePreview" class="cancel-preview-button">
+                <img class="icon" :src="Closeicon" alt="Close icon" />
+              </button>
+            </div>
+          </div>
+
+          <textarea
+            v-model="newMessage"
+            ref="textarea"
+            @keyup.enter="sendMessage"
+            placeholder="輸入訊息..."
+            class="message-input"
+          ></textarea>
+        </div>
+
+        <button @click="sendMessage" class="send-button">發送</button>
+      </div>
+    </div>
+  </div>
+</template>
+
+<script setup>
+import {
+  ref,
+  onMounted,
+  computed,
+  onBeforeUnmount,
+  nextTick,
+  watch,
+} from "vue";
+import { useMessage } from "naive-ui";
+import { useRouter } from "vue-router";
+import { io } from "socket.io-client";
+import { openDB } from "idb";
+import apiClient from "../stores/axiosConfig";
+
+import Backiconchat from "../assets/Backicon-chat.svg";
+import Noteicon from "../assets/Noteicon.svg";
+import Closeicon from "../assets/Closeicon.svg";
+
+const props = defineProps({
+  friendId: String,
+});
+
+const router = useRouter();
+const message = useMessage();
+
+// 定義響應式變數
+const socket = ref(null);
+const messages = ref([]);
+const newMessage = ref("");
+const textarea = ref(null);
+const textareabox = ref(null);
+const selectedFile = ref(null);
+const currentUserId = ref(null);
+const db = ref(null);
+const friendName = ref("");
+const file = ref(null);
+const fileUrl = ref(null);
+const fileInputRef = ref(null);
+
+// 動態調整高度的函數
+const adjustTextareaHeight = () => {
+  nextTick(() => {
+    if (textarea.value && textareabox.value) {
+      // 重置高度為初始值
+      textarea.value.style.height = "auto"; // 先設為 auto 以正確計算 scrollHeight
+      textareabox.value.style.height = "auto";
+
+      // 計算文字內容高度（限制最大 100px）
+      const textHeight = Math.min(textarea.value.scrollHeight, 100);
+
+      // 設置 textarea 的高度
+      textarea.value.style.height = `${textHeight}px`;
+
+      // 計算總高度（文字高度 + 預覽區域高度）
+      let totalHeight = textHeight;
+      if (fileUrl.value) {
+        totalHeight += 90; // 預覽區域高度 (80px + 10px padding)
+      }
+
+      // 設置 custom-input-container 的高度
+      textareabox.value.style.height = `${totalHeight}px`;
+
+      // 不再直接調整 .input-area，由 Flexbox 自動處理
+      if (textarea.value.scrollHeight > 100) {
+        textarea.value.style.overflowY = "auto";
+      } else {
+        textarea.value.style.overflowY = "hidden";
+      }
+    }
+  });
+};
+
+// 監聽 newMessage 和 fileUrl 的變化
+watch(
+  [newMessage, fileUrl],
+  () => {
+    adjustTextareaHeight();
+  },
+  { immediate: true }
+);
+
+// onMounted 初始化高度
+onMounted(() => {
+  adjustTextareaHeight();
+});
+
+const triggerFileInput = () => {
+  fileInputRef.value?.click();
+};
+
+// 檔案類型檢查
+const getFileType = (fileOrUrl) => {
+  if (typeof fileOrUrl === "string") {
+    const ext = fileOrUrl.split(".").pop().toLowerCase();
+    if (["jpg", "jpeg", "png", "gif", "bmp", "webp"].includes(ext))
+      return "image";
+    if (["mp4", "webm", "ogg", "mov"].includes(ext)) return "video";
+  } else if (fileOrUrl?.type) {
+    if (fileOrUrl.type.startsWith("image/")) return "image";
+    if (fileOrUrl.type.startsWith("video/")) return "video";
+  }
+  return null;
+};
+
+const isPreviewImage = computed(() => getFileType(file.value) === "image");
+const isPreviewVideo = computed(() => getFileType(file.value) === "video");
+
+const loadMessages = async () => {
+  const allMessages = await db.value.getAll("messages");
+  console.log("從 IndexedDB 載入消息:", allMessages);
+  messages.value = allMessages.filter(
+    (msg) =>
+      (msg.senderId === currentUserId.value &&
+        msg.receiverId === props.friendId) ||
+      (msg.senderId === props.friendId &&
+        msg.receiverId === currentUserId.value)
+  );
+  console.log("更新後的 messages 陣列:", messages.value);
+};
+
+// 儲存消息到 IndexedDB
+const saveMessage = async (message) => {
+  const tx = db.value.transaction("messages", "readwrite");
+  await tx.store.put({ ...message });
+  await tx.done;
+};
+
+// 更新消息到 IndexedDB
+const updateMessage = async (message) => {
+  const tx = db.value.transaction("messages", "readwrite");
+  await tx.store.put({ ...message });
+  await tx.done;
+  const msg = messages.value.find((m) => m.id === message.id);
+  if (msg) Object.assign(msg, message);
+};
+
+// 添加或更新消息到本地陣列
+const addOrUpdateMessage = (message) => {
+  const existingMsg = messages.value.find((m) => m.id === message.id);
+  if (existingMsg) {
+    Object.assign(existingMsg, message);
+  } else {
+    messages.value.push({ ...message });
+  }
+};
+
+// 發送消息
+const sendMessage = async () => {
+  if (newMessage.value.trim() || selectedFile.value) {
+    const message = {
+      senderId: currentUserId.value,
+      receiverId: props.friendId,
+      content: newMessage.value,
+      media: selectedFile.value ? await processFile(selectedFile.value) : null,
+    };
+    console.log("發送消息:", message);
+    socket.value.emit("sendMessage", message);
+    newMessage.value = "";
+    selectedFile.value = null;
+  }
+};
+
+// 檢查檔案上傳處理，並顯示預覽
+const handleFileUpload = (event) => {
+  const selectedFile = event.target.files[0];
+  if (!selectedFile) return;
+
+  if (fileUrl.value) URL.revokeObjectURL(fileUrl.value);
+  file.value = selectedFile;
+
+  try {
+    if (selectedFile.type.startsWith("image/")) {
+      const reader = new FileReader();
+      reader.onload = (e) => {
+        fileUrl.value = e.target.result;
+        adjustTextareaHeight(); // 上傳後調整高度
+      };
+      reader.onerror = () => {
+        message.error("圖片讀取失敗！");
+      };
+      reader.readAsDataURL(selectedFile);
+    } else if (selectedFile.type.startsWith("video/")) {
+      fileUrl.value = URL.createObjectURL(selectedFile);
+      adjustTextareaHeight(); // 上傳後調整高度
+    } else {
+      file.value = null;
+      message.error("僅支援圖片和影片檔案！");
+    }
+  } catch (error) {
+    file.value = null;
+    fileUrl.value = null;
+    message.error("檔案處理失敗，請重試！");
+  }
+};
+
+// 取消檔案預覽，重設檔案選擇
+const cancelFilePreview = () => {
+  if (fileUrl.value) URL.revokeObjectURL(fileUrl.value);
+  fileUrl.value = null;
+  file.value = null;
+  if (fileInputRef.value) fileInputRef.value.value = null;
+  adjustTextareaHeight(); // 取消後調整高度
+};
+
+// 處理檔案轉換為 Data URL
+const processFile = (file) => {
+  return new Promise((resolve) => {
+    const reader = new FileReader();
+    reader.onload = (e) =>
+      resolve({
+        type: file.type.startsWith("image") ? "image" : "video",
+        data: e.target.result,
+      });
+    reader.readAsDataURL(file);
+  });
+};
+
+// 標記消息為已讀
+const markAsRead = (messageId, senderId, receiverId) => {
+  console.log("標記已讀:", { messageId, senderId, receiverId });
+  socket.value.emit("markAsRead", { messageId, senderId, receiverId });
+};
+
+// 獲取好友名稱
+const fetchFriendName = async () => {
+  try {
+    const response = await apiClient.get("/api/friends");
+    const friend = response.data.find(
+      (f) => f.id.toString() === props.friendId
+    );
+    friendName.value = friend ? friend.name : "未知好友";
+  } catch (err) {
+    console.error("獲取好友名稱失敗:", err);
+    friendName.value = "未知好友";
+  }
+};
+
+// 獲取當前用戶 ID
+const fetchCurrentUser = async () => {
+  try {
+    const response = await apiClient.get("/auth/me");
+    currentUserId.value = response.data.id.toString();
+    console.log("當前用戶 ID:", currentUserId.value);
+    await fetchFriendName();
+    await loadMessages();
+
+    socket.value = io("wss://message-board-server-7yot.onrender.com", {
+      query: { userId: currentUserId.value },
+    });
+
+    socket.value.on("connect", () => {
+      console.log("WebSocket 連接成功");
+    });
+
+    socket.value.on("connect_error", (err) => {
+      console.log("WebSocket 連接錯誤:", err);
+    });
+
+    socket.value.on("receiveMessage", async (message) => {
+      console.log("收到消息:", message);
+      await saveMessage(message);
+      if (
+        (message.senderId === props.friendId &&
+          message.receiverId === currentUserId.value) ||
+        (message.receiverId === props.friendId &&
+          message.senderId === currentUserId.value)
+      ) {
+        addOrUpdateMessage(message);
+      }
+      if (message.receiverId === currentUserId.value && !message.isRead) {
+        markAsRead(message.id, message.senderId, message.receiverId);
+      }
+    });
+
+    socket.value.on("messageSent", async (message) => {
+      console.log("消息已發送:", message);
+      await saveMessage(message);
+      if (
+        (message.senderId === currentUserId.value &&
+          message.receiverId === props.friendId) ||
+        (message.receiverId === currentUserId.value &&
+          message.senderId === props.friendId)
+      ) {
+        addOrUpdateMessage(message);
+      }
+    });
+
+    socket.value.on("messageRead", async ({ messageId }) => {
+      console.log("收到消息已讀通知:", messageId);
+      let msg = messages.value.find((m) => m.id === messageId);
+      if (msg) {
+        msg.isRead = true;
+        await updateMessage(msg);
+        console.log("更新現有消息已讀狀態:", msg);
+        messages.value = [...messages.value];
+      } else {
+        console.log(
+          `消息 ${messageId} 未在當前 messages 中，嘗試從 IndexedDB 載入`
+        );
+        const allMessages = await db.value.getAll("messages");
+        const missingMsg = allMessages.find((m) => m.id === messageId);
+        if (missingMsg) {
+          missingMsg.isRead = true;
+          await saveMessage(missingMsg);
+          if (
+            (missingMsg.senderId === currentUserId.value &&
+              missingMsg.receiverId === props.friendId) ||
+            (missingMsg.receiverId === currentUserId.value &&
+              missingMsg.senderId === props.friendId)
+          ) {
+            addOrUpdateMessage(missingMsg);
+            console.log("從 IndexedDB 載入並更新消息:", missingMsg);
+            messages.value = [...messages.value];
+          }
+        } else {
+          console.log(`消息 ${messageId} 在 IndexedDB 中也未找到`);
+        }
+      }
+    });
+
+    socket.value.on("syncMessages", async (messagesData) => {
+      console.log("收到短期同步消息:", messagesData);
+      for (const message of messagesData) {
+        await saveMessage(message);
+        if (
+          (message.senderId === currentUserId.value &&
+            message.receiverId === props.friendId) ||
+          (message.receiverId === currentUserId.value &&
+            message.senderId === props.friendId)
+        ) {
+          addOrUpdateMessage(message);
+        }
+        if (message.receiverId === currentUserId.value && !message.isRead) {
+          markAsRead(message.id, message.senderId, message.receiverId);
+        }
+      }
+    });
+  } catch (err) {
+    console.error(
+      "獲取用戶 ID 失敗:",
+      err.response?.data?.message || err.message
+    );
+    router.push("/login");
+  }
+};
+
+// 頁面掛載時執行
+onMounted(async () => {
+  db.value = await openDB("chatDB", 1, {
+    upgrade(db) {
+      db.createObjectStore("messages", { keyPath: "id" });
+    },
+  });
+  await fetchCurrentUser();
+});
+
+// 頁面卸載前斷開 WebSocket
+onBeforeUnmount(() => {
+  if (socket.value) {
+    socket.value.disconnect();
+  }
+});
+</script>
+
+<style scoped>
+.container-box {
+  width: 650px;
+  height: 95vh;
+  display: flex;
+  flex-direction: column;
+  margin: 0 auto;
+  margin-top: 2.5vh;
+}
+
+.container {
+  display: flex;
+  flex-direction: column;
+  height: 100%;
+}
+
+.icon-name {
+  display: flex;
+  padding: 10px 30px;
+  gap: 20px;
+  border-bottom: 1px solid #e0e0e0;
+}
+
+.back-icon {
+  margin: 15px 0 15px 5px;
+  display: flex;
+}
+
+.back-icon a {
+  display: flex;
+}
+.back-icon img {
+  width: 24px;
+}
+
+.container .info {
+  display: flex;
+  align-items: center;
+  gap: 20px;
+}
+.container .info-name {
+  display: flex;
+  flex-direction: column;
+}
+
+.container .info .avatar {
+  width: 50px;
+  height: 50px;
+  border-radius: 50%;
+  object-fit: cover;
+}
+
+.messages {
+  flex: 1; /* 靈活縮放，占據剩餘空間 */
+  padding: 10px;
+  overflow-y: auto;
+  overflow-x: hidden;
+  min-height: 100px; /* 確保不會過小 */
+}
+
+.message {
+  max-width: 60%;
+  margin-bottom: 15px;
+  padding: 10px 15px;
+  border-radius: 8px;
+}
+
+.message.sent {
+  background-color: #eedfcc;
+  margin-left: auto;
+  position: relative;
+}
+
+.message.received {
+  background-color: #e9ecef;
+  margin-right: auto;
+}
+
+.content {
+  word-wrap: break-word;
+}
+
+.media {
+  max-width: 100%;
+  margin-top: 5px;
+  border-radius: 8px;
+}
+
+.file-input {
+  display: none;
+}
+
+.read-status {
+  position: absolute;
+  left: -30px;
+  bottom: 0;
+  font-size: 12px;
+  text-align: center;
   opacity: 0.7;
 }
 
 .input-area {
   display: flex;
-  padding: 15px;
-  background-color: #ffffff;
-  border-top: 1px solid #e0e0e0;
+  padding: 10px;
+  margin: 15px;
   gap: 10px;
+  border: 1px solid #ddd;
+  border-radius: 20px;
+  align-items: flex-end;
+  box-sizing: border-box;
+  background-color: #fff;
+  height: auto; /* 高度自適應 */
+  min-height: 60px; /* 最小高度 */
+}
+
+.custom-input-container {
+  flex: 1;
+  gap: 5px;
+  flex-direction: column;
+  overflow: hidden;
+  display: inline-flex;
+  padding: 8px;
 }
 
 .message-input {
-  flex: 1;
-  padding: 10px;
-  border: 1px solid #ddd;
-  border-radius: 20px;
-  outline: none;
   font-size: 14px;
+  width: 100%;
+  padding: 0px 5px;
+  outline: none;
+  border: none;
+  resize: none;
+  line-height: 1.2;
+  box-sizing: border-box;
 }
 
-.message-input:focus {
-  border-color: #007bff;
+.file-preview {
+  display: flex;
+  justify-content: flex-start;
 }
 
-.file-input {
-  padding: 8px;
+.file-preview-position {
+  position: relative;
+  display: flex;
+}
+
+.preview-img,
+.preview-video {
+  max-width: 100%;
+  max-height: 80px;
+  object-fit: contain;
+  border-radius: 8px;
+}
+
+.cancel-preview-button {
+  position: absolute;
+  top: 0;
+  right: 0;
+  color: var(--n-text-color) !important;
+  background-color: var(--n-body-color) !important;
+  border-radius: 50%;
+  width: 30px;
+  height: 30px;
+  font-size: 16px;
+  cursor: pointer;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+}
+
+.file-upload-select {
+  display: flex;
 }
 
 .send-button {
   padding: 10px 20px;
-  background-color: #007bff;
-  color: #ffffff;
   border: none;
   border-radius: 20px;
   cursor: pointer;
-  transition: background-color 0.2s;
 }
 
 .send-button:hover {
-  background-color: #0056b3;
+  /* 可添加懸停效果 */
 }
 </style>
