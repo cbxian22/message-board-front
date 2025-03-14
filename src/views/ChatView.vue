@@ -863,27 +863,54 @@ const friend = ref({
 });
 
 // 動態調整高度的函數
+// const adjustTextareaHeight = () => {
+//   nextTick(() => {
+//     if (textarea.value && textareabox.value) {
+//       textarea.value.style.height = "auto";
+//       textareabox.value.style.height = "auto";
+//       const textHeight = Math.min(textarea.value.scrollHeight, 100);
+//       textarea.value.style.height = `${textHeight}px`;
+//       let totalHeight = textHeight;
+//       if (fileUrl.value) {
+//         totalHeight += 90;
+//       }
+//       textareabox.value.style.height = `${totalHeight}px`;
+//       if (textarea.value.scrollHeight > 100) {
+//         textarea.value.style.overflowY = "auto";
+//       } else {
+//         textarea.value.style.overflowY = "hidden";
+//       }
+//     }
+//   });
+// };
+
 const adjustTextareaHeight = () => {
   nextTick(() => {
     if (textarea.value && textareabox.value) {
       textarea.value.style.height = "auto";
       textareabox.value.style.height = "auto";
 
+      // 獲取行高（從 CSS 或預設值）
       const lineHeight =
-        parseInt(getComputedStyle(textarea.value).lineHeight) || 20;
-      const lines = newMessage.value.split("\n").length;
+        parseInt(getComputedStyle(textarea.value).lineHeight) || 20; // 默認 20px
+      // 計算行數，根據換行符
+      const lines = (newMessage.value || "").split("\n").length;
+      // 計算文字區域高度，至少一行，最大 100px
       const textHeight = Math.min(
         Math.max(lines * lineHeight, lineHeight),
         100
       );
-      // const textHeight = Math.min(textarea.value.scrollHeight, 100);
 
       textarea.value.style.height = `${textHeight}px`;
+
+      // 計算總高度（包括文件預覽）
       let totalHeight = textHeight;
       if (fileUrl.value) {
-        totalHeight += 90;
+        totalHeight += 90; // 文件預覽高度
       }
       textareabox.value.style.height = `${totalHeight}px`;
+
+      // 處理滾動條
       if (textarea.value.scrollHeight > 100) {
         textarea.value.style.overflowY = "auto";
       } else {
