@@ -445,7 +445,11 @@ onUnmounted(() => {
   <div
     v-for="(reply, index) in replies"
     :key="reply.id"
-    :class="['reply-box', { 'last-reply': index === replies.length - 1 }]"
+    :class="[
+      'reply-box',
+      { 'has-reply': reply.length > 0 },
+      { 'last-reply': index === replies.length - 1 },
+    ]"
   >
     <div class="photo-content">
       <router-link :to="`/@${reply.name}`">
@@ -631,6 +635,11 @@ onUnmounted(() => {
   padding: 20px 25px 15px 25px;
   display: flex;
 }
+
+.comment-box.has-reply {
+  border-bottom: 0.5px solid #373737;
+}
+
 .reply-box.last-reply {
   border-bottom: none !important;
 }
