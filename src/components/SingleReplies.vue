@@ -446,7 +446,7 @@ onUnmounted(() => {
     <div
       v-for="(reply, index) in replies"
       :key="reply.id"
-      :class="['reply-box', { 'not-last': index !== replies.length - 1 }]"
+      :class="['reply-box', { 'is-last': index == replies.length - 1 }]"
     >
       <div class="photo-content">
         <router-link :to="`/@${reply.name}`">
@@ -639,8 +639,8 @@ onUnmounted(() => {
   border-top: 0.5px solid #373737;
 }
 
-.reply-box.not-last {
-  border-bottom: 0.5px solid #373737;
+.reply-box.is-last {
+  border-bottom: none;
 }
 
 .photo-content {
