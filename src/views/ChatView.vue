@@ -1402,28 +1402,11 @@ onBeforeUnmount(() => {
   color: #373737 !important;
 }
 
-@media (max-width: 500px) {
+@media (max-width: 768px) {
   .container-box {
-    width: 100% !important;
-    height: 95vh !important; /* 固定高度 */
-    padding: 0 5px;
-    margin: 0; /* 移除外邊距 */
-    overflow: hidden; /* 移除整體滾動 */
-    display: flex;
-    flex-direction: column;
-  }
-
-  .container {
-    height: 100%;
-    display: flex;
-    flex-direction: column;
-  }
-  .input-area {
-    padding: 5px;
-    margin: 5px;
-    border-radius: 10px;
-    flex-shrink: 0;
-    max-height: 200px; /* 限制輸入區域最大高度 */
+    width: 100%;
+    height: 100vh;
+    margin-top: 0;
   }
 }
 </style>
