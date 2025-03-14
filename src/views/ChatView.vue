@@ -730,7 +730,7 @@ onBeforeUnmount(() => {
         <router-link :to="`/@${friend.accountname}`" class="info">
           <img :src="friend.avatar_url" :alt="friend.name" class="avatar" />
           <div class="info-name">
-            <span class="friend-name">{{ friend.name }}</span>
+            <span class="friend-name">{{ friendName }}</span>
             <span class="friend-account-name">{{ friend.accountname }}</span>
           </div>
         </router-link>
@@ -1263,6 +1263,7 @@ onBeforeUnmount(() => {
 
 .content {
   word-wrap: break-word;
+  color: #000;
 }
 
 .media {
