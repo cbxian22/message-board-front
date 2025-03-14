@@ -636,7 +636,7 @@ onUnmounted(() => {
   display: flex;
 }
 
-.comment-box.has-reply {
+.reply-box.has-reply {
   border-bottom: 0.5px solid #373737;
 }
 
