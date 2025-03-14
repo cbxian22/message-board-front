@@ -229,13 +229,8 @@ onUnmounted(() => {
   <div
     v-for="(comment, index) in comments"
     :key="comment.id"
-    :class="[
-      'comment-box',
-      { 'no-content': comments.length === 0 },
-      { 'last-comment': index === comments.length - 1 },
-    ]"
+    :class="['comment-box', { 'last-comment': index === comments.length - 1 }]"
   >
-    <p>{{ (comment, index) }}</p>
     <div class="photo-content">
       <router-link :to="`/@${comment.name}`">
         <img :src="comment.user_avatar" alt="頭像" class="photo" />
@@ -371,14 +366,9 @@ onUnmounted(() => {
 <style scoped>
 .comment-box {
   padding: 20px 25px 15px 25px;
-  display: flex;
   border-bottom: 0.5px solid #373737;
+  display: flex;
 }
-
-.comment-box.no-content {
-  border: none !important;
-}
-
 .comment-box.last-comment {
   border-bottom: none !important;
 }
