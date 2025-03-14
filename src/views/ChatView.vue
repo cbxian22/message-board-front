@@ -804,10 +804,9 @@ onBeforeUnmount(() => {
 
           <textarea
             v-model="newMessage"
-            ref="textareaRef"
+            ref="textarea"
             placeholder="輸入訊息..."
-            @keydown.enter="handleEnter"
-            @input="adjustTextareaHeight"
+            @keyup.enter="sendMessage"
             class="message-input"
           ></textarea>
         </div>
@@ -853,7 +852,6 @@ const textareabox = ref(null);
 const selectedFile = ref(null);
 const currentUserId = ref(null);
 const db = ref(null);
-const textareaRef = ref(null);
 const friendName = ref("");
 const file = ref(null);
 const fileUrl = ref(null);
@@ -865,43 +863,25 @@ const friend = ref({
 });
 
 // 動態調整高度的函數
-// const adjustTextareaHeight = () => {
-//   nextTick(() => {
-//     if (textarea.value && textareabox.value) {
-//       textarea.value.style.height = "auto";
-//       textareabox.value.style.height = "auto";
-//       const textHeight = Math.min(textarea.value.scrollHeight, 100);
-//       textarea.value.style.height = `${textHeight}px`;
-//       let totalHeight = textHeight;
-//       if (fileUrl.value) {
-//         totalHeight += 90;
-//       }
-//       textareabox.value.style.height = `${totalHeight}px`;
-//       if (textarea.value.scrollHeight > 100) {
-//         textarea.value.style.overflowY = "auto";
-//       } else {
-//         textarea.value.style.overflowY = "hidden";
-//       }
-//     }
-//   });
-// };
 const adjustTextareaHeight = () => {
-  const textarea = textareaRef.value;
-  if (!textarea) return;
-
-  textarea.style.height = "auto"; // 先重置高度，確保計算準確
-  const maxHeight = 6 * parseFloat(getComputedStyle(textarea).lineHeight); // 6 行高
-  textarea.style.height = Math.min(textarea.scrollHeight, maxHeight) + "px";
-};
-
-const handleEnter = (event) => {
-  if (event.shiftKey) {
-    event.preventDefault();
-    newMessage.value = newMessage.value.trimEnd() + "\n"; // 確保只加一個換行
-  } else {
-    event.preventDefault();
-    sendMessage();
-  }
+  nextTick(() => {
+    if (textarea.value && textareabox.value) {
+      textarea.value.style.height = "auto";
+      textareabox.value.style.height = "auto";
+      const textHeight = Math.min(textarea.value.scrollHeight, 100);
+      textarea.value.style.height = `${textHeight}px`;
+      let totalHeight = textHeight;
+      if (fileUrl.value) {
+        totalHeight += 90;
+      }
+      textareabox.value.style.height = `${totalHeight}px`;
+      if (textarea.value.scrollHeight > 100) {
+        textarea.value.style.overflowY = "auto";
+      } else {
+        textarea.value.style.overflowY = "hidden";
+      }
+    }
+  });
 };
 
 // 監聽 newMessage 和 fileUrl 的變化
@@ -1209,7 +1189,7 @@ const fetchCurrentUser = async () => {
       "獲取用戶 ID 失敗:",
       err.response?.data?.message || err.message
     );
-    router.push("/login");
+    // router.push("/login");
   }
 };
 
@@ -1427,7 +1407,6 @@ onBeforeUnmount(() => {
     width: 100%;
     height: 80vh;
     margin-top: 10vh;
-    overflow: hidden;
   }
 }
 </style>
