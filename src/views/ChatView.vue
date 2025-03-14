@@ -1044,7 +1044,7 @@ const markAsRead = (messageId, senderId, receiverId) => {
 // 獲取好友名稱
 const fetchFriendName = async () => {
   try {
-    const response = await apiClient.get("/api/friends");
+    const response = await apiClient.get("/friends");
     const friend = response.data.find(
       (f) => f.id.toString() === props.friendId
     );
