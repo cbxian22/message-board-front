@@ -888,6 +888,7 @@ const handleEnter = (event) => {
   if (event.shiftKey) {
   } else {
     event.preventDefault(); // 防止換行
+    sendMessage();
   }
   nextTick(() => adjustTextareaHeight());
 };
