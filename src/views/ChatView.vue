@@ -1402,11 +1402,11 @@ onBeforeUnmount(() => {
   color: #373737 !important;
 }
 
-@media (max-width: 768px) {
+@media (max-width: 500px) {
   .container-box {
     width: 100%;
-    height: 100vh;
-    margin-top: 0;
+    height: 95vh;
+    margin-top: 2.5vh;
   }
 }
 </style>
