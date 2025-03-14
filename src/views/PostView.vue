@@ -814,8 +814,6 @@ watch(
 }
 
 .light-mode .user-content textarea {
-  background-color: #f5f5f5;
-  color: #000;
-  border: 1px solid #ccc;
+  color: rgb(0, 0, 0);
 }
 </style>
