@@ -866,26 +866,15 @@ const friend = ref({
 const adjustTextareaHeight = () => {
   nextTick(() => {
     if (textarea.value && textareabox.value) {
-      // 重置高度為初始值
-      textarea.value.style.height = "auto"; // 先設為 auto 以正確計算 scrollHeight
+      textarea.value.style.height = "auto";
       textareabox.value.style.height = "auto";
-
-      // 計算文字內容高度（限制最大 100px）
       const textHeight = Math.min(textarea.value.scrollHeight, 100);
-
-      // 設置 textarea 的高度
       textarea.value.style.height = `${textHeight}px`;
-
-      // 計算總高度（文字高度 + 預覽區域高度）
       let totalHeight = textHeight;
       if (fileUrl.value) {
-        totalHeight += 90; // 預覽區域高度 (80px + 10px padding)
+        totalHeight += 90;
       }
-
-      // 設置 custom-input-container 的高度
       textareabox.value.style.height = `${totalHeight}px`;
-
-      // 不再直接調整 .input-area，由 Flexbox 自動處理
       if (textarea.value.scrollHeight > 100) {
         textarea.value.style.overflowY = "auto";
       } else {
@@ -930,6 +919,15 @@ const getFileType = (fileOrUrl) => {
 const isPreviewImage = computed(() => getFileType(file.value) === "image");
 const isPreviewVideo = computed(() => getFileType(file.value) === "video");
 
+const scrollToBottom = () => {
+  nextTick(() => {
+    const messagesContainer = document.querySelector(".messages");
+    if (messagesContainer) {
+      messagesContainer.scrollTop = messagesContainer.scrollHeight;
+    }
+  });
+};
+
 const loadMessages = async () => {
   const allMessages = await db.value.getAll("messages");
   console.log("從 IndexedDB 載入消息:", allMessages);
@@ -941,6 +939,7 @@ const loadMessages = async () => {
         msg.receiverId === currentUserId.value)
   );
   console.log("更新後的 messages 陣列:", messages.value);
+  scrollToBottom();
 };
 
 // 儲存消息到 IndexedDB
@@ -982,6 +981,7 @@ const sendMessage = async () => {
     socket.value.emit("sendMessage", message);
     newMessage.value = "";
     selectedFile.value = null;
+    scrollToBottom();
   }
 };
 
@@ -1047,19 +1047,6 @@ const markAsRead = (messageId, senderId, receiverId) => {
 };
 
 // 獲取好友名稱
-// const fetchFriendName = async () => {
-//   try {
-//     const response = await apiClient.get("/friends");
-//     const friend = response.data.find(
-//       (f) => f.id.toString() === props.friendId
-//     );
-//     friendName.value = friend ? friend.name : "未知好友";
-//   } catch (err) {
-//     console.error("獲取好友名稱失敗:", err);
-//     friendName.value = "未知好友";
-//   }
-// };
-
 const fetchFriendName = async () => {
   try {
     const response = await apiClient.get("/friends");
@@ -1124,6 +1111,7 @@ const fetchCurrentUser = async () => {
           message.senderId === currentUserId.value)
       ) {
         addOrUpdateMessage(message);
+        scrollToBottom();
       }
       if (message.receiverId === currentUserId.value && !message.isRead) {
         markAsRead(message.id, message.senderId, message.receiverId);
@@ -1140,6 +1128,7 @@ const fetchCurrentUser = async () => {
           message.senderId === props.friendId)
       ) {
         addOrUpdateMessage(message);
+        scrollToBottom();
       }
     });
 
@@ -1167,6 +1156,7 @@ const fetchCurrentUser = async () => {
               missingMsg.senderId === props.friendId)
           ) {
             addOrUpdateMessage(missingMsg);
+            scrollToBottom();
             console.log("從 IndexedDB 載入並更新消息:", missingMsg);
             messages.value = [...messages.value];
           }
@@ -1187,6 +1177,7 @@ const fetchCurrentUser = async () => {
             message.senderId === props.friendId)
         ) {
           addOrUpdateMessage(message);
+          scrollToBottom();
         }
         if (message.receiverId === currentUserId.value && !message.isRead) {
           markAsRead(message.id, message.senderId, message.receiverId);
