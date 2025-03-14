@@ -1407,7 +1407,7 @@ onBeforeUnmount(() => {
     width: 100%;
     height: 80vh;
     margin-top: 10vh;
-    overflow: hidden;
+    overflow-y: hidden !important;
   }
 }
 </style>
