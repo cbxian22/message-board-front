@@ -886,9 +886,10 @@ const adjustTextareaHeight = () => {
 
 const handleEnter = (event) => {
   if (event.shiftKey) {
-    newMessage.value += "\n"; // Shift + Enter 換行
+    event.preventDefault();
+    newMessage.value = newMessage.value.trimEnd() + "\n"; // 確保只加一個換行
   } else {
-    event.preventDefault(); // Enter 送出訊息
+    event.preventDefault();
     sendMessage();
   }
 };
