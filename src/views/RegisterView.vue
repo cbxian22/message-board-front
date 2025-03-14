@@ -231,7 +231,7 @@ const handleRegister = async () => {
       name: name.value,
       account: account.value,
       password: password.value,
-      accountName: accountName.value,
+      accountname: accountName.value,
       role: role,
     });
     if (response.data.success) {
