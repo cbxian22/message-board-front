@@ -806,7 +806,7 @@ onBeforeUnmount(() => {
             v-model="newMessage"
             ref="textarea"
             placeholder="輸入訊息..."
-            @keydown.enter="handleEnter"
+            @keyup.enter="sendMessage"
             class="message-input"
           ></textarea>
         </div>
@@ -862,62 +862,19 @@ const friend = ref({
   avatar_url: "",
 });
 
-const handleEnter = (event) => {
-  if (event.shiftKey) {
-    // Shift + Enter：換行
-    newMessage.value += "\n";
-  } else {
-    // 僅 Enter：送出訊息
-    event.preventDefault(); // 防止默認換行
-    sendMessage();
-  }
-};
-
-// // 動態調整高度的函數
-// const adjustTextareaHeight = () => {
-//   nextTick(() => {
-//     if (textarea.value && textareabox.value) {
-//       textarea.value.style.height = "auto";
-//       textareabox.value.style.height = "auto";
-//       const textHeight = Math.min(textarea.value.scrollHeight, 100);
-//       textarea.value.style.height = `${textHeight}px`;
-//       let totalHeight = textHeight;
-//       if (fileUrl.value) {
-//         totalHeight += 90;
-//       }
-//       textareabox.value.style.height = `${totalHeight}px`;
-//       if (textarea.value.scrollHeight > 100) {
-//         textarea.value.style.overflowY = "auto";
-//       } else {
-//         textarea.value.style.overflowY = "hidden";
-//       }
-//     }
-//   });
-// };
-
+// 動態調整高度的函數
 const adjustTextareaHeight = () => {
   nextTick(() => {
     if (textarea.value && textareabox.value) {
       textarea.value.style.height = "auto";
       textareabox.value.style.height = "auto";
-
-      // 計算行數
-      const lineHeight =
-        parseInt(getComputedStyle(textarea.value).lineHeight) || 20; // 默認行高
-      const lines = newMessage.value.split("\n").length;
-      const textHeight = Math.min(
-        Math.max(lines * lineHeight, lineHeight),
-        100
-      ); // 至少一行，最大 100px
-
+      const textHeight = Math.min(textarea.value.scrollHeight, 100);
       textarea.value.style.height = `${textHeight}px`;
-
       let totalHeight = textHeight;
       if (fileUrl.value) {
         totalHeight += 90;
       }
       textareabox.value.style.height = `${totalHeight}px`;
-
       if (textarea.value.scrollHeight > 100) {
         textarea.value.style.overflowY = "auto";
       } else {
@@ -1262,14 +1219,12 @@ onBeforeUnmount(() => {
   flex-direction: column;
   margin: 0 auto;
   margin-top: 2.5vh;
-  overflow: hidden;
 }
 
 .container {
   display: flex;
   flex-direction: column;
   height: 100%;
-  overflow: hidden;
 }
 
 .icon-name {
@@ -1452,7 +1407,7 @@ onBeforeUnmount(() => {
     width: 100%;
     height: 80vh;
     margin-top: 10vh;
-    overflow-y: hidden !important;
+    overflow: hidden;
   }
 }
 </style>
