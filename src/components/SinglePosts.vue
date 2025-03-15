@@ -197,7 +197,7 @@ const handlelike = async (id) => {
       targetType: "post",
       targetId: id,
     });
-    console.log("Like API 回應:", response.data);
+
     if (response.status === 200 && response.data.likesCount !== undefined) {
       comment.likes = response.data.likesCount;
     }

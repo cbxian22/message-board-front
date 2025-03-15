@@ -107,10 +107,12 @@ const fetchReplies = async (postId) => {
   try {
     const userId = authStore.userId || localStorage.getItem("userId");
     const token = authStore.accessToken;
+    console.log("fetchReplies - postId:", postId, "userId:", userId);
     const response = await apiClient.get(`/replies/${postId}`, {
       params: { userId },
       headers: token ? { Authorization: `Bearer ${token}` } : {},
     });
+    console.log("Replies API 回應:", response.data); // 除錯用
     replies.value = response.data.map((reply) => ({
       id: reply.id,
       content: reply.content,
@@ -343,7 +345,7 @@ const handlelike = async (id) => {
       targetType: "reply",
       targetId: id,
     });
-    console.log("Like API 回應:", response.data);
+
     if (response.status === 200 && response.data.likesCount !== undefined) {
       reply.likes = response.data.likesCount;
     }
