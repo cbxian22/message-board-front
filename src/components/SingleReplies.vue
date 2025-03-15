@@ -303,6 +303,7 @@ const handleDelete = async (replayId) => {
     message.error("刪除失敗");
   }
 };
+
 // 登入確認＿like
 const checkTokenAndOpenModal = (id) => {
   if (!authStore.userId || !authStore.accessToken) {
@@ -342,15 +343,9 @@ const handlelike = async (id) => {
       targetType: "reply",
       targetId: id,
     });
-    // if (response.status === 200 && response.data.likesCount !== undefined) {
-    //   reply.likes = response.data.likesCount;
-    // }
-    if (response.status === 200) {
-      reply.likes = response.data.likesCount || reply.likes;
-      reply.userLiked =
-        response.data.userLiked !== undefined
-          ? response.data.userLiked
-          : !previousUserLiked;
+    console.log("Like API 回應:", response.data);
+    if (response.status === 200 && response.data.likesCount !== undefined) {
+      reply.likes = response.data.likesCount;
     }
   } catch (error) {
     console.error(
