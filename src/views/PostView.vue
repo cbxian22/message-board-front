@@ -349,6 +349,11 @@ watch(
 <template>
   <NavbarUp />
   <div class="container-box container" v-if="post">
+    <div class="back-icon">
+      <router-link to="#" @click.prevent="$router.back()">
+        <img class="icon" :src="Backicon" alt="Backicon" />
+      </router-link>
+    </div>
     <div class="comment-box">
       <div class="photo-content">
         <router-link :to="`/@${post.name}`">
@@ -542,6 +547,15 @@ watch(
 
 .comment-box {
   padding: 20px 25px 15px 25px;
+  display: flex;
+}
+
+.back-icon {
+  margin: 15px 0 15px 5px;
+  display: flex;
+}
+
+.back-icon a {
   display: flex;
 }
 
