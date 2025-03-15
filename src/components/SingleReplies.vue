@@ -103,30 +103,6 @@ const closeModal = (event) => {
 };
 
 // 獲取回覆
-// const fetchReplies = async (postId) => {
-//   try {
-//     const userId = authStore.userId || localStorage.getItem("userId");
-//     const token = authStore.accessToken;
-//     const response = await apiClient.get(`/replies/${postId}`, {
-//       params: { userId },
-//       headers: token ? { Authorization: `Bearer ${token}` } : {},
-//     });
-//     replies.value = response.data.map((reply) => ({
-//       id: reply.id,
-//       content: reply.content,
-//       timestamp: new Date(reply.created_at),
-//       file_url: reply.file_url,
-//       name: reply.user_name,
-//       user_avatar: reply.user_avatar,
-//       likes: reply.likes || 0,
-//       userLiked: reply.user_liked || false,
-//       replies: reply.replies || 0,
-//     }));
-//   } catch (error) {
-//     console.error("取得回覆錯誤:", error);
-//     message.error("回覆載入失敗");
-//   }
-// };
 const fetchReplies = async (postId) => {
   try {
     const userId = authStore.userId || localStorage.getItem("userId");
@@ -135,27 +111,17 @@ const fetchReplies = async (postId) => {
       params: { userId },
       headers: token ? { Authorization: `Bearer ${token}` } : {},
     });
-
-    if (response.status === 200 && Array.isArray(response.data)) {
-      replies.value = response.data.map((reply) => ({
-        id: reply.id,
-        content: reply.content,
-        timestamp: new Date(reply.created_at),
-        file_url: reply.file_url,
-        name: reply.user_name,
-        user_avatar: reply.user_avatar,
-        likes: reply.likes || 0,
-        userLiked: reply.user_liked || false,
-        replies: reply.replies || 0,
-      }));
-    } else {
-      console.error(
-        "無效的回覆數據或請求失敗:",
-        response.status,
-        response.data
-      );
-      message.error("回覆載入失敗");
-    }
+    replies.value = response.data.map((reply) => ({
+      id: reply.id,
+      content: reply.content,
+      timestamp: new Date(reply.created_at),
+      file_url: reply.file_url,
+      name: reply.user_name,
+      user_avatar: reply.user_avatar,
+      likes: reply.likes || 0,
+      userLiked: reply.user_liked || false,
+      replies: reply.replies || 0,
+    }));
   } catch (error) {
     console.error("取得回覆錯誤:", error);
     message.error("回覆載入失敗");
