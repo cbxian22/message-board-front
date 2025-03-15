@@ -348,189 +348,194 @@ watch(
 
 <template>
   <NavbarUp />
-  <div class="back-icon">
-    <router-link to="#" @click.prevent="$router.back()">
-      <img class="icon" :src="Backicon" alt="Backicon" />
-    </router-link>
-  </div>
-  <div class="container-box container" v-if="post">
-    <div class="comment-box">
-      <div class="photo-content">
-        <router-link :to="`/@${post.name}`">
-          <img
-            :src="post.user_avatar || 'https://via.placeholder.com/50'"
-            alt="頭像"
-            class="photo"
-          />
+  <div class="container-box" v-if="post">
+    <div class="container">
+      <div class="back-icon">
+        <router-link to="#" @click.prevent="$router.back()">
+          <img class="icon" :src="Backicon" alt="Backicon" />
         </router-link>
       </div>
+      <div class="comment-box">
+        <div class="photo-content">
+          <router-link :to="`/@${post.name}`">
+            <img
+              :src="post.user_avatar || 'https://via.placeholder.com/50'"
+              alt="頭像"
+              class="photo"
+            />
+          </router-link>
+        </div>
 
-      <div class="comment">
-        <div class="info">
-          <div class="info-span">
-            <router-link class="comment-author" :to="`/@${post.name}`">
-              {{ post.name }}
-            </router-link>
-            <span class="comment-time">
-              {{ dateStore.formatDate(post.timestamp) }}
+        <div class="comment">
+          <div class="info">
+            <div class="info-span">
+              <router-link class="comment-author" :to="`/@${post.name}`">
+                {{ post.name }}
+              </router-link>
+              <span class="comment-time">
+                {{ dateStore.formatDate(post.timestamp) }}
+              </span>
+            </div>
+
+            <div class="info-modal">
+              <button @click="openModal" class="info-link">
+                <img class="icon" :src="Moreicon" alt="More icon" />
+              </button>
+              <div v-show="isModalOpen" class="modal-overlay">
+                <div class="modal-content" @click.stop>
+                  <ul>
+                    <li
+                      v-if="
+                        authStore.isLoggedIn &&
+                        authStore.accountName === post.name
+                      "
+                    >
+                      <button class="modal-link" @click="handleUpdate(post.id)">
+                        <img class="icon" :src="Editicon" alt="Edit icon" />
+                        <span>編輯</span>
+                      </button>
+                    </li>
+                    <li
+                      v-if="
+                        authStore.isLoggedIn &&
+                        authStore.accountName === post.name
+                      "
+                    >
+                      <button
+                        class="modal-link"
+                        @click="handleDeleteConfirm(post.id)"
+                      >
+                        <img class="icon" :src="Deleteicon" alt="Delete icon" />
+                        <span>刪除</span>
+                      </button>
+                    </li>
+                    <li v-if="authStore.accountName !== post.name">
+                      <button class="modal-link">
+                        <img class="icon" :src="Flagicon" alt="Flag icon" />
+                        <span>檢舉</span>
+                      </button>
+                    </li>
+                  </ul>
+                </div>
+              </div>
+            </div>
+          </div>
+
+          <div class="comment-content">
+            <p>{{ post.content }}</p>
+            <span v-if="post.file_url">
+              <n-image
+                v-if="isImage(post.file_url)"
+                :src="post.file_url"
+                alt="post media"
+                lazy
+                :preview-disabled="false"
+                class="comment-image"
+              >
+                <template #placeholder>
+                  <div class="media-placeholder">Loading Image...</div>
+                </template>
+              </n-image>
+              <div v-else-if="isVideo(post.file_url)" class="video-wrapper">
+                <video
+                  :src="post.file_url"
+                  controls
+                  class="comment-video"
+                  preload="auto"
+                  @error="
+                    (e) => {
+                      console.error('Video load error:', post.file_url, e);
+                      message.error('影片載入失敗，請檢查格式或網絡');
+                    }
+                  "
+                />
+              </div>
             </span>
           </div>
 
-          <div class="info-modal">
-            <button @click="openModal" class="info-link">
-              <img class="icon" :src="Moreicon" alt="More icon" />
-            </button>
-            <div v-show="isModalOpen" class="modal-overlay">
-              <div class="modal-content" @click.stop>
-                <ul>
-                  <li
-                    v-if="
-                      authStore.isLoggedIn &&
-                      authStore.accountName === post.name
-                    "
-                  >
-                    <button class="modal-link" @click="handleUpdate(post.id)">
-                      <img class="icon" :src="Editicon" alt="Edit icon" />
-                      <span>編輯</span>
-                    </button>
-                  </li>
-                  <li
-                    v-if="
-                      authStore.isLoggedIn &&
-                      authStore.accountName === post.name
-                    "
-                  >
-                    <button
-                      class="modal-link"
-                      @click="handleDeleteConfirm(post.id)"
-                    >
-                      <img class="icon" :src="Deleteicon" alt="Delete icon" />
-                      <span>刪除</span>
-                    </button>
-                  </li>
-                  <li v-if="authStore.accountName !== post.name">
-                    <button class="modal-link">
-                      <img class="icon" :src="Flagicon" alt="Flag icon" />
-                      <span>檢舉</span>
-                    </button>
-                  </li>
-                </ul>
-              </div>
-            </div>
-          </div>
-        </div>
-
-        <div class="comment-content">
-          <p>{{ post.content }}</p>
-          <span v-if="post.file_url">
-            <n-image
-              v-if="isImage(post.file_url)"
-              :src="post.file_url"
-              alt="post media"
-              lazy
-              :preview-disabled="false"
-              class="comment-image"
-            >
-              <template #placeholder>
-                <div class="media-placeholder">Loading Image...</div>
-              </template>
-            </n-image>
-            <div v-else-if="isVideo(post.file_url)" class="video-wrapper">
-              <video
-                :src="post.file_url"
-                controls
-                class="comment-video"
-                preload="auto"
-                @error="
-                  (e) => {
-                    console.error('Video load error:', post.file_url, e);
-                    message.error('影片載入失敗，請檢查格式或網絡');
-                  }
-                "
-              />
-            </div>
-          </span>
-        </div>
-
-        <div class="reply-section">
-          <ul>
-            <li>
-              <div class="reply-count" @click="checkTokenAndOpenModal(post.id)">
-                <button class="reply-link">
-                  <img
-                    :class="{ icon: !post.userLiked }"
-                    :src="post.userLiked ? FavoriteRedicon : Favoriteicon"
-                    alt="Like"
-                  />
-                </button>
-                <n-badge :value="post.likes || 0" />
-              </div>
-            </li>
-          </ul>
-          <div class="user-content">
-            <div class="file-upload-container">
-              <div class="file-upload-select">
-                <input
-                  type="file"
-                  ref="fileInputRef"
-                  @change="handleFileUpload"
-                  class="file-input"
-                  style="display: none"
-                />
-                <button
-                  type="button"
-                  @click="triggerFileInput"
-                  class="submit-button"
+          <div class="reply-section">
+            <ul>
+              <li>
+                <div
+                  class="reply-count"
+                  @click="checkTokenAndOpenModal(post.id)"
                 >
-                  <img class="icon" :src="Noteicon" alt="Note icon" />
-                </button>
+                  <button class="reply-link">
+                    <img
+                      :class="{ icon: !post.userLiked }"
+                      :src="post.userLiked ? FavoriteRedicon : Favoriteicon"
+                      alt="Like"
+                    />
+                  </button>
+                  <n-badge :value="post.likes || 0" />
+                </div>
+              </li>
+            </ul>
+            <div class="user-content">
+              <div class="file-upload-container">
+                <div class="file-upload-select">
+                  <input
+                    type="file"
+                    ref="fileInputRef"
+                    @change="handleFileUpload"
+                    class="file-input"
+                    style="display: none"
+                  />
+                  <button
+                    type="button"
+                    @click="triggerFileInput"
+                    class="submit-button"
+                  >
+                    <img class="icon" :src="Noteicon" alt="Note icon" />
+                  </button>
+                </div>
+              </div>
+
+              <div class="textarea-wrapper">
+                <label for="content"></label>
+                <textarea
+                  id="content"
+                  ref="textareaRef"
+                  :readonly="!authStore.userId || !authStore.accessToken"
+                  v-model="content"
+                  placeholder="想回覆點什麼呢？"
+                ></textarea>
+              </div>
+              <div class="message-form-end">
+                <n-button
+                  :disabled="isSubmitDisabled"
+                  @click="handleMessage(post.id)"
+                >
+                  發佈
+                </n-button>
               </div>
             </div>
-
-            <div class="textarea-wrapper">
-              <label for="content"></label>
-              <textarea
-                id="content"
-                ref="textareaRef"
-                :readonly="!authStore.userId || !authStore.accessToken"
-                v-model="content"
-                placeholder="想回覆點什麼呢？"
-              ></textarea>
-            </div>
-            <div class="message-form-end">
-              <n-button
-                :disabled="isSubmitDisabled"
-                @click="handleMessage(post.id)"
-              >
-                發佈
-              </n-button>
-            </div>
           </div>
-        </div>
 
-        <div v-if="fileUrl" class="file-preview-container">
-          <div class="file-preview">
-            <img
-              v-if="isPreviewImage"
-              :src="fileUrl"
-              alt="File Preview"
-              class="preview-img"
-            />
-            <video
-              v-else-if="isPreviewVideo"
-              :src="fileUrl"
-              controls
-              class="preview-video"
-              preload="auto"
-            />
-            <button @click="cancelFilePreview" class="cancel-preview-button">
-              <img :src="Closeicon" alt="Close icon" />
-            </button>
+          <div v-if="fileUrl" class="file-preview-container">
+            <div class="file-preview">
+              <img
+                v-if="isPreviewImage"
+                :src="fileUrl"
+                alt="File Preview"
+                class="preview-img"
+              />
+              <video
+                v-else-if="isPreviewVideo"
+                :src="fileUrl"
+                controls
+                class="preview-video"
+                preload="auto"
+              />
+              <button @click="cancelFilePreview" class="cancel-preview-button">
+                <img :src="Closeicon" alt="Close icon" />
+              </button>
+            </div>
           </div>
         </div>
       </div>
+      <SingleReplies />
     </div>
-    <SingleReplies />
   </div>
   <div v-else>正在加載貼文...</div>
   <Navbar />
