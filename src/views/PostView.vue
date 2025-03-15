@@ -348,12 +348,12 @@ watch(
 
 <template>
   <NavbarUp />
+  <div class="back-icon">
+    <router-link to="#" @click.prevent="$router.back()">
+      <img class="icon" :src="Backicon" alt="Backicon" />
+    </router-link>
+  </div>
   <div class="container-box container" v-if="post">
-    <div class="back-icon">
-      <router-link to="#" @click.prevent="$router.back()">
-        <img class="icon" :src="Backicon" alt="Backicon" />
-      </router-link>
-    </div>
     <div class="comment-box">
       <div class="photo-content">
         <router-link :to="`/@${post.name}`">
