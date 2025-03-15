@@ -342,8 +342,15 @@ const handlelike = async (id) => {
       targetType: "reply",
       targetId: id,
     });
-    if (response.status === 200 && response.data.likesCount !== undefined) {
-      reply.likes = response.data.likesCount;
+    // if (response.status === 200 && response.data.likesCount !== undefined) {
+    //   reply.likes = response.data.likesCount;
+    // }
+    if (response.status === 200) {
+      reply.likes = response.data.likesCount || reply.likes;
+      reply.userLiked =
+        response.data.userLiked !== undefined
+          ? response.data.userLiked
+          : !previousUserLiked;
     }
   } catch (error) {
     console.error(
