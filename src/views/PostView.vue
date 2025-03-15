@@ -96,38 +96,38 @@ const isPreviewImage = computed(() => getFileType(file.value) === "image");
 const isPreviewVideo = computed(() => getFileType(file.value) === "video");
 
 // 貼文＿獲取單一
-// const fetchSingleComment = async (postId) => {
-//   try {
-//     const userId = authStore.userId || localStorage.getItem("userId");
-//     const response = await apiClient.get(`/posts/${postId}`, {
-//       params: { userId },
-//       headers: authStore.accessToken
-//         ? { Authorization: `Bearer ${authStore.accessToken}` }
-//         : {},
-//     });
-//     if (response.status === 200) {
-//       const comment = response.data;
-//       post.value = {
-//         id: comment.id,
-//         content: comment.content,
-//         name: comment.user_name,
-//         timestamp: new Date(comment.created_at),
-//         file_url: comment.file_url,
-//         user_avatar: comment.user_avatar,
-//         likes: comment.likes || 0,
-//         userLiked: comment.user_liked || false,
-//         replies: comment.replies || 0,
-//       };
-//     } else {
-//       console.error("無法獲取單一貼文，數據格式不正確");
-//       router.replace("/not-found");
-//       return;
-//     }
-//   } catch (error) {
-//     console.error("取得單一貼文錯誤:", error);
-//     router.replace("/not-found");
-//   }
-// };
+const fetchSingleComment = async (postId) => {
+  try {
+    const userId = authStore.userId || localStorage.getItem("userId");
+    const response = await apiClient.get(`/posts/${postId}`, {
+      params: { userId },
+      headers: authStore.accessToken
+        ? { Authorization: `Bearer ${authStore.accessToken}` }
+        : {},
+    });
+    if (response.status === 200) {
+      const comment = response.data;
+      post.value = {
+        id: comment.id,
+        content: comment.content,
+        name: comment.user_name,
+        timestamp: new Date(comment.created_at),
+        file_url: comment.file_url,
+        user_avatar: comment.user_avatar,
+        likes: comment.likes || 0,
+        userLiked: comment.user_liked || false,
+        replies: comment.replies || 0,
+      };
+    } else {
+      console.error("無法獲取單一貼文，數據格式不正確");
+      router.replace("/not-found");
+      return;
+    }
+  } catch (error) {
+    console.error("取得單一貼文錯誤:", error);
+    router.replace("/not-found");
+  }
+};
 
 // 貼文＿刪除確認
 const handleDeleteConfirm = (postId) => {
