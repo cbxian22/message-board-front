@@ -707,7 +707,6 @@ const isFormInvalid = computed(() => {
 <style scoped>
 .info-box {
   padding: 40px 50px 25px;
-  border-bottom: 0.5px solid #373737;
 }
 
 .info-box-in {
