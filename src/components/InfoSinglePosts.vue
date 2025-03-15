@@ -220,152 +220,154 @@ const scrollToTop = () => {
 </script>
 
 <template>
-  <div
-    v-for="(comment, index) in comments"
-    :key="comment.id"
-    :class="['comment-box', { 'last-comment': index === comments.length - 1 }]"
-  >
-    <div class="photo-content">
-      <img :src="comment.user_avatar" alt="頭像" class="photo" />
-    </div>
-
-    <div class="comment">
-      <div class="info">
-        <div class="info-span">
-          <span class="comment-author" @click="scrollToTop">
-            {{ comment.name }}</span
-          >
-          <span class="comment-time">
-            {{ dateStore.formatDate(comment.timestamp) }}</span
-          >
-        </div>
-
-        <div class="info-modal">
-          <button
-            ref="buttonRefs"
-            @click="openModal($event, comment.id)"
-            class="info-link"
-          >
-            <img class="icon" :src="Moreicon" alt="Moreicon" />
-          </button>
-          <div
-            v-show="modalState[comment.id]"
-            class="modal-overlay"
-            ref="modalRefs"
-          >
-            <div class="modal-content" @click.stop>
-              <ul>
-                <li
-                  v-if="
-                    authStore.isLoggedIn &&
-                    authStore.accountName === comment.name
-                  "
-                >
-                  <button class="modal-link" @click="handleUpdate(comment.id)">
-                    <img class="icon" :src="Editicon" alt="Editicon" />
-                    <span>編輯</span>
-                  </button>
-                </li>
-                <li
-                  v-if="
-                    authStore.isLoggedIn &&
-                    authStore.accountName === comment.name
-                  "
-                >
-                  <button
-                    class="modal-link"
-                    @click="handleDeleteConfirm(comment.id)"
-                  >
-                    <img class="icon" :src="Deleteicon" alt="Deleteicon" />
-                    <span>刪除</span>
-                  </button>
-                </li>
-                <li v-if="authStore.accountName !== comment.name">
-                  <button class="modal-link">
-                    <img class="icon" :src="Flagicon" alt="Flagicon" />
-                    <span>檢舉</span>
-                  </button>
-                </li>
-              </ul>
-            </div>
-          </div>
-        </div>
+  <div v-if="comments.length > 0">
+    <div
+      v-for="(comment, index) in comments"
+      :key="comment.id"
+      :class="['comment-box', { 'is-last': index === comments.length - 1 }]"
+    >
+      <div class="photo-content">
+        <img :src="comment.user_avatar" alt="頭像" class="photo" />
       </div>
 
-      <div class="comment-content">
-        <p>{{ comment.content }}</p>
-        <span v-if="comment.file_url">
-          <n-image
-            v-if="isImage(comment.file_url)"
-            :src="comment.file_url"
-            alt="comment media"
-            lazy
-            :preview-disabled="false"
-            class="comment-image"
-          >
-            <template #placeholder>
-              <div class="media-placeholder">Loading Image...</div>
-            </template>
-          </n-image>
-          <div v-else-if="isVideo(comment.file_url)" class="video-wrapper">
-            <video
-              :src="comment.file_url"
-              controls
-              class="comment-video"
-              preload="auto"
-              @error="
-                (e) => {
-                  console.error('Video load error:', comment.file_url, e);
-                  message.error('影片載入失敗，請檢查格式或網絡');
-                }
-              "
-            />
-          </div>
-        </span>
-      </div>
-
-      <div class="reply">
-        <ul>
-          <li>
-            <div
-              class="reply-count"
-              @click="checkTokenAndOpenModal(comment.id)"
+      <div class="comment">
+        <div class="info">
+          <div class="info-span">
+            <span class="comment-author" @click="scrollToTop">
+              {{ comment.name }}</span
             >
-              <button class="reply-link">
-                <img
-                  :class="{ icon: !comment.userLiked }"
-                  :src="comment.userLiked ? FavoriteRedicon : Favoriteicon"
-                  alt="Like"
-                />
-              </button>
-              <n-badge :value="comment.likes || 0" />
+            <span class="comment-time">
+              {{ dateStore.formatDate(comment.timestamp) }}</span
+            >
+          </div>
+
+          <div class="info-modal">
+            <button
+              ref="buttonRefs"
+              @click="openModal($event, comment.id)"
+              class="info-link"
+            >
+              <img class="icon" :src="Moreicon" alt="Moreicon" />
+            </button>
+            <div
+              v-show="modalState[comment.id]"
+              class="modal-overlay"
+              ref="modalRefs"
+            >
+              <div class="modal-content" @click.stop>
+                <ul>
+                  <li
+                    v-if="
+                      authStore.isLoggedIn &&
+                      authStore.accountName === comment.name
+                    "
+                  >
+                    <button
+                      class="modal-link"
+                      @click="handleUpdate(comment.id)"
+                    >
+                      <img class="icon" :src="Editicon" alt="Editicon" />
+                      <span>編輯</span>
+                    </button>
+                  </li>
+                  <li
+                    v-if="
+                      authStore.isLoggedIn &&
+                      authStore.accountName === comment.name
+                    "
+                  >
+                    <button
+                      class="modal-link"
+                      @click="handleDeleteConfirm(comment.id)"
+                    >
+                      <img class="icon" :src="Deleteicon" alt="Deleteicon" />
+                      <span>刪除</span>
+                    </button>
+                  </li>
+                  <li v-if="authStore.accountName !== comment.name">
+                    <button class="modal-link">
+                      <img class="icon" :src="Flagicon" alt="Flagicon" />
+                      <span>檢舉</span>
+                    </button>
+                  </li>
+                </ul>
+              </div>
             </div>
-          </li>
-          <li>
-            <div class="reply-count" @click="handleReply(comment.id)">
-              <button class="reply-link">
-                <img class="icon" :src="Replyicon" alt="Replyicon" />
-              </button>
-              <n-badge :value="comment.replies || 0" />
+          </div>
+        </div>
+
+        <div class="comment-content">
+          <p>{{ comment.content }}</p>
+          <span v-if="comment.file_url">
+            <n-image
+              v-if="isImage(comment.file_url)"
+              :src="comment.file_url"
+              alt="comment media"
+              lazy
+              :preview-disabled="false"
+              class="comment-image"
+            >
+              <template #placeholder>
+                <div class="media-placeholder">Loading Image...</div>
+              </template>
+            </n-image>
+            <div v-else-if="isVideo(comment.file_url)" class="video-wrapper">
+              <video
+                :src="comment.file_url"
+                controls
+                class="comment-video"
+                preload="auto"
+                @error="
+                  (e) => {
+                    console.error('Video load error:', comment.file_url, e);
+                    message.error('影片載入失敗，請檢查格式或網絡');
+                  }
+                "
+              />
             </div>
-          </li>
-        </ul>
+          </span>
+        </div>
+
+        <div class="reply">
+          <ul>
+            <li>
+              <div
+                class="reply-count"
+                @click="checkTokenAndOpenModal(comment.id)"
+              >
+                <button class="reply-link">
+                  <img
+                    :class="{ icon: !comment.userLiked }"
+                    :src="comment.userLiked ? FavoriteRedicon : Favoriteicon"
+                    alt="Like"
+                  />
+                </button>
+                <n-badge :value="comment.likes || 0" />
+              </div>
+            </li>
+            <li>
+              <div class="reply-count" @click="handleReply(comment.id)">
+                <button class="reply-link">
+                  <img class="icon" :src="Replyicon" alt="Replyicon" />
+                </button>
+                <n-badge :value="comment.replies || 0" />
+              </div>
+            </li>
+          </ul>
+        </div>
       </div>
     </div>
   </div>
-  <!-- <UpdatePostView v-model="isOpenModal" :post-id="selectedPostId" /> -->
-  <!-- 登入 Modal -->
-  <!-- <Login v-model="isLoginModalOpen" /> -->
 </template>
 
 <style scoped>
 .comment-box {
   padding: 20px 25px 15px 25px;
-  border-bottom: 0.5px solid #373737;
+  border-top: 0.5px solid #373737;
   display: flex;
 }
-.comment-box.last-comment {
-  border-bottom: none !important;
+.comment-box.is-last {
+  border-bottom: none;
 }
 
 .photo-content {

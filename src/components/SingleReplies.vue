@@ -446,7 +446,7 @@ onUnmounted(() => {
     <div
       v-for="(reply, index) in replies"
       :key="reply.id"
-      :class="['reply-box', { 'is-last': index == replies.length - 1 }]"
+      :class="['reply-box', { 'is-last': index === replies.length - 1 }]"
     >
       <div class="photo-content">
         <router-link :to="`/@${reply.name}`">
