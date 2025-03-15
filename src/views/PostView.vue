@@ -172,6 +172,41 @@ const handleUpdate = async (postId) => {
 };
 
 // 貼文＿按讚
+// const handlelike = async (id) => {
+//   if (!authStore.userId || !authStore.accessToken) {
+//     message.error("請先登入！");
+//     return;
+//   }
+//   if (isLikeProcessing.value) {
+//     console.log("點讚操作正在進行中，忽略此次請求");
+//     return;
+//   }
+
+//   isLikeProcessing.value = true;
+//   try {
+//     const response = await apiClient.post(`/like/${authStore.userId}`, {
+//       targetType: "post",
+//       targetId: id,
+//     });
+//     if (response.status === 200 && response.data.likesCount !== undefined) {
+//       emit("likePost", {
+//         id,
+//         likes: response.data.likesCount,
+//         userLiked: !post.value.userLiked,
+//       });
+//       post.value.likes = response.data.likesCount;
+//       post.value.userLiked = !post.value.userLiked;
+//     }
+//   } catch (error) {
+//     console.error(
+//       "按讚提交錯誤:",
+//       error.response ? error.response.data.error : error.message
+//     );
+//   } finally {
+//     isLikeProcessing.value = false;
+//   }
+// };
+// 貼文＿按讚
 const handlelike = async (id) => {
   if (!authStore.userId || !authStore.accessToken) {
     message.error("請先登入！");
@@ -181,26 +216,44 @@ const handlelike = async (id) => {
     console.log("點讚操作正在進行中，忽略此次請求");
     return;
   }
+
+  // 儲存之前的狀態以便失敗時回滾
+  const previousLikes = post.value.likes;
+  const previousUserLiked = post.value.userLiked;
+
+  // 立即更新前端顯示（樂觀更新）
+  if (!post.value.userLiked) {
+    post.value.likes += 1;
+    post.value.userLiked = true;
+  } else {
+    post.value.likes = Math.max(post.value.likes - 1, 0);
+    post.value.userLiked = false;
+  }
+
   isLikeProcessing.value = true;
+
   try {
     const response = await apiClient.post(`/like/${authStore.userId}`, {
       targetType: "post",
       targetId: id,
     });
     if (response.status === 200 && response.data.likesCount !== undefined) {
+      // 使用伺服器返回的最新數據更新
+      post.value.likes = response.data.likesCount;
       emit("likePost", {
         id,
         likes: response.data.likesCount,
-        userLiked: !post.value.userLiked,
+        userLiked: post.value.userLiked,
       });
-      post.value.likes = response.data.likesCount;
-      post.value.userLiked = !post.value.userLiked;
     }
   } catch (error) {
     console.error(
       "按讚提交錯誤:",
       error.response ? error.response.data.error : error.message
     );
+    // 失敗時回滾到之前狀態
+    post.value.likes = previousLikes;
+    post.value.userLiked = previousUserLiked;
   } finally {
     isLikeProcessing.value = false;
   }

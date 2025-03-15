@@ -190,6 +190,7 @@ const handlelike = async (id) => {
   }
 
   isLikeProcessing.value = true;
+
   try {
     const response = await apiClient.post(`/like/${authStore.userId}`, {
       targetType: "post",
