@@ -170,6 +170,7 @@ const handlelike = async (id) => {
     message.error("請先登入！");
     return;
   }
+
   if (isLikeProcessing.value) {
     console.log("點讚操作正在進行中，忽略此次請求");
     return;
