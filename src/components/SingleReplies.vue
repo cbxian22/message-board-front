@@ -348,6 +348,7 @@ const handlelike = async (id) => {
 
     if (response.status === 200 && response.data.likesCount !== undefined) {
       reply.likes = response.data.likesCount;
+      reply.userLiked = response.data.action === "liked";
     }
   } catch (error) {
     console.error(
