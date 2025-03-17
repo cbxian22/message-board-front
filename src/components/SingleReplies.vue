@@ -103,6 +103,32 @@ const closeModal = (event) => {
 };
 
 // 獲取回覆
+// const fetchReplies = async (postId) => {
+//   try {
+//     const userId = authStore.userId || localStorage.getItem("userId");
+//     const token = authStore.accessToken;
+//     console.log("fetchReplies - postId:", postId, "userId:", userId);
+//     const response = await apiClient.get(`/replies/${postId}`, {
+//       params: { userId },
+//       headers: token ? { Authorization: `Bearer ${token}` } : {},
+//     });
+//     console.log("Replies API 回應:", response.data); // 除錯用
+//     replies.value = response.data.map((reply) => ({
+//       id: reply.id,
+//       content: reply.content,
+//       timestamp: new Date(reply.created_at),
+//       file_url: reply.file_url,
+//       name: reply.user_name,
+//       user_avatar: reply.user_avatar,
+//       likes: reply.likes || 0,
+//       userLiked: Boolean(reply.user_liked) || false,
+//       replies: reply.replies || 0,
+//     }));
+//   } catch (error) {
+//     console.error("取得回覆錯誤:", error);
+//     message.error("回覆載入失敗");
+//   }
+// };
 const fetchReplies = async (postId) => {
   try {
     const userId = authStore.userId || localStorage.getItem("userId");
@@ -112,18 +138,21 @@ const fetchReplies = async (postId) => {
       params: { userId },
       headers: token ? { Authorization: `Bearer ${token}` } : {},
     });
-    console.log("Replies API 回應:", response.data); // 除錯用
-    replies.value = response.data.map((reply) => ({
-      id: reply.id,
-      content: reply.content,
-      timestamp: new Date(reply.created_at),
-      file_url: reply.file_url,
-      name: reply.user_name,
-      user_avatar: reply.user_avatar,
-      likes: reply.likes || 0,
-      userLiked: Boolean(reply.user_liked) || false,
-      replies: reply.replies || 0,
-    }));
+    console.log("Replies API 回應:", response.data);
+    replies.value = response.data.map((reply) => {
+      console.log(`Reply ${reply.id} user_liked:`, reply.user_liked); // 除錯用
+      return {
+        id: reply.id,
+        content: reply.content,
+        timestamp: new Date(reply.created_at),
+        file_url: reply.file_url,
+        name: reply.user_name,
+        user_avatar: reply.user_avatar,
+        likes: reply.likes || 0,
+        userLiked: Boolean(reply.user_liked), // 確保轉為布林值
+        replies: reply.replies || 0,
+      };
+    });
   } catch (error) {
     console.error("取得回覆錯誤:", error);
     message.error("回覆載入失敗");
@@ -315,6 +344,56 @@ const checkTokenAndOpenModal = (id) => {
   }
 };
 
+// const handlelike = async (id) => {
+//   if (!authStore.userId || !authStore.accessToken) {
+//     message.error("請先登入！");
+//     return;
+//   }
+//   if (isLikeProcessing.value) {
+//     console.log("點讚操作正在進行中，忽略此次請求");
+//     return;
+//   }
+
+//   const reply = replies.value.find((c) => c.id === id);
+//   if (!reply) return;
+
+//   const previousLikes = reply.likes;
+//   const previousUserLiked = reply.userLiked;
+
+//   if (!reply.userLiked) {
+//     reply.likes += 1;
+//     reply.userLiked = true;
+//   } else {
+//     reply.likes = Math.max(reply.likes - 1, 0);
+//     reply.userLiked = false;
+//   }
+
+//   isLikeProcessing.value = true;
+//   try {
+//     const response = await apiClient.post(`/like/${authStore.userId}`, {
+//       targetType: "reply",
+//       targetId: id,
+//     });
+
+//     if (response.status === 200 && response.data.likesCount !== undefined) {
+//       reply.likes = response.data.likesCount;
+//       reply.userLiked = response.data.action === "liked";
+//       await fetchReplies(postId);
+//     }
+//   } catch (error) {
+//     console.error(
+//       "按讚提交錯誤:",
+//       error.response ? error.response.data.error : error.message
+//     );
+//     reply.likes = previousLikes;
+//     reply.userLiked = previousUserLiked;
+//   } finally {
+//     isLikeProcessing.value = false;
+//   }
+// };
+
+// 提交更新
+
 const handlelike = async (id) => {
   if (!authStore.userId || !authStore.accessToken) {
     message.error("請先登入！");
@@ -331,6 +410,7 @@ const handlelike = async (id) => {
   const previousLikes = reply.likes;
   const previousUserLiked = reply.userLiked;
 
+  // 樂觀更新
   if (!reply.userLiked) {
     reply.likes += 1;
     reply.userLiked = true;
@@ -346,9 +426,12 @@ const handlelike = async (id) => {
       targetId: id,
     });
 
+    console.log("Like response:", response.data); // 除錯用
+
     if (response.status === 200 && response.data.likesCount !== undefined) {
       reply.likes = response.data.likesCount;
       reply.userLiked = response.data.action === "liked";
+      // 重新獲取回覆資料以確保同步
       await fetchReplies(postId);
     }
   } catch (error) {
@@ -363,7 +446,6 @@ const handlelike = async (id) => {
   }
 };
 
-// 提交更新
 const handleMessage = async () => {
   if (!authStore.accessToken) {
     message.error("請先登入！");
