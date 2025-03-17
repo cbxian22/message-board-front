@@ -172,41 +172,6 @@ const handleUpdate = async (postId) => {
 };
 
 // 貼文＿按讚
-// const handlelike = async (id) => {
-//   if (!authStore.userId || !authStore.accessToken) {
-//     message.error("請先登入！");
-//     return;
-//   }
-//   if (isLikeProcessing.value) {
-//     console.log("點讚操作正在進行中，忽略此次請求");
-//     return;
-//   }
-
-//   isLikeProcessing.value = true;
-//   try {
-//     const response = await apiClient.post(`/like/${authStore.userId}`, {
-//       targetType: "post",
-//       targetId: id,
-//     });
-//     if (response.status === 200 && response.data.likesCount !== undefined) {
-//       emit("likePost", {
-//         id,
-//         likes: response.data.likesCount,
-//         userLiked: !post.value.userLiked,
-//       });
-//       post.value.likes = response.data.likesCount;
-//       post.value.userLiked = !post.value.userLiked;
-//     }
-//   } catch (error) {
-//     console.error(
-//       "按讚提交錯誤:",
-//       error.response ? error.response.data.error : error.message
-//     );
-//   } finally {
-//     isLikeProcessing.value = false;
-//   }
-// };
-// 貼文＿按讚
 const handlelike = async (id) => {
   if (!authStore.userId || !authStore.accessToken) {
     message.error("請先登入！");
