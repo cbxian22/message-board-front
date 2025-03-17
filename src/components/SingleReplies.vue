@@ -429,9 +429,6 @@ const handlelike = async (id) => {
     console.log("Like response:", response.data); // 除錯用
 
     if (response.status === 200 && response.data.likesCount !== undefined) {
-      reply.likes = response.data.likesCount;
-      reply.userLiked = response.data.action === "liked";
-      // 重新獲取回覆資料以確保同步
       await fetchReplies(postId);
     }
   } catch (error) {
