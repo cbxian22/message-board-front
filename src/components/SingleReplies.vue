@@ -121,7 +121,7 @@ const fetchReplies = async (postId) => {
       name: reply.user_name,
       user_avatar: reply.user_avatar,
       likes: reply.likes || 0,
-      userLiked: reply.user_liked || false,
+      userLiked: Boolean(reply.user_liked) || false,
       replies: reply.replies || 0,
     }));
   } catch (error) {
