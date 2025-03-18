@@ -337,6 +337,58 @@ const triggerFileInput = (replyId) => {
 //     message.error("檔案處理失敗，請重試！");
 //   }
 // };
+// const handleFileUpload = (event, replyId) => {
+//   const selectedFile = event.target.files[0];
+//   if (!selectedFile) {
+//     console.log("未選擇檔案");
+//     return;
+//   }
+
+//   console.log("選擇的檔案:", selectedFile.name, selectedFile.type);
+
+//   initReplyState(replyId);
+//   const state = replyStates.value[replyId];
+
+//   // 清理舊的 URL
+//   if (
+//     state.fileUrl &&
+//     !replies.value.some((r) => r.file_url === state.fileUrl)
+//   ) {
+//     URL.revokeObjectURL(state.fileUrl);
+//     console.log("已清理舊的 fileUrl:", state.fileUrl);
+//   }
+
+//   state.file = selectedFile;
+//   try {
+//     if (selectedFile.type.startsWith("image/")) {
+//       const reader = new FileReader();
+//       reader.onload = (e) => {
+//         state.fileUrl = e.target.result; // Base64 數據
+//         console.log("圖片已載入，fileUrl 更新為:", state.fileUrl);
+//         nextTick(() => {
+//           console.log("DOM 更新後，fileUrl:", state.fileUrl);
+//           adjustTextareaHeight(replyId); // 確保 textarea 高度適應
+//         });
+//       };
+//       reader.readAsDataURL(selectedFile);
+//     } else if (selectedFile.type.startsWith("video/")) {
+//       state.fileUrl = URL.createObjectURL(selectedFile);
+//       console.log("影片已處理，fileUrl 更新為:", state.fileUrl);
+//       nextTick(() => {
+//         console.log("DOM 更新後，fileUrl:", state.fileUrl);
+//       });
+//     } else {
+//       state.file = null;
+//       message.error("僅支援圖片和影片檔案！");
+//       console.log("檔案類型不受支援");
+//     }
+//   } catch (error) {
+//     state.file = null;
+//     state.fileUrl = null;
+//     message.error("檔案處理失敗，請重試！");
+//     console.error("檔案處理錯誤:", error);
+//   }
+// };
 const handleFileUpload = (event, replyId) => {
   const selectedFile = event.target.files[0];
   if (!selectedFile) {
@@ -349,7 +401,6 @@ const handleFileUpload = (event, replyId) => {
   initReplyState(replyId);
   const state = replyStates.value[replyId];
 
-  // 清理舊的 URL
   if (
     state.fileUrl &&
     !replies.value.some((r) => r.file_url === state.fileUrl)
@@ -363,24 +414,18 @@ const handleFileUpload = (event, replyId) => {
     if (selectedFile.type.startsWith("image/")) {
       const reader = new FileReader();
       reader.onload = (e) => {
-        state.fileUrl = e.target.result; // Base64 數據
-        console.log("圖片已載入，fileUrl 更新為:", state.fileUrl);
-        nextTick(() => {
-          console.log("DOM 更新後，fileUrl:", state.fileUrl);
-          adjustTextareaHeight(replyId); // 確保 textarea 高度適應
-        });
+        state.fileUrl = e.target.result;
+        console.log("圖片預覽已生成:", state.fileUrl);
+        nextTick(() => adjustTextareaHeight(replyId));
       };
       reader.readAsDataURL(selectedFile);
     } else if (selectedFile.type.startsWith("video/")) {
       state.fileUrl = URL.createObjectURL(selectedFile);
-      console.log("影片已處理，fileUrl 更新為:", state.fileUrl);
-      nextTick(() => {
-        console.log("DOM 更新後，fileUrl:", state.fileUrl);
-      });
+      console.log("影片預覽已生成:", state.fileUrl);
+      nextTick(() => adjustTextareaHeight(replyId));
     } else {
       state.file = null;
       message.error("僅支援圖片和影片檔案！");
-      console.log("檔案類型不受支援");
     }
   } catch (error) {
     state.file = null;
@@ -436,19 +481,40 @@ const cancelFilePreview = (replyId) => {
 //     return null;
 //   }
 // };
+// const uploadFile = async (replyId) => {
+//   const state = replyStates.value[replyId] || {};
+//   if (!state.file) return state.fileUrl || null;
+//   try {
+//     const { data } = await apiClient.get("/upload", {
+//       params: { filename: state.file.name, contentType: state.file.type },
+//     });
+//     await apiClient.put(data.uploadUrl, state.file, {
+//       headers: { "Content-Type": state.file.type },
+//     });
+//     return data.fileUrl;
+//   } catch (error) {
+//     console.error("檔案上傳失敗:", error);
+//     return null;
+//   }
+// };
 const uploadFile = async (replyId) => {
   const state = replyStates.value[replyId] || {};
-  if (!state.file) return state.fileUrl || null;
+  if (!state.file) return state.fileUrl || null; // 如果沒有新檔案，返回現有 URL
+
   try {
+    console.log("開始上傳檔案:", state.file.name); // 調試用
     const { data } = await apiClient.get("/upload", {
       params: { filename: state.file.name, contentType: state.file.type },
     });
+    console.log("獲取上傳 URL:", data.uploadUrl); // 調試用
+
     await apiClient.put(data.uploadUrl, state.file, {
       headers: { "Content-Type": state.file.type },
     });
+    console.log("檔案上傳成功，返回 URL:", data.fileUrl); // 調試用
     return data.fileUrl;
   } catch (error) {
-    console.error("檔案上傳失敗:", error);
+    console.error("檔案上傳失敗:", error.response?.data || error.message);
     return null;
   }
 };
@@ -544,44 +610,6 @@ const handlelike = async (id) => {
 };
 
 // 提交更新
-const handleMessage = async () => {
-  if (!authStore.accessToken) {
-    message.error("請先登入！");
-    return;
-  }
-
-  loadingBar.start();
-  try {
-    const uploadedFileUrl = await uploadFile();
-    const response = await apiClient.put(
-      `/replies/${editingReplyId.value}/${authStore.userId}`,
-      {
-        content: content.value,
-        file_url: uploadedFileUrl,
-      }
-    );
-    if (response.status === 200) {
-      const index = replies.value.findIndex(
-        (r) => r.id === editingReplyId.value
-      );
-      if (index !== -1) {
-        replies.value[index] = {
-          ...replies.value[index],
-          content: content.value,
-          file_url: uploadedFileUrl,
-        };
-      }
-      message.success("回覆更新成功！");
-      cancelEdit();
-      await fetchReplies(postId);
-    }
-  } catch (error) {
-    console.error("更新失敗:", error);
-    message.error("更新失敗！");
-  } finally {
-    loadingBar.finish();
-  }
-};
 // const handleMessage = async () => {
 //   if (!authStore.accessToken) {
 //     message.error("請先登入！");
@@ -590,17 +618,18 @@ const handleMessage = async () => {
 
 //   loadingBar.start();
 //   try {
-//     const replyId = editingReplyId.value;
-//     const uploadedFileUrl = await uploadFile(replyId);
+//     const uploadedFileUrl = await uploadFile();
 //     const response = await apiClient.put(
-//       `/replies/${replyId}/${authStore.userId}`,
+//       `/replies/${editingReplyId.value}/${authStore.userId}`,
 //       {
 //         content: content.value,
 //         file_url: uploadedFileUrl,
 //       }
 //     );
 //     if (response.status === 200) {
-//       const index = replies.value.findIndex((r) => r.id === replyId);
+//       const index = replies.value.findIndex(
+//         (r) => r.id === editingReplyId.value
+//       );
 //       if (index !== -1) {
 //         replies.value[index] = {
 //           ...replies.value[index],
@@ -619,6 +648,57 @@ const handleMessage = async () => {
 //     loadingBar.finish();
 //   }
 // };
+const handleMessage = async () => {
+  if (!authStore.accessToken) {
+    message.error("請先登入！");
+    return;
+  }
+
+  loadingBar.start();
+  try {
+    const replyId = editingReplyId.value;
+    if (!replyId) {
+      message.error("無效的回覆 ID");
+      return;
+    }
+
+    // 獲取當前回覆的狀態
+    const state = replyStates.value[replyId] || {};
+    const uploadedFileUrl = await uploadFile(replyId); // 確保上傳檔案並獲取 URL
+    if (state.file && !uploadedFileUrl) {
+      message.error("檔案上傳失敗，請重試！");
+      return;
+    }
+
+    // 提交更新請求
+    const response = await apiClient.put(
+      `/replies/${replyId}/${authStore.userId}`,
+      {
+        content: content.value,
+        file_url: uploadedFileUrl || state.fileUrl, // 如果沒有新檔案，使用現有 fileUrl
+      }
+    );
+
+    if (response.status === 200) {
+      const index = replies.value.findIndex((r) => r.id === replyId);
+      if (index !== -1) {
+        replies.value[index] = {
+          ...replies.value[index],
+          content: content.value,
+          file_url: uploadedFileUrl || state.fileUrl,
+        };
+      }
+      message.success("回覆更新成功！");
+      cancelEdit();
+      await fetchReplies(postId);
+    }
+  } catch (error) {
+    console.error("更新失敗:", error.response?.data || error.message);
+    message.error("更新失敗，請檢查網絡或檔案格式！");
+  } finally {
+    loadingBar.finish();
+  }
+};
 
 // 檢查提交按鈕是否啟用
 // const isSubmitDisabled = computed(() => {
@@ -630,6 +710,7 @@ const handleMessage = async () => {
 //     !file.value
 //   );
 // });
+
 const isSubmitDisabled = computed(() => {
   const reply = replies.value.find((r) => r.id === editingReplyId.value);
   if (!reply) return !content.value.trim();
