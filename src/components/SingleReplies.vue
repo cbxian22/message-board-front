@@ -349,6 +349,7 @@ const handleFileUpload = (event, replyId) => {
   initReplyState(replyId);
   const state = replyStates.value[replyId];
 
+  // 清理舊的 URL
   if (
     state.fileUrl &&
     !replies.value.some((r) => r.file_url === state.fileUrl)
@@ -362,10 +363,11 @@ const handleFileUpload = (event, replyId) => {
     if (selectedFile.type.startsWith("image/")) {
       const reader = new FileReader();
       reader.onload = (e) => {
-        state.fileUrl = e.target.result;
+        state.fileUrl = e.target.result; // Base64 數據
         console.log("圖片已載入，fileUrl 更新為:", state.fileUrl);
         nextTick(() => {
-          console.log("強制觸發 DOM 更新，fileUrl:", state.fileUrl);
+          console.log("DOM 更新後，fileUrl:", state.fileUrl);
+          adjustTextareaHeight(replyId); // 確保 textarea 高度適應
         });
       };
       reader.readAsDataURL(selectedFile);
@@ -373,7 +375,7 @@ const handleFileUpload = (event, replyId) => {
       state.fileUrl = URL.createObjectURL(selectedFile);
       console.log("影片已處理，fileUrl 更新為:", state.fileUrl);
       nextTick(() => {
-        console.log("強制觸發 DOM 更新，fileUrl:", state.fileUrl);
+        console.log("DOM 更新後，fileUrl:", state.fileUrl);
       });
     } else {
       state.file = null;
@@ -860,13 +862,13 @@ onUnmounted(() => {
           <div class="file-preview">
             <img
               v-if="isPreviewImage"
-              :src="fileUrl"
+              :src="replyStates[reply.id].fileUrl"
               alt="File Preview"
               class="preview-img"
             />
             <video
               v-else-if="isPreviewVideo"
-              :src="fileUrl"
+              :src="replyStates[reply.id].fileUrl"
               controls
               class="preview-video"
               preload="auto"
