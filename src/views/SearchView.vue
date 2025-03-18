@@ -39,7 +39,7 @@ import { ref, onMounted } from "vue";
 import { useRouter } from "vue-router";
 import apiClient from "../stores/axiosConfig";
 import { useMessage, useLoadingBar, useDialog } from "naive-ui";
-import { debounce } from "lodash"; // 引入 lodash 的 debounce
+import { debounce } from "lodash";
 
 import Navbar from "../components/Navbar.vue";
 import NavbarUp from "../components/NavbarUp.vue";
@@ -52,21 +52,33 @@ const message = useMessage();
 const searchQuery = ref("");
 const searchResults = ref([]);
 const isSearching = ref(false);
+let searchController = null; // 用於取消請求
 
 // 搜尋用戶和貼文的核心邏輯
 const handleSearch = async () => {
+  // 如果輸入框為空，立即清空結果並取消之前的請求
   if (!searchQuery.value.trim()) {
+    if (searchController) {
+      searchController.abort(); // 取消正在進行的請求
+    }
     searchResults.value = [];
+    isSearching.value = false;
     return;
   }
 
   isSearching.value = true;
   searchResults.value = []; // 確保每次搜尋開始時清空結果
 
+  // 创建新的 AbortController
+  searchController = new AbortController();
+  const signal = searchController.signal;
+
   try {
     // 1. 搜尋用戶（如果輸入的是用戶名）
     try {
-      const userResponse = await apiClient.get(`/users/${searchQuery.value}`);
+      const userResponse = await apiClient.get(`/users/${searchQuery.value}`, {
+        signal,
+      });
       if (userResponse.data) {
         const user = userResponse.data;
         searchResults.value.push({
@@ -83,14 +95,14 @@ const handleSearch = async () => {
     }
 
     // 2. 獲取所有貼文並過濾
-    const postsResponse = await apiClient.get(`/posts`);
+    const postsResponse = await apiClient.get(`/posts`, { signal });
     console.log("所有貼文:", postsResponse.data);
 
     if (postsResponse.data && postsResponse.data.length > 0) {
       const posts = postsResponse.data
         .filter((post) => {
           const contentLower = post.content.toLowerCase();
-          const queryLower = searchQuery.value.trim().toLowerCase(); // 修剪輸入
+          const queryLower = searchQuery.value.trim().toLowerCase();
           const matches = contentLower.includes(queryLower);
           if (!matches && post.content.includes("金磚")) {
             console.log("未匹配但包含金磚的貼文:", post);
@@ -111,10 +123,15 @@ const handleSearch = async () => {
       console.log("沒有返回任何貼文");
     }
   } catch (err) {
-    console.error("搜尋貼文失敗:", err);
-    message.error("搜尋失敗，請稍後再試");
+    if (err.name === "AbortError") {
+      console.log("搜尋請求被取消");
+    } else {
+      console.error("搜尋貼文失敗:", err);
+      message.error("搜尋失敗，請稍後再試");
+    }
   } finally {
     isSearching.value = false;
+    searchController = null; // 重置控制器
   }
 };
 
