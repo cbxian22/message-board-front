@@ -173,7 +173,7 @@ const fetchReplies = async (postId) => {
       params: { userId },
       headers: token ? { Authorization: `Bearer ${token}` } : {},
     });
-    console.log("後端返回的資料:", response.data); // 調試用
+    console.log("fetchReplies 後端返回的資料:", response.data); // 調試用
     if (response.status === 200 && Array.isArray(response.data)) {
       replies.value = response.data.map((reply) => {
         console.log("單個 reply 的 file_url:", reply.file_url); // 調試用
@@ -181,7 +181,7 @@ const fetchReplies = async (postId) => {
           id: reply.id,
           content: reply.content,
           timestamp: new Date(reply.created_at),
-          file_url: reply.file_url, // 確保這一行正確映射
+          file_url: reply.file_url, // 確保映射正確
           name: reply.user_name,
           user_avatar: reply.user_avatar,
           likes: reply.likes || 0,
@@ -714,7 +714,7 @@ const handleMessage = async () => {
       `/replies/${replyId}/${authStore.userId}`,
       {
         content: content.value,
-        file_url: fileUrlToSend,
+        fileUrl: fileUrlToSend, // 改為 fileUrl，匹配後端
       }
     );
 
@@ -723,16 +723,16 @@ const handleMessage = async () => {
     if (response.status === 200) {
       const index = replies.value.findIndex((r) => r.id === replyId);
       if (index !== -1) {
-        // 使用後端回應更新前端，確保一致性
         replies.value[index] = {
           ...replies.value[index],
-          content: response.data.content || content.value,
-          file_url: response.data.file_url || fileUrlToSend,
+          content: content.value,
+          file_url: fileUrlToSend, // 前端仍使用 file_url 作為內部字段
         };
         console.log("更新後的前端 replies:", replies.value[index]);
       }
       message.success("回覆更新成功！");
       cancelEdit();
+      await fetchReplies(postId); // 立即同步後端資料
     }
   } catch (error) {
     console.error("更新失敗:", error.response?.data || error.message);
