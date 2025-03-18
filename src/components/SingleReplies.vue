@@ -26,8 +26,6 @@ const dialog = useDialog();
 const replies = ref([]);
 const content = ref("");
 const textareas = ref({});
-const file = ref(null);
-const fileUrl = ref(null);
 const fileInputRefs = ref({});
 const editingReplyId = ref(null);
 const modalState = ref({});
@@ -48,16 +46,6 @@ const initReplyState = (replyId) => {
 };
 
 // 是否有未儲存的變更
-// const hasUnsavedChanges = computed(() => {
-//   const reply = replies.value.find((r) => r.id === editingReplyId.value);
-//   if (!reply || !isEditing.value) return false;
-//   return (
-//     content.value !== reply.content ||
-//     (fileUrl.value !== reply.file_url && fileUrl.value !== null) ||
-//     file.value !== null
-//   );
-// });
-
 const hasUnsavedChanges = computed(() => {
   const reply = replies.value.find((r) => r.id === editingReplyId.value);
   if (!reply || !isEditing.value) return false;
@@ -85,15 +73,6 @@ const getFileType = (fileOrUrl) => {
 
 const isImage = (url) => getFileType(url) === "image";
 const isVideo = (url) => getFileType(url) === "video";
-
-// const isPreviewImage = computed(
-//   () => getFileType(file.value || fileUrl.value) === "image"
-// );
-// const isPreviewVideo = computed(
-//   () => getFileType(file.value || fileUrl.value) === "video"
-// );
-
-// 回覆＿打開 Modal
 
 const isPreviewImage = computed(() => {
   const state = replyStates.value[editingReplyId.value] || {};
@@ -133,38 +112,6 @@ const closeModal = (event) => {
 };
 
 // 獲取回覆
-// const fetchReplies = async (postId) => {
-//   try {
-//     const userId = authStore.userId || localStorage.getItem("userId");
-//     const token = authStore.accessToken;
-//     const response = await apiClient.get(`/replies/${postId}`, {
-//       params: { userId },
-//       headers: token ? { Authorization: `Bearer ${token}` } : {},
-//     });
-//     if (response.status === 200 && Array.isArray(response.data)) {
-//       replies.value = response.data.map((reply) => ({
-//         id: reply.id,
-//         content: reply.content,
-//         timestamp: new Date(reply.created_at),
-//         file_url: reply.file_url,
-//         name: reply.user_name,
-//         user_avatar: reply.user_avatar,
-//         likes: reply.likes || 0,
-//         userLiked: reply.user_liked || false,
-//         replies: reply.replies || 0,
-//       }));
-//     } else {
-//       console.error("數據格式不正確:", response.data);
-//       message.error("數據格式不正確");
-//     }
-//   } catch (error) {
-//     console.error(
-//       "取得貼文錯誤:",
-//       error.response ? error.response.data : error.message
-//     );
-//     message.error("貼文取得失敗，請檢查網絡或稍後再試");
-//   }
-// };
 const fetchReplies = async (postId) => {
   try {
     const userId = authStore.userId || localStorage.getItem("userId");
@@ -204,58 +151,6 @@ const fetchReplies = async (postId) => {
 };
 
 // 編輯回覆
-// const handleUpdate = async (replyId) => {
-//   if (!authStore.accessToken) {
-//     message.error("請先登入！");
-//     return;
-//   }
-
-//   Object.keys(modalState.value).forEach((key) => {
-//     modalState.value[key] = false;
-//   });
-
-//   // 如果已在編輯其他回覆且有未儲存變更，等待用戶確認
-//   if (
-//     isEditing.value &&
-//     editingReplyId.value !== replyId &&
-//     hasUnsavedChanges.value
-//   ) {
-//     const shouldProceed = await new Promise((resolve) => {
-//       dialog.warning({
-//         content: "您有未儲存的變更，確定要編輯其他回覆嗎？",
-//         positiveText: "確定",
-//         negativeText: "取消",
-//         onPositiveClick: () => {
-//           cancelEdit(); // 清理當前編輯
-//           resolve(true); // 繼續編輯新回覆
-//         },
-//         onNegativeClick: () => {
-//           resolve(false); // 保持當前編輯
-//         },
-//       });
-//     });
-
-//     if (!shouldProceed) return;
-//   }
-
-//   const reply = replies.value.find((r) => r.id === replyId);
-//   if (reply) {
-//     isEditing.value = true;
-//     editingReplyId.value = replyId;
-//     content.value = reply.content;
-//     fileUrl.value = reply.file_url; // 初始化為現有檔案URL
-//     file.value = null; // 重置新上傳的檔案
-//     nextTick(() => {
-//       adjustTextareaHeight(replyId);
-//       const textarea = textareas.value[replyId];
-//       if (textarea) {
-//         textarea.focus();
-//       } else {
-//         console.warn(`Textarea for reply ${replyId} not found.`);
-//       }
-//     });
-//   }
-// };
 const handleUpdate = async (replyId) => {
   if (!authStore.accessToken) {
     message.error("請先登入！");
@@ -304,19 +199,6 @@ const handleUpdate = async (replyId) => {
 };
 
 // 取消編輯
-// const cancelEdit = () => {
-//   isEditing.value = false;
-//   editingReplyId.value = null;
-//   content.value = "";
-//   if (
-//     fileUrl.value &&
-//     !replies.value.some((r) => r.file_url === fileUrl.value)
-//   ) {
-//     URL.revokeObjectURL(fileUrl.value); // 清理非原始檔案的預覽
-//   }
-//   fileUrl.value = null;
-//   file.value = null;
-// };
 const cancelEdit = () => {
   isEditing.value = false;
   const replyId = editingReplyId.value;
@@ -343,90 +225,6 @@ const triggerFileInput = (replyId) => {
 };
 
 // 處理檔案上傳
-// const handleFileUpload = (event) => {
-//   const selectedFile = event.target.files[0];
-//   if (!selectedFile) return;
-
-//   // 清理舊的預覽
-//   if (
-//     fileUrl.value &&
-//     !replies.value.some((r) => r.file_url === fileUrl.value)
-//   ) {
-//     URL.revokeObjectURL(fileUrl.value);
-//   }
-
-//   file.value = selectedFile;
-//   try {
-//     if (selectedFile.type.startsWith("image/")) {
-//       const reader = new FileReader();
-//       reader.onload = (e) => {
-//         fileUrl.value = e.target.result;
-//       };
-//       reader.readAsDataURL(selectedFile);
-//     } else if (selectedFile.type.startsWith("video/")) {
-//       fileUrl.value = URL.createObjectURL(selectedFile);
-//     } else {
-//       file.value = null;
-//       message.error("僅支援圖片和影片檔案！");
-//     }
-//   } catch (error) {
-//     file.value = null;
-//     fileUrl.value = null;
-//     message.error("檔案處理失敗，請重試！");
-//   }
-// };
-// const handleFileUpload = (event, replyId) => {
-//   const selectedFile = event.target.files[0];
-//   if (!selectedFile) {
-//     console.log("未選擇檔案");
-//     return;
-//   }
-
-//   console.log("選擇的檔案:", selectedFile.name, selectedFile.type);
-
-//   initReplyState(replyId);
-//   const state = replyStates.value[replyId];
-
-//   // 清理舊的 URL
-//   if (
-//     state.fileUrl &&
-//     !replies.value.some((r) => r.file_url === state.fileUrl)
-//   ) {
-//     URL.revokeObjectURL(state.fileUrl);
-//     console.log("已清理舊的 fileUrl:", state.fileUrl);
-//   }
-
-//   state.file = selectedFile;
-//   try {
-//     if (selectedFile.type.startsWith("image/")) {
-//       const reader = new FileReader();
-//       reader.onload = (e) => {
-//         state.fileUrl = e.target.result; // Base64 數據
-//         console.log("圖片已載入，fileUrl 更新為:", state.fileUrl);
-//         nextTick(() => {
-//           console.log("DOM 更新後，fileUrl:", state.fileUrl);
-//           adjustTextareaHeight(replyId); // 確保 textarea 高度適應
-//         });
-//       };
-//       reader.readAsDataURL(selectedFile);
-//     } else if (selectedFile.type.startsWith("video/")) {
-//       state.fileUrl = URL.createObjectURL(selectedFile);
-//       console.log("影片已處理，fileUrl 更新為:", state.fileUrl);
-//       nextTick(() => {
-//         console.log("DOM 更新後，fileUrl:", state.fileUrl);
-//       });
-//     } else {
-//       state.file = null;
-//       message.error("僅支援圖片和影片檔案！");
-//       console.log("檔案類型不受支援");
-//     }
-//   } catch (error) {
-//     state.file = null;
-//     state.fileUrl = null;
-//     message.error("檔案處理失敗，請重試！");
-//     console.error("檔案處理錯誤:", error);
-//   }
-// };
 const handleFileUpload = (event, replyId) => {
   const selectedFile = event.target.files[0];
   if (!selectedFile) {
@@ -474,19 +272,6 @@ const handleFileUpload = (event, replyId) => {
 };
 
 // 取消檔案預覽
-// const cancelFilePreview = () => {
-//   if (
-//     fileUrl.value &&
-//     !replies.value.some((r) => r.file_url === fileUrl.value)
-//   ) {
-//     URL.revokeObjectURL(fileUrl.value);
-//   }
-//   fileUrl.value = null;
-//   file.value = null;
-//   if (fileInputRefs.value[editingReplyId.value]) {
-//     fileInputRefs.value[editingReplyId.value].value = null;
-//   }
-// };
 const cancelFilePreview = (replyId) => {
   const state = replyStates.value[replyId];
   if (
@@ -504,37 +289,6 @@ const cancelFilePreview = (replyId) => {
 };
 
 // 上傳檔案
-// const uploadFile = async () => {
-//   if (!file.value) return fileUrl.value || null;
-//   try {
-//     const { data } = await apiClient.get("/upload", {
-//       params: { filename: file.value.name, contentType: file.value.type },
-//     });
-//     await apiClient.put(data.uploadUrl, file.value, {
-//       headers: { "Content-Type": file.value.type },
-//     });
-//     return data.fileUrl;
-//   } catch (error) {
-//     console.error("檔案上傳失敗:", error);
-//     return null;
-//   }
-// };
-// const uploadFile = async (replyId) => {
-//   const state = replyStates.value[replyId] || {};
-//   if (!state.file) return state.fileUrl || null;
-//   try {
-//     const { data } = await apiClient.get("/upload", {
-//       params: { filename: state.file.name, contentType: state.file.type },
-//     });
-//     await apiClient.put(data.uploadUrl, state.file, {
-//       headers: { "Content-Type": state.file.type },
-//     });
-//     return data.fileUrl;
-//   } catch (error) {
-//     console.error("檔案上傳失敗:", error);
-//     return null;
-//   }
-// };
 const uploadFile = async (replyId) => {
   const state = replyStates.value[replyId] || {};
   if (!state.file) return state.fileUrl || null; // 如果沒有新檔案，返回現有 URL
@@ -648,44 +402,6 @@ const handlelike = async (id) => {
 };
 
 // 提交更新
-// const handleMessage = async () => {
-//   if (!authStore.accessToken) {
-//     message.error("請先登入！");
-//     return;
-//   }
-
-//   loadingBar.start();
-//   try {
-//     const uploadedFileUrl = await uploadFile();
-//     const response = await apiClient.put(
-//       `/replies/${editingReplyId.value}/${authStore.userId}`,
-//       {
-//         content: content.value,
-//         file_url: uploadedFileUrl,
-//       }
-//     );
-//     if (response.status === 200) {
-//       const index = replies.value.findIndex(
-//         (r) => r.id === editingReplyId.value
-//       );
-//       if (index !== -1) {
-//         replies.value[index] = {
-//           ...replies.value[index],
-//           content: content.value,
-//           file_url: uploadedFileUrl,
-//         };
-//       }
-//       message.success("回覆更新成功！");
-//       cancelEdit();
-//       await fetchReplies(postId);
-//     }
-//   } catch (error) {
-//     console.error("更新失敗:", error);
-//     message.error("更新失敗！");
-//   } finally {
-//     loadingBar.finish();
-//   }
-// };
 const handleMessage = async () => {
   if (!authStore.accessToken) {
     message.error("請先登入！");
@@ -743,16 +459,6 @@ const handleMessage = async () => {
 };
 
 // 檢查提交按鈕是否啟用
-// const isSubmitDisabled = computed(() => {
-//   const reply = replies.value.find((r) => r.id === editingReplyId.value);
-//   if (!reply) return !content.value.trim() && !file.value;
-//   return (
-//     content.value === reply.content &&
-//     fileUrl.value === reply.file_url &&
-//     !file.value
-//   );
-// });
-
 const isSubmitDisabled = computed(() => {
   const reply = replies.value.find((r) => r.id === editingReplyId.value);
   if (!reply) return !content.value.trim();
@@ -786,15 +492,6 @@ onMounted(async () => {
   await fetchReplies(postId);
 });
 
-// onUnmounted(() => {
-//   document.removeEventListener("mousedown", closeModal);
-//   if (
-//     fileUrl.value &&
-//     !replies.value.some((r) => r.file_url === fileUrl.value)
-//   ) {
-//     URL.revokeObjectURL(fileUrl.value);
-//   }
-// });
 onUnmounted(() => {
   document.removeEventListener("mousedown", closeModal);
   Object.keys(replyStates.value).forEach((replyId) => {
