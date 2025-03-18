@@ -78,25 +78,31 @@ const handleSearch = async () => {
         avatar_url: user.avatar_url || "/default-avatar.png",
         type: "user",
       });
+    }
 
-      // 2. 如果找到用戶，搜尋該用戶的貼文
-      const postsResponse = await apiClient.get(`/posts?userId=${user.id}`);
-      if (postsResponse.data && postsResponse.data.length > 0) {
-        const posts = postsResponse.data.map((post) => ({
+    // 2. 搜尋所有貼文並過濾
+    const postsResponse = await apiClient.get(`/posts`); // 假設有這個端點
+    if (postsResponse.data && postsResponse.data.length > 0) {
+      const posts = postsResponse.data
+        .filter((post) =>
+          post.content.toLowerCase().includes(searchQuery.value.toLowerCase())
+        )
+        .map((post) => ({
           id: post.id,
           name:
             post.content.substring(0, 20) +
             (post.content.length > 20 ? "..." : ""),
-          avatar_url: user.avatar_url || "/default-avatar.png",
+          avatar_url: post.avatar_url || "/default-avatar.png", // 假設貼文有 avatar_url
           type: "post",
-          userId: user.id,
         }));
-        searchResults.value.push(...posts);
-      }
+      searchResults.value.push(...posts);
     }
   } catch (err) {
     if (err.response?.status === 404) {
-      searchResults.value = [];
+      // 用戶或貼文不存在時繼續處理其他結果
+      if (searchResults.value.length === 0) {
+        searchResults.value = [];
+      }
     } else {
       console.error("搜尋失敗:", err);
       message.error("搜尋失敗，請稍後再試");
@@ -106,18 +112,22 @@ const handleSearch = async () => {
   }
 };
 
-// 跳轉到聊天頁面，根據類型處理
+// 跳轉到對應頁面，根據類型處理
 const goToPage = (id, type) => {
   if (type === "user") {
-    router.push({ name: "Profile", params: { searchQuery } });
+    // 跳轉到個人頁面，使用 accountname 參數
+    router.push({
+      name: "Profile",
+      params: { accountname: searchQuery.value },
+    });
   } else if (type === "post") {
-    // 假設有一個顯示特定貼文的路由
-    router.push({ name: "Post", params: { id } });
+    // 跳轉到貼文頁面，使用 id 參數
+    router.push({ name: "Post", params: { id: String(id) } });
   }
 };
 
 onMounted(() => {
-  // 可以選擇在這裡初始化一些預設數據，如果需要的話
+  // 如果需要初始化的話可以在這裡添加
 });
 </script>
 
