@@ -18,7 +18,7 @@
 
       <li @click="setActive('search')">
         <router-link
-          to="/"
+          to="/search"
           class="nav-link"
           :class="{ active: navStore.activeItem === 'search' }"
         >
