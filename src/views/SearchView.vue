@@ -109,7 +109,7 @@ const handleSearch = async () => {
 // 跳轉到聊天頁面，根據類型處理
 const goToPage = (id, type) => {
   if (type === "user") {
-    router.push({ name: "Profile", params: { user } });
+    router.push({ name: "Profile", params: { searchQuery } });
   } else if (type === "post") {
     // 假設有一個顯示特定貼文的路由
     router.push({ name: "Post", params: { id } });
