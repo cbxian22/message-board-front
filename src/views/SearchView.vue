@@ -37,7 +37,7 @@
 <script setup>
 import { ref, onMounted } from "vue";
 import { useRouter } from "vue-router";
-import apiClient from "../stores/axiosConfig"; // 假設這是你的 axios 配置
+import apiClient from "../stores/axiosConfig";
 import { useMessage, useLoadingBar, useDialog } from "naive-ui";
 
 import Navbar from "../components/Navbar.vue";
@@ -52,9 +52,6 @@ const searchQuery = ref("");
 const searchResults = ref([]);
 const isSearching = ref(false);
 
-// 確保 apiClient 已配置認證（如果需要）
-console.log("apiClient 配置:", apiClient.defaults);
-
 // 搜尋用戶和貼文
 const handleSearch = async () => {
   if (!searchQuery.value.trim()) {
@@ -66,30 +63,37 @@ const handleSearch = async () => {
   searchResults.value = [];
 
   try {
-    // 1. 搜尋用戶
-    const userResponse = await apiClient.get(`/users/${searchQuery.value}`);
-    if (userResponse.data) {
-      const user = userResponse.data;
-      searchResults.value.push({
-        id: user.id,
-        name: user.accountname,
-        avatar_url: user.avatar_url || "/default-avatar.png",
-        type: "user",
-      });
+    // 1. 搜尋用戶（如果輸入的是用戶名）
+    try {
+      const userResponse = await apiClient.get(`/users/${searchQuery.value}`);
+      if (userResponse.data) {
+        const user = userResponse.data;
+        searchResults.value.push({
+          id: user.id,
+          name: user.accountname,
+          avatar_url: user.avatar_url || "/default-avatar.png",
+          type: "user",
+        });
+      }
+    } catch (userErr) {
+      if (userErr.response?.status !== 404) {
+        console.error("搜尋用戶失敗:", userErr);
+      }
+      // 404 表示不是用戶名，繼續搜尋貼文
     }
 
     // 2. 獲取所有貼文並過濾
     const postsResponse = await apiClient.get(`/posts`);
-    console.log("所有貼文回應:", postsResponse.data); // 檢查後端返回的貼文
+    console.log("所有貼文:", postsResponse.data); // 檢查後端返回的所有貼文
 
     if (postsResponse.data && postsResponse.data.length > 0) {
       const posts = postsResponse.data
         .filter((post) => {
-          const matches = post.content
-            .toLowerCase()
-            .includes(searchQuery.value.toLowerCase());
+          const contentLower = post.content.toLowerCase();
+          const queryLower = searchQuery.value.toLowerCase();
+          const matches = contentLower.includes(queryLower);
           if (!matches && post.content.includes("金磚")) {
-            console.log("漏掉的貼文:", post); // 檢查是否有包含“金磚”的貼文被過濾掉
+            console.log("未匹配但包含金磚的貼文:", post);
           }
           return matches;
         })
@@ -101,17 +105,14 @@ const handleSearch = async () => {
           avatar_url: post.user_avatar || "/default-avatar.png",
           type: "post",
         }));
+      console.log("過濾後的貼文:", posts); // 檢查過濾結果
       searchResults.value.push(...posts);
+    } else {
+      console.log("沒有返回任何貼文");
     }
   } catch (err) {
-    if (err.response?.status === 404) {
-      if (searchResults.value.length === 0) {
-        searchResults.value = [];
-      }
-    } else {
-      console.error("搜尋失敗:", err);
-      message.error("搜尋失敗，請稍後再試");
-    }
+    console.error("搜尋貼文失敗:", err);
+    message.error("搜尋失敗，請稍後再試");
   } finally {
     isSearching.value = false;
   }
