@@ -116,8 +116,13 @@ const handleSearch = async () => {
           avatar_url: post.user_avatar || "/default-avatar.png",
           type: "post",
         }));
-      console.log("過濾後的貼文:", posts);
-      searchResults.value.push(...posts);
+
+      // 去重貼文（根據 id）
+      const uniquePosts = Array.from(
+        new Map(posts.map((post) => [post.id, post])).values()
+      );
+      console.log("過濾並去重後的貼文:", uniquePosts);
+      searchResults.value.push(...uniquePosts);
     } else {
       console.log("沒有返回任何貼文");
     }
