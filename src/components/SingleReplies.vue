@@ -339,7 +339,12 @@ const triggerFileInput = (replyId) => {
 // };
 const handleFileUpload = (event, replyId) => {
   const selectedFile = event.target.files[0];
-  if (!selectedFile) return;
+  if (!selectedFile) {
+    console.log("未選擇檔案");
+    return;
+  }
+
+  console.log("選擇的檔案:", selectedFile.name, selectedFile.type);
 
   initReplyState(replyId);
   const state = replyStates.value[replyId];
@@ -349,6 +354,7 @@ const handleFileUpload = (event, replyId) => {
     !replies.value.some((r) => r.file_url === state.fileUrl)
   ) {
     URL.revokeObjectURL(state.fileUrl);
+    console.log("已清理舊的 fileUrl:", state.fileUrl);
   }
 
   state.file = selectedFile;
@@ -357,18 +363,28 @@ const handleFileUpload = (event, replyId) => {
       const reader = new FileReader();
       reader.onload = (e) => {
         state.fileUrl = e.target.result;
+        console.log("圖片已載入，fileUrl 更新為:", state.fileUrl);
+        nextTick(() => {
+          console.log("強制觸發 DOM 更新，fileUrl:", state.fileUrl);
+        });
       };
       reader.readAsDataURL(selectedFile);
     } else if (selectedFile.type.startsWith("video/")) {
       state.fileUrl = URL.createObjectURL(selectedFile);
+      console.log("影片已處理，fileUrl 更新為:", state.fileUrl);
+      nextTick(() => {
+        console.log("強制觸發 DOM 更新，fileUrl:", state.fileUrl);
+      });
     } else {
       state.file = null;
       message.error("僅支援圖片和影片檔案！");
+      console.log("檔案類型不受支援");
     }
   } catch (error) {
     state.file = null;
     state.fileUrl = null;
     message.error("檔案處理失敗，請重試！");
+    console.error("檔案處理錯誤:", error);
   }
 };
 
