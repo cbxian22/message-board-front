@@ -34,11 +34,10 @@
   <Navbar />
 </template>
 
-<!-- ChatHistory.vue -->
 <script setup>
 import { ref, onMounted } from "vue";
 import { useRouter } from "vue-router";
-import apiClient from "../stores/axiosConfig";
+import apiClient from "../stores/axiosConfig"; // 假設這是你的 axios 配置
 import { useMessage, useLoadingBar, useDialog } from "naive-ui";
 
 import Navbar from "../components/Navbar.vue";
@@ -52,6 +51,9 @@ const message = useMessage();
 const searchQuery = ref("");
 const searchResults = ref([]);
 const isSearching = ref(false);
+
+// 確保 apiClient 已配置認證（如果需要）
+console.log("apiClient 配置:", apiClient.defaults);
 
 // 搜尋用戶和貼文
 const handleSearch = async () => {
@@ -76,13 +78,21 @@ const handleSearch = async () => {
       });
     }
 
-    // 2. 獲取所有貼文並過濾（假設有 GET /posts 端點）
-    const postsResponse = await apiClient.get(`/posts`); // 需要確認是否有這個端點
+    // 2. 獲取所有貼文並過濾
+    const postsResponse = await apiClient.get(`/posts`);
+    console.log("所有貼文回應:", postsResponse.data); // 檢查後端返回的貼文
+
     if (postsResponse.data && postsResponse.data.length > 0) {
       const posts = postsResponse.data
-        .filter((post) =>
-          post.content.toLowerCase().includes(searchQuery.value.toLowerCase())
-        )
+        .filter((post) => {
+          const matches = post.content
+            .toLowerCase()
+            .includes(searchQuery.value.toLowerCase());
+          if (!matches && post.content.includes("金磚")) {
+            console.log("漏掉的貼文:", post); // 檢查是否有包含“金磚”的貼文被過濾掉
+          }
+          return matches;
+        })
         .map((post) => ({
           id: post.id,
           name:
@@ -121,73 +131,6 @@ const goToPage = (id, type) => {
 
 onMounted(() => {});
 </script>
-<!-- template 和 style 部分保持不變 -->
-
-<style scoped>
-.container-box {
-  width: 650px;
-  display: flex;
-  flex-direction: column;
-  justify-self: center;
-  margin: 100px 0;
-}
-
-.search {
-  padding: 20px 30px;
-  cursor: text;
-  border-bottom: 0.5px solid #373737;
-  width: 100%;
-  background: transparent;
-  border: none;
-  outline: none;
-  font-size: 16px;
-}
-
-.search-item {
-  display: flex;
-  align-items: center;
-  padding: 20px 30px;
-  border-bottom: 0.5px solid #373737;
-  cursor: pointer;
-  gap: 20px;
-}
-
-.search-item:hover {
-  background-color: rgba(55, 55, 55, 0.2) !important;
-}
-.light-mode .search-item:hover {
-  background-color: rgba(55, 55, 55, 0.08) !important;
-}
-
-.search-item .avatar {
-  width: 50px;
-  height: 50px;
-  border-radius: 50%;
-  object-fit: cover;
-}
-
-.info-name-message {
-  display: flex;
-  flex-direction: column;
-  width: 50%;
-  gap: 5px;
-}
-
-.result-type {
-  font-size: 12px;
-  color: #666;
-}
-
-.search-item:last-child {
-  border-bottom: none;
-}
-
-.no-chat {
-  color: #666;
-  display: flex;
-  padding: 20px 30px;
-}
-</style>
 
 <style scoped>
 .container-box {
