@@ -133,6 +133,38 @@ const closeModal = (event) => {
 };
 
 // 獲取回覆
+// const fetchReplies = async (postId) => {
+//   try {
+//     const userId = authStore.userId || localStorage.getItem("userId");
+//     const token = authStore.accessToken;
+//     const response = await apiClient.get(`/replies/${postId}`, {
+//       params: { userId },
+//       headers: token ? { Authorization: `Bearer ${token}` } : {},
+//     });
+//     if (response.status === 200 && Array.isArray(response.data)) {
+//       replies.value = response.data.map((reply) => ({
+//         id: reply.id,
+//         content: reply.content,
+//         timestamp: new Date(reply.created_at),
+//         file_url: reply.file_url,
+//         name: reply.user_name,
+//         user_avatar: reply.user_avatar,
+//         likes: reply.likes || 0,
+//         userLiked: reply.user_liked || false,
+//         replies: reply.replies || 0,
+//       }));
+//     } else {
+//       console.error("數據格式不正確:", response.data);
+//       message.error("數據格式不正確");
+//     }
+//   } catch (error) {
+//     console.error(
+//       "取得貼文錯誤:",
+//       error.response ? error.response.data : error.message
+//     );
+//     message.error("貼文取得失敗，請檢查網絡或稍後再試");
+//   }
+// };
 const fetchReplies = async (postId) => {
   try {
     const userId = authStore.userId || localStorage.getItem("userId");
@@ -141,18 +173,23 @@ const fetchReplies = async (postId) => {
       params: { userId },
       headers: token ? { Authorization: `Bearer ${token}` } : {},
     });
+    console.log("後端返回的資料:", response.data); // 調試用
     if (response.status === 200 && Array.isArray(response.data)) {
-      replies.value = response.data.map((reply) => ({
-        id: reply.id,
-        content: reply.content,
-        timestamp: new Date(reply.created_at),
-        file_url: reply.file_url,
-        name: reply.user_name,
-        user_avatar: reply.user_avatar,
-        likes: reply.likes || 0,
-        userLiked: reply.user_liked || false,
-        replies: reply.replies || 0,
-      }));
+      replies.value = response.data.map((reply) => {
+        console.log("單個 reply 的 file_url:", reply.file_url); // 調試用
+        return {
+          id: reply.id,
+          content: reply.content,
+          timestamp: new Date(reply.created_at),
+          file_url: reply.file_url, // 確保這一行正確映射
+          name: reply.user_name,
+          user_avatar: reply.user_avatar,
+          likes: reply.likes || 0,
+          userLiked: reply.user_liked || false,
+          replies: reply.replies || 0,
+        };
+      });
+      console.log("更新後的 replies:", replies.value); // 調試用
     } else {
       console.error("數據格式不正確:", response.data);
       message.error("數據格式不正確");
@@ -665,18 +702,25 @@ const handleMessage = async () => {
 
     const state = replyStates.value[replyId] || {};
     const uploadedFileUrl = await uploadFile(replyId);
+    console.log("上傳的 fileUrl:", uploadedFileUrl); // 調試用
+
     if (state.file && !uploadedFileUrl) {
       message.error("檔案上傳失敗，請重試！");
       return;
     }
 
+    const fileUrlToSend = uploadedFileUrl || state.fileUrl;
+    console.log("提交給後端的 file_url:", fileUrlToSend); // 調試用
+
     const response = await apiClient.put(
       `/replies/${replyId}/${authStore.userId}`,
       {
         content: content.value,
-        file_url: uploadedFileUrl || state.fileUrl,
+        file_url: fileUrlToSend,
       }
     );
+
+    console.log("後端回應:", response.data); // 檢查後端返回的資料
 
     if (response.status === 200) {
       const index = replies.value.findIndex((r) => r.id === replyId);
@@ -684,11 +728,13 @@ const handleMessage = async () => {
         replies.value[index] = {
           ...replies.value[index],
           content: content.value,
-          file_url: uploadedFileUrl || state.fileUrl,
+          file_url: fileUrlToSend, // 使用提交的 URL
         };
+        console.log("更新後的前端 replies:", replies.value[index]); // 調試用
       }
       message.success("回覆更新成功！");
       cancelEdit();
+      // 可選：await fetchReplies(postId); // 如果需要同步後端資料
     }
   } catch (error) {
     console.error("更新失敗:", error.response?.data || error.message);
