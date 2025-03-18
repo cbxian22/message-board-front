@@ -7,7 +7,7 @@
         v-model="searchQuery"
         class="search"
         placeholder="搜尋用戶或貼文..."
-        @input="handleSearch"
+        @input="debouncedSearch"
       />
       <div class="chat-list">
         <div
@@ -39,6 +39,7 @@ import { ref, onMounted } from "vue";
 import { useRouter } from "vue-router";
 import apiClient from "../stores/axiosConfig";
 import { useMessage, useLoadingBar, useDialog } from "naive-ui";
+import { debounce } from "lodash"; // 引入 lodash 的 debounce
 
 import Navbar from "../components/Navbar.vue";
 import NavbarUp from "../components/NavbarUp.vue";
@@ -52,7 +53,7 @@ const searchQuery = ref("");
 const searchResults = ref([]);
 const isSearching = ref(false);
 
-// 搜尋用戶和貼文
+// 搜尋用戶和貼文的核心邏輯
 const handleSearch = async () => {
   if (!searchQuery.value.trim()) {
     searchResults.value = [];
@@ -60,7 +61,7 @@ const handleSearch = async () => {
   }
 
   isSearching.value = true;
-  searchResults.value = [];
+  searchResults.value = []; // 確保每次搜尋開始時清空結果
 
   try {
     // 1. 搜尋用戶（如果輸入的是用戶名）
@@ -79,18 +80,17 @@ const handleSearch = async () => {
       if (userErr.response?.status !== 404) {
         console.error("搜尋用戶失敗:", userErr);
       }
-      // 404 表示不是用戶名，繼續搜尋貼文
     }
 
     // 2. 獲取所有貼文並過濾
     const postsResponse = await apiClient.get(`/posts`);
-    console.log("所有貼文:", postsResponse.data); // 檢查後端返回的所有貼文
+    console.log("所有貼文:", postsResponse.data);
 
     if (postsResponse.data && postsResponse.data.length > 0) {
       const posts = postsResponse.data
         .filter((post) => {
           const contentLower = post.content.toLowerCase();
-          const queryLower = searchQuery.value.toLowerCase();
+          const queryLower = searchQuery.value.trim().toLowerCase(); // 修剪輸入
           const matches = contentLower.includes(queryLower);
           if (!matches && post.content.includes("金磚")) {
             console.log("未匹配但包含金磚的貼文:", post);
@@ -105,7 +105,7 @@ const handleSearch = async () => {
           avatar_url: post.user_avatar || "/default-avatar.png",
           type: "post",
         }));
-      console.log("過濾後的貼文:", posts); // 檢查過濾結果
+      console.log("過濾後的貼文:", posts);
       searchResults.value.push(...posts);
     } else {
       console.log("沒有返回任何貼文");
@@ -117,6 +117,9 @@ const handleSearch = async () => {
     isSearching.value = false;
   }
 };
+
+// 添加防抖，300ms 延遲
+const debouncedSearch = debounce(handleSearch, 300);
 
 // 跳轉到對應頁面
 const goToPage = (id, type) => {
