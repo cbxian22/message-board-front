@@ -285,13 +285,14 @@ const cancelEdit = () => {
   const replyId = editingReplyId.value;
   if (replyId && replyStates.value[replyId]) {
     const state = replyStates.value[replyId];
-    if (
-      state.fileUrl &&
-      !replies.value.some((r) => r.file_url === state.fileUrl)
-    ) {
+    const reply = replies.value.find((r) => r.id === replyId);
+    if (state.fileUrl && (!reply || reply.file_url !== state.fileUrl)) {
       URL.revokeObjectURL(state.fileUrl);
     }
-    replyStates.value[replyId] = { file: null, fileUrl: null };
+    replyStates.value[replyId] = {
+      file: null,
+      fileUrl: reply?.file_url || null,
+    };
   }
   editingReplyId.value = null;
   content.value = "";
@@ -662,20 +663,18 @@ const handleMessage = async () => {
       return;
     }
 
-    // 獲取當前回覆的狀態
     const state = replyStates.value[replyId] || {};
-    const uploadedFileUrl = await uploadFile(replyId); // 確保上傳檔案並獲取 URL
+    const uploadedFileUrl = await uploadFile(replyId);
     if (state.file && !uploadedFileUrl) {
       message.error("檔案上傳失敗，請重試！");
       return;
     }
 
-    // 提交更新請求
     const response = await apiClient.put(
       `/replies/${replyId}/${authStore.userId}`,
       {
         content: content.value,
-        file_url: uploadedFileUrl || state.fileUrl, // 如果沒有新檔案，使用現有 fileUrl
+        file_url: uploadedFileUrl || state.fileUrl,
       }
     );
 
@@ -690,7 +689,6 @@ const handleMessage = async () => {
       }
       message.success("回覆更新成功！");
       cancelEdit();
-      await fetchReplies(postId);
     }
   } catch (error) {
     console.error("更新失敗:", error.response?.data || error.message);
