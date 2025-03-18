@@ -25,6 +25,7 @@
             }}</span>
           </div>
         </div>
+        <div v-else-if="isSearching" class="no-chat">載入中...</div>
         <div v-else-if="searchQuery && !isSearching" class="no-chat">
           沒有找到相關結果
         </div>
@@ -38,16 +39,12 @@
 import { ref, onMounted } from "vue";
 import { useRouter } from "vue-router";
 import apiClient from "../stores/axiosConfig";
-import { useMessage, useLoadingBar, useDialog } from "naive-ui";
 import { debounce } from "lodash";
 
 import Navbar from "../components/Navbar.vue";
 import NavbarUp from "../components/NavbarUp.vue";
 
 const router = useRouter();
-const dialog = useDialog();
-const loadingBar = useLoadingBar();
-const message = useMessage();
 
 const searchQuery = ref("");
 const searchResults = ref([]);
@@ -56,8 +53,10 @@ let searchController = null; // 用於取消請求
 
 // 搜尋用戶和貼文的核心邏輯
 const handleSearch = async () => {
+  const trimmedQuery = searchQuery.value.trim();
+
   // 如果輸入框為空，立即清空結果並取消之前的請求
-  if (!searchQuery.value.trim()) {
+  if (!trimmedQuery) {
     if (searchController) {
       searchController.abort(); // 取消正在進行的請求
     }
@@ -76,7 +75,7 @@ const handleSearch = async () => {
   try {
     // 1. 搜尋用戶（如果輸入的是用戶名）
     try {
-      const userResponse = await apiClient.get(`/users/${searchQuery.value}`, {
+      const userResponse = await apiClient.get(`/users/${trimmedQuery}`, {
         signal,
       });
       if (userResponse.data) {
@@ -102,7 +101,7 @@ const handleSearch = async () => {
       const posts = postsResponse.data
         .filter((post) => {
           const contentLower = post.content.toLowerCase();
-          const queryLower = searchQuery.value.trim().toLowerCase();
+          const queryLower = trimmedQuery.toLowerCase();
           const matches = contentLower.includes(queryLower);
           if (!matches && post.content.includes("金磚")) {
             console.log("未匹配但包含金磚的貼文:", post);
@@ -127,7 +126,6 @@ const handleSearch = async () => {
       console.log("搜尋請求被取消");
     } else {
       console.error("搜尋貼文失敗:", err);
-      message.error("搜尋失敗，請稍後再試");
     }
   } finally {
     isSearching.value = false;
@@ -136,14 +134,16 @@ const handleSearch = async () => {
 };
 
 // 添加防抖，300ms 延遲
-const debouncedSearch = debounce(handleSearch, 300);
+const debouncedSearch = debounce(() => {
+  handleSearch();
+}, 300);
 
 // 跳轉到對應頁面
 const goToPage = (id, type) => {
   if (type === "user") {
     router.push({
       name: "Profile",
-      params: { accountname: searchQuery.value },
+      params: { accountname: searchQuery.value.trim() },
     });
   } else if (type === "post") {
     router.push({ name: "Post", params: { id: String(id) } });
