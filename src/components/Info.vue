@@ -628,7 +628,6 @@ const isFormInvalid = computed(() => {
                 <img
                   :src="tempAvatar || info.userAvatar"
                   alt="更新圖片"
-                  type="button"
                   @input="triggerFileInput"
                   class="submit-button"
                 />
