@@ -702,7 +702,7 @@ const handleMessage = async () => {
 
     const state = replyStates.value[replyId] || {};
     const uploadedFileUrl = await uploadFile(replyId);
-    console.log("上傳的 fileUrl:", uploadedFileUrl); // 調試用
+    console.log("上傳的 fileUrl:", uploadedFileUrl);
 
     if (state.file && !uploadedFileUrl) {
       message.error("檔案上傳失敗，請重試！");
@@ -710,8 +710,6 @@ const handleMessage = async () => {
     }
 
     const fileUrlToSend = uploadedFileUrl || state.fileUrl;
-    console.log("提交給後端的 file_url:", fileUrlToSend); // 調試用
-
     const response = await apiClient.put(
       `/replies/${replyId}/${authStore.userId}`,
       {
@@ -720,21 +718,21 @@ const handleMessage = async () => {
       }
     );
 
-    console.log("後端回應:", response.data); // 檢查後端返回的資料
+    console.log("後端回應:", response.data);
 
     if (response.status === 200) {
       const index = replies.value.findIndex((r) => r.id === replyId);
       if (index !== -1) {
+        // 使用後端回應更新前端，確保一致性
         replies.value[index] = {
           ...replies.value[index],
-          content: content.value,
-          file_url: fileUrlToSend, // 使用提交的 URL
+          content: response.data.content || content.value,
+          file_url: response.data.file_url || fileUrlToSend,
         };
-        console.log("更新後的前端 replies:", replies.value[index]); // 調試用
+        console.log("更新後的前端 replies:", replies.value[index]);
       }
       message.success("回覆更新成功！");
       cancelEdit();
-      // 可選：await fetchReplies(postId); // 如果需要同步後端資料
     }
   } catch (error) {
     console.error("更新失敗:", error.response?.data || error.message);
