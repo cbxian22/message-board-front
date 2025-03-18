@@ -328,7 +328,11 @@ watch(
 
 // 觸發檔案輸入
 const triggerFileInput = () => {
-  fileInputRef.value?.click();
+  if (fileInputRef.value) {
+    fileInputRef.value.click();
+  } else {
+    console.error("fileInputRef 未初始化");
+  }
 };
 
 // 處理檔案上傳並顯示預覽
@@ -628,7 +632,7 @@ const isFormInvalid = computed(() => {
                 <img
                   :src="tempAvatar || info.userAvatar"
                   alt="更新圖片"
-                  @input="triggerFileInput"
+                  @click="triggerFileInput"
                   class="submit-button"
                 />
               </div>
