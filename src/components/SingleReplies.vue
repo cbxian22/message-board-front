@@ -544,44 +544,6 @@ const handlelike = async (id) => {
 };
 
 // 提交更新
-// const handleMessage = async () => {
-//   if (!authStore.accessToken) {
-//     message.error("請先登入！");
-//     return;
-//   }
-
-//   loadingBar.start();
-//   try {
-//     const uploadedFileUrl = await uploadFile();
-//     const response = await apiClient.put(
-//       `/replies/${editingReplyId.value}/${authStore.userId}`,
-//       {
-//         content: content.value,
-//         file_url: uploadedFileUrl,
-//       }
-//     );
-//     if (response.status === 200) {
-//       const index = replies.value.findIndex(
-//         (r) => r.id === editingReplyId.value
-//       );
-//       if (index !== -1) {
-//         replies.value[index] = {
-//           ...replies.value[index],
-//           content: content.value,
-//           file_url: uploadedFileUrl,
-//         };
-//       }
-//       message.success("回覆更新成功！");
-//       cancelEdit();
-//       await fetchReplies(postId);
-//     }
-//   } catch (error) {
-//     console.error("更新失敗:", error);
-//     message.error("更新失敗！");
-//   } finally {
-//     loadingBar.finish();
-//   }
-// };
 const handleMessage = async () => {
   if (!authStore.accessToken) {
     message.error("請先登入！");
@@ -590,17 +552,18 @@ const handleMessage = async () => {
 
   loadingBar.start();
   try {
-    const replyId = editingReplyId.value;
-    const uploadedFileUrl = await uploadFile(replyId);
+    const uploadedFileUrl = await uploadFile();
     const response = await apiClient.put(
-      `/replies/${replyId}/${authStore.userId}`,
+      `/replies/${editingReplyId.value}/${authStore.userId}`,
       {
         content: content.value,
         file_url: uploadedFileUrl,
       }
     );
     if (response.status === 200) {
-      const index = replies.value.findIndex((r) => r.id === replyId);
+      const index = replies.value.findIndex(
+        (r) => r.id === editingReplyId.value
+      );
       if (index !== -1) {
         replies.value[index] = {
           ...replies.value[index],
@@ -619,6 +582,43 @@ const handleMessage = async () => {
     loadingBar.finish();
   }
 };
+// const handleMessage = async () => {
+//   if (!authStore.accessToken) {
+//     message.error("請先登入！");
+//     return;
+//   }
+
+//   loadingBar.start();
+//   try {
+//     const replyId = editingReplyId.value;
+//     const uploadedFileUrl = await uploadFile(replyId);
+//     const response = await apiClient.put(
+//       `/replies/${replyId}/${authStore.userId}`,
+//       {
+//         content: content.value,
+//         file_url: uploadedFileUrl,
+//       }
+//     );
+//     if (response.status === 200) {
+//       const index = replies.value.findIndex((r) => r.id === replyId);
+//       if (index !== -1) {
+//         replies.value[index] = {
+//           ...replies.value[index],
+//           content: content.value,
+//           file_url: uploadedFileUrl,
+//         };
+//       }
+//       message.success("回覆更新成功！");
+//       cancelEdit();
+//       await fetchReplies(postId);
+//     }
+//   } catch (error) {
+//     console.error("更新失敗:", error);
+//     message.error("更新失敗！");
+//   } finally {
+//     loadingBar.finish();
+//   }
+// };
 
 // 檢查提交按鈕是否啟用
 // const isSubmitDisabled = computed(() => {
